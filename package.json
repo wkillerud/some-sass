@@ -1,19 +1,18 @@
 {
-	"name": "vscode-scss",
-	"displayName": "SCSS IntelliSense",
+	"name": "untitled-scss-extension",
+	"displayName": "Untitled Sass Extension",
 	"description": "Advanced autocompletion and refactoring support for SCSS",
-	"version": "0.10.0",
-	"preview": true,
-	"publisher": "mrmlnc",
+	"version": "1.0.0",
+	"publisher": "SomewhatStationery",
 	"license": "MIT",
 	"engines": {
 		"vscode": "^1.53.0"
 	},
 	"icon": "icon.png",
-	"homepage": "https://github.com/mrmlnc/vscode-scss/blob/master/README.md",
+	"homepage": "https://github.com/wkillerud/vscode-scss/blob/main/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/mrmlnc/vscode-scss"
+		"url": "https://github.com/wkillerud/vscode-scss"
 	},
 	"keywords": [
 		"scss",
@@ -33,12 +32,12 @@
 	"contributes": {
 		"configuration": {
 			"properties": {
-				"scss.scannerDepth": {
+				"untitledsass.scannerDepth": {
 					"type": "number",
 					"default": 30,
 					"description": "The maximum number of nested directories to scan."
 				},
-				"scss.scannerExclude": {
+				"untitledsass.scannerExclude": {
 					"type": "array",
 					"items": {
 						"type": "string"
@@ -50,12 +49,12 @@
 					],
 					"description": "List of glob patterns for directories that are excluded when scanning."
 				},
-				"scss.scanImportedFiles": {
+				"untitledsass.scanImportedFiles": {
 					"type": "boolean",
 					"default": true,
 					"description": "Allows scan imported files."
 				},
-				"scss.implicitlyLabel": {
+				"untitledsass.implicitlyLabel": {
 					"type": [
 						"string",
 						"null"
@@ -63,32 +62,32 @@
 					"default": "(implicitly)",
 					"description": "The text of a label that the file imported implicitly. If `null` then label not displayed."
 				},
-				"scss.showErrors": {
+				"untitledsass.showErrors": {
 					"type": "boolean",
 					"default": false,
 					"description": "Allows to display errors."
 				},
-				"scss.suggestVariables": {
+				"untitledsass.suggestVariables": {
 					"type": "boolean",
 					"default": true,
 					"description": "Allows prompt Variables."
 				},
-				"scss.suggestMixins": {
+				"untitledsass.suggestMixins": {
 					"type": "boolean",
 					"default": true,
 					"description": "Allows prompt Mixins."
 				},
-				"scss.suggestFunctions": {
+				"untitledsass.suggestFunctions": {
 					"type": "boolean",
 					"default": true,
 					"description": "Allows prompt Functions."
 				},
-				"scss.suggestFunctionsInStringContextAfterSymbols": {
+				"untitledsass.suggestFunctionsInStringContextAfterSymbols": {
 					"type": "string",
 					"default": " (+-*%",
 					"description": "Allows prompt Functions in String context after specified symbols."
 				},
-				"scss.dev.serverPort": {
+				"untitledsass.dev.serverPort": {
 					"type": "number",
 					"description": "The port that SCSS IntelliSense server listens to. Can be used for attaching to the server Node process for debugging / profiling.",
 					"default": -1

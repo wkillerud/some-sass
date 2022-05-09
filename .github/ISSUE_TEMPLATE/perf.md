@@ -10,6 +10,6 @@ about: Report a performance issue
 - Operating System:
 
 <!--
-  Please read: https://github.com/mrmlnc/vscode-scss/blob/master/.github/PERF_ISSUE.md
+  Please read: https://github.com/wkillerud/vscode-scss/blob/main/.github/PERF_ISSUE.md
   And include your profile in the issue.
 -->

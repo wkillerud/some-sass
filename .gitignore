@@ -12,3 +12,7 @@ out/
 *.vsix
 .vscode-test
 .eslintcache
+
+# Configuration
+.vscode
+.eslintcache

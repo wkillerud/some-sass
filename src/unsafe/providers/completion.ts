@@ -157,7 +157,7 @@ async function createVariableCompletionItems(
 				const sassdoc = await applySassDoc(
 					{ document: symbol.filepath, info: variable },
 					"function",
-					{ displayOptions: { description: true }}
+					{ displayOptions: { description: true, deprecated: true, type: true }}
 				);
 				if (sassdoc) {
 					documentation += `\n\n${sassdoc}`;
@@ -270,7 +270,7 @@ async function createFunctionCompletionItems(
 			const sassdoc = await applySassDoc(
 				{ document: symbol.filepath, info: func },
 				"function",
-				{ displayOptions: { description: true }}
+				{ displayOptions: { description: true, deprecated: true, return: true }}
 			);
 			if (sassdoc) {
 				documentation += `\n\n${sassdoc}`;

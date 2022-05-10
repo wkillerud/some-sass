@@ -190,7 +190,7 @@ export async function doSignatureHelp(
 		const sassdoc = await applySassDoc(
 			{ document: path, info: symbol },
 			symbolType === "mixins" ? "mixin" : "function",
-			{ displayOptions: { description: true }} // Follow convention, reduce duplicate parameter information
+			{ displayOptions: { description: true, deprecated: true, return: true }}
 		);
 
 		signatureInfo.documentation = {

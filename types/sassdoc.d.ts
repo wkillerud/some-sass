@@ -65,6 +65,7 @@ declare module 'sassdoc' {
 	  type Parameter = {
 		type: string;
 		name: string;
+		default?: string;
 		description: string;
 	  };
 
@@ -78,8 +79,10 @@ declare module 'sassdoc' {
 	  type Require = {
 		type: string;
 		name: string;
-		autofill: boolean;
-		item: ParseResult;
+		autofill?: boolean;
+		description?: string;
+		url?: string;
+		item?: ParseResult;
 	  };
 
 	  type Since = {

@@ -79,7 +79,7 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 					}
 
 					if (displayOptions.return && doc.return) {
-						description += `\n\n@return {\`${doc.return.type}\`}`;
+						description += `\n\n@return {\`${doc.return.type}\`}${doc.return.description ? ` - ${doc.return.description}` : ''}`;
 					}
 
 					if (displayOptions.see && doc.see) {

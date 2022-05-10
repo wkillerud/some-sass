@@ -112,6 +112,7 @@ declare module 'sassdoc' {
 		  | undefined
 		  | {
 			  type: string;
+			  description?: string;
 			};
 		group: string[];
 		require: Array<Require>;

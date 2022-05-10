@@ -7,23 +7,33 @@ interface ISymbol {
 
 interface ISassDocOptions {
 	displayOptions?: {
-		asDocString?: boolean;
-		description?: boolean;
-		author?: boolean;
 		access?: boolean;
+		author?: boolean;
+		content?: boolean;
+		deprecated?: boolean;
+		description?: boolean;
+		example?: boolean;
+		output?: boolean;
 		parameters?: boolean;
 		return?: boolean;
+		see?: boolean;
+		type?: boolean;
 	};
 }
 
 const defaultOptions = {
 	displayOptions: {
-		description: true,
-		author: true,
 		access: false,
+		author: true,
+		content: true,
+		deprecated: true,
+		example: true,
+		description: true,
+		output: true,
 		parameters: true,
 		return: true,
 		see: true,
+		type: true,
 	},
 };
 
@@ -38,18 +48,20 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 				if (doc.description && doc.context.type === identifierType && doc.context.name === name) {
 					let description = '';
 
-					if (displayOptions.description) {
+					if (displayOptions.description && doc.description) {
 						description += doc.description.trimStart();
 					}
 
-					if (displayOptions.author && doc.author) {
-						for (let author of doc.author) {
-							description += `\n\n@author ${author}`;
-						}
+					if (displayOptions.deprecated && doc.deprecated) {
+						description += `\n\n@deprecated \`${doc.deprecated}\``;
 					}
 
 					if (displayOptions.access) {
 						description += `\n\n@access \`${doc.access}\``;
+					}
+
+					if (displayOptions.type && doc.type) {
+						description += `\n\n@type {\`${doc.type}\`}`;
 					}
 
 					if (displayOptions.parameters && doc.parameter) {
@@ -58,8 +70,26 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 						}
 					}
 
+					if (displayOptions.content && doc.content) {
+						description += `\n\n@content {\`${doc.content}\`}`;
+					}
+
+					if (displayOptions.output && doc.output) {
+						description += `\n\n@output {\`${doc.output}\`}`;
+					}
+
 					if (displayOptions.return && doc.return) {
 						description += `\n\n@return {\`${doc.return.type}\`}`;
+					}
+
+					if (displayOptions.see && doc.see) {
+						description += `\n\n@see {\`${doc.see}\`}`;
+					}
+
+					if (displayOptions.author && doc.author) {
+						for (let author of doc.author) {
+							description += `\n\n@author ${author}`;
+						}
 					}
 
 					return description;

@@ -1,2 +1,2 @@
-export const EXTENSION_ID = 'scss-intellisense';
-export const EXTENSION_NAME = 'SCSS IntelliSense';
+export const EXTENSION_ID = 'some-sass';
+export const EXTENSION_NAME = 'Some Sass';

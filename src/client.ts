@@ -79,7 +79,7 @@ function buildClient(workspace: URI): LanguageClient {
 }
 
 function buildServerOptions(workspace: URI): ServerOptions {
-	const extensionServerPort = vscode.workspace.getConfiguration('scss.dev', workspace).get<number>('serverPort', EXTENSION_DEFAULT_DEBUG_PORT);
+	const extensionServerPort = vscode.workspace.getConfiguration('somesass.dev', workspace).get<number>('serverPort', EXTENSION_DEFAULT_DEBUG_PORT);
 
 	const configuration: NodeModule = {
 		module: EXTENSION_SERVER_MODULE_PATH,
@@ -116,7 +116,7 @@ function buildClientOptions(workspace: URI): LanguageClientOptions {
 			{ scheme: 'file', language: 'svelte', pattern }
 		],
 		synchronize: {
-			configurationSection: ['scss'],
+			configurationSection: ['somesass'],
 			fileEvents: vscode.workspace.createFileSystemWatcher({
 				base: workspace.fsPath,
 				pattern: '**/*.scss'
@@ -124,7 +124,7 @@ function buildClientOptions(workspace: URI): LanguageClientOptions {
 		},
 		initializationOptions: {
 			workspace: workspace.fsPath,
-			settings: vscode.workspace.getConfiguration('scss', workspace)
+			settings: vscode.workspace.getConfiguration('somesass', workspace)
 		},
 		// Don't open the output console (very annoying) in case of error
 		revealOutputChannelOn: RevealOutputChannelOn.Never

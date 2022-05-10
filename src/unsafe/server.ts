@@ -92,7 +92,7 @@ connection.onInitialize(
 );
 
 connection.onDidChangeConfiguration(params => {
-	settings = params.settings.scss;
+	settings = params.settings.somesass;
 });
 
 connection.onDidChangeWatchedFiles(event => {

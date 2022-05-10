@@ -1,7 +1,7 @@
 {
-	"name": "untitled-scss-extension",
-	"displayName": "Untitled Sass Extension",
-	"description": "Advanced autocompletion and refactoring support for SCSS",
+	"name": "some-sass",
+	"displayName": "Some Sass",
+	"description": "Autocompletion, refactoring, and documentation support for SCSS",
 	"version": "1.0.0",
 	"publisher": "SomewhatStationery",
 	"license": "MIT",
@@ -32,12 +32,12 @@
 	"contributes": {
 		"configuration": {
 			"properties": {
-				"untitledsass.scannerDepth": {
+				"somesass.scannerDepth": {
 					"type": "number",
 					"default": 30,
 					"description": "The maximum number of nested directories to scan."
 				},
-				"untitledsass.scannerExclude": {
+				"somesass.scannerExclude": {
 					"type": "array",
 					"items": {
 						"type": "string"
@@ -49,12 +49,12 @@
 					],
 					"description": "List of glob patterns for directories that are excluded when scanning."
 				},
-				"untitledsass.scanImportedFiles": {
+				"somesass.scanImportedFiles": {
 					"type": "boolean",
 					"default": true,
 					"description": "Allows scan imported files."
 				},
-				"untitledsass.implicitlyLabel": {
+				"somesass.implicitlyLabel": {
 					"type": [
 						"string",
 						"null"
@@ -62,32 +62,32 @@
 					"default": "(implicitly)",
 					"description": "The text of a label that the file imported implicitly. If `null` then label not displayed."
 				},
-				"untitledsass.showErrors": {
+				"somesass.showErrors": {
 					"type": "boolean",
 					"default": false,
 					"description": "Allows to display errors."
 				},
-				"untitledsass.suggestVariables": {
+				"somesass.suggestVariables": {
 					"type": "boolean",
 					"default": true,
 					"description": "Allows prompt Variables."
 				},
-				"untitledsass.suggestMixins": {
+				"somesass.suggestMixins": {
 					"type": "boolean",
 					"default": true,
 					"description": "Allows prompt Mixins."
 				},
-				"untitledsass.suggestFunctions": {
+				"somesass.suggestFunctions": {
 					"type": "boolean",
 					"default": true,
 					"description": "Allows prompt Functions."
 				},
-				"untitledsass.suggestFunctionsInStringContextAfterSymbols": {
+				"somesass.suggestFunctionsInStringContextAfterSymbols": {
 					"type": "string",
 					"default": " (+-*%",
 					"description": "Allows prompt Functions in String context after specified symbols."
 				},
-				"untitledsass.dev.serverPort": {
+				"somesass.dev.serverPort": {
 					"type": "number",
 					"description": "The port that SCSS IntelliSense server listens to. Can be used for attaching to the server Node process for debugging / profiling.",
 					"default": -1

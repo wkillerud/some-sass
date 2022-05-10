@@ -1,16 +1,18 @@
-# Untitled Sass Extension
+# Some Sass for Visual Studio Code
 
-Provides intellisense for SCSS with rich documentation through [SassDoc](http://sassdoc.com). Supports standalone SCSS, as well as style blocks inside Vue and Svelte components.
+Some Sass provides autocompletion and refactoring for SCSS, with rich documentation through [SassDoc](http://sassdoc.com). Supports standalone SCSS, as well as style blocks inside Vue and Svelte components.
 
 Based on SCSS Intellisense by [Denis Malinochkin and contributors](https://github.com/mrmlnc/vscode-scss). Uses the built-in VS Code language server for SCSS.
 
 ## Setup
 
-Search for Untitled Sass Extension from the extension installer within VS Code or put this into the command palette.
+Search for Some Sass from the extension installer within VS Code or put this into the command palette.
 
 ```
-ext install untitled-sass-extension
+ext install some-sass
 ```
+
+If you have SCSS IntelliSense (`mrmlnc.vscode-scss`) installed you should disable or uninstall it. Otherwise the two extensions will both provide hover information and code suggestions.
 
 ## Usage
 
@@ -54,7 +56,7 @@ In the `Go` menu, choose either `Go to Symbol in Workspace` (`Cmd + Shift + R`) 
 | suggestFunctionsInStringContextAfterSymbols | ` (+-*%` | `string` | Suggest functions after the specified symbols when in a string context. For example, if you add the `/` symbol to this setting, then `background: url(images/he|)` could suggest a `hello()` function. |
 | dev.serverPort | `-1` | `number` | Launches the SCSS IntelliSense server at a specific port for debugging and profiling. Used for [filing performance issues](./.github/PERF_ISSUE.md). |
 
-In JSON, all settings should be prefixed with `untitledsass.`, for instance `untitledsass.maxDepth`.
+In JSON, all settings should be prefixed with `somesass.`, for instance `somesass.maxDepth`.
 
 ## What this extension does _not_ do
 

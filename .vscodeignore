@@ -1,5 +1,5 @@
 # Logs
-logs/**
+logs/
 *.log
 npm-debug.log*
 
@@ -7,8 +7,8 @@ npm-debug.log*
 .eslintcache
 
 # Configuration
-.github/**
-.vscode/**
+.github/
+.vscode/
 .editorconfig
 .eslintrc.json
 .gitattributes
@@ -17,10 +17,10 @@ npm-debug.log*
 tsconfig.json
 
 # Source and test files
-.vscode-test/**
-fixtures/**
-src/**
-types/**
+.vscode-test/
+fixtures/
+src/
+types/
 
 # Build artifacts
 out/**/*.spec.*

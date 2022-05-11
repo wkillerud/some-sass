@@ -1,6 +1,6 @@
 'use strict';
 
-import * as assert from 'assert';
+import assert from 'assert';
 
 import { CompletionItemKind, CompletionList } from 'vscode-languageserver';
 

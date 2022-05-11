@@ -1,8 +1,8 @@
 'use strict';
 
-import * as fs from 'fs';
+import fs from 'fs';
 
-import * as fg from 'fast-glob';
+import fg from 'fast-glob';
 
 export function findFiles(pattern: string, options: fg.Options): Promise<string[]> {
 	return fg(pattern, {

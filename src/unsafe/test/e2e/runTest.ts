@@ -1,5 +1,5 @@
-import * as path from 'path';
-import * as cp from 'child_process';
+import path from 'path';
+import cp from 'child_process';
 
 import { runTests, downloadAndUnzipVSCode, resolveCliArgsFromVSCodeExecutablePath } from '@vscode/test-electron';
 

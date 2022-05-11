@@ -1,4 +1,4 @@
-import * as sassdoc from 'sassdoc';
+import sassdoc from 'sassdoc';
 
 interface ISymbol {
 	document?: string;
@@ -54,7 +54,7 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 			const name = symbol.info.name.replace("$", "");
 			const displayOptions = options?.displayOptions || defaultOptions.displayOptions;
 
-			for (let doc of sassdocs) {
+			for (const doc of sassdocs) {
 				if (doc.description && doc.context.type === identifierType && doc.context.name === name) {
 					// Loosely mimic the layout of JSDoc and the order of the default SassDoc template
 
@@ -71,7 +71,7 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 
 					// Function and mixin parameters, listed one per line like JSDoc
 					if (displayOptions.parameter && doc.parameter) {
-						for (let parameter of doc.parameter) {
+						for (const parameter of doc.parameter) {
 							description += "\n\n@param"
 
 							if (parameter.type) {
@@ -98,7 +98,7 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 
 					// Documents the properties of a map
 					if (displayOptions.property && doc.property) {
-						for (let prop of doc.property) {
+						for (const prop of doc.property) {
 							description += "\n\n@prop"
 
 							if (prop.type) {
@@ -133,13 +133,13 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 					}
 
 					if (displayOptions.throw && doc.throw) {
-						for (let thrown of doc.throw) {
+						for (const thrown of doc.throw) {
 							description += `\n\n@throw ${thrown}`;
 						}
 					}
 
 					if (displayOptions.require && doc.require.length) {
-						for (let requirement of doc.require) {
+						for (const requirement of doc.require) {
 							description += "\n\n@require"
 
 							if (requirement.type) {
@@ -160,20 +160,20 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 
 					if (displayOptions.alias && doc.alias) {
 						const aliases = typeof doc.alias === "string" ? [doc.alias] : doc.alias;
-						for (let alias of aliases) {
+						for (const alias of aliases) {
 							description += `\n\n@alias {\`${alias}\`}`;
 						}
 					}
 
 					// Hint to related variables, functions, or mixins
 					if (displayOptions.see && doc.see) {
-						for (let see of doc.see) {
+						for (const see of doc.see) {
 							description += `\n\n@see {\`${see}\`}`;
 						}
 					}
 
 					if (displayOptions.since && doc.since) {
-						for (let since of doc.since) {
+						for (const since of doc.since) {
 							description += `\n\n@since ${since.version}`;
 							if (since.description) {
 								description += ` - ${since.description}`;
@@ -183,13 +183,13 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 
 					// Show credit to authors
 					if (displayOptions.author && doc.author) {
-						for (let author of doc.author) {
+						for (const author of doc.author) {
 							description += `\n\n@author ${author}`;
 						}
 					}
 
 					if (displayOptions.link && doc.link) {
-						for (let link of doc.link) {
+						for (const link of doc.link) {
 							if (link.caption) {
 								description += `\n\n[${link.caption}](${link.url})`;
 							} else {
@@ -199,7 +199,7 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 					}
 
 					if (displayOptions.example && doc.example) {
-						for (let example of doc.example) {
+						for (const example of doc.example) {
 							description += "\n\n@example";
 							if (example.description) {
 								description += ` ${example.description}`

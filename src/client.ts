@@ -1,6 +1,6 @@
-import * as path from 'path';
+import path from 'path';
 
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import type { URI } from 'vscode-uri';
 import type { LanguageClientOptions, NodeModule, ServerOptions } from 'vscode-languageclient/node';
 import { LanguageClient, TransportKind, RevealOutputChannelOn } from 'vscode-languageclient/node';

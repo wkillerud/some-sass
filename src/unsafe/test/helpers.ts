@@ -1,4 +1,4 @@
-import * as path from 'path';
+import path from 'path';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { getSCSSLanguageService, MarkupContent, MarkupKind, Position, Range } from 'vscode-css-languageservice';

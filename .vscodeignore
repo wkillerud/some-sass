@@ -15,14 +15,19 @@ npm-debug.log*
 .gitignore
 .npmrc
 tsconfig.json
+webpack.config.js
+
+# Dependencies
+node_modules/
 
 # Source and test files
 .vscode-test/
 fixtures/
 src/
 types/
+patches/
+CHANGELOG.md
 
 # Build artifacts
-out/**/*.spec.*
-out/**/*.ts
+out/
 *.vsix

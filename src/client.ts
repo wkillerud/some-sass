@@ -1,14 +1,13 @@
-import * as path from 'path';
+import path from 'path';
 
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import type { URI } from 'vscode-uri';
-import type { LanguageClientOptions, NodeModule, ServerOptions } from 'vscode-languageclient/node';
+import type { LanguageClientOptions, ServerOptions } from 'vscode-languageclient/node';
 import { LanguageClient, TransportKind, RevealOutputChannelOn } from 'vscode-languageclient/node';
 
 import { EXTENSION_ID, EXTENSION_NAME } from './constants';
 
 const EXTENSION_SERVER_MODULE_PATH = path.join(__dirname, './unsafe/server.js');
-const EXTENSION_DEFAULT_DEBUG_PORT = -1;
 
 const clients: Map<string, LanguageClient> = new Map<string, LanguageClient>();
 
@@ -75,26 +74,18 @@ async function initializeClient(workspace: vscode.WorkspaceFolder): Promise<Lang
 }
 
 function buildClient(workspace: URI): LanguageClient {
-	return new LanguageClient(EXTENSION_ID, EXTENSION_NAME, buildServerOptions(workspace), buildClientOptions(workspace));
+	return new LanguageClient(EXTENSION_ID, EXTENSION_NAME, buildServerOptions(), buildClientOptions(workspace));
 }
 
-function buildServerOptions(workspace: URI): ServerOptions {
-	const extensionServerPort = vscode.workspace.getConfiguration('scss.dev', workspace).get<number>('serverPort', EXTENSION_DEFAULT_DEBUG_PORT);
-
-	const configuration: NodeModule = {
-		module: EXTENSION_SERVER_MODULE_PATH,
-		transport: TransportKind.ipc,
-		options: {
-			execArgv: extensionServerPort === EXTENSION_DEFAULT_DEBUG_PORT ? [] : [`--inspect=${extensionServerPort}`]
-		}
-	};
-
+function buildServerOptions(): ServerOptions {
 	return {
 		run: {
-			...configuration
+			module: EXTENSION_SERVER_MODULE_PATH,
+			transport: TransportKind.ipc
 		},
 		debug: {
-			...configuration,
+			module: EXTENSION_SERVER_MODULE_PATH,
+			transport: TransportKind.ipc,
 			options: {
 				execArgv: ['--nolazy', '--inspect=6006']
 			}
@@ -116,7 +107,7 @@ function buildClientOptions(workspace: URI): LanguageClientOptions {
 			{ scheme: 'file', language: 'svelte', pattern }
 		],
 		synchronize: {
-			configurationSection: ['scss'],
+			configurationSection: ['somesass'],
 			fileEvents: vscode.workspace.createFileSystemWatcher({
 				base: workspace.fsPath,
 				pattern: '**/*.scss'
@@ -124,8 +115,10 @@ function buildClientOptions(workspace: URI): LanguageClientOptions {
 		},
 		initializationOptions: {
 			workspace: workspace.fsPath,
-			settings: vscode.workspace.getConfiguration('scss', workspace)
+			settings: vscode.workspace.getConfiguration('somesass', workspace)
 		},
+		diagnosticCollectionName: EXTENSION_ID,
+		outputChannel: vscode.window.createOutputChannel(EXTENSION_ID),
 		// Don't open the output console (very annoying) in case of error
 		revealOutputChannelOn: RevealOutputChannelOn.Never
 	};

@@ -1,6 +1,6 @@
-import * as assert from 'assert';
+import assert from 'assert';
 
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 
 import { showFile } from '../util';
 

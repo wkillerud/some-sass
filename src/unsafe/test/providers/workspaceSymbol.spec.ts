@@ -1,6 +1,6 @@
 'use strict';
 
-import * as assert from 'assert';
+import assert from 'assert';
 
 import StorageService from '../../services/storage';
 import { searchWorkspaceSymbol } from '../../providers/workspaceSymbol';

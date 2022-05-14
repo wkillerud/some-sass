@@ -1,48 +1,32 @@
+// A launch configuration that compiles the extension and then opens it inside a new window
 {
 	"version": "0.2.0",
-	"compounds": [
-		{
-			"name": "all",
-			"configurations": ["Launch Extension", "Attach Server"]
-		}
-	],
 	"configurations": [
-		{
-			"name": "Launch Extension",
-			"type": "extensionHost",
-			"request": "launch",
-			"runtimeExecutable": "${execPath}",
-			"args": ["--extensionDevelopmentPath=${workspaceRoot}"],
-			"stopOnEntry": false,
-			"outFiles": ["${workspaceRoot}/out"]
-		},
-		{
-			"name": "Attach Server",
-			"type": "node",
-			"request": "attach",
-			"port": 6006,
-			"sourceMaps": true,
-			"outFiles": ["${workspaceFolder}/out"],
-			"protocol": "inspector",
-			"restart": true,
-			"smartStep": true,
-			"skipFiles": ["<node_internals>/**"]
-		},
-		{
-			"name": "E2E Test",
-			"type": "extensionHost",
-			"request": "launch",
-			"runtimeExecutable": "${execPath}",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceRoot}",
-				"--extensionTestsPath=${workspaceFolder}/out/test/e2e/suite",
-				"${workspaceFolder}/fixtures/e2e"
-			],
-			"stopOnEntry": false,
-			"sourceMaps": true,
-			"outFiles": ["${workspaceRoot}/out"],
-			"smartStep": true,
-			"skipFiles": ["<node_internals>/**"]
+	  {
+		"type": "extensionHost",
+		"request": "launch",
+		"name": "Launch Client",
+		"runtimeExecutable": "${execPath}",
+		"args": ["--extensionDevelopmentPath=${workspaceRoot}"],
+		"outFiles": ["${workspaceRoot}/dist/**/*.js"],
+		"preLaunchTask": {
+		  "type": "npm",
+		  "script": "watch"
 		}
+	  },
+	  {
+		"type": "node",
+		"request": "attach",
+		"name": "Attach to Server",
+		"port": 6006,
+		"restart": true,
+		"outFiles": ["${workspaceRoot}/dist/unsafe/**/*.js"]
+	  }
+	],
+	"compounds": [
+	  {
+		"name": "Client + Server",
+		"configurations": ["Launch Client", "Attach to Server"]
+	  }
 	]
-}
+  }

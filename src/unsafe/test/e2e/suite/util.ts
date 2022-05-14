@@ -1,6 +1,6 @@
-import * as path from 'path';
+import path from 'path';
 
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 
 /**
  * Line and Char as shown in lowerright of VS Code

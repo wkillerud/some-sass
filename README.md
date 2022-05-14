@@ -1,124 +1,75 @@
-# vscode-scss
+# Some Sass for Visual Studio Code
 
-> SCSS IntelliSense (Variables, Mixins and Functions) for all files in the workspace.
+Some Sass provides autocompletion and refactoring for SCSS, with rich documentation through [SassDoc](http://sassdoc.com). Supports standalone SCSS, as well as style blocks inside Vue and Svelte components.
 
-## Donation
+Based on SCSS Intellisense by [Denis Malinochkin and contributors](https://github.com/mrmlnc/vscode-scss). Uses the built-in VS Code language server for SCSS.
 
-Do you like this project? Support it by donating, creating an issue or pull request.
+## Setup
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/mrmlnc)
+Search for Some Sass from the extension installer within VS Code or put this into the command palette.
 
-## Install
+```
+ext install some-sass
+```
 
-Plugin installation is performed in several stages:
-
-* Press <kbd>F1</kbd> and select `Extensions: Install Extensions`.
-* Search and choose `vscode-scss`.
-
-See the [extension installation guide](https://code.visualstudio.com/docs/editor/extension-gallery) for details.
+If you have SCSS IntelliSense (`mrmlnc.vscode-scss`) installed you should disable or uninstall it. Otherwise the two extensions will both provide hover information and code suggestions.
 
 ## Usage
 
-Just install the plugin and use it.
+### Information on hover
 
-## Supported features
+Hover over any of your own variables, mixins or functions to see more details about them. If they are documented with SassDoc, that documentation will be shown as well.
 
-* Code Completion Proposals (variables, mixins, functions) — [description](http://code.visualstudio.com/docs/extensions/language-support#_show-code-completion-proposals)
-* Hover (variables, mixins, functions) — [description](http://code.visualstudio.com/docs/extensions/language-support#_show-hovers)
-* Signature Help (mixins, functions) — [description](http://code.visualstudio.com/docs/extensions/language-support#_help-with-function-and-method-signatures)
-* Go to (variables, mixins, functions) — [description](http://code.visualstudio.com/docs/extensions/language-support#_show-definitions-of-a-symbol)
-* Show all All Symbol Definitions in Folder (variables, mixin, functions) — [description](http://code.visualstudio.com/docs/extensions/language-support#_show-all-all-symbol-definitions-in-folder)
-* Import files by `@import "filepath";` from anywhere. Even outside of the open workspace.
-* Support vue file scss block.
+### Signature help for mixins and functions
 
-## Supported settings
+When you are about to use a mixin or function, the extension will help you with signature information as you type.
 
-#### scss.scannerDepth
+### Go to definition
 
-* Type: `number`
-* Default: `30`
+To use this feature, either:
 
-The maximum number of nested directories to scan.
+- Hold down `Cmd` and click a variable, mixin or function
+- Right-click a variable, mixin or function and choose `Go to Definition`
+- Press `F12` when the cursor is at a variable, mixin or function
 
-#### scss.scannerExclude
+### Code suggestions
 
-* Type: `string[]`
-* Default: `["**/.git", "**/node_modules", "**/bower_components"]`
+The extension will suggest variables, mixins and functions as you type.
 
-List of glob patterns for directories that are excluded when scanning.
+### Show all symbols
 
-#### scss.scanImportedFiles
+In the `Go` menu, choose either `Go to Symbol in Workspace` (`Cmd + Shift + R`) or `Go to Symbol in Editor` (`Cmd + R`) to use this feature.
 
-* Type: `boolean`
-* Default: `true`
+## Settings
 
-Allows scan imported files.
 
-#### scss.implicitlyLabel
+| Name | Default | Type | Description |
+|------|---------|------|-------------|
+| scannerDepth | 30 | `number` | The maximum number of nested directories to scan. |
+| scannerExclude | `["**/.git", "**/node_modules", "**/bower_components"]` | `string[]` | List of [glob](https://github.com/mrmlnc/fast-glob) patterns for directories that are excluded when scanning. |
+| scanImportedFiles | `true` | `boolean` | Allows scan imported files. |
+| implicitlyLabel | `(implicitly)` | `string\|null` | The text of a label that the file imported implicitly. If `null` then label not displayed. |
+| showErrors | `false` | `boolean` | Allows to display parsing errors from the internal scanner. |
+| suggestVariables | `true` | `boolean` | Include variables in suggestions. |
+| suggestMixins | `true` | `boolean` | Include mixins in suggestions. |
+| suggestFunctions | `true` | `boolean` | Include functions in suggestions. |
+| suggestFunctionsInStringContextAfterSymbols | ` (+-*%` | `string` | Suggest functions after the specified symbols when in a string context. For example, if you add the `/` symbol to this setting, then `background: url(images/he|)` could suggest a `hello()` function. |
 
-* Type: `string|null`
-* Default: `(implicitly)`
+In JSON, all settings should be prefixed with `somesass.`, for instance `somesass.maxDepth`.
 
-The text of a label that the file imported implicitly. If `null` then label not displayed.
+## What this extension does _not_ do
 
-#### scss.showErrors
-
-* Type: `boolean`
-* Default: `false`
-
-Allows to display errors.
-
-#### scss.suggestVariables
-
-* Type: `boolean`
-* Default: `true`
-
-Allows prompt Variables.
-
-#### scss.suggestMixins
-
-* Type: `boolean`
-* Default: `true`
-
-Allows prompt Mixins.
-
-#### scss.suggestFunctions
-
-* Type: `boolean`
-* Default: `true`
-
-Allows prompt Functions.
-
-#### scss.suggestFunctionsInStringContextAfterSymbols
-
-* Type: `boolean`
-* Default: ` (+-*%`
-
-Allows prompt Functions in String context after specified symbols. For example, if you add the `/` symbol, then `background: url(images/he|)` will be suggest `hello()` function if it is defined.
-
-#### scss.dev.serverPort
-
-* Type: `number`
-* Default: `-1`
-
-Launches the SCSS IntelliSense server at a specific port for debugging and profiling. Used for [filing performance issue](./.github/PERF_ISSUE.md).
-
-## Questions
-
-**I don't see suggestions in the SCSS files.**
-
-You must perform several steps:
-
-* Set `scss.showErrors` option in settings of Editor.
-* Restart VS Code.
-* Try to reproduce your problem.
-* Open `Help -> Toggle Developer Tools` and copy errors.
-* Create Issue on GitHub.
+- Formating. Consider using [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) if you want automatic formating.
+- Linting. Consider using [Stylelint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint) if you want a linter that supports SCSS.
+- Compiling. If you want VS Code to compile SCSS for you, consider [Live Sass Compiler](https://marketplace.visualstudio.com/items?itemName=glenn2223.live-sass).
+- Support Sass Indented. See the [Sass](https://marketplace.visualstudio.com/items?itemName=Syler.sass-indented) extension if you use indented syntax.
 
 ## Changelog
 
-See the [Releases section of our GitHub project](https://github.com/mrmlnc/vscode-scss/releases) for changelogs for each release version.
+Visit the [release section on GitHub](https://github.com/wkillerud/vscode-scss/releases) to see what has changed.
 
 ## License
 
 This software is released under the terms of the MIT license.
+
+The logo is [owned by the Sass](https://sass-lang.com/styleguide/brand) project and licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.

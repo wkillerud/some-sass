@@ -1,7 +1,7 @@
-import * as path from 'path';
+import path from 'path';
 
-import * as Mocha from 'mocha';
-import * as fg from 'fast-glob';
+import Mocha from 'mocha';
+import fg from 'fast-glob';
 
 const ONE_SECOND_IN_MS = 1 * 1000;
 

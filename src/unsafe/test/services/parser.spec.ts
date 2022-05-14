@@ -1,9 +1,9 @@
 'use strict';
 
-import * as assert from 'assert';
-import * as fs from 'fs';
+import assert from 'assert';
+import fs from 'fs';
 
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import { Stats } from '@nodelib/fs.macchiato';
 import type { DocumentLink } from 'vscode-languageclient';
 

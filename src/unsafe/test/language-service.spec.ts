@@ -1,6 +1,6 @@
-import * as assert from 'assert';
+import assert from 'assert';
 
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import { Position } from 'vscode-languageserver';
 
 import * as ls from '../language-service';

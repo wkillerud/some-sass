@@ -1,14 +1,33 @@
-.vscode/**
-.github/**
-.ci/**
-typings/**
-fixtures/**
-src/**
-out/**/*.spec.*
-.editorconfig
-.gitignore
-.mergify.yml
-tsconfig.json
-.eslintrc.json
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Cache
 .eslintcache
+
+# Configuration
+.github/
+.vscode/
+.editorconfig
+.eslintrc.json
+.gitattributes
+.gitignore
+.npmrc
+tsconfig.json
+webpack.config.js
+
+# Dependencies
+node_modules/
+
+# Source and test files
+.vscode-test/
+fixtures/
+src/
+types/
+patches/
+CHANGELOG.md
+
+# Build artifacts
+out/
 *.vsix

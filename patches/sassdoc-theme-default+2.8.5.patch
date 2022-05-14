@@ -1,0 +1,13 @@
+diff --git a/node_modules/sassdoc-theme-default/dist/index.js b/node_modules/sassdoc-theme-default/dist/index.js
+index 2e26cfb..1c72d77 100644
+--- a/node_modules/sassdoc-theme-default/dist/index.js
++++ b/node_modules/sassdoc-theme-default/dist/index.js
+@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
+   value: true
+ });
+ 
+-var _default = require('../default');
++var _default = require('../default.json');
+ 
+ var _default2 = _interopRequireDefault(_default);
+ 

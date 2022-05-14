@@ -1,6 +1,6 @@
 'use strict';
 
-import * as path from 'path';
+import path from 'path';
 
 import type { DocumentContext } from 'vscode-css-languageservice';
 

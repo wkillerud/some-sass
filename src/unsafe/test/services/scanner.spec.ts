@@ -1,10 +1,10 @@
 'use strict';
 
-import * as assert from 'assert';
-import * as path from 'path';
-import * as fs from 'fs';
+import assert from 'assert';
+import path from 'path';
+import fs from 'fs';
 
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import { Stats } from '@nodelib/fs.macchiato';
 
 import StorageService from '../../services/storage';

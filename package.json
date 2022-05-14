@@ -1,22 +1,22 @@
 {
-	"name": "vscode-scss",
-	"displayName": "SCSS IntelliSense",
-	"description": "Advanced autocompletion and refactoring support for SCSS",
-	"version": "0.10.0",
-	"preview": true,
-	"publisher": "mrmlnc",
+	"name": "some-sass",
+	"displayName": "Some Sass",
+	"description": "Autocompletion, refactoring, and documentation support for SCSS",
+	"version": "1.0.0",
+	"publisher": "SomewhatStationery",
 	"license": "MIT",
 	"engines": {
 		"vscode": "^1.53.0"
 	},
 	"icon": "icon.png",
-	"homepage": "https://github.com/mrmlnc/vscode-scss/blob/master/README.md",
+	"homepage": "https://github.com/wkillerud/vscode-scss/blob/main/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/mrmlnc/vscode-scss"
+		"url": "https://github.com/wkillerud/vscode-scss"
 	},
 	"keywords": [
 		"scss",
+		"sassdoc",
 		"autocompletion",
 		"intellisense",
 		"refactor"
@@ -29,16 +29,16 @@
 		"onLanguage:vue",
 		"onLanguage:svelte"
 	],
-	"main": "./out/client.js",
+	"main": "./dist/client.js",
 	"contributes": {
 		"configuration": {
 			"properties": {
-				"scss.scannerDepth": {
+				"somesass.scannerDepth": {
 					"type": "number",
 					"default": 30,
 					"description": "The maximum number of nested directories to scan."
 				},
-				"scss.scannerExclude": {
+				"somesass.scannerExclude": {
 					"type": "array",
 					"items": {
 						"type": "string"
@@ -50,12 +50,12 @@
 					],
 					"description": "List of glob patterns for directories that are excluded when scanning."
 				},
-				"scss.scanImportedFiles": {
+				"somesass.scanImportedFiles": {
 					"type": "boolean",
 					"default": true,
 					"description": "Allows scan imported files."
 				},
-				"scss.implicitlyLabel": {
+				"somesass.implicitlyLabel": {
 					"type": [
 						"string",
 						"null"
@@ -63,35 +63,30 @@
 					"default": "(implicitly)",
 					"description": "The text of a label that the file imported implicitly. If `null` then label not displayed."
 				},
-				"scss.showErrors": {
+				"somesass.showErrors": {
 					"type": "boolean",
 					"default": false,
 					"description": "Allows to display errors."
 				},
-				"scss.suggestVariables": {
+				"somesass.suggestVariables": {
 					"type": "boolean",
 					"default": true,
 					"description": "Allows prompt Variables."
 				},
-				"scss.suggestMixins": {
+				"somesass.suggestMixins": {
 					"type": "boolean",
 					"default": true,
 					"description": "Allows prompt Mixins."
 				},
-				"scss.suggestFunctions": {
+				"somesass.suggestFunctions": {
 					"type": "boolean",
 					"default": true,
 					"description": "Allows prompt Functions."
 				},
-				"scss.suggestFunctionsInStringContextAfterSymbols": {
+				"somesass.suggestFunctionsInStringContextAfterSymbols": {
 					"type": "string",
 					"default": " (+-*%",
 					"description": "Allows prompt Functions in String context after specified symbols."
-				},
-				"scss.dev.serverPort": {
-					"type": "number",
-					"description": "The port that SCSS IntelliSense server listens to. Can be used for attaching to the server Node process for debugging / profiling.",
-					"default": -1
 				}
 			}
 		}
@@ -109,15 +104,20 @@
 		"eslint-config-mrmlnc": "2.0.0",
 		"glob": "8.0.1",
 		"mocha": "8.4.0",
+		"patch-package": "6.4.7",
 		"rimraf": "3.0.2",
 		"sinon": "10.0.0",
-		"typescript": "4.2.4"
+		"ts-loader": "9.3.0",
+		"typescript": "4.2.4",
+		"webpack": "5.72.1",
+		"webpack-cli": "4.9.2"
 	},
 	"dependencies": {
 		"color": "3.1.3",
 		"color-name": "1.1.4",
 		"fast-glob": "3.2.5",
 		"sassdoc": "2.7.3",
+		"scss-sassdoc-parser": "1.0.0",
 		"scss-symbols-parser": "2.0.1",
 		"vscode-css-languageservice": "5.1.1",
 		"vscode-languageclient": "7.0.0",
@@ -127,12 +127,17 @@
 		"vscode-uri": "3.0.2"
 	},
 	"scripts": {
-		"clean": "rimraf out",
+		"vscode:prepublish": "npm run package",
+		"webpack": "webpack --mode development",
+		"webpack-dev": "webpack --mode development --watch",
+		"package": "webpack --mode production --devtool hidden-source-map",
 		"lint": "eslint \"src/**/*.ts\" --cache",
-		"compile": "tsc",
-		"test": "mocha \"out/**/*.spec.js\"",
+		"test": "npm run test:clean && npm run test:compile && npm run test:unit",
+		"test:clean": "rimraf out",
+		"test:compile": "tsc -p ./",
+		"test:unit": "mocha \"out/**/*.spec.js\"",
 		"test:e2e": "node ./out/unsafe/test/e2e/runTest.js",
-		"build": "npm run clean && npm run lint && npm run compile && npm test",
-		"watch": "npm run clean && npm run lint && tsc --watch"
+		"patch": "patch-package",
+		"postinstall": "npm run patch"
 	}
 }

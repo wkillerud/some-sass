@@ -1,8 +1,10 @@
 {
 	"compilerOptions": {
-		"target": "es2017",
+		"target": "es2020",
+		"sourceMap": true,
 		"module": "commonjs",
 		"moduleResolution": "node",
+		"esModuleInterop": true,
 		"resolveJsonModule": true,
 
 		"rootDir": "src",

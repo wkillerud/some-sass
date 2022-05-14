@@ -1,4 +1,4 @@
-import sassdoc from 'sassdoc';
+import { parse } from 'scss-sassdoc-parser';
 
 interface ISymbol {
 	document?: string;
@@ -21,7 +21,7 @@ interface ISassDocOptions {
 		return?: boolean;
 		see?: boolean;
 		since?: boolean;
-		throw?: boolean;
+		throws?: boolean;
 		type?: boolean;
 	};
 }
@@ -42,14 +42,18 @@ const defaultOptions = {
 		return: true,
 		see: true,
 		since: true,
-		throw: true,
+		throws: true,
 		type: true,
 	},
 };
 
 export async function applySassDoc(symbol: ISymbol, identifierType: "function" | "mixin" | "variable", options?: ISassDocOptions): Promise<string> {
+	if (!symbol.document) {
+		return "";
+	}
+
 	try {
-		const sassdocs = await sassdoc.parse(symbol.document);
+		const sassdocs = await parse(symbol.document);
 		if (sassdocs.length) {
 			const name = symbol.info.name.replace("$", "");
 			const displayOptions = options?.displayOptions || defaultOptions.displayOptions;
@@ -93,7 +97,7 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 					// Type is for standalone variable annotation
 					// Type and Parameters is likely mutually exclusive
 					if (displayOptions.type && doc.type) {
-						description += `\n\n@type {\`${doc.type}\`}`;
+						description += `\n\n@type {${doc.type}}`;
 					}
 
 					// Documents the properties of a map
@@ -129,11 +133,11 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 
 					// Describes function return values with a type and optional description
 					if (displayOptions.return && doc.return) {
-						description += `\n\n@return {\`${doc.return.type}\`}${doc.return.description ? ` - ${doc.return.description}` : ''}`;
+						description += `\n\n@return {${doc.return.type}}${doc.return.description ? ` - ${doc.return.description}` : ''}`;
 					}
 
-					if (displayOptions.throw && doc.throw) {
-						for (const thrown of doc.throw) {
+					if (displayOptions.throws && doc.throws) {
+						for (const thrown of doc.throws) {
 							description += `\n\n@throw ${thrown}`;
 						}
 					}
@@ -161,14 +165,14 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 					if (displayOptions.alias && doc.alias) {
 						const aliases = typeof doc.alias === "string" ? [doc.alias] : doc.alias;
 						for (const alias of aliases) {
-							description += `\n\n@alias {\`${alias}\`}`;
+							description += `\n\n@alias \`${alias}\``;
 						}
 					}
 
 					// Hint to related variables, functions, or mixins
 					if (displayOptions.see && doc.see) {
 						for (const see of doc.see) {
-							description += `\n\n@see {\`${see}\`}`;
+							description += `\n\n@see \`${see}\``;
 						}
 					}
 

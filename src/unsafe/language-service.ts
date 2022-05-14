@@ -32,7 +32,7 @@ const fileSystemProvider: FileSystemProvider = {
 				size: stats.size
 			};
 		} catch (error) {
-			if (error.code !== 'ENOENT') {
+			if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
 				throw error;
 			}
 

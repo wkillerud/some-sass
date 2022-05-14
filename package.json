@@ -87,11 +87,6 @@
 					"type": "string",
 					"default": " (+-*%",
 					"description": "Allows prompt Functions in String context after specified symbols."
-				},
-				"somesass.dev.serverPort": {
-					"type": "number",
-					"description": "The port that SCSS IntelliSense server listens to. Can be used for attaching to the server Node process for debugging / profiling.",
-					"default": -1
 				}
 			}
 		}

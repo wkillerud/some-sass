@@ -54,7 +54,6 @@ In the `Go` menu, choose either `Go to Symbol in Workspace` (`Cmd + Shift + R`) 
 | suggestMixins | `true` | `boolean` | Include mixins in suggestions. |
 | suggestFunctions | `true` | `boolean` | Include functions in suggestions. |
 | suggestFunctionsInStringContextAfterSymbols | ` (+-*%` | `string` | Suggest functions after the specified symbols when in a string context. For example, if you add the `/` symbol to this setting, then `background: url(images/he|)` could suggest a `hello()` function. |
-| dev.serverPort | `-1` | `number` | Launches the SCSS IntelliSense server at a specific port for debugging and profiling. Used for [filing performance issues](./.github/PERF_ISSUE.md). |
 
 In JSON, all settings should be prefixed with `somesass.`, for instance `somesass.maxDepth`.
 

@@ -3,12 +3,11 @@
 import {
 	createConnection,
 	Connection,
-	IPCMessageReader,
-	IPCMessageWriter,
 	TextDocuments,
 	InitializeParams,
 	InitializeResult,
-	TextDocumentSyncKind
+	TextDocumentSyncKind,
+	ProposedFeatures
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
@@ -37,7 +36,7 @@ let storageService: StorageService;
 let scannerService: ScannerService;
 
 // Create a connection for the server
-const connection: Connection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
+const connection: Connection = createConnection(ProposedFeatures.all);
 
 console.log = connection.console.log.bind(connection.console);
 console.error = connection.console.error.bind(connection.console);
@@ -72,7 +71,7 @@ connection.onInitialize(
 			await scannerService.scan(files);
 		} catch (error) {
 			if (settings.showErrors) {
-				connection.window.showErrorMessage(error);
+				connection.window.showErrorMessage(String(error));
 			}
 		}
 

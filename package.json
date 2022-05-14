@@ -104,7 +104,6 @@
 		"eslint-config-mrmlnc": "2.0.0",
 		"glob": "8.0.1",
 		"mocha": "8.4.0",
-		"patch-package": "6.4.7",
 		"rimraf": "3.0.2",
 		"sinon": "10.0.0",
 		"ts-loader": "9.3.0",
@@ -136,8 +135,6 @@
 		"test:clean": "rimraf out",
 		"test:compile": "tsc -p ./",
 		"test:unit": "mocha \"out/**/*.spec.js\"",
-		"test:e2e": "node ./out/unsafe/test/e2e/runTest.js",
-		"patch": "patch-package",
-		"postinstall": "npm run patch"
+		"test:e2e": "node ./out/unsafe/test/e2e/runTest.js"
 	}
 }

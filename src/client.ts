@@ -61,10 +61,9 @@ async function initializeClient(workspace: vscode.WorkspaceFolder): Promise<Lang
 			location: vscode.ProgressLocation.Window,
 		},
 		async () => {
-			client.start();
 
 			try {
-				await client.onReady();
+				await client.start();
 			} catch (error: unknown) {
 				await vscode.window.showErrorMessage(`Client initialization failed. ${(error as Error).stack ?? '<empty_stack>'}`);
 			}
@@ -110,6 +109,7 @@ function buildClientOptions(workspace: URI): LanguageClientOptions {
 		synchronize: {
 			configurationSection: ['somesass'],
 			fileEvents: vscode.workspace.createFileSystemWatcher({
+				baseUri: workspace,
 				base: workspace.fsPath,
 				pattern: '**/*.scss',
 			}),

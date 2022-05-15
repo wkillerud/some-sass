@@ -79,7 +79,7 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 							description += "\n\n@param"
 
 							if (parameter.type) {
-								description += ` {${parameter.type}}`;
+								description += ` ${parameter.type}`;
 							}
 
 							description += `\`${parameter.name}\``;
@@ -97,7 +97,7 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 					// Type is for standalone variable annotation
 					// Type and Parameters is likely mutually exclusive
 					if (displayOptions.type && doc.type) {
-						description += `\n\n@type {${doc.type}}`;
+						description += `\n\n@type ${doc.type}`;
 					}
 
 					// Documents the properties of a map
@@ -133,7 +133,7 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 
 					// Describes function return values with a type and optional description
 					if (displayOptions.return && doc.return) {
-						description += `\n\n@return {${doc.return.type}}${doc.return.description ? ` - ${doc.return.description}` : ''}`;
+						description += `\n\n@return ${doc.return.type}${doc.return.description ? ` - ${doc.return.description}` : ''}`;
 					}
 
 					if (displayOptions.throws && doc.throws) {
@@ -142,7 +142,7 @@ export async function applySassDoc(symbol: ISymbol, identifierType: "function" |
 						}
 					}
 
-					if (displayOptions.require && doc.require.length) {
+					if (displayOptions.require && doc.require && doc.require.length) {
 						for (const requirement of doc.require) {
 							description += "\n\n@require"
 

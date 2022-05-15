@@ -1,6 +1,6 @@
-import assert from 'assert';
+import * as assert from 'assert';
 
-import vscode from 'vscode';
+import * as vscode from 'vscode';
 import type { CompletionItem, MarkupContent } from 'vscode-languageclient';
 import { showFile } from '../util';
 

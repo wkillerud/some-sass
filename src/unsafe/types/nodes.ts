@@ -1,6 +1,10 @@
 'use strict';
 
-export enum NodeType {
+/**
+ * Must be synced with https://github.com/microsoft/vscode-css-languageservice/blob/main/src/parser/cssNodes.ts
+ * when upgrading vscode-css-languageservice.
+ */
+ export enum NodeType {
 	Undefined,
 	Identifier,
 	Stylesheet,
@@ -34,6 +38,7 @@ export enum NodeType {
 	Function,
 	NumericValue,
 	HexColorValue,
+	RatioValue,
 	MixinDeclaration,
 	MixinReference,
 	VariableName,
@@ -49,7 +54,8 @@ export enum NodeType {
 	For,
 	Each,
 	While,
-	MixinContent,
+	MixinContentReference,
+	MixinContentDeclaration,
 	Media,
 	Keyframe,
 	FontFace,
@@ -59,6 +65,8 @@ export enum NodeType {
 	FunctionDeclaration,
 	ReturnStatement,
 	MediaQuery,
+	MediaCondition,
+	MediaFeature,
 	FunctionParameter,
 	FunctionArgument,
 	KeyframeSelector,
@@ -67,7 +75,19 @@ export enum NodeType {
 	AtApplyRule,
 	CustomPropertyDeclaration,
 	CustomPropertySet,
-	ListEntry
+	ListEntry,
+	Supports,
+	SupportsCondition,
+	NamespacePrefix,
+	GridLine,
+	Plugin,
+	UnknownAtRule,
+	Use,
+	ModuleConfiguration,
+	Forward,
+	ForwardVisibility,
+	Module,
+	UnicodeRange,
 }
 
 export interface INode {

@@ -6,11 +6,7 @@ Based on SCSS Intellisense by [Denis Malinochkin and contributors](https://githu
 
 ## Setup
 
-Search for Some Sass from the extension installer within VS Code or put this into the command palette.
-
-```
-ext install some-sass
-```
+Search for Some Sass (`SomewhatStationery.some-sass`) from the extension installer within VS Code or install from [the Marketplace](https://marketplace.visualstudio.com/items?itemName=SomewhatStationery.some-sass).
 
 If you have SCSS IntelliSense (`mrmlnc.vscode-scss`) installed you should disable or uninstall it. Otherwise the two extensions will both provide hover information and code suggestions.
 

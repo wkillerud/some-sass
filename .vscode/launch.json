@@ -8,11 +8,7 @@
 		"name": "Launch Client",
 		"runtimeExecutable": "${execPath}",
 		"args": ["--extensionDevelopmentPath=${workspaceRoot}"],
-		"outFiles": ["${workspaceRoot}/dist/**/*.js"],
-		"preLaunchTask": {
-		  "type": "npm",
-		  "script": "watch"
-		}
+		"outFiles": ["${workspaceRoot}/dist/**/*.js"]
 	  },
 	  {
 		"type": "node",

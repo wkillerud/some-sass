@@ -1,11 +1,12 @@
 import path from 'path';
 
 import vscode from 'vscode';
-import type { URI } from 'vscode-uri';
-import type { LanguageClientOptions, ServerOptions } from 'vscode-languageclient/node';
 import { LanguageClient, TransportKind, RevealOutputChannelOn } from 'vscode-languageclient/node';
 
 import { EXTENSION_ID, EXTENSION_NAME } from './constants';
+
+import type { LanguageClientOptions, ServerOptions } from 'vscode-languageclient/node';
+import type { URI } from 'vscode-uri';
 
 const EXTENSION_SERVER_MODULE_PATH = path.join(__dirname, './unsafe/server.js');
 
@@ -14,7 +15,7 @@ const clients: Map<string, LanguageClient> = new Map<string, LanguageClient>();
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
 	context.subscriptions.push(
 		vscode.workspace.onDidChangeWorkspaceFolders(changeWorkspaceFoldersEventHandler),
-		vscode.window.onDidChangeActiveTextEditor(changeActiveTextEditorEventHandler)
+		vscode.window.onDidChangeActiveTextEditor(changeActiveTextEditorEventHandler),
 	);
 
 	await changeActiveTextEditorEventHandler(vscode.window.activeTextEditor);
@@ -57,19 +58,17 @@ async function initializeClient(workspace: vscode.WorkspaceFolder): Promise<Lang
 	return vscode.window.withProgress(
 		{
 			title: `[${workspace.name}] Starting SCSS IntelliSense server`,
-			location: vscode.ProgressLocation.Window
+			location: vscode.ProgressLocation.Window,
 		},
 		async () => {
-			client.start();
-
 			try {
-				await client.onReady();
+				await client.start();
 			} catch (error: unknown) {
 				await vscode.window.showErrorMessage(`Client initialization failed. ${(error as Error).stack ?? '<empty_stack>'}`);
 			}
 
 			return client;
-		}
+		},
 	);
 }
 
@@ -81,15 +80,15 @@ function buildServerOptions(): ServerOptions {
 	return {
 		run: {
 			module: EXTENSION_SERVER_MODULE_PATH,
-			transport: TransportKind.ipc
+			transport: TransportKind.ipc,
 		},
 		debug: {
 			module: EXTENSION_SERVER_MODULE_PATH,
 			transport: TransportKind.ipc,
 			options: {
-				execArgv: ['--nolazy', '--inspect=6006']
-			}
-		}
+				execArgv: ['--nolazy', '--inspect=6006'],
+			},
+		},
 	};
 }
 
@@ -104,22 +103,23 @@ function buildClientOptions(workspace: URI): LanguageClientOptions {
 		documentSelector: [
 			{ scheme: 'file', language: 'scss', pattern },
 			{ scheme: 'file', language: 'vue', pattern },
-			{ scheme: 'file', language: 'svelte', pattern }
+			{ scheme: 'file', language: 'svelte', pattern },
 		],
 		synchronize: {
 			configurationSection: ['somesass'],
 			fileEvents: vscode.workspace.createFileSystemWatcher({
+				baseUri: workspace,
 				base: workspace.fsPath,
-				pattern: '**/*.scss'
-			})
+				pattern: '**/*.scss',
+			}),
 		},
 		initializationOptions: {
 			workspace: workspace.fsPath,
-			settings: vscode.workspace.getConfiguration('somesass', workspace)
+			settings: vscode.workspace.getConfiguration('somesass', workspace),
 		},
 		diagnosticCollectionName: EXTENSION_ID,
 		outputChannel: vscode.window.createOutputChannel(EXTENSION_ID),
 		// Don't open the output console (very annoying) in case of error
-		revealOutputChannelOn: RevealOutputChannelOn.Never
+		revealOutputChannelOn: RevealOutputChannelOn.Never,
 	};
 }

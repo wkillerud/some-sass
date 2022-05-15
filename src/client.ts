@@ -61,7 +61,6 @@ async function initializeClient(workspace: vscode.WorkspaceFolder): Promise<Lang
 			location: vscode.ProgressLocation.Window,
 		},
 		async () => {
-
 			try {
 				await client.start();
 			} catch (error: unknown) {

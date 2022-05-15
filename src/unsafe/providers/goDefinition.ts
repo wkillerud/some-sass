@@ -38,12 +38,12 @@ function samePosition(a: Position | undefined, b: Position): boolean {
 function getSymbols(symbolList: IDocumentSymbols[], identifier: IIdentifier, currentPath: string): ISymbol[] {
 	const list: ISymbol[] = [];
 
+	if (identifier.type === "imports") {
+		return list;
+	}
+
 	for (const symbols of symbolList) {
 		const fsPath = getDocumentPath(currentPath, symbols.document);
-
-		if (identifier.type === 'imports') {
-			continue;
-		}
 
 		for (const item of symbols[identifier.type]) {
 			if (item.name === identifier.name && !samePosition(item.position, identifier.position)) {

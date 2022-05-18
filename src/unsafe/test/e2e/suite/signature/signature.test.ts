@@ -15,7 +15,7 @@ describe('SCSS Signature Help Test', () => {
 
 	describe('Mixin', () => {
 		it('should suggest all parameters of mixin', async () => {
-			await testSignature(docUri, position(2, 19), {
+			await testSignature(docUri, position(5, 19), {
 				activeParameter: 0,
 				activeSignature: 0,
 				signatures: [
@@ -28,7 +28,7 @@ describe('SCSS Signature Help Test', () => {
 		});
 
 		it('should suggest the second parameter of mixin', async () => {
-			await testSignature(docUri, position(3, 21), {
+			await testSignature(docUri, position(6, 21), {
 				activeParameter: 1,
 				activeSignature: 0,
 				signatures: [
@@ -41,7 +41,7 @@ describe('SCSS Signature Help Test', () => {
 		});
 
 		it('should suggest all parameters of mixin on vue file', async () => {
-			await testSignature(vueDocUri, position(13, 19), {
+			await testSignature(vueDocUri, position(14, 19), {
 				activeParameter: 0,
 				activeSignature: 0,
 				signatures: [
@@ -54,7 +54,7 @@ describe('SCSS Signature Help Test', () => {
 		});
 
 		it('should suggest the second parameter of mixin on vue file', async () => {
-			await testSignature(vueDocUri, position(14, 21), {
+			await testSignature(vueDocUri, position(15, 21), {
 				activeParameter: 1,
 				activeSignature: 0,
 				signatures: [
@@ -67,7 +67,7 @@ describe('SCSS Signature Help Test', () => {
 		});
 
 		it('should suggest all parameters of mixin on svelte file', async () => {
-			await testSignature(svelteDocUri, position(5, 19), {
+			await testSignature(svelteDocUri, position(8, 19), {
 				activeParameter: 0,
 				activeSignature: 0,
 				signatures: [
@@ -80,7 +80,7 @@ describe('SCSS Signature Help Test', () => {
 		});
 
 		it('should suggest the second parameter of mixin on svelte file', async () => {
-			await testSignature(svelteDocUri, position(6, 21), {
+			await testSignature(svelteDocUri, position(9, 21), {
 				activeParameter: 1,
 				activeSignature: 0,
 				signatures: [
@@ -95,7 +95,7 @@ describe('SCSS Signature Help Test', () => {
 
 	describe('Function', () => {
 		it('should suggest all parameters of function', async () => {
-			await testSignature(docUri, position(5, 16), {
+			await testSignature(docUri, position(8, 16), {
 				activeParameter: 0,
 				activeSignature: 0,
 				signatures: [
@@ -108,7 +108,7 @@ describe('SCSS Signature Help Test', () => {
 		});
 
 		it('should suggest the second parameter of function', async () => {
-			await testSignature(docUri, position(5, 26), {
+			await testSignature(docUri, position(8, 26), {
 				activeParameter: 1,
 				activeSignature: 0,
 				signatures: [
@@ -121,7 +121,7 @@ describe('SCSS Signature Help Test', () => {
 		});
 
 		it('should suggest all parameters of function on vue file', async () => {
-			await testSignature(vueDocUri, position(16, 16), {
+			await testSignature(vueDocUri, position(17, 16), {
 				activeParameter: 0,
 				activeSignature: 0,
 				signatures: [
@@ -134,7 +134,7 @@ describe('SCSS Signature Help Test', () => {
 		});
 
 		it('should suggest the second parameter of function on vue file', async () => {
-			await testSignature(vueDocUri, position(16, 26), {
+			await testSignature(vueDocUri, position(17, 26), {
 				activeParameter: 1,
 				activeSignature: 0,
 				signatures: [
@@ -147,7 +147,7 @@ describe('SCSS Signature Help Test', () => {
 		});
 
 		it('should suggest all parameters of function on svelte file', async () => {
-			await testSignature(svelteDocUri, position(8, 16), {
+			await testSignature(svelteDocUri, position(11, 16), {
 				activeParameter: 0,
 				activeSignature: 0,
 				signatures: [
@@ -160,7 +160,7 @@ describe('SCSS Signature Help Test', () => {
 		});
 
 		it('should suggest the second parameter of function on svelte file', async () => {
-			await testSignature(svelteDocUri, position(8, 26), {
+			await testSignature(svelteDocUri, position(11, 26), {
 				activeParameter: 1,
 				activeSignature: 0,
 				signatures: [

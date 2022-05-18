@@ -2,34 +2,40 @@
 
 import assert from 'assert';
 
-import type { Hover } from 'vscode-languageserver';
+import { Hover, MarkupKind, SymbolKind } from 'vscode-languageserver';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 
+import { ScssDocument } from '../../document';
 import StorageService from '../../services/storage';
 import { doHover } from '../../providers/hover';
 import * as helpers from '../helpers';
 
 const storage = new StorageService();
 
-storage.set('file.scss', {
-	document: 'file.scss',
-	filepath: 'file.scss',
-	variables: [
-		{ name: '$variable', value: null, offset: 0, position: { line: 1, character: 1 } }
-	],
-	mixins: [
-		{ name: 'mixin', parameters: [], offset: 0, position: { line: 1, character: 1 } }
-	],
-	functions: [
-		{ name: 'make', parameters: [], offset: 0, position: { line: 1, character: 1 } }
-	],
-	imports: []
-});
+storage.set('file.scss', new ScssDocument(
+	TextDocument.create("./file.scss", 'scss', 1, ""),
+	{
+		variables: new Map(
+			[["$variable", { name: '$variable', kind: SymbolKind.Variable, value: '2', offset: 0, position: { line: 1, character: 1 } }]]
+		),
+		mixins: new Map(
+			[["mixin", { name: 'mixin',kind: SymbolKind.Method, parameters: [], offset: 0, position: { line: 1, character: 1 } } ]]
+		),
+		functions: new Map(
+			[["func", { name: 'func', kind: SymbolKind.Function, parameters: [], offset: 0, position: { line: 1, character: 1 } } ]]
+		),
+		imports: new Map(),
+		uses: new Map(),
+		forwards: new Map(),
+	}
+));
 
-function getHover(lines: string[]): Promise<Hover | null> {
-	const text = lines.join('\n');
-
-	const document = helpers.makeDocument(text);
+async function getHover(lines: string[]): Promise<Hover | null> {
+	let text = lines.join('\n');
 	const offset = text.indexOf('|');
+	text = text.replace('|', '');
+
+	const document = await helpers.makeDocument(storage, text);
 
 	return doHover(document, offset, storage);
 }
@@ -41,7 +47,16 @@ describe('Providers/Hover', () => {
 			'.a { content: $one|; }'
 		]);
 
-		assert.deepStrictEqual(actual?.contents, helpers.makeMarkupContentForScssLanguage('$one: 1;'));
+		assert.deepStrictEqual(actual?.contents, {
+			kind: MarkupKind.Markdown,
+			value: [
+				'```scss',
+				'$one: 1;',
+				'```',
+				'____',
+				`Variable declared in index.scss`,
+			].join('\n')
+		});
 	});
 
 	it('should suggest global variables', async () => {
@@ -49,23 +64,51 @@ describe('Providers/Hover', () => {
 			'.a { content: $variable|; }'
 		]);
 
-		assert.deepStrictEqual(actual?.contents, helpers.makeMarkupContentForScssLanguage('$variable: null;\n@import "file.scss" (implicitly)'));
+		assert.deepStrictEqual(actual?.contents, {
+			kind: MarkupKind.Markdown,
+			value: [
+				'```scss',
+				'$variable: 2;',
+				'```',
+				'____',
+				`Variable declared in file.scss`,
+			].join('\n')
+		});
 	});
 
 	it('should suggest global mixins', async () => {
 		const actual = await getHover([
-			'@include mixin|'
+			'.a { @include mixin| }'
 		]);
 
-		assert.deepStrictEqual(actual?.contents, helpers.makeMarkupContentForScssLanguage('@mixin mixin() {…}\n@import "file.scss" (implicitly)'));
+		assert.deepStrictEqual(actual?.contents, {
+			kind: MarkupKind.Markdown,
+			value: [
+				'```scss',
+				'@mixin mixin()',
+				'```',
+				'____',
+				`Mixin declared in file.scss`,
+			].join('\n')
+		});
 	});
 
-	// Does not work right now
-	it.skip('should suggest global functions', async () => {
+	it('should suggest global functions', async () => {
 		const actual = await getHover([
-			'.a { content: make|(); }'
+			'.a {',
+			'	width: func|();',
+			'}'
 		]);
 
-		assert.deepStrictEqual(actual?.contents, helpers.makeMarkupContentForScssLanguage('@function make($a: null) {…}\n@import "file.scss" (implicitly)'));
+		assert.deepStrictEqual(actual?.contents, {
+			kind: MarkupKind.Markdown,
+			value: [
+				'```scss',
+				'@function func()',
+				'```',
+				'____',
+				`Function declared in file.scss`,
+			].join('\n')
+		});
 	});
 });

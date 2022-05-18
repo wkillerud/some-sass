@@ -1,9 +1,11 @@
-import type { IDocumentSymbols } from '../types/symbols';
+import type { IScssDocument } from '../types/symbols';
 
 export type Storage = Map<StorageItemKey, StorageItemValue>;
 export type StorageItemEntry = [StorageItemKey, StorageItemValue];
-export type StorageItemKey = string;
-export type StorageItemValue = IDocumentSymbols;
+
+type SCSSDocumentUrl = string;
+export type StorageItemKey = SCSSDocumentUrl;
+export type StorageItemValue = IScssDocument;
 
 export default class StorageService {
 	private readonly _storage: Storage = new Map();
@@ -16,7 +18,7 @@ export default class StorageService {
 		this._storage.set(key, value);
 	}
 
-	public delete(key: string): void {
+	public delete(key: SCSSDocumentUrl): void {
 		this._storage.delete(key);
 	}
 

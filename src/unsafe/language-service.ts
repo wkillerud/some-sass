@@ -3,7 +3,6 @@ import {
 	FileSystemProvider,
 	FileType,
 	getSCSSLanguageService,
-	ICompletionParticipant
 } from 'vscode-css-languageservice';
 import { URI } from 'vscode-uri';
 
@@ -46,16 +45,12 @@ const fileSystemProvider: FileSystemProvider = {
 	}
 };
 
-export function getLanguageService(completionParticipants?: ICompletionParticipant[]): LanguageService {
-	const ls = getSCSSLanguageService({ fileSystemProvider });
+const ls = getSCSSLanguageService({ fileSystemProvider });
 
-	if (completionParticipants !== undefined) {
-		ls.setCompletionParticipants(completionParticipants);
-	}
+ls.configure({
+	validate: false
+});
 
-	ls.configure({
-		validate: false
-	});
-
+export function getLanguageService(): LanguageService {
 	return ls;
 }

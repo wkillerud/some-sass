@@ -1,5 +1,9 @@
-.test {
-  content: $variable + function();
+@use "../functions" as *;
+@use "../mixins" as *;
+@use "../variables" as *;
 
-  @include mixin();
+.test {
+	content: $variable + function();
+
+	@include mixin();
 }

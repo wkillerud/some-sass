@@ -25,8 +25,8 @@ import type StorageService from '../services/storage';
 // }
 
 export async function doDiagnostics(
-  document: VersionedTextDocumentIdentifier,
-  storage: StorageService
+  _document: VersionedTextDocumentIdentifier,
+  _storage: StorageService
 ): Promise<Diagnostic[]> {
   const diagnostics: Diagnostic[] = [];
   // 1. find all symbols (i. e. scanner)

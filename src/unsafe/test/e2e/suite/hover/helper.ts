@@ -24,9 +24,9 @@ export async function testHover(docUri: vscode.Uri, position: vscode.Position, e
 		.join('\n');
 
 	// We use `.includes` here because the hover can contain content from other plugins.
-	assert.ok(contents.includes(expectedHover.contents.join('')));
+	assert.ok(contents.includes(expectedHover.contents.join('')), "Hover does not include expected output. Actual: '" + contents + "'.");
 
 	if (expectedHover.range && result[0] && result[0].range) {
-		assert.ok(result[0].range!.isEqual(expectedHover.range!));
+		assert.ok(result[0].range!.isEqual(expectedHover.range!), "Expected output does not match expected range. Actual: '" + result[0].range!.toString() + "'.");
 	}
 }

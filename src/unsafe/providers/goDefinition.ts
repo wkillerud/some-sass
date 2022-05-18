@@ -1,25 +1,15 @@
 'use strict';
 
-import { Location } from 'vscode-languageserver';
+import { Location, SymbolKind } from 'vscode-languageserver';
 import type { TextDocument, Position } from 'vscode-languageserver-textdocument';
-import { URI } from 'vscode-uri';
 
 import { NodeType } from '../types/nodes';
-import type { IDocumentSymbols, ISymbols } from '../types/symbols';
 import type StorageService from '../services/storage';
 
-import { parseDocument } from '../services/parser';
-import { getSymbolsRelatedToDocument } from '../utils/symbols';
-import { getDocumentPath } from '../utils/document';
+import type { IScssDocument, ScssSymbol } from '../types/symbols';
 
-interface ISymbol {
-	document: string | undefined;
-	path: string;
-	info: any;
-}
-
-interface IIdentifier {
-	type: keyof ISymbols;
+interface Identifier {
+	kind: SymbolKind;
 	position: Position;
 	name: string;
 }
@@ -32,50 +22,25 @@ function samePosition(a: Position | undefined, b: Position): boolean {
 	return a.line === b.line && a.character === b.character;
 }
 
-/**
- * Returns the Symbol, if it present in the documents.
- */
-function getSymbols(symbolList: IDocumentSymbols[], identifier: IIdentifier, currentPath: string): ISymbol[] {
-	const list: ISymbol[] = [];
-
-	if (identifier.type === "imports") {
-		return list;
-	}
-
-	for (const symbols of symbolList) {
-		const fsPath = getDocumentPath(currentPath, symbols.document);
-
-		for (const item of symbols[identifier.type]) {
-			if (item.name === identifier.name && !samePosition(item.position, identifier.position)) {
-				list.push({
-					document: symbols.filepath,
-					path: fsPath,
-					info: item
-				});
-			}
-		}
-	}
-
-	return list;
-}
-
 export async function goDefinition(document: TextDocument, offset: number, storage: StorageService): Promise<Location | null> {
-	const documentPath = URI.parse(document.uri).fsPath;
+	const currentScssDocument = storage.get(document.uri);
+	if (!currentScssDocument) {
+		return null;
+	}
 
-	const resource = await parseDocument(document, offset);
-	const hoverNode = resource.node;
+	const hoverNode = currentScssDocument.getNodeAt(offset);
 	if (!hoverNode || !hoverNode.type) {
 		return null;
 	}
 
-	let identifier: IIdentifier | null = null;
+	let identifier: Identifier | null = null;
 	if (hoverNode.type === NodeType.VariableName) {
 		const parent = hoverNode.getParent();
 		if (parent.type !== NodeType.FunctionParameter && parent.type !== NodeType.VariableDeclaration) {
 			identifier = {
 				name: hoverNode.getName(),
 				position: document.positionAt(hoverNode.offset),
-				type: 'variables'
+				kind: SymbolKind.Variable,
 			};
 		}
 	} else if (hoverNode.type === NodeType.Identifier) {
@@ -87,15 +52,15 @@ export async function goDefinition(document: TextDocument, offset: number, stora
 		}
 
 		if (node && (node.type === NodeType.MixinReference || node.type === NodeType.Function)) {
-			let type: keyof ISymbols = 'mixins';
+			let kind: SymbolKind = SymbolKind.Method;
 			if (node.type === NodeType.Function) {
-				type = 'functions';
+				kind = SymbolKind.Function;
 			}
 
 			identifier = {
 				name: node.getName(),
 				position: document.positionAt(node.offset),
-				type
+				kind
 			};
 		}
 	}
@@ -104,29 +69,36 @@ export async function goDefinition(document: TextDocument, offset: number, stora
 		return null;
 	}
 
-	if (resource.symbols.document !== undefined) {
-		storage.set(document.uri, resource.symbols);
+	let definition: ScssSymbol | null = null;
+	let sourceDocument: IScssDocument | null = null;
+	for (const scssDocument of storage.values()) {
+		let symbols: IterableIterator<ScssSymbol>;
+
+		if (identifier.kind === SymbolKind.Variable) {
+			symbols = scssDocument.variables.values();
+		} else if (identifier.kind === SymbolKind.Function) {
+			symbols = scssDocument.functions.values();
+		} else {
+			symbols = scssDocument.mixins.values();
+		}
+
+		for (const symbol of symbols) {
+			if (symbol.name === identifier.name && !samePosition(symbol.position, identifier.position)) {
+				definition = symbol;
+				sourceDocument = scssDocument;
+			}
+		}
 	}
 
-	const symbolsList = getSymbolsRelatedToDocument(storage, documentPath);
-
-	// Symbols
-	const candidates = getSymbols(symbolsList, identifier, documentPath);
-	if (candidates.length === 0) {
+	if (!definition || !sourceDocument) {
 		return null;
 	}
 
-	const definition = candidates[0];
-
-	if (definition?.document === undefined) {
-		return null;
-	}
-
-	const symbol = Location.create(URI.file(definition.document).toString(), {
-		start: definition.info.position,
+	const symbol = Location.create(sourceDocument.uri, {
+		start: definition.position,
 		end: {
-			line: definition.info.position.line,
-			character: definition.info.position.character + definition.info.name.length
+			line: definition.position.line,
+			character: definition.position.character + definition.name.length
 		}
 	});
 

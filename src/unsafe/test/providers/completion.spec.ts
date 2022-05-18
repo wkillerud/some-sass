@@ -2,39 +2,44 @@
 
 import assert from 'assert';
 
-import { CompletionItemKind, CompletionList } from 'vscode-languageserver';
+import { CompletionItemKind, CompletionList, SymbolKind } from 'vscode-languageserver';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 
 import StorageService from '../../services/storage';
 import { doCompletion } from '../../providers/completion';
 import * as helpers from '../helpers';
 import type { ISettings } from '../../types/settings';
+import { ScssDocument } from '../../document';
 
 const storage = new StorageService();
 
-storage.set('one.scss', {
-	document: 'one.scss',
-	filepath: 'one.scss',
-	variables: [
-		{ name: '$one', value: '1', offset: 0, position: undefined },
-		{ name: '$two', value: null, offset: 0, position: undefined },
-		{ name: '$hex', value: '#fff', offset: 0, position: undefined },
-		{ name: '$rgb', value: 'rgb(0,0,0)', offset: 0, position: undefined },
-		{ name: '$word', value: 'red', offset: 0, position: undefined }
-	],
-	mixins: [
-		{ name: 'test', parameters: [], offset: 0, position: undefined }
-	],
-	functions: [
-		{ name: 'make', parameters: [], offset: 0, position: undefined }
-	],
-	imports: []
-});
+storage.set('one.scss', new ScssDocument(
+	TextDocument.create("./one.scss", 'scss', 1, ""),
+	{
+		variables: new Map([
+			['$one', { name: '$one', kind: SymbolKind.Variable, value: '1', offset: 0, position: { line: 1, character: 1 } }],
+			['$two', { name: '$two', kind: SymbolKind.Variable, value: null, offset: 0, position: { line: 1, character: 1 } }],
+			['$hex', { name: '$hex', kind: SymbolKind.Variable, value: '#fff', offset: 0, position: { line: 1, character: 1 } }],
+			['$rgb', { name: '$rgb', kind: SymbolKind.Variable, value: 'rgb(0,0,0)', offset: 0, position: { line: 1, character: 1 } }],
+			['$word', { name: '$word', kind: SymbolKind.Variable, value: 'red', offset: 0, position: { line: 1, character: 1 } }]
+		]),
+		mixins: new Map(
+			[["test", { name: 'test',kind: SymbolKind.Method, parameters: [], offset: 0, position: { line: 1, character: 1 } } ]]
+		),
+		functions: new Map(
+			[["make", { name: 'make', kind: SymbolKind.Function, parameters: [], offset: 0, position: { line: 1, character: 1 } } ]]
+		),
+		imports: new Map(),
+		uses: new Map(),
+		forwards: new Map(),
+	}
+));
 
-function getCompletionList(lines: string[], options?: Partial<ISettings>): Promise<CompletionList | null> {
+async function getCompletionList(lines: string[], options?: Partial<ISettings>): Promise<CompletionList> {
 	const text = lines.join('\n');
 
 	const settings = helpers.makeSettings(options);
-	const document = helpers.makeDocument(text);
+	const document = await helpers.makeDocument(storage, text);
 	const offset = text.indexOf('|');
 
 	return doCompletion(document, offset, settings, storage);
@@ -54,7 +59,7 @@ describe('Providers/Completion - Basic', () => {
 	});
 });
 
-describe('Providers/Completion - Context', async () => {
+describe('Providers/Completion - Context', () => {
 	it('Empty property value', async () => {
 		const actual = await getCompletionList(['.a { content: | }']);
 
@@ -111,29 +116,5 @@ describe('Providers/Completion - Context', async () => {
 		assert.strictEqual(actual?.items[2]?.kind, CompletionItemKind.Color);
 		assert.strictEqual(actual?.items[3]?.kind, CompletionItemKind.Color);
 		assert.strictEqual(actual?.items[4]?.kind, CompletionItemKind.Color);
-	});
-});
-
-describe('Providers/Completion - Implicitly', () => {
-	it('Show default implicitly label', async () => {
-		const actual = await getCompletionList(['$|']);
-
-		assert.strictEqual(actual?.items[0]?.detail, '(implicitly) one.scss');
-	});
-
-	it('Show custom implicitly label', async () => {
-		const actual = await getCompletionList(['$|'], {
-			implicitlyLabel: '👻'
-		});
-
-		assert.strictEqual(actual?.items[0]?.detail, '👻 one.scss');
-	});
-
-	it('Hide implicitly label', async () => {
-		const actual = await getCompletionList(['$|'], {
-			implicitlyLabel: null
-		});
-
-		assert.strictEqual(actual?.items[0]?.detail, 'one.scss');
 	});
 });

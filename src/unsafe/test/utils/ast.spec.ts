@@ -1,6 +1,7 @@
 'use strict';
 
 import assert from 'assert';
+import StorageService from '../../services/storage';
 
 import { NodeType } from '../../types/nodes';
 import {
@@ -9,9 +10,11 @@ import {
 } from '../../utils/ast';
 import * as helpers from '../helpers';
 
+const storage = new StorageService();
+
 describe('Utils/Ast', () => {
-	it('getNodeAtOffset', () => {
-		const ast = helpers.makeAst([
+	it('getNodeAtOffset', async () => {
+		const ast = await helpers.makeAst(storage, [
 			'.a {}'
 		]);
 
@@ -21,8 +24,8 @@ describe('Utils/Ast', () => {
 		assert.strictEqual(node?.getText(), '{}');
 	});
 
-	it('getParentNodeByType', () => {
-		const ast = helpers.makeAst([
+	it('getParentNodeByType', async () => {
+		const ast = await helpers.makeAst(storage, [
 			'.a {}'
 		]);
 

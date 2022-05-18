@@ -1,11 +1,13 @@
 import path from 'path';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { getSCSSLanguageService, MarkupContent, MarkupKind, Position, Range } from 'vscode-css-languageservice';
+import { getSCSSLanguageService, Position, Range } from 'vscode-css-languageservice';
 import { URI } from 'vscode-uri';
+import { parseDocument } from '../services/parser';
 
 import type { INode } from '../types/nodes';
 import type { ISettings } from '../types/settings';
+import type StorageService from '../services/storage';
 
 const ls = getSCSSLanguageService();
 
@@ -19,18 +21,23 @@ export type MakeDocumentOptions = {
 	version?: number;
 };
 
-export function makeDocument(lines: string | string[], options: MakeDocumentOptions = {}): TextDocument {
-	return TextDocument.create(
-		options.uri || URI.file(path.join(process.cwd(), 'index.scss')).toString(),
+export async function makeDocument(storage: StorageService, lines: string | string[],  options: MakeDocumentOptions = {}): Promise<TextDocument> {
+	const workspaceRootPath = path.resolve('');
+	const workspaceRootUri = URI.file(workspaceRootPath);
+	const uri = options.uri || URI.file(path.join(process.cwd(), 'index.scss')).toString();
+	const document = TextDocument.create(
+		uri,
 		options.languageId || 'scss',
 		options.version || 1,
 		Array.isArray(lines) ? lines.join('\n') : lines
 	);
+	const scssDocument = await parseDocument(document, workspaceRootUri);
+	storage.set(uri, scssDocument)
+	return document;
 }
 
-export function makeAst(lines: string[]): INode {
-	const document = makeDocument(lines);
-
+export async function makeAst(storage: StorageService, lines: string[]): Promise<INode> {
+	const document = await makeDocument(storage, lines);
 	return ls.parseStylesheet(document) as INode;
 }
 
@@ -51,11 +58,4 @@ export function makeSettings(options?: Partial<ISettings>): ISettings {
 		suggestFunctionsInStringContextAfterSymbols: ' (+-*%',
 		...options
 	};
-}
-
-export function makeMarkupContentForScssLanguage(content: string): MarkupContent {
-	return {
-		kind: MarkupKind.Markdown,
-		value: ['```scss', content, '```'].join('\n')
-	}
 }

@@ -18,11 +18,11 @@ describe('SCSS Completion Test', () => {
 	});
 
 	it('Offers completions from tilde imports', async () => {
-		await testCompletion(docUri, position(11, 11), [{ label: '$tilde', detail: 'node_modules/foo/bar.scss' }]);
+		await testCompletion(docUri, position(11, 11), [{ label: '$tilde', detail: 'Variable declared in bar.scss' }]);
 	});
 
 	it('Offers completions from partial file', async () => {
-		await testCompletion(docUri, position(17, 11), [{ label: '$partial', detail: '_partial.scss' }]);
+		await testCompletion(docUri, position(17, 11), [{ label: '$partial', detail: 'Variable declared in _partial.scss' }]);
 	});
 
 	it('no completions on vue file outside scss regions', async () => {
@@ -35,11 +35,11 @@ describe('SCSS Completion Test', () => {
 	});
 
 	it('Offers completions from tilde imports on vue file', async () => {
-		await testCompletion(vueDocUri, position(22, 11), [{ label: '$tilde', detail: 'node_modules/foo/bar.scss' }]);
+		await testCompletion(vueDocUri, position(22, 11), [{ label: '$tilde', detail: 'Variable declared in bar.scss' }]);
 	});
 
 	it('Offers completions from partial file on vue file', async () => {
-		await testCompletion(vueDocUri, position(28, 11), [{ label: '$partial', detail: '_partial.scss' }]);
+		await testCompletion(vueDocUri, position(28, 11), [{ label: '$partial', detail: 'Variable declared in _partial.scss' }]);
 	});
 
 	it('Offers variable completions on svelte file', async () => {
@@ -47,10 +47,10 @@ describe('SCSS Completion Test', () => {
 	});
 
 	it('Offers completions from tilde imports on svelte file', async () => {
-		await testCompletion(svelteDocUri, position(14, 11), [{ label: '$tilde', detail: 'node_modules/foo/bar.scss' }]);
+		await testCompletion(svelteDocUri, position(14, 11), [{ label: '$tilde', detail: 'Variable declared in bar.scss' }]);
 	});
 
 	it('Offers completions from partial file on svelte file', async () => {
-		await testCompletion(svelteDocUri, position(20, 11), [{ label: '$partial', detail: '_partial.scss' }]);
+		await testCompletion(svelteDocUri, position(20, 11), [{ label: '$partial', detail: 'Variable declared in _partial.scss' }]);
 	});
 });

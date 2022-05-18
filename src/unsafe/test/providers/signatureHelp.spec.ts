@@ -2,68 +2,67 @@
 
 import assert from 'assert';
 
-import type { SignatureHelp } from 'vscode-languageserver';
+import { SignatureHelp, SymbolKind } from 'vscode-languageserver';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 
+import { ScssDocument } from '../../document';
 import StorageService from '../../services/storage';
 import { doSignatureHelp } from '../../providers/signatureHelp';
 import * as helpers from '../helpers';
 
 const storage = new StorageService();
 
-storage.set('one.scss', {
-	document: 'one.scss',
-	filepath: 'one.scss',
-	variables: [],
-	mixins: [
-		{ name: 'one', parameters: [], offset: 0, position: undefined },
-		{ name: 'two', parameters: [], offset: 0, position: undefined },
-		{
-			name: 'two',
-			parameters: [
-				{ name: '$a', value: null, offset: 0 }
-			],
-			offset: 0,
-			position: undefined
-		},
-		{
-			name: 'two',
-			parameters: [
-				{ name: '$a', value: null, offset: 0 },
-				{ name: '$b', value: null, offset: 0 }
-			],
-			offset: 0,
-			position: undefined
-		}
-	],
-	functions: [
-		{ name: 'make', parameters: [], offset: 0, position: undefined },
-		{
-			name: 'one',
-			parameters: [
-				{ name: '$a', value: null, offset: 0 },
-				{ name: '$b', value: null, offset: 0 },
-				{ name: '$c', value: null, offset: 0 }
-			],
-			offset: 0,
-			position: undefined
-		},
-		{
-			name: 'two',
-			parameters: [
-				{ name: '$a', value: null, offset: 0 },
-				{ name: '$b', value: null, offset: 0 }
-			],
-			offset: 0,
-			position: undefined
-		}
-	],
-	imports: []
-});
+storage.set('one.scss', new ScssDocument(
+	TextDocument.create("./one.scss", 'scss', 1, ""),
+	{
+		variables: new Map(),
+		mixins: new Map([
+			['one', { name: 'one', kind: SymbolKind.Method, parameters: [], offset: 0, position: { line: 1, character: 1 } }],
+			['two', {
+				name: 'two',
+				kind: SymbolKind.Method,
+				parameters: [
+					{ name: '$a', value: null, offset: 0 },
+					{ name: '$b', value: null, offset: 0 }
+				],
+				offset: 0,
+				position: { line: 1, character: 1 }
+			}]
+		]),
+		functions: new Map([
+			['make', { name: 'make', kind: SymbolKind.Function, parameters: [], offset: 0, position: { line: 1, character: 1 } }],
+			['one', {
+				name: 'one',
+				kind: SymbolKind.Function,
+				parameters: [
+					{ name: '$a', value: null, offset: 0 },
+					{ name: '$b', value: null, offset: 0 },
+					{ name: '$c', value: null, offset: 0 }
+				],
+				offset: 0,
+				position: { line: 1, character: 1 }
+			}],
+			['two', {
+				name: 'two',
+				kind: SymbolKind.Function,
+				parameters: [
+					{ name: '$a', value: null, offset: 0 },
+					{ name: '$b', value: null, offset: 0 }
+				],
+				offset: 0,
+				position: { line: 1, character: 1 }
+			}]
+		]),
+		imports: new Map(),
+		uses: new Map(),
+		forwards: new Map(),
+	}
+));
 
-function getSignatureHelp(lines: string[]): Promise<SignatureHelp> {
+async function getSignatureHelp(lines: string[]): Promise<SignatureHelp> {
 	const text = lines.join('\n');
 
-	const document = helpers.makeDocument(text);
+	const document = await helpers.makeDocument(storage, text);
 	const offset = text.indexOf('|');
 
 	return doSignatureHelp(document, offset, storage);
@@ -78,7 +77,7 @@ describe('Providers/SignatureHelp - Empty', () => {
 	it('Closed without parameters', async () => {
 		const actual = await getSignatureHelp(['@include two(|)']);
 
-		assert.strictEqual(actual.signatures.length, 3);
+		assert.strictEqual(actual.signatures.length, 1);
 	});
 
 	it('Closed with parameters', async () => {
@@ -93,7 +92,7 @@ describe('Providers/SignatureHelp - Two parameters', () => {
 		const actual = await getSignatureHelp(['@include two(1,|']);
 
 		assert.strictEqual(actual.activeParameter, 1, 'activeParameter');
-		assert.strictEqual(actual.signatures.length, 2, 'signatures.length');
+		assert.strictEqual(actual.signatures.length, 1, 'signatures.length');
 	});
 
 	it('Passed two parameter of two', async () => {
@@ -121,33 +120,33 @@ describe('Providers/SignatureHelp - parseArgumentsAtLine for Mixins', () => {
 		const actual = await getSignatureHelp(['@include two(rgba(0,0,0,.0001),|']);
 
 		assert.strictEqual(actual.activeParameter, 1, 'activeParameter');
-		assert.strictEqual(actual.signatures.length, 2, 'signatures.length');
+		assert.strictEqual(actual.signatures.length, 1, 'signatures.length');
 	});
 
 	it('RGBA when typing', async () => {
 		const actual = await getSignatureHelp(['@include two(rgba(0,0,0,|']);
 
 		assert.strictEqual(actual.activeParameter, 0, 'activeParameter');
-		assert.strictEqual(actual.signatures.length, 3, 'signatures.length');
+		assert.strictEqual(actual.signatures.length, 1, 'signatures.length');
 	});
 
 	it('Quotes', async () => {
 		const actual = await getSignatureHelp(['@include two("\\",;",|']);
 
 		assert.strictEqual(actual.activeParameter, 1, 'activeParameter');
-		assert.strictEqual(actual.signatures.length, 2, 'signatures.length');
+		assert.strictEqual(actual.signatures.length, 1, 'signatures.length');
 	});
 
 	it('With overload', async () => {
 		const actual = await getSignatureHelp(['@include two(|']);
 
-		assert.strictEqual(actual.signatures.length, 3);
+		assert.strictEqual(actual.signatures.length, 1);
 	});
 
 	it('Single-line selector', async () => {
 		const actual = await getSignatureHelp(['h1 { @include two(1,| }']);
 
-		assert.strictEqual(actual.signatures.length, 2);
+		assert.strictEqual(actual.signatures.length, 1);
 	});
 
 	it('Single-line Mixin reference', async () => {
@@ -157,13 +156,13 @@ describe('Providers/SignatureHelp - parseArgumentsAtLine for Mixins', () => {
 			'    @include two(1,|)',
 			'}']);
 
-		assert.strictEqual(actual.signatures.length, 2);
+		assert.strictEqual(actual.signatures.length, 1);
 	});
 
 	it('Mixin with named argument', async () => {
 		const actual = await getSignatureHelp(['@include two($a: 1,|']);
 
-		assert.strictEqual(actual.signatures.length, 2);
+		assert.strictEqual(actual.signatures.length, 1);
 	});
 });
 

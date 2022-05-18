@@ -10,6 +10,7 @@ import {
 	ProposedFeatures
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
+import { URI } from 'vscode-uri';
 
 import type { ISettings } from './types/settings';
 
@@ -17,13 +18,13 @@ import ScannerService from './services/scanner';
 import StorageService from './services/storage';
 
 import { doCompletion } from './providers/completion';
+import { doDiagnostics } from './providers/diagnostics';
 import { doHover } from './providers/hover';
 import { doSignatureHelp } from './providers/signatureHelp';
 import { goDefinition } from './providers/goDefinition';
 import { searchWorkspaceSymbol } from './providers/workspaceSymbol';
 import { findFiles } from './utils/fs';
 import { getSCSSRegionsDocument } from './utils/vue-svelte';
-import { URI } from 'vscode-uri';
 
 interface InitializationOption {
 	workspace: string;
@@ -89,6 +90,15 @@ connection.onInitialize(
 		};
 	}
 );
+
+documents.onDidChangeContent(async (change) => {
+	const diagnostics = await doDiagnostics(change.document, storageService);
+	// Check that no new version has been made while we waited
+	const latestTextDocument = documents.get(change.document.uri);
+	if (latestTextDocument && latestTextDocument.version === change.document.version) {
+		connection.sendDiagnostics({ uri: latestTextDocument.uri, diagnostics });
+	}
+});
 
 connection.onDidChangeConfiguration(params => {
 	settings = params.settings.somesass;

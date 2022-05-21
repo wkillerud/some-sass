@@ -2,7 +2,7 @@
 	"name": "some-sass",
 	"displayName": "Some Sass",
 	"description": "Autocompletion, refactoring, and documentation support for SCSS",
-	"version": "1.0.1",
+	"version": "2.0.0",
 	"publisher": "SomewhatStationery",
 	"license": "MIT",
 	"engines": {

@@ -44,7 +44,6 @@ In the `Go` menu, choose either `Go to Symbol in Workspace` (`Cmd + Shift + R`) 
 | scannerDepth | 30 | `number` | The maximum number of nested directories to scan. |
 | scannerExclude | `["**/.git", "**/node_modules", "**/bower_components"]` | `string[]` | List of [glob](https://github.com/mrmlnc/fast-glob) patterns for directories that are excluded when scanning. |
 | scanImportedFiles | `true` | `boolean` | Allows scan imported files. |
-| implicitlyLabel | `(implicitly)` | `string\|null` | The text of a label that the file imported implicitly. If `null` then label not displayed. |
 | showErrors | `false` | `boolean` | Allows to display parsing errors from the internal scanner. |
 | suggestVariables | `true` | `boolean` | Include variables in suggestions. |
 | suggestMixins | `true` | `boolean` | Include mixins in suggestions. |

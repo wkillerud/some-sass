@@ -6,9 +6,6 @@ export interface ISettings {
 	scannerExclude: string[];
 	scanImportedFiles: boolean;
 
-	// Label
-	implicitlyLabel: string | null;
-
 	// Display
 	showErrors: boolean;
 

@@ -25,7 +25,7 @@ export async function parseDocument(document: TextDocument, workspaceRoot: URI):
 	const ast = ls.parseStylesheet(document) as INode;
 	const symbols = await findDocumentSymbols(document, ast, workspaceRoot)
 
-	return new ScssDocument(document, symbols)
+	return new ScssDocument(document, symbols, ast);
 }
 
 async function findDocumentSymbols(document: TextDocument, ast: INode, workspaceRoot: URI): Promise<IScssSymbols> {

@@ -86,7 +86,12 @@ export async function goDefinition(document: TextDocument, offset: number, stora
 			if (symbol.name === identifier.name && !samePosition(symbol.position, identifier.position)) {
 				definition = symbol;
 				sourceDocument = scssDocument;
+				break;
 			}
+		}
+
+		if (definition) {
+			break;
 		}
 	}
 

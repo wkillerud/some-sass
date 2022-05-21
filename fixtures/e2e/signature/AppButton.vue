@@ -7,8 +7,8 @@ export default {};
 </script>
 
 <style lang="scss">
-@use "../functions" as *;
-@use "../mixins" as *;
+@use '../functions' as *;
+@use '../mixins' as *;
 
 .test {
   @include square();
@@ -16,4 +16,5 @@ export default {};
 
   content: pow() + pow(1,);
 }
+
 </style>

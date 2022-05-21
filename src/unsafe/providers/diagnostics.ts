@@ -1,36 +1,94 @@
-import type { Diagnostic, VersionedTextDocumentIdentifier } from 'vscode-languageserver-types';
+import { Diagnostic, DiagnosticSeverity, DiagnosticTag, VersionedTextDocumentIdentifier } from 'vscode-languageserver-types';
+import { EXTENSION_NAME } from '../../constants';
 import type StorageService from '../services/storage';
-
-// interface Diagnostic {
-//   /**
-//    * The range at which the message applies
-//    */
-//   range: Range;
-//   /**
-//    * A human-readable string describing the source of this
-//    * diagnostic, e.g. 'typescript' or 'super lint'. It usually
-//    * appears in the user interface.
-//    */
-//   source?: string; // TODO: "Some Sass"
-//   /**
-//    * The diagnostic's message. It usually appears in the user interface
-//    */
-//   message: string;
-//   /**
-//    * Additional metadata about the diagnostic.
-//    *
-//    * @since 3.15.0
-//    */
-//   tags?: DiagnosticTag[]; // TODO: Deprecated er en gyldig verdi her
-// }
+import { INode, NodeType } from '../types/nodes';
+import type { ScssFunction, ScssMixin, ScssVariable } from '../types/symbols';
 
 export async function doDiagnostics(
-  _document: VersionedTextDocumentIdentifier,
-  _storage: StorageService
+  document: VersionedTextDocumentIdentifier,
+  storage: StorageService
 ): Promise<Diagnostic[]> {
   const diagnostics: Diagnostic[] = [];
-  // 1. find all symbols (i. e. scanner)
-  // 2. find all symbols that are deprecated (i. e. scanner should have this info)
-  // 3. find all ranges of deprecated symbols
+
+  const currentScssDocument = storage.get(document.uri);
+  if (!currentScssDocument) {
+    console.error("Tried to do diagnostics on a document that has not been scanned. This should never happen.");
+    return diagnostics;
+  }
+
+  const references: INode[] = getVariableFunctionMixinReferences(currentScssDocument.ast);
+  if (references.length === 0) {
+    return diagnostics;
+  }
+
+
+  for (const node of references) {
+    const identifier = {
+      type: node.type,
+      name: node.getName(),
+    };
+
+    const scssDocuments = storage.values();
+    for (const scssDocument of scssDocuments) {
+      if (identifier.type === NodeType.VariableName && scssDocument.variables.has(identifier.name)) {
+        const variable = scssDocument.variables.get(identifier.name) as ScssVariable;
+        if (typeof variable.sassdoc?.deprecated !== 'undefined') {
+          diagnostics.push({
+            message: variable.sassdoc.deprecated || `${identifier.name} is deprecated`,
+            range: currentScssDocument.getNodeRange(node),
+            source: EXTENSION_NAME,
+            tags: [DiagnosticTag.Deprecated],
+            severity: DiagnosticSeverity.Hint,
+          })
+        }
+      } else if (identifier.type === NodeType.MixinReference && scssDocument.mixins.has(identifier.name)) {
+        const mixin = scssDocument.mixins.get(identifier.name) as ScssMixin;
+        if (typeof mixin.sassdoc?.deprecated !== 'undefined') {
+          diagnostics.push({
+            message: mixin.sassdoc.deprecated || `${identifier.name} is deprecated`,
+            range: currentScssDocument.getNodeRange(node),
+            source: EXTENSION_NAME,
+            tags: [DiagnosticTag.Deprecated],
+            severity: DiagnosticSeverity.Hint,
+          })
+        }
+      } else if (identifier.type === NodeType.Function && scssDocument.functions.has(identifier.name)) {
+        const func = scssDocument.functions.get(identifier.name) as ScssFunction;
+        if (typeof func.sassdoc?.deprecated !== 'undefined') {
+          diagnostics.push({
+            message: func.sassdoc.deprecated || `${identifier.name} is deprecated`,
+            range: currentScssDocument.getNodeRange(node),
+            source: EXTENSION_NAME,
+            tags: [DiagnosticTag.Deprecated],
+            severity: DiagnosticSeverity.Hint,
+          })
+        }
+      }
+    }
+  }
+
   return diagnostics;
+}
+
+function getVariableFunctionMixinReferences(fromNode: INode): INode[] {
+  return fromNode.getChildren()
+    .flatMap(child => {
+      if (child.type === NodeType.VariableName) {
+        const parent = child.getParent();
+        if (parent.type !== NodeType.FunctionParameter && parent.type !== NodeType.VariableDeclaration) {
+          return [child];
+        }
+      } else if (child.type === NodeType.Identifier) {
+        let i = 0;
+        let node = child;
+        while (node.type !== NodeType.MixinReference && node.type !== NodeType.Function && i !== 2) {
+          node = node.getParent();
+          i++;
+        }
+        if (node.type === NodeType.MixinReference || node.type === NodeType.Function) {
+          return [node];
+        }
+      }
+      return getVariableFunctionMixinReferences(child);
+    });
 }

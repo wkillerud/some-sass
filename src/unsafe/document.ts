@@ -1,16 +1,19 @@
+import { Range } from 'vscode-languageserver-types';
+
 import { getLanguageService } from './language-service';
 import { getNodeAtOffset } from './utils/ast';
 import { getLinesFromText } from './utils/document';
 
 import type { IScssDocument, IScssSymbols, ScssForward, ScssFunction, ScssImport, ScssLink, ScssMixin, ScssSymbol, ScssUse, ScssVariable } from './types/symbols';
-import type { Position, Range, TextDocument } from 'vscode-languageserver-textdocument';
+import type { Position, TextDocument } from 'vscode-languageserver-textdocument';
 import type { INode } from './types/nodes';
 
 const ls = getLanguageService();
 
 export class ScssDocument implements IScssDocument {
-	protected _document: TextDocument;
-	protected _ast: INode;
+	public textDocument: TextDocument;
+	public ast: INode;
+	public fileName: string;
 
 	public imports: Map<string, ScssImport> = new Map();
 	public uses: Map<string, ScssUse> = new Map();
@@ -19,72 +22,77 @@ export class ScssDocument implements IScssDocument {
 	public mixins: Map<string, ScssMixin> = new Map();
 	public functions: Map<string, ScssFunction> = new Map();
 
-	constructor(document: TextDocument, symbols: IScssSymbols) {
-		this._document = document;
-		this._ast = ls.parseStylesheet(document) as INode;
+	constructor(document: TextDocument, symbols: IScssSymbols, ast?: INode) {
+		this.textDocument = document;
+		this.ast = ast ?? ls.parseStylesheet(document) as INode;
 		this.imports = symbols.imports;
 		this.uses = symbols.uses;
 		this.forwards = symbols.forwards;
 		this.variables = symbols.variables;
 		this.mixins = symbols.mixins;
 		this.functions = symbols.functions;
+		this.fileName = this.getFileName();
 	}
 
 	public get uri(): string {
-		return this._document.uri;
+		return this.textDocument.uri;
 	}
 
-	public get fileName(): string {
-		const uri = this._document.uri;
+	private getFileName(): string {
+		const uri = this.textDocument.uri;
 		const lastIndex = uri.lastIndexOf('/');
 		return lastIndex === -1 ? uri : uri.substring(lastIndex + 1);
 	}
 
 	public get languageId(): string {
-		return this._document.languageId;
+		return this.textDocument.languageId;
 	}
 
 	public get version(): number {
-		return this._document.version;
+		return this.textDocument.version;
 	}
 
 	public getText(range?: Range): string {
-		return this._document.getText(range);
+		return this.textDocument.getText(range);
 	}
 
 	public getNodeAt(offset: number): INode | null {
-		return getNodeAtOffset(this._ast, offset);
+		return getNodeAtOffset(this.ast, offset);
+	}
+
+	public getNodeRange(node: INode): Range {
+		return Range.create(this.textDocument.positionAt(node.offset), this.textDocument.positionAt(node.end));
 	}
 
 	public positionAt(offset: number): Position {
-		return this._document.positionAt(offset);
+		return this.textDocument.positionAt(offset);
 	}
 
 	public offsetAt(position: Position): number {
-		return this._document.offsetAt(position);
+		return this.textDocument.offsetAt(position);
 	}
 
 	public get lineCount(): number {
-		return this._document.lineCount;
+		return this.textDocument.lineCount;
 	}
 
 	public getLines(): string[] {
-		return getLinesFromText(this._document.getText());
+		return getLinesFromText(this.textDocument.getText());
 	}
 
 	public getSymbols(): ScssSymbol[] {
 		const symbols: ScssSymbol[] = [];
 
-		for (const [, variable] of this.variables) {
+		for (const variable of this.variables.values()) {
 			symbols.push(variable);
 		}
 
-		for (const [, mixin] of this.mixins) {
+		for (const mixin of this.mixins.values()) {
 			symbols.push(mixin);
 		}
 
-		for (const [, function_] of this.functions) {
-			symbols.push(function_);
+		for (const func of this.functions.values()) {
+			symbols.push(func);
 		}
 
 		return symbols;
@@ -93,15 +101,15 @@ export class ScssDocument implements IScssDocument {
 	public getLinks(): ScssLink[] {
 		const links: ScssLink[] = [];
 
-		for (const [, import_] of this.imports) {
-			links.push(import_);
+		for (const imp of this.imports.values()) {
+			links.push(imp);
 		}
 
-		for (const [, use] of this.uses) {
+		for (const use of this.uses.values()) {
 			links.push(use);
 		}
 
-		for (const [, forward] of this.forwards) {
+		for (const forward of this.forwards.values()) {
 			links.push(forward);
 		}
 

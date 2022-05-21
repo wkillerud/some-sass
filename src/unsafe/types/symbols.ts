@@ -2,7 +2,7 @@
 
 import type { ParseResult } from 'scss-sassdoc-parser';
 import type { Position, TextDocument } from 'vscode-languageserver-textdocument';
-import type { DocumentLink, SymbolKind } from 'vscode-languageserver-types';
+import type { DocumentLink, Range, SymbolKind } from 'vscode-languageserver-types';
 import type { INode } from './nodes';
 
 export interface ScssSymbol {
@@ -54,6 +54,8 @@ export interface IScssSymbols {
 }
 
 export interface IScssDocument extends TextDocument, IScssSymbols {
+	textDocument: TextDocument;
+	ast: INode;
 	/**
 	 * The last part of the URI, including extension.
 	 * For instance, given the URI `file:///home/test.scss`,
@@ -63,4 +65,5 @@ export interface IScssDocument extends TextDocument, IScssSymbols {
 	getLinks: () => ScssLink[];
 	getSymbols: () => ScssSymbol[];
 	getNodeAt: (offset: number) => INode | null;
+	getNodeRange: (node: INode) => Range;
 }

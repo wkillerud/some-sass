@@ -49,7 +49,11 @@ describe('Services/Scanner', () => {
 
 			await scanner.scan([indexDocumentPath, variablesDocumentPath], workspaceRootUri);
 
-			assert.deepStrictEqual(storage.keys(), [indexDocumentUri, variablesDocumentUri]);
+			const expected = new Map([
+				[indexDocumentUri, indexDocumentUri],
+				[variablesDocumentUri, variablesDocumentUri]
+			]);
+			assert.deepStrictEqual(storage.keys(), expected.keys());
 			assert.strictEqual(storage.get(indexDocumentUri)?.variables.size, 1);
 
 			assert.strictEqual(fileExistsStub.callCount, 2, "File exists was not called twice");
@@ -74,7 +78,11 @@ describe('Services/Scanner', () => {
 
 			await scanner.scan([indexDocumentPath], workspaceRootUri);
 
-			assert.deepStrictEqual(storage.keys(), [indexDocumentUri, variablesDocumentUri]);
+			const expected = new Map([
+					[indexDocumentUri, indexDocumentUri],
+					[variablesDocumentUri, variablesDocumentUri]
+			]);
+			assert.deepStrictEqual(storage.keys(), expected.keys());
 
 			assert.strictEqual(fileExistsStub.callCount, 3, "File exists was not called three times"); // Scanner only calls twice, but parser does as well
 			assert.strictEqual(readFileStub.callCount, 2, "Read file was not called twice");
@@ -94,7 +102,11 @@ describe('Services/Scanner', () => {
 
 			await scanner.scan(['index.scss'], workspaceRootUri);
 
-			assert.deepStrictEqual(storage.keys(), [URI.file('index.scss').toString()]);
+			const indexDocumentUri = URI.file('index.scss').toString();
+			const expected = new Map([
+				[indexDocumentUri, indexDocumentUri],
+			]);
+			assert.deepStrictEqual(storage.keys(), expected.keys());
 
 			assert.strictEqual(fileExistsStub.callCount, 2, "File exists was not called twice");  // Scanner only calls once, but parser does as well
 			assert.strictEqual(readFileStub.callCount, 1, "Read file was not called once");

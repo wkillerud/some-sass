@@ -26,15 +26,15 @@ export default class StorageService {
 		this._storage.clear();
 	}
 
-	public keys(): StorageItemKey[] {
-		return [...this._storage.keys()];
+	public keys(): IterableIterator<StorageItemKey> {
+		return this._storage.keys();
 	}
 
-	public values(): StorageItemValue[] {
-		return [...this._storage.values()];
+	public values(): IterableIterator<StorageItemValue> {
+		return this._storage.values();
 	}
 
-	public entries(): StorageItemEntry[] {
-		return [...this._storage.entries()];
+	public entries(): IterableIterator<StorageItemEntry> {
+		return this._storage.entries();
 	}
 }

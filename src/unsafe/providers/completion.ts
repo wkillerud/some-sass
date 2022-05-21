@@ -6,7 +6,7 @@ import type { TextDocument } from 'vscode-languageserver-textdocument';
 import type { ISettings } from '../types/settings';
 import type StorageService from '../services/storage';
 import type { IScssDocument, ScssMixin } from '../types/symbols';
-;
+
 import { getCurrentWord, getLimitedString, getTextBeforePosition } from '../utils/string';
 import { getVariableColor } from '../utils/color';
 import { applySassDoc } from '../utils/sassdoc';
@@ -84,8 +84,9 @@ function isInterpolationContext(text: string): boolean {
 }
 
 function createCompletionContext(document: TextDocument, offset: number, settings: ISettings) {
-	const currentWord = getCurrentWord(document.getText(), offset);
-	const textBeforeWord = getTextBeforePosition(document.getText(), offset);
+	const text = document.getText();
+	const currentWord = getCurrentWord(text, offset);
+	const textBeforeWord = getTextBeforePosition(text, offset);
 
 	// Is "#{INTERPOLATION}"
 	const isInterpolation = isInterpolationContext(currentWord);
@@ -117,10 +118,7 @@ function createVariableCompletionItems(
 	const completions: CompletionItem[] = [];
 
 	for (let variable of scssDocument.variables.values()) {
-		const isPrivate = variable.name.match(rePrivate);
-		const isFromCurrentDocument = scssDocument.uri === currentDocument.uri;
-
-		const color = getVariableColor(variable.value || '');
+		const color = variable.value ? getVariableColor(variable.value) : null;
 		const completionKind = color ? CompletionItemKind.Color : CompletionItemKind.Variable;
 
 		let documentation = getLimitedString(color ? color.toString() : variable.value || '');
@@ -129,12 +127,13 @@ function createVariableCompletionItems(
 			// Add 'argument from MIXIN_NAME' suffix if Variable is Mixin argument
 			detail = `Argument from ${variable.mixin}, ${detail.toLowerCase()}`;
 		} else {
+			const isPrivate = variable.name.match(rePrivate);
+			const isFromCurrentDocument = scssDocument.uri === currentDocument.uri;
+
 			if (isPrivate && !isFromCurrentDocument) {
-				// Don't suggest private variables from other files
 				continue;
 			}
 
-			// See if there is sassdoc for this standalone variable
 			const sassdoc = applySassDoc(
 				variable,
 				{ displayOptions: { description: true, deprecated: true, type: true }}

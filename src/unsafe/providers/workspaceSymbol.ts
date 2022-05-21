@@ -16,7 +16,7 @@ export async function searchWorkspaceSymbol(
 		}
 
 		for (const symbol of scssDocument.getSymbols()) {
-			if (!symbol.name.includes(query) || symbol.position === undefined) {
+			if (symbol.position === undefined || !symbol.name.includes(query)) {
 				continue;
 			}
 

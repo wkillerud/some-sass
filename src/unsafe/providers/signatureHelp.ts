@@ -76,10 +76,11 @@ function getSymbolName(text: string): string | null | undefined {
  * Returns Mixin name and its parameters from line.
  */
 function parseArgumentsAtLine(text: string): IMixinEntry {
-	text = text.trim();
-	if (text.includes('{')) {
-		text = text.slice(text.indexOf('{') + 1, text.length).trim();
+	const indexOfOpenCurly = text.indexOf('{');
+	if (indexOfOpenCurly !== -1) {
+		text = text.slice(indexOfOpenCurly + 1, text.length);
 	}
+	text = text.trim();
 
 	// Try to find name of Mixin or Function
 	const name = getSymbolName(text);
@@ -91,7 +92,7 @@ function parseArgumentsAtLine(text: string): IMixinEntry {
 	}
 
 	let parameters = 0;
-	if (paramsString.substr(1).length !== 0) {
+	if (paramsString.substring(1).length !== 0) {
 		const tokens = tokenizer(paramsString);
 
 		if (tokens.length === 1 && tokens[0][0] === 'brackets') {

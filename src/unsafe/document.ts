@@ -40,8 +40,8 @@ export class ScssDocument implements IScssDocument {
 
 	private getFileName(): string {
 		const uri = this.textDocument.uri;
-		const lastIndex = uri.lastIndexOf('/');
-		return lastIndex === -1 ? uri : uri.substring(lastIndex + 1);
+		let lastSlash = uri.lastIndexOf('/');
+		return lastSlash === -1 ? uri : uri.substring(lastSlash + 1);
 	}
 
 	public get languageId(): string {

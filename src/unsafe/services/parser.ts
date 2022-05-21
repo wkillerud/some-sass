@@ -149,7 +149,7 @@ function getFilenameFromLink(link: DocumentLink): string | undefined {
 		return undefined;
 	}
 
-	const lastSlash = link.target.lastIndexOf('/') || 0;
+	const lastSlash = link.target.lastIndexOf('/');
 	const extension = link.target.lastIndexOf('.');
 	return link.target.substring(lastSlash + 1, extension);
 }
@@ -162,7 +162,7 @@ function ensureScssExtension(target: string): string {
 }
 
 function ensurePartial(target: string): string {
-	const lastSlash = target.lastIndexOf('/') || 0;
+	let lastSlash = target.lastIndexOf('/');
 	const lastDot = target.lastIndexOf('.');
 	const fileName = target.substring(lastSlash + 1, lastDot)
 

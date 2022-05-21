@@ -37,7 +37,7 @@ export default class ScannerService {
 
 	protected async parse(filepath: string, workspaceRoot: URI, depth: number): Promise<void> {
 		// Cast to the system file path style
-		filepath = path.normalize(filepath).replace("file:", "");
+		filepath = path.normalize(filepath);
 		const uri = URI.file(filepath).toString();
 
 		const isExistFile = await fileExists(filepath);
@@ -70,7 +70,7 @@ export default class ScannerService {
 				continue;
 			}
 
-			await this.parse(symbol.link.target, workspaceRoot, depth + 1);
+			await this.parse(URI.parse(symbol.link.target).fsPath, workspaceRoot, depth + 1);
 		}
 	}
 }

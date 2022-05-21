@@ -14,11 +14,11 @@ If you have SCSS IntelliSense (`mrmlnc.vscode-scss`) installed you should disabl
 
 ### Information on hover
 
-Hover over any of your own variables, mixins or functions to see more details about them. If they are documented with SassDoc, that documentation will be shown as well.
+Hover over any Sass variables, mixins or functions to see more details about them.
 
-### Signature help for mixins and functions
+Documentation written with SassDoc will be included in the hover information. Additionally, the extension will provide (~~strikethrough~~) hints when using something marked as `@deprecated` [with SassDoc](http://sassdoc.com/annotations/#deprecated).
 
-When you are about to use a mixin or function, the extension will help you with signature information as you type.
+![](images/sassdoc-hover.gif)
 
 ### Go to definition
 
@@ -28,13 +28,21 @@ To use this feature, either:
 - Right-click a variable, mixin or function and choose `Go to Definition`
 - Press `F12` when the cursor is at a variable, mixin or function
 
+#### Go to Symbol
+
+In the `Go` menu, choose either `Go to Symbol in Workspace` (`Cmd + Shift + R`) or `Go to Symbol in Editor` (`Cmd + R`) to use this feature.
+
+![](images/workspace-symbols.gif)
+
 ### Code suggestions
 
 The extension will suggest variables, mixins and functions as you type.
 
-### Show all symbols
+For mixins and functions the extension will help you with signature information as you type.
 
-In the `Go` menu, choose either `Go to Symbol in Workspace` (`Cmd + Shift + R`) or `Go to Symbol in Editor` (`Cmd + R`) to use this feature.
+If you document your mixin using the `@content` [annotation from SassDoc](http://sassdoc.com/annotations/#content) the extension will use that information to autosuggest brackets and move focus inside the mixin contents.
+
+![](images/suggestions-mixins.gif)
 
 ## Settings
 

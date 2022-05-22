@@ -1,6 +1,6 @@
 'use strict';
 
-import { CompletionList, CompletionItemKind, CompletionItem, MarkupKind, InsertTextFormat } from 'vscode-languageserver';
+import { CompletionList, CompletionItemKind, CompletionItem, MarkupKind, InsertTextFormat, CompletionItemTag } from 'vscode-languageserver';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 
 import type { ISettings } from '../types/settings';
@@ -189,6 +189,7 @@ function createVariableCompletionItems(
 			insertText,
 			kind: completionKind,
 			detail,
+			tags: Boolean(variable.sassdoc?.deprecated) ? [CompletionItemTag.Deprecated] : [],
 			documentation: {
 				kind: MarkupKind.Markdown,
 				value: documentation,
@@ -246,10 +247,11 @@ function createMixinCompletionItems(
 		completions.push({
 			label: mixin.name,
 			filterText,
-			kind: CompletionItemKind.Function,
+			kind: CompletionItemKind.Snippet,
 			detail,
 			insertTextFormat: InsertTextFormat.Snippet,
 			insertText,
+			tags: Boolean(mixin.sassdoc?.deprecated) ? [CompletionItemTag.Deprecated] : [],
 			documentation: {
 				kind: MarkupKind.Markdown,
 				value: documentation,
@@ -302,10 +304,11 @@ function createFunctionCompletionItems(
 		completions.push({
 			label: func.name,
 			filterText,
-			kind: CompletionItemKind.Interface,
+			kind: CompletionItemKind.Function,
 			detail,
 			insertTextFormat: InsertTextFormat.Snippet,
 			insertText,
+			tags: Boolean(func.sassdoc?.deprecated) ? [CompletionItemTag.Deprecated] : [],
 			documentation: {
 				kind: MarkupKind.Markdown,
 				value: documentation,

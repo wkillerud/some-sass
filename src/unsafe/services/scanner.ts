@@ -54,23 +54,28 @@ export default class ScannerService {
 			return;
 		}
 
-		const content = await readFile(filepath);
-		const document = TextDocument.create(uri, 'scss', 1, content);
-		const scssDocument = await parseDocument(document, workspaceRoot);
+		try {
+			const content = await readFile(filepath);
+			const document = TextDocument.create(uri, 'scss', 1, content);
+			const scssDocument = await parseDocument(document, workspaceRoot);
+			// TODO: be inspired by the way the LSP sample handles document storage and cache invalidation? Documents can be renamed, deleted.
+			this._storage.set(scssDocument.uri, scssDocument);
 
-		// TODO: be inspired by the way the LSP sample handles document storage and cache invalidation? Documents can be renamed, deleted.
-		this._storage.set(scssDocument.uri, scssDocument);
-
-		if (depth > this.maxDepth || !this._settings.scanImportedFiles) {
-			return;
-		}
-
-		for (const symbol of scssDocument.getLinks()) {
-			if (!symbol.link.target || (symbol as ScssImport).dynamic || (symbol as ScssImport).css) {
-				continue;
+			if (depth > this.maxDepth || !this._settings.scanImportedFiles) {
+				return;
 			}
 
-			await this.parse(URI.parse(symbol.link.target).fsPath, workspaceRoot, depth + 1);
+			for (const symbol of scssDocument.getLinks()) {
+				if (!symbol.link.target || (symbol as ScssImport).dynamic || (symbol as ScssImport).css) {
+					continue;
+				}
+
+				await this.parse(URI.parse(symbol.link.target).fsPath, workspaceRoot, depth + 1);
+			}
+		} catch (e) {
+			console.error((e as Error)?.message);
+			// Something went wrong parsing this file. Try to parse the others.
+			return;
 		}
 	}
 }

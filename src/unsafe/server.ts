@@ -92,7 +92,14 @@ connection.onInitialize(
 );
 
 documents.onDidChangeContent(async (change) => {
-	await scannerService.update(change.document, workspaceRoot);
+	try {
+		await scannerService.update(change.document, workspaceRoot);
+	} catch (e) {
+		// Something went wrong trying to parse the changed document.
+		console.error((e as Error)?.message);
+		return;
+	}
+
 	const diagnostics = await doDiagnostics(change.document, storageService);
 
 	// Check that no new version has been made while we waited

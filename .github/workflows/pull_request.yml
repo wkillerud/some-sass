@@ -26,10 +26,13 @@ jobs:
       - name: Run linter
         run: npm run lint
 
-      - name: Run tests in simulated X environment
-        run: xvfb-run -a npm run test
-        if: runner.os == 'Linux'
-
       - name: Run tests
         run: npm run test
+
+      - name: Run e2e tests in simulated X environment
+        run: xvfb-run -a npm run test:e2e
+        if: runner.os == 'Linux'
+
+      - name: Run e2e tests
+        run: npm run test:e2e
         if: runner.os != 'Linux'

@@ -1,0 +1,12 @@
+/// @deprecated Use something else.
+@function old-function() {
+  @return 1;
+}
+
+/// @deprecated Use something else.
+$old-variable: 'value';
+
+/// @deprecated Use something else.
+@mixin old-mixin {
+  content: 'mixin';
+}

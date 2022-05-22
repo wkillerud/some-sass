@@ -10,6 +10,7 @@ import {
 	ProposedFeatures
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
+import { URI } from 'vscode-uri';
 
 import type { ISettings } from './types/settings';
 
@@ -17,20 +18,20 @@ import ScannerService from './services/scanner';
 import StorageService from './services/storage';
 
 import { doCompletion } from './providers/completion';
+import { doDiagnostics } from './providers/diagnostics';
 import { doHover } from './providers/hover';
 import { doSignatureHelp } from './providers/signatureHelp';
 import { goDefinition } from './providers/goDefinition';
 import { searchWorkspaceSymbol } from './providers/workspaceSymbol';
 import { findFiles } from './utils/fs';
 import { getSCSSRegionsDocument } from './utils/vue-svelte';
-import { URI } from 'vscode-uri';
 
 interface InitializationOption {
 	workspace: string;
 	settings: ISettings;
 }
 
-let workspaceRoot: string;
+let workspaceRoot: URI;
 let settings: ISettings;
 let storageService: StorageService;
 let scannerService: ScannerService;
@@ -55,20 +56,20 @@ connection.onInitialize(
 	async (params: InitializeParams): Promise<InitializeResult> => {
 		const options = params.initializationOptions as InitializationOption;
 
-		workspaceRoot = options.workspace;
+		workspaceRoot = URI.file(options.workspace);
 		settings = options.settings;
 
 		storageService = new StorageService();
 		scannerService = new ScannerService(storageService, settings);
 
 		const files = await findFiles('**/*.scss', {
-			cwd: workspaceRoot,
+			cwd: workspaceRoot.fsPath,
 			deep: settings.scannerDepth,
 			ignore: settings.scannerExclude
 		});
 
 		try {
-			await scannerService.scan(files);
+			await scannerService.scan(files, workspaceRoot);
 		} catch (error) {
 			if (settings.showErrors) {
 				connection.window.showErrorMessage(String(error));
@@ -90,14 +91,24 @@ connection.onInitialize(
 	}
 );
 
+documents.onDidChangeContent(async (change) => {
+	await scannerService.update(change.document, workspaceRoot);
+	const diagnostics = await doDiagnostics(change.document, storageService);
+
+	// Check that no new version has been made while we waited
+	const latestTextDocument = documents.get(change.document.uri);
+	if (latestTextDocument && latestTextDocument.version === change.document.version) {
+		connection.sendDiagnostics({ uri: latestTextDocument.uri, diagnostics });
+	}
+});
+
 connection.onDidChangeConfiguration(params => {
 	settings = params.settings.somesass;
 });
 
 connection.onDidChangeWatchedFiles(event => {
 	const files = event.changes.map((file) => URI.parse(file.uri).fsPath);
-
-	return scannerService.scan(files);
+	return scannerService.scan(files, workspaceRoot);
 });
 
 connection.onCompletion(textDocumentPosition => {
@@ -165,7 +176,7 @@ connection.onDefinition(textDocumentPosition => {
 });
 
 connection.onWorkspaceSymbol(workspaceSymbolParams => {
-	return searchWorkspaceSymbol(workspaceSymbolParams.query, storageService, workspaceRoot);
+	return searchWorkspaceSymbol(workspaceSymbolParams.query, storageService, workspaceRoot.toString());
 });
 
 connection.onShutdown(() => {

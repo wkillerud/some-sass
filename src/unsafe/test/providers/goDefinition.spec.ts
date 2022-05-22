@@ -2,38 +2,42 @@
 
 import assert from 'assert';
 
-import { URI } from 'vscode-uri';
+import { TextDocument } from 'vscode-languageserver-textdocument';
+import { SymbolKind } from 'vscode-languageserver';
 
 import StorageService from '../../services/storage';
 import { goDefinition } from '../../providers/goDefinition';
 import * as helpers from '../helpers';
+import { ScssDocument } from '../../document';
 
 const storage = new StorageService();
 
-storage.set('one.scss', {
-	document: 'one.scss',
-	filepath: 'one.scss',
-	variables: [
-		{ name: '$a', value: '1', offset: 0, position: { line: 1, character: 1 } }
-	],
-	mixins: [
-		{ name: 'mixin', parameters: [], offset: 0, position: { line: 1, character: 1 } }
-	],
-	functions: [
-		{ name: 'make', parameters: [], offset: 0, position: { line: 1, character: 1 } }
-	],
-	imports: []
-});
+storage.set('one.scss', new ScssDocument(
+	TextDocument.create("./one.scss", 'scss', 1, ""),
+	{
+		variables: new Map(
+			[["$a", { name: '$a', kind: SymbolKind.Variable, value: '1', offset: 0, position: { line: 1, character: 1 } }]]
+		),
+		mixins: new Map(
+			[["mixin", { name: 'mixin',kind: SymbolKind.Method, parameters: [], offset: 0, position: { line: 1, character: 1 } } ]]
+		),
+		functions: new Map(
+			[["make", { name: 'make', kind: SymbolKind.Function, parameters: [], offset: 0, position: { line: 1, character: 1 } } ]]
+		),
+		imports: new Map(),
+		uses: new Map(),
+		forwards: new Map(),
+	}
+));
 
 describe('Providers/GoDefinition', () => {
 	it('doGoDefinition - Variables', async () => {
-		const document = helpers.makeDocument('.a { content: $a; }');
+		const document = await helpers.makeDocument(storage, '.a { content: $a; }');
 
 		const actual = await goDefinition(document, 15, storage);
 
-
-
-		assert.ok(URI.parse(actual?.uri ?? ''), 'one.scss');
+		assert.ok(actual);
+		assert.strictEqual(actual?.uri, './one.scss');
 		assert.deepStrictEqual(actual?.range, {
 			start: { line: 1, character: 1 },
 			end: { line: 1, character: 3 }
@@ -41,7 +45,7 @@ describe('Providers/GoDefinition', () => {
 	});
 
 	it('doGoDefinition - Variable definition', async () => {
-		const document = helpers.makeDocument('$a: 1;');
+		const document = await helpers.makeDocument(storage, '$a: 1;');
 
 		const actual = await goDefinition(document, 2, storage);
 
@@ -49,11 +53,12 @@ describe('Providers/GoDefinition', () => {
 	});
 
 	it('doGoDefinition - Mixins', async () => {
-		const document = helpers.makeDocument('.a { @include mixin(); }');
+		const document = await helpers.makeDocument(storage, '.a { @include mixin(); }');
 
 		const actual = await goDefinition(document, 16, storage);
 
-		assert.ok(URI.parse(actual?.uri ?? ''), 'one.scss');
+		assert.ok(actual);
+		assert.strictEqual(actual?.uri, './one.scss');
 		assert.deepStrictEqual(actual?.range, {
 			start: { line: 1, character: 1 },
 			end: { line: 1, character: 6 }
@@ -61,7 +66,7 @@ describe('Providers/GoDefinition', () => {
 	});
 
 	it('doGoDefinition - Mixin definition', async () => {
-		const document = helpers.makeDocument('@mixin mixin($a) {}');
+		const document = await helpers.makeDocument(storage, '@mixin mixin($a) {}');
 
 		const actual = await goDefinition(document, 8, storage);
 
@@ -69,7 +74,7 @@ describe('Providers/GoDefinition', () => {
 	});
 
 	it('doGoDefinition - Mixin Arguments', async () => {
-		const document = helpers.makeDocument('@mixin mixin($a) {}');
+		const document = await helpers.makeDocument(storage, '@mixin mixin($a) {}');
 
 		const actual = await goDefinition(document, 10, storage);
 
@@ -77,11 +82,12 @@ describe('Providers/GoDefinition', () => {
 	});
 
 	it('doGoDefinition - Functions', async () => {
-		const document = helpers.makeDocument('.a { content: make(1); }');
+		const document = await helpers.makeDocument(storage, '.a { content: make(1); }');
 
 		const actual = await goDefinition(document, 16, storage);
 
-		assert.ok(URI.parse(actual?.uri ?? ''), 'one.scss');
+		assert.ok(actual);
+		assert.strictEqual(actual?.uri, './one.scss');
 		assert.deepStrictEqual(actual?.range, {
 			start: { line: 1, character: 1 },
 			end: { line: 1, character: 5 }
@@ -89,7 +95,7 @@ describe('Providers/GoDefinition', () => {
 	});
 
 	it('doGoDefinition - Function definition', async () => {
-		const document = helpers.makeDocument('@function make($a) {}');
+		const document = await helpers.makeDocument(storage, '@function make($a) {}');
 
 		const actual = await goDefinition(document, 8, storage);
 
@@ -97,7 +103,7 @@ describe('Providers/GoDefinition', () => {
 	});
 
 	it('doGoDefinition - Function Arguments', async () => {
-		const document = helpers.makeDocument('@function make($a) {}');
+		const document = await helpers.makeDocument(storage, '@function make($a) {}');
 
 		const actual = await goDefinition(document, 13, storage);
 

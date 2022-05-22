@@ -4,14 +4,12 @@ import { MarkupKind, SignatureHelp, SignatureInformation } from 'vscode-language
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 import { tokenizer } from 'scss-symbols-parser';
 
-import type { IFunction, IMixin } from '../types/symbols';
+import type { ScssFunction, ScssMixin } from '../types/symbols';
 import type StorageService from '../services/storage';
 
-import { parseDocument } from '../services/parser';
-import { getSymbolsCollection } from '../utils/symbols';
 import { getTextBeforePosition } from '../utils/string';
 import { hasInFacts } from '../utils/facts';
-import { applySassDoc } from './sassdoc';
+import { applySassDoc } from '../utils/sassdoc';
 
 // RegExp's
 const reNestedParenthesis = /\(([\w-]+)\(/;
@@ -78,10 +76,11 @@ function getSymbolName(text: string): string | null | undefined {
  * Returns Mixin name and its parameters from line.
  */
 function parseArgumentsAtLine(text: string): IMixinEntry {
-	text = text.trim();
-	if (text.includes('{')) {
-		text = text.slice(text.indexOf('{') + 1, text.length).trim();
+	const indexOfOpenCurly = text.indexOf('{');
+	if (indexOfOpenCurly !== -1) {
+		text = text.slice(indexOfOpenCurly + 1, text.length);
 	}
+	text = text.trim();
 
 	// Try to find name of Mixin or Function
 	const name = getSymbolName(text);
@@ -93,7 +92,7 @@ function parseArgumentsAtLine(text: string): IMixinEntry {
 	}
 
 	let parameters = 0;
-	if (paramsString.substr(1).length !== 0) {
+	if (paramsString.substring(1).length !== 0) {
 		const tokens = tokenizer(paramsString);
 
 		if (tokens.length === 1 && tokens[0][0] === 'brackets') {
@@ -144,7 +143,7 @@ export async function doSignatureHelp(
 	offset: number,
 	storage: StorageService
 ): Promise<SignatureHelp> {
-	const suggestions: Array<{ symbol: IMixin | IFunction; path: string | undefined }> = [];
+	const suggestions: Array<{ symbol: ScssMixin | ScssFunction; path: string | undefined }> = [];
 
 	const ret: SignatureHelp = {
 		activeSignature: 0,
@@ -163,19 +162,16 @@ export async function doSignatureHelp(
 		return ret;
 	}
 
-	const symbolType = textBeforeWord.indexOf('@include') !== -1 ? 'mixins' : 'functions';
+	const symbolType = textBeforeWord.indexOf('@include') !== -1 ? 'mixin' : 'function';
 
-	const resource = await parseDocument(document, offset);
-
-	storage.set(document.uri, resource.symbols);
-
-	getSymbolsCollection(storage).forEach(symbols => {
-		symbols[symbolType].forEach((symbol: IMixin | IFunction) => {
+	for (const scssDocument of storage.values()) {
+		const symbols = symbolType === "mixin" ? scssDocument.mixins.values() : scssDocument.functions.values();
+		for (const symbol of symbols) {
 			if (entry.name === symbol.name && symbol.parameters.length >= entry.parameters) {
-				suggestions.push({ symbol, path: symbols.filepath });
+				suggestions.push({ symbol, path: scssDocument.uri });
 			}
-		});
-	});
+		}
+	}
 
 	if (suggestions.length === 0) {
 		return ret;
@@ -183,13 +179,12 @@ export async function doSignatureHelp(
 
 	ret.activeParameter = Math.max(0, entry.parameters);
 
-	for (let { symbol, path } of suggestions) {
+	for (let { symbol } of suggestions) {
 		const paramsString = symbol.parameters.map(x => `${x.name}: ${x.value}`).join(', ');
 		const signatureInfo = SignatureInformation.create(`${symbol.name} (${paramsString})`);
 
-		const sassdoc = await applySassDoc(
-			{ document: path, info: symbol },
-			symbolType === "mixins" ? "mixin" : "function",
+		const sassdoc = applySassDoc(
+			symbol,
 			{ displayOptions: { description: true, deprecated: true, return: true }}
 		);
 

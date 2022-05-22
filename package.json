@@ -2,7 +2,7 @@
 	"name": "some-sass",
 	"displayName": "Some Sass",
 	"description": "Autocompletion, refactoring, and documentation support for SCSS",
-	"version": "1.0.1",
+	"version": "2.0.0",
 	"publisher": "SomewhatStationery",
 	"license": "MIT",
 	"engines": {
@@ -55,14 +55,6 @@
 					"default": true,
 					"description": "Allows scan imported files."
 				},
-				"somesass.implicitlyLabel": {
-					"type": [
-						"string",
-						"null"
-					],
-					"default": "(implicitly)",
-					"description": "The text of a label that the file imported implicitly. If `null` then label not displayed."
-				},
 				"somesass.showErrors": {
 					"type": "boolean",
 					"default": false,
@@ -114,7 +106,7 @@
 		"color": "4.2.3",
 		"color-name": "1.1.4",
 		"fast-glob": "3.2.11",
-		"scss-sassdoc-parser": "1.0.1",
+		"scss-sassdoc-parser": "1.0.2",
 		"scss-symbols-parser": "2.0.1",
 		"vscode-css-languageservice": "5.4.2",
 		"vscode-languageclient": "8.0.1",
@@ -129,7 +121,7 @@
 		"webpack-dev": "webpack --mode development --watch",
 		"package": "webpack --mode production --devtool hidden-source-map",
 		"lint": "eslint \"src/**/*.ts\" --cache",
-		"test": "npm run webpack && npm run test:clean && npm run test:compile && npm run test:unit && npm run test:e2e",
+		"test": "npm run webpack && npm run test:clean && npm run test:compile && npm run test:unit",
 		"test:clean": "rimraf out",
 		"test:compile": "tsc -p ./",
 		"test:unit": "mocha \"out/**/*.spec.js\"",

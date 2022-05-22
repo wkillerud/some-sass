@@ -2,18 +2,14 @@
 
 import { CompletionList, CompletionItemKind, CompletionItem, MarkupKind, InsertTextFormat } from 'vscode-languageserver';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
-import { URI } from 'vscode-uri';
 
-import type { IMixin, IDocumentSymbols } from '../types/symbols';
 import type { ISettings } from '../types/settings';
 import type StorageService from '../services/storage';
+import type { IScssDocument, ScssMixin } from '../types/symbols';
 
-import { parseDocument } from '../services/parser';
-import { getSymbolsRelatedToDocument } from '../utils/symbols';
-import { getDocumentPath } from '../utils/document';
 import { getCurrentWord, getLimitedString, getTextBeforePosition } from '../utils/string';
 import { getVariableColor } from '../utils/color';
-import { applySassDoc } from './sassdoc';
+import { applySassDoc } from '../utils/sassdoc';
 
 // RegExp's
 const rePropertyValue = /.*:\s*/;
@@ -25,22 +21,11 @@ const reQuotes = /['"]/;
 const rePrivate = /^\$[_-].*$/;
 
 /**
- * Returns `true` if the path is not present in the document.
- */
-function isImplicitly(symbolsDocument: string | undefined, documentPath: string, documentImports: string[]): boolean {
-	if (symbolsDocument === undefined) {
-		return true;
-	}
-
-	return symbolsDocument !== documentPath && documentImports.indexOf(symbolsDocument) === -1;
-}
-
-/**
  * Return Mixin as string.
  */
-function makeMixinDocumentation(symbol: IMixin): string {
+function makeMixinDocumentation(symbol: ScssMixin): string {
 	const args = symbol.parameters.map(item => `${item.name}: ${item.value}`).join(', ');
-	return `${symbol.name}(${args}) {\u2026}`;
+	return `${symbol.name}(${args})`;
 }
 
 /**
@@ -99,8 +84,9 @@ function isInterpolationContext(text: string): boolean {
 }
 
 function createCompletionContext(document: TextDocument, offset: number, settings: ISettings) {
-	const currentWord = getCurrentWord(document.getText(), offset);
-	const textBeforeWord = getTextBeforePosition(document.getText(), offset);
+	const text = document.getText();
+	const currentWord = getCurrentWord(text, offset);
+	const textBeforeWord = getTextBeforePosition(text, offset);
 
 	// Is "#{INTERPOLATION}"
 	const isInterpolation = isInterpolationContext(currentWord);
@@ -125,209 +111,164 @@ function createCompletionContext(document: TextDocument, offset: number, setting
 	};
 }
 
-async function createVariableCompletionItems(
-	symbols: IDocumentSymbols[],
-	filepath: string,
-	imports: string[],
-	settings: ISettings
-): Promise<CompletionItem[]> {
+function createVariableCompletionItems(
+	scssDocument: IScssDocument,
+	currentDocument: TextDocument
+): CompletionItem[] {
 	const completions: CompletionItem[] = [];
 
-	for (let symbol of symbols) {
-		const isImplicitlyImport = isImplicitly(symbol.document, filepath, imports);
-		const fsPath = getDocumentPath(filepath, isImplicitlyImport ? symbol.filepath : symbol.document);
+	for (let variable of scssDocument.variables.values()) {
+		const color = variable.value ? getVariableColor(variable.value) : null;
+		const completionKind = color ? CompletionItemKind.Color : CompletionItemKind.Variable;
 
-		for (let variable of symbol.variables) {
+		let documentation = getLimitedString(color ? color.toString() : variable.value || '');
+		let detail = `Variable declared in ${scssDocument.fileName}`;
+		if (variable.mixin) {
+			// Add 'argument from MIXIN_NAME' suffix if Variable is Mixin argument
+			detail = `Argument from ${variable.mixin}, ${detail.toLowerCase()}`;
+		} else {
 			const isPrivate = variable.name.match(rePrivate);
-			if (symbol.filepath !== filepath && isPrivate) {
-				// Don't suggest private variables from other files
+			const isFromCurrentDocument = scssDocument.uri === currentDocument.uri;
+
+			if (isPrivate && !isFromCurrentDocument) {
 				continue;
 			}
 
-			const color = getVariableColor(variable.value || '');
-			const completionKind = color ? CompletionItemKind.Color : CompletionItemKind.Variable;
-
-			// Add 'implicitly' prefix for Path if the file imported implicitly
-			let detailPath = fsPath;
-			if (isImplicitlyImport && settings.implicitlyLabel) {
-				detailPath = settings.implicitlyLabel + ' ' + detailPath;
+			const sassdoc = applySassDoc(
+				variable,
+				{ displayOptions: { description: true, deprecated: true, type: true }}
+			);
+			if (sassdoc) {
+				documentation += `\n\n${sassdoc}`;
 			}
-
-
-			let documentation = getLimitedString(color ? color.toString() : variable.value || '');
-			let detailText = detailPath;
-			if (variable.mixin) {
-				// Add 'argument from MIXIN_NAME' suffix if Variable is Mixin argument
-				detailText = `argument from ${variable.mixin}, ${detailText}`;
-			} else {
-				// See if there is sassdoc for this standalone variable
-				const sassdoc = await applySassDoc(
-					{ document: symbol.filepath, info: variable },
-					"function",
-					{ displayOptions: { description: true, deprecated: true, type: true }}
-				);
-				if (sassdoc) {
-					documentation += `\n\n${sassdoc}`;
-				}
-			}
-
-			completions.push({
-				label: variable.name,
-				kind: completionKind,
-				detail: detailText,
-				documentation: {
-					kind: MarkupKind.Markdown,
-					value: documentation,
-				},
-			});
 		}
+
+		completions.push({
+			label: variable.name,
+			kind: completionKind,
+			detail,
+			documentation: {
+				kind: MarkupKind.Markdown,
+				value: documentation,
+			},
+		});
 	}
 
 	return completions;
 }
 
-async function createMixinCompletionItems(
-	symbols: IDocumentSymbols[],
-	filepath: string,
-	imports: string[],
-	settings: ISettings
-): Promise<CompletionItem[]> {
+function createMixinCompletionItems(
+	scssDocument: IScssDocument,
+	currentDocument: TextDocument
+): CompletionItem[] {
 	const completions: CompletionItem[] = [];
 
-	for (let symbol of symbols) {
-		const isImplicitlyImport = isImplicitly(symbol.document, filepath, imports);
-		const fsPath = getDocumentPath(filepath, isImplicitlyImport ? symbol.filepath : symbol.document);
-
-		for (let mixin of symbol.mixins) {
-			const isPrivate = mixin.name.match(rePrivate);
-			if (symbol.filepath !== filepath && isPrivate) {
-				// Don't suggest private mixins from other files
-				continue;
-			}
-
-			// Add 'implicitly' prefix for Path if the file imported implicitly
-			let detailPath = fsPath;
-			if (isImplicitlyImport && settings.implicitlyLabel) {
-				detailPath = settings.implicitlyLabel + ' ' + detailPath;
-			}
-
-			let documentation = makeMixinDocumentation(mixin);
-			const sassdoc = await applySassDoc(
-				{ document: symbol.filepath, info: mixin },
-				"mixin",
-				{ displayOptions: { content: true, description: true,  deprecated: true, output: true }}
-			);
-			if (sassdoc) {
-				documentation += `\n\n${sassdoc}`;
-			}
-
-			let insertText = mixin.name;
-
-			// Use the SnippetString syntax to provide smart completions of parameter names
-			if (mixin.parameters.length > 0) {
-				const parametersSnippet = mixin.parameters.map((p, index) => "${" + (index + 1) + ":\$" + p.name + "}").join(", ")
-				insertText += `(${parametersSnippet})`;
-			}
-
-			// Not all mixins have @content, but when they do, be smart about adding brackets
-			// and move the cursor to be ready to add said contents.
-			if (sassdoc && sassdoc.includes("@content")) {
-				insertText += " {\n\t$0\n}"
-			}
-
-			completions.push({
-				label: mixin.name,
-				kind: CompletionItemKind.Function,
-				detail: detailPath,
-				insertTextFormat: InsertTextFormat.Snippet,
-				insertText,
-				documentation: {
-					kind: MarkupKind.Markdown,
-					value: documentation,
-				}
-			});
+	for (let mixin of scssDocument.mixins.values()) {
+		const isPrivate = mixin.name.match(rePrivate);
+		const isFromCurrentDocument = scssDocument.uri === currentDocument.uri;
+		if (isPrivate && !isFromCurrentDocument) {
+			// Don't suggest private mixins from other files
+			continue;
 		}
+
+		let documentation = makeMixinDocumentation(mixin);
+		const sassdoc = applySassDoc(
+			mixin,
+			{ displayOptions: { content: true, description: true,  deprecated: true, output: true }}
+		);
+		if (sassdoc) {
+			documentation += `\n____\n${sassdoc}`;
+		}
+
+		let insertText = mixin.name;
+
+		// Use the SnippetString syntax to provide smart completions of parameter names
+		if (mixin.parameters.length > 0) {
+			const parametersSnippet = mixin.parameters.map((p, index) => "${" + (index + 1) + ":\$" + p.name + "}").join(", ")
+			insertText += `(${parametersSnippet})`;
+		}
+
+		// Not all mixins have @content, but when they do, be smart about adding brackets
+		// and move the cursor to be ready to add said contents.
+		if (sassdoc && sassdoc.includes("@content")) {
+			insertText += " {\n\t$0\n}"
+		}
+
+		const detail = `Mixin declared in ${scssDocument.fileName}`;
+
+		completions.push({
+			label: mixin.name,
+			kind: CompletionItemKind.Function,
+			detail,
+			insertTextFormat: InsertTextFormat.Snippet,
+			insertText,
+			documentation: {
+				kind: MarkupKind.Markdown,
+				value: documentation,
+			}
+		});
 	}
 
 	return completions;
 }
 
-async function createFunctionCompletionItems(
-	symbols: IDocumentSymbols[],
-	filepath: string,
-	imports: string[],
-	settings: ISettings
-): Promise<CompletionItem[]> {
+function createFunctionCompletionItems(
+	scssDocument: IScssDocument,
+	currentDocument: TextDocument
+): CompletionItem[] {
 	const completions: CompletionItem[] = [];
 
-	for (let symbol of symbols) {
-		const isImplicitlyImport = isImplicitly(symbol.document, filepath, imports);
-		const fsPath = getDocumentPath(filepath, isImplicitlyImport ? symbol.filepath : symbol.document);
+	for (let func of scssDocument.functions.values()) {
+		const isPrivate = func.name.match(rePrivate);
+		const isFromCurrentDocument = scssDocument.uri === currentDocument.uri;
+		if (isPrivate && !isFromCurrentDocument) {
+			// Don't suggest private functions from other files
+			continue;
+		}
 
-		for (let func of symbol.functions) {
-			const isPrivate = func.name.match(rePrivate);
-			if (symbol.filepath !== filepath && isPrivate) {
-				// Don't suggest private functions from other files
-				continue;
+		let insertText = func.name;
+
+		// Use the SnippetString syntax to provide smart completions of parameter names
+		if (func.parameters.length > 0) {
+			const parametersSnippet = func.parameters.map((p, index) => "${" + (index + 1) + ":\$" + p.name + "}").join(", ")
+			insertText += `(${parametersSnippet})`;
+		}
+
+
+		let documentation = makeMixinDocumentation(func);
+		const sassdoc = applySassDoc(
+			func,
+			{ displayOptions: { description: true, deprecated: true, return: true }}
+		);
+		if (sassdoc) {
+			documentation += `\n____\n${sassdoc}`;
+		}
+
+		const detail = `Function declared in ${scssDocument.fileName}`;
+
+		completions.push({
+			label: func.name,
+			kind: CompletionItemKind.Interface,
+			detail,
+			insertTextFormat: InsertTextFormat.Snippet,
+			insertText,
+			documentation: {
+				kind: MarkupKind.Markdown,
+				value: documentation,
 			}
-
-			// Add 'implicitly' prefix for Path if the file imported implicitly
-			let detailPath = fsPath;
-			if (isImplicitlyImport && settings.implicitlyLabel) {
-				detailPath = settings.implicitlyLabel + ' ' + detailPath;
-			}
-
-			let insertText = func.name;
-
-			// Use the SnippetString syntax to provide smart completions of parameter names
-			if (func.parameters.length > 0) {
-				const parametersSnippet = func.parameters.map((p, index) => "${" + (index + 1) + ":\$" + p.name + "}").join(", ")
-				insertText += `(${parametersSnippet})`;
-			}
-
-			let documentation = makeMixinDocumentation(func);
-			const sassdoc = await applySassDoc(
-				{ document: symbol.filepath, info: func },
-				"function",
-				{ displayOptions: { description: true, deprecated: true, return: true }}
-			);
-			if (sassdoc) {
-				documentation += `\n\n${sassdoc}`;
-			}
-
-			completions.push({
-				label: func.name,
-				kind: CompletionItemKind.Interface,
-				detail: detailPath,
-				insertTextFormat: InsertTextFormat.Snippet,
-				insertText,
-				documentation: {
-					kind: MarkupKind.Markdown,
-					value: documentation,
-				}
-			});
-		};
+		});
 	};
 
 	return completions;
 }
 
-export async function doCompletion(
+export function doCompletion(
 	document: TextDocument,
 	offset: number,
 	settings: ISettings,
 	storage: StorageService
-): Promise<CompletionList | null> {
+): CompletionList {
 	const completions = CompletionList.create([], false);
-
-	const documentPath = URI.parse(document.uri).fsPath;
-
-	const resource = await parseDocument(document, offset);
-
-	storage.set(document.uri, resource.symbols);
-
-	const symbolsList = getSymbolsRelatedToDocument(storage, documentPath);
-	const documentImports = resource.symbols.imports.map(x => x.filepath);
 	const context = createCompletionContext(document, offset, settings);
 
 	// Drop suggestions inside `//` and `/* */` comments
@@ -335,22 +276,17 @@ export async function doCompletion(
 		return completions;
 	}
 
-	if (settings.suggestVariables && context.variable) {
-		const variables = await createVariableCompletionItems([resource.symbols, ...symbolsList], documentPath, documentImports, settings);
-
-		completions.items = completions.items.concat(variables);
-	}
-
-	if (settings.suggestMixins && context.mixin) {
-		const mixins = await createMixinCompletionItems([resource.symbols, ...symbolsList], documentPath, documentImports, settings);
-
-		completions.items = completions.items.concat(mixins);
-	}
-
-	if (settings.suggestFunctions && context.function) {
-		const functions = await createFunctionCompletionItems([resource.symbols, ...symbolsList], documentPath, documentImports, settings);
-
-		completions.items = completions.items.concat(functions);
+	for (const scssDocument of storage.values()) {
+		if (settings.suggestVariables && context.variable) {
+			const variables = createVariableCompletionItems(scssDocument, document);
+			completions.items = completions.items.concat(variables);
+		} else if (settings.suggestMixins && context.mixin) {
+			const mixins = createMixinCompletionItems(scssDocument, document);
+			completions.items = completions.items.concat(mixins);
+		} else if (settings.suggestFunctions && context.function) {
+			const functions = createFunctionCompletionItems(scssDocument, document);
+			completions.items = completions.items.concat(functions);
+		}
 	}
 
 	return completions;

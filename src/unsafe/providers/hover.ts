@@ -1,146 +1,91 @@
 'use strict';
 
-import { Hover, MarkupContent, MarkupKind } from 'vscode-languageserver';
+import { Hover, MarkupContent, MarkupKind, SymbolKind } from 'vscode-languageserver';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
-import { URI } from 'vscode-uri';
 
 import { NodeType } from '../types/nodes';
-import type { IDocumentSymbols, IVariable, IMixin, IFunction, ISymbols } from '../types/symbols';
+import type { IScssDocument, ScssSymbol, ScssVariable, ScssMixin, ScssFunction } from '../types/symbols';
 import type StorageService from '../services/storage';
 
-import { parseDocument } from '../services/parser';
-import { getSymbolsCollection } from '../utils/symbols';
-import { getDocumentPath } from '../utils/document';
 import { getLimitedString } from '../utils/string';
-import { applySassDoc} from './sassdoc';
+import { applySassDoc} from '../utils/sassdoc';
 
-type Identifier = { type: keyof ISymbols; name: string };
+type Identifier = { kind: SymbolKind; name: string };
 
-async function formatVariableMarkupContent(symbol: ISymbol, suffix: string): Promise<MarkupContent> {
-	const variable = symbol.info as IVariable;
-	const fsPath = symbol.path;
+
+async function formatVariableMarkupContent(variable: ScssVariable, sourceDocument: IScssDocument): Promise<MarkupContent> {
 	const value = getLimitedString(variable.value || '');
-	if (fsPath !== 'current') {
-		suffix = `\n@import "${fsPath}"` + suffix;
-	}
 
 	const result = {
 		kind: MarkupKind.Markdown,
 		value: [
 			'```scss',
-			`${variable.name}: ${value};${suffix}`,
+			`${variable.name}: ${value};`,
 			'```',
 		].join('\n')
 	};
 
-	const sassdoc = await applySassDoc(symbol, "variable");
+	const sassdoc = applySassDoc(variable);
 	if (sassdoc) {
 		result.value += `\n____\n${sassdoc}`;
 	}
 
+	result.value += `\n____\nVariable declared in ${sourceDocument.fileName}`;
+
 	return result;
 }
 
-async function formatMixinMarkupContent(symbol: ISymbol, suffix: string): Promise<MarkupContent> {
-	const mixin = symbol.info as IMixin;
-	const fsPath = symbol.path;
+async function formatMixinMarkupContent(mixin: ScssMixin, sourceDocument: IScssDocument): Promise<MarkupContent> {
 	const args = mixin.parameters.map(item => `${item.name}: ${item.value}`).join(', ');
-
-	if (fsPath !== 'current') {
-		suffix = `\n@import "${fsPath}"` + suffix;
-	}
-
 
 	const result = {
 		kind: MarkupKind.Markdown,
 		value: [
 			'```scss',
-			`@mixin ${mixin.name}(${args}) {\u2026}${suffix}`,
-			'```'
+			`@mixin ${mixin.name}(${args})`,
+			'```',
 		].join('\n')
 	}
 
-	const sassdoc = await applySassDoc(symbol, "mixin");
+	const sassdoc = applySassDoc(mixin);
 	if (sassdoc) {
 		result.value += `\n____\n${sassdoc}`;
 	}
 
+	result.value += `\n____\nMixin declared in ${sourceDocument.fileName}`;
+
 	return result;
 }
 
-async function formatFunctionMarkupContent(symbol: ISymbol, suffix: string): Promise<MarkupContent> {
-	const func = symbol.info as IFunction;
-	const fsPath = symbol.path;
+async function formatFunctionMarkupContent(func: ScssFunction, sourceDocument: IScssDocument): Promise<MarkupContent> {
 	const args = func.parameters.map(item => `${item.name}: ${item.value}`).join(', ');
-
-	if (fsPath !== 'current') {
-		suffix = `\n@import "${fsPath}"` + suffix;
-	}
-
 
 	const result = {
 		kind: MarkupKind.Markdown,
 		value: [
 			'```scss',
-			`@function ${func.name}(${args}) {\u2026}${suffix}`,
-			'```'
+			`@function ${func.name}(${args})`,
+			'```',
 		].join('\n')
 	};
 
-	const sassdoc = await applySassDoc(symbol, "function");
+	const sassdoc = applySassDoc(func);
 	if (sassdoc) {
 		result.value += `\n____\n${sassdoc}`;
 	}
 
+	result.value += `\n____\nFunction declared in ${sourceDocument.fileName}`;
+
 	return result;
 }
 
-interface ISymbol {
-	document?: string;
-	path: string;
-	info: any;
-}
-
-/**
- * Returns the Symbol, if it present in the documents.
- */
-function getSymbol(symbolList: IDocumentSymbols[], identifier: Identifier, currentPath: string): ISymbol | null {
-	for (let i = 0; i < symbolList.length; i++) {
-		if (identifier.type === 'imports') {
-			continue;
-		}
-
-		const symbols = symbolList[i];
-
-		if (symbols === undefined) {
-			continue;
-		}
-
-		const symbolsByType = symbols[identifier.type];
-
-		const fsPath = getDocumentPath(currentPath, symbols.filepath || symbols.document);
-
-		for (let j = 0; j < symbolsByType.length; j++) {
-			const symbol = symbolsByType[j];
-
-			if (symbol && symbol.name === identifier.name) {
-				return {
-					document: symbols.document,
-					path: fsPath,
-					info: symbol
-				};
-			}
-		}
+export async function doHover(document: TextDocument, offset: number, storage: StorageService): Promise<Hover | null> {
+	const scssDocument = storage.get(document.uri);
+	if (!scssDocument) {
+		return null;
 	}
 
-	return null;
-}
-
-export async function doHover(document: TextDocument, offset: number, storage: StorageService): Promise<Hover | null> {
-	const documentPath = URI.parse(document.uri).fsPath;
-
-	const resource = await parseDocument(document, offset);
-	const hoverNode = resource.node;
+	const hoverNode = scssDocument.getNodeAt(offset);
 	if (!hoverNode || !hoverNode.type) {
 		return null;
 	}
@@ -152,20 +97,20 @@ export async function doHover(document: TextDocument, offset: number, storage: S
 		if (parent.type !== NodeType.VariableDeclaration && parent.type !== NodeType.FunctionParameter) {
 			identifier = {
 				name: hoverNode.getName(),
-				type: 'variables'
+				kind: SymbolKind.Variable,
 			};
 		}
 	} else if (hoverNode.type === NodeType.Identifier) {
 		let node;
-		let type: keyof ISymbols | null = null;
+		let type: SymbolKind | null = null;
 
 		const parent = hoverNode.getParent();
 		if (parent.type === NodeType.Function) {
 			node = parent;
-			type = 'functions';
+			type = SymbolKind.Function;
 		} else if (parent.type === NodeType.MixinReference) {
 			node = parent;
-			type = 'mixins';
+			type = SymbolKind.Method;
 		}
 
 		if (type === null) {
@@ -175,13 +120,13 @@ export async function doHover(document: TextDocument, offset: number, storage: S
 		if (node) {
 			identifier = {
 				name: node.getName(),
-				type
+				kind: type
 			};
 		}
 	} else if (hoverNode.type === NodeType.MixinReference) {
 		identifier = {
 			name: hoverNode.getName(),
-			type: 'mixins'
+			kind: SymbolKind.Method,
 		};
 	}
 
@@ -189,27 +134,42 @@ export async function doHover(document: TextDocument, offset: number, storage: S
 		return null;
 	}
 
-	storage.set(document.uri, resource.symbols);
-
-	const symbolsList = getSymbolsCollection(storage);
-	const documentImports = resource.symbols.imports.map(x => x.filepath);
-	const symbol = getSymbol(symbolsList, identifier, documentPath);
+	let symbol: ScssSymbol | null = null;
+	let sourceDocument: IScssDocument | null = null;
+	for (const document of storage.values()) {
+		if (identifier.kind === SymbolKind.Variable) {
+			const variable = document.variables.get(identifier.name);
+			if (variable) {
+				symbol = variable;
+				sourceDocument = document;
+				break;
+			}
+		} else if (identifier.kind === SymbolKind.Method) {
+			const mixin = document.mixins.get(identifier.name);
+			if (mixin) {
+				symbol = mixin;
+				sourceDocument = document;
+				break;
+			}
+		} else if (identifier.kind === SymbolKind.Function) {
+			const func = document.functions.get(identifier.name);
+			if (func) {
+				symbol = func;
+				sourceDocument = document;
+				break;
+			}
+		}
+	}
 
 	// Content for Hover popup
 	let contents: MarkupContent | undefined;
-	if (symbol && symbol.document !== undefined) {
-		// Add 'implicitly' suffix if the file imported implicitly
-		let contentSuffix = '';
-		if (symbol.path !== 'current' && symbol.document && documentImports.indexOf(symbol.document) === -1) {
-			contentSuffix = ' (implicitly)';
-		}
-
-		if (identifier.type === 'variables') {
-			contents = await formatVariableMarkupContent(symbol, contentSuffix);
-		} else if (identifier.type === 'mixins') {
-			contents = await formatMixinMarkupContent(symbol, contentSuffix);
-		} else if (identifier.type === 'functions') {
-			contents = await formatFunctionMarkupContent(symbol, contentSuffix);
+	if (symbol && sourceDocument) {
+		if (identifier.kind === SymbolKind.Variable) {
+			contents = await formatVariableMarkupContent(symbol as ScssVariable, sourceDocument);
+		} else if (identifier.kind === SymbolKind.Method) {
+			contents = await formatMixinMarkupContent(symbol as ScssMixin, sourceDocument);
+		} else if (identifier.kind === SymbolKind.Function) {
+			contents = await formatFunctionMarkupContent(symbol as ScssFunction, sourceDocument);
 		}
 	}
 

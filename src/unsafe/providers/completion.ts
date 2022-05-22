@@ -5,11 +5,13 @@ import type { TextDocument } from 'vscode-languageserver-textdocument';
 
 import type { ISettings } from '../types/settings';
 import type StorageService from '../services/storage';
-import type { IScssDocument, ScssMixin } from '../types/symbols';
+import type { IScssDocument, ScssImport, ScssMixin, ScssUse } from '../types/symbols';
 
 import { getCurrentWord, getLimitedString, getTextBeforePosition } from '../utils/string';
 import { getVariableColor } from '../utils/color';
 import { applySassDoc } from '../utils/sassdoc';
+
+type CompletionContext = { comment: boolean; namespace: string | null; variable: boolean; function: boolean; mixin: boolean; };
 
 // RegExp's
 const rePropertyValue = /.*:\s*/;
@@ -83,7 +85,14 @@ function isInterpolationContext(text: string): boolean {
 	return text.includes('#{');
 }
 
-function createCompletionContext(document: TextDocument, offset: number, settings: ISettings) {
+function checkNamespaceContext(currentWord: string): string | null {
+	if (currentWord.length === 0 || !currentWord.includes(".")) {
+		return null;
+	}
+	return currentWord.substring(0, currentWord.indexOf("."));
+}
+
+function createCompletionContext(document: TextDocument, offset: number, settings: ISettings): CompletionContext {
 	const text = document.getText();
 	const currentWord = getCurrentWord(text, offset);
 	const textBeforeWord = getTextBeforePosition(text, offset);
@@ -98,6 +107,7 @@ function createCompletionContext(document: TextDocument, offset: number, setting
 
 	return {
 		comment: isCommentContext(textBeforeWord),
+		namespace: checkNamespaceContext(currentWord),
 		variable: checkVariableContext(currentWord, isInterpolation, isPropertyValue, isEmptyValue, isQuotes),
 		function: checkFunctionContext(
 			textBeforeWord,
@@ -276,7 +286,18 @@ export function doCompletion(
 		return completions;
 	}
 
-	for (const scssDocument of storage.values()) {
+	let iterator: IterableIterator<IScssDocument> = storage.values();
+	if (context.namespace) {
+		const scssDocument = storage.get(document.uri);
+		if (scssDocument) {
+			const namespacedIterator = buildNamespacedIterator(scssDocument, context, storage);
+			if (namespacedIterator) {
+				iterator = namespacedIterator;
+			}
+		}
+	}
+
+	for (const scssDocument of iterator) {
 		if (settings.suggestVariables && context.variable) {
 			const variables = createVariableCompletionItems(scssDocument, document);
 			completions.items = completions.items.concat(variables);
@@ -290,4 +311,49 @@ export function doCompletion(
 	}
 
 	return completions;
+}
+
+function buildNamespacedIterator(document: IScssDocument, context: CompletionContext, storage: StorageService): IterableIterator<IScssDocument> | null {
+	const namespace = context.namespace;
+
+	let use: ScssUse | null = null;
+	for (const candidate of document.uses.values()) {
+		if (candidate.namespace === namespace || candidate.namespace === `_${namespace}`) {
+			use = candidate;
+			break;
+		}
+	}
+
+	if (!use || !use.link.target) {
+		return null;
+	}
+
+	const namespaceRootDocument = storage.get(use.link.target);
+	if (!namespaceRootDocument) {
+		return null;
+	}
+
+	const accumulator: Map<string, IScssDocument> = new Map();
+	traverseTree(accumulator, namespaceRootDocument, storage);
+
+	return accumulator.values();
+}
+
+function traverseTree(accumulator: Map<string, IScssDocument>, leaf: IScssDocument, storage: StorageService) {
+	if (!accumulator.has(leaf.uri)) {
+		accumulator.set(leaf.uri, leaf);
+	}
+
+	for (const child of leaf.getLinks()) {
+		if (!child.link.target || (child as ScssImport).dynamic || (child as ScssImport).css) {
+			continue;
+		}
+
+		const childDocument = storage.get(child.link.target);
+		if (!childDocument) {
+			continue;
+		}
+
+		traverseTree(accumulator, childDocument, storage);
+	}
 }

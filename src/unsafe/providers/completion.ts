@@ -1,13 +1,13 @@
 'use strict';
 
-import { CompletionList, CompletionItemKind, CompletionItem, MarkupKind, InsertTextFormat, CompletionItemTag } from 'vscode-languageserver';
+import { CompletionList, CompletionItemKind, CompletionItem, MarkupKind, InsertTextFormat, CompletionItemTag, CompletionItemLabelDetails } from 'vscode-languageserver';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 
 import type { ISettings } from '../types/settings';
 import type StorageService from '../services/storage';
 import type { IScssDocument, ScssImport, ScssMixin, ScssUse } from '../types/symbols';
 
-import { getCurrentWord, getLimitedString, getTextBeforePosition } from '../utils/string';
+import { getCurrentWord, getLimitedString, getTextBeforePosition, asDollarlessVariable } from '../utils/string';
 import { getVariableColor } from '../utils/color';
 import { applySassDoc } from '../utils/sassdoc';
 
@@ -231,9 +231,16 @@ function createMixinCompletionItems(
 		let insertText = context.namespace ? `.${mixin.name}` : mixin.name;
 
 		// Use the SnippetString syntax to provide smart completions of parameter names
+		let labelDetails: CompletionItemLabelDetails | undefined = undefined;
 		if (mixin.parameters.length > 0) {
-			const parametersSnippet = mixin.parameters.map((p, index) => "${" + (index + 1) + ":\$" + p.name + "}").join(", ")
+			// The snippet syntax does not like `-` in placeholder names, so make them camel case.
+			// These are not suggestions for keyword arguments, it's fine.
+			const parametersSnippet = mixin.parameters.map((p, index) => "${" + (index + 1) + ":" + asDollarlessVariable(p.name) + "}").join(", ")
+			const parameterSignature = mixin.parameters.map(p => p.name).join(", ");
 			insertText += `(${parametersSnippet})`;
+			labelDetails = {
+				detail: `(${parameterSignature})`,
+			};
 		}
 
 		// Not all mixins have @content, but when they do, be smart about adding brackets
@@ -246,6 +253,7 @@ function createMixinCompletionItems(
 
 		completions.push({
 			label: mixin.name,
+			labelDetails,
 			filterText,
 			kind: CompletionItemKind.Snippet,
 			detail,
@@ -284,9 +292,16 @@ function createFunctionCompletionItems(
 		let insertText = context.namespace ? `.${func.name}` : func.name;
 
 		// Use the SnippetString syntax to provide smart completions of parameter names
+		let labelDetails: CompletionItemLabelDetails | undefined = undefined;
 		if (func.parameters.length > 0) {
-			const parametersSnippet = func.parameters.map((p, index) => "${" + (index + 1) + ":\$" + p.name + "}").join(", ")
+			// The snippet syntax does not like `-` in placeholder names, so make them camel case.
+			// These are not suggestions for keyword arguments, it's fine.
+			const parametersSnippet = func.parameters.map((p, index) => "${" + (index + 1) + ":" + asDollarlessVariable(p.name) + "}").join(", ")
+			const functionSignature = func.parameters.map(p => p.name).join(", ");
 			insertText += `(${parametersSnippet})`;
+			labelDetails = {
+				detail: `(${functionSignature})`,
+			};
 		}
 
 
@@ -303,6 +318,7 @@ function createFunctionCompletionItems(
 
 		completions.push({
 			label: func.name,
+			labelDetails,
 			filterText,
 			kind: CompletionItemKind.Function,
 			detail,

@@ -169,7 +169,8 @@ function createVariableCompletionItems(
 
 function createMixinCompletionItems(
 	scssDocument: IScssDocument,
-	currentDocument: TextDocument
+	currentDocument: TextDocument,
+	context: CompletionContext
 ): CompletionItem[] {
 	const completions: CompletionItem[] = [];
 
@@ -190,7 +191,11 @@ function createMixinCompletionItems(
 			documentation += `\n____\n${sassdoc}`;
 		}
 
-		let insertText = mixin.name;
+		// Client needs the namespace as part of the text that is matched,
+		// and inserted text needs to include the `.` which will otherwise
+		// be replaced.
+		const filterText = context.namespace ? `${context.namespace}\.${mixin.name}` : mixin.name;
+		let insertText = context.namespace ? `.${mixin.name}` : mixin.name;
 
 		// Use the SnippetString syntax to provide smart completions of parameter names
 		if (mixin.parameters.length > 0) {
@@ -208,6 +213,7 @@ function createMixinCompletionItems(
 
 		completions.push({
 			label: mixin.name,
+			filterText,
 			kind: CompletionItemKind.Function,
 			detail,
 			insertTextFormat: InsertTextFormat.Snippet,
@@ -224,7 +230,8 @@ function createMixinCompletionItems(
 
 function createFunctionCompletionItems(
 	scssDocument: IScssDocument,
-	currentDocument: TextDocument
+	currentDocument: TextDocument,
+	context: CompletionContext
 ): CompletionItem[] {
 	const completions: CompletionItem[] = [];
 
@@ -236,7 +243,11 @@ function createFunctionCompletionItems(
 			continue;
 		}
 
-		let insertText = func.name;
+		// Client needs the namespace as part of the text that is matched,
+		// and inserted text needs to include the `.` which will otherwise
+		// be replaced.
+		const filterText = context.namespace ? `${context.namespace}.${func.name}` : func.name;
+		let insertText = context.namespace ? `.${func.name}` : func.name;
 
 		// Use the SnippetString syntax to provide smart completions of parameter names
 		if (func.parameters.length > 0) {
@@ -258,6 +269,7 @@ function createFunctionCompletionItems(
 
 		completions.push({
 			label: func.name,
+			filterText,
 			kind: CompletionItemKind.Interface,
 			detail,
 			insertTextFormat: InsertTextFormat.Snippet,
@@ -302,10 +314,10 @@ export function doCompletion(
 			const variables = createVariableCompletionItems(scssDocument, document);
 			completions.items = completions.items.concat(variables);
 		} else if (settings.suggestMixins && context.mixin) {
-			const mixins = createMixinCompletionItems(scssDocument, document);
+			const mixins = createMixinCompletionItems(scssDocument, document, context);
 			completions.items = completions.items.concat(mixins);
 		} else if (settings.suggestFunctions && context.function) {
-			const functions = createFunctionCompletionItems(scssDocument, document);
+			const functions = createFunctionCompletionItems(scssDocument, document, context);
 			completions.items = completions.items.concat(functions);
 		}
 	}

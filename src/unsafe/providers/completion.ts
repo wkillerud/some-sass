@@ -11,7 +11,7 @@ import { getCurrentWord, getLimitedString, getTextBeforePosition } from '../util
 import { getVariableColor } from '../utils/color';
 import { applySassDoc } from '../utils/sassdoc';
 
-type CompletionContext = { comment: boolean; namespace: string | null; variable: boolean; function: boolean; mixin: boolean; };
+type CompletionContext = { word: string; comment: boolean; namespace: string | null; variable: boolean; function: boolean; mixin: boolean; };
 
 // RegExp's
 const rePropertyValue = /.*:\s*/;
@@ -38,9 +38,13 @@ function checkVariableContext(
 	isInterpolation: boolean,
 	isPropertyValue: boolean,
 	isEmptyValue: boolean,
-	isQuotes: boolean
+	isQuotes: boolean,
+	isNamespace: boolean
 ): boolean {
 	if (isPropertyValue && !isEmptyValue && !isQuotes) {
+		if (isNamespace && word.endsWith(".")) {
+			return true;
+		}
 		return word.includes('$');
 	} else if (isQuotes) {
 		return isInterpolation;
@@ -65,9 +69,13 @@ function checkFunctionContext(
 	isPropertyValue: boolean,
 	isEmptyValue: boolean,
 	isQuotes: boolean,
+	isNamespace: boolean,
 	settings: ISettings
 ): boolean {
 	if (isPropertyValue && !isEmptyValue && !isQuotes) {
+		if (isNamespace) {
+			return true;
+		}
 		const lastChar = textBeforeWord.substr(-2, 1);
 		return settings.suggestFunctionsInStringContextAfterSymbols.indexOf(lastChar) !== -1;
 	} else if (isQuotes) {
@@ -105,16 +113,21 @@ function createCompletionContext(document: TextDocument, offset: number, setting
 	const isEmptyValue = reEmptyPropertyValue.test(textBeforeWord);
 	const isQuotes = reQuotes.test(textBeforeWord.replace(reQuotedValueInString, ''));
 
+	// Is namespace, e.g. `namespace.$var` or `@include namespace.mixin` or `namespace.func()`
+	const namespace = checkNamespaceContext(currentWord)
+
 	return {
+		word: currentWord,
 		comment: isCommentContext(textBeforeWord),
-		namespace: checkNamespaceContext(currentWord),
-		variable: checkVariableContext(currentWord, isInterpolation, isPropertyValue, isEmptyValue, isQuotes),
+		namespace,
+		variable: checkVariableContext(currentWord, isInterpolation, isPropertyValue, isEmptyValue, isQuotes, Boolean(namespace)),
 		function: checkFunctionContext(
 			textBeforeWord,
 			isInterpolation,
 			isPropertyValue,
 			isEmptyValue,
 			isQuotes,
+			Boolean(namespace),
 			settings
 		),
 		mixin: checkMixinContext(textBeforeWord, isPropertyValue)
@@ -123,7 +136,8 @@ function createCompletionContext(document: TextDocument, offset: number, setting
 
 function createVariableCompletionItems(
 	scssDocument: IScssDocument,
-	currentDocument: TextDocument
+	currentDocument: TextDocument,
+	context: CompletionContext
 ): CompletionItem[] {
 	const completions: CompletionItem[] = [];
 
@@ -153,8 +167,26 @@ function createVariableCompletionItems(
 			}
 		}
 
+		let filterText = variable.name;
+		let insertText = variable.name;
+
+		// In order to provide suggestions for variables immediately after the dot,
+		// we need to provide a dollarless filterText. However, when we actually
+		// want to use the variable we do need the dollar sign. So only provide
+		// a dollarless filterText when the word only includes `namespace.`.
+		if (context.namespace) {
+			if (context.word.endsWith(".")) {
+				filterText = `${context.namespace}\.${variable.name.replace(/^\$/, '')}`;
+			} else {
+				filterText = `${context.namespace}\.${variable.name}`;
+			}
+			insertText = `.${variable.name}`;
+		}
+
 		completions.push({
 			label: variable.name,
+			filterText,
+			insertText,
 			kind: completionKind,
 			detail,
 			documentation: {
@@ -311,12 +343,14 @@ export function doCompletion(
 
 	for (const scssDocument of iterator) {
 		if (settings.suggestVariables && context.variable) {
-			const variables = createVariableCompletionItems(scssDocument, document);
+			const variables = createVariableCompletionItems(scssDocument, document, context);
 			completions.items = completions.items.concat(variables);
-		} else if (settings.suggestMixins && context.mixin) {
+		}
+		if (settings.suggestMixins && context.mixin) {
 			const mixins = createMixinCompletionItems(scssDocument, document, context);
 			completions.items = completions.items.concat(mixins);
-		} else if (settings.suggestFunctions && context.function) {
+		}
+		if (settings.suggestFunctions && context.function) {
 			const functions = createFunctionCompletionItems(scssDocument, document, context);
 			completions.items = completions.items.concat(functions);
 		}

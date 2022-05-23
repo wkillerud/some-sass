@@ -60,6 +60,19 @@ If you document your mixin using the `@content` [annotation from SassDoc](http:/
 
 In JSON, all settings should be prefixed with `somesass.`, for instance `somesass.maxDepth`.
 
+## Recommended settings
+
+```jsonc
+{
+  // When providing code suggestions under namespaces (`@use "~namespace"`, then typing `namespace.$`)
+  // you may see the default word-based suggestions appear again. VS Code seems to think of `$` as a
+  // new fresh start for suggestions, so it will start matching any variable in the current document.
+  // I'm trying to figure out a workaround that does _not_ involve tweaking default settings in VS Code,
+  // but for now the best experience is had with word based suggestions turned off.
+  "editor.wordBasedSuggestions": false
+}
+```
+
 ## What this extension does _not_ do
 
 - Formating. Consider using [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) if you want automatic formating.

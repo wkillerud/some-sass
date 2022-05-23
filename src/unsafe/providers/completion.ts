@@ -170,16 +170,8 @@ function createVariableCompletionItems(
 		let filterText = variable.name;
 		let insertText = variable.name;
 
-		// In order to provide suggestions for variables immediately after the dot,
-		// we need to provide a dollarless filterText. However, when we actually
-		// want to use the variable we do need the dollar sign. So only provide
-		// a dollarless filterText when the word only includes `namespace.`.
 		if (context.namespace) {
-			if (context.word.endsWith(".")) {
-				filterText = `${context.namespace}\.${variable.name.replace(/^\$/, '')}`;
-			} else {
-				filterText = `${context.namespace}\.${variable.name}`;
-			}
+			filterText = `${context.namespace}.${variable.name}`;
 			insertText = `.${variable.name}`;
 		}
 
@@ -187,6 +179,7 @@ function createVariableCompletionItems(
 			label: variable.name,
 			filterText,
 			insertText,
+			commitCharacters: [';', ','],
 			kind: completionKind,
 			detail,
 			tags: Boolean(variable.sassdoc?.deprecated) ? [CompletionItemTag.Deprecated] : [],
@@ -227,7 +220,7 @@ function createMixinCompletionItems(
 		// Client needs the namespace as part of the text that is matched,
 		// and inserted text needs to include the `.` which will otherwise
 		// be replaced.
-		const filterText = context.namespace ? `${context.namespace}\.${mixin.name}` : mixin.name;
+		const filterText = context.namespace ? `${context.namespace}.${mixin.name}` : mixin.name;
 		let insertText = context.namespace ? `.${mixin.name}` : mixin.name;
 
 		// Use the SnippetString syntax to provide smart completions of parameter names

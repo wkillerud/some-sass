@@ -5,7 +5,7 @@ import type { TextDocument } from 'vscode-languageserver-textdocument';
 
 import type { ISettings } from '../types/settings';
 import type StorageService from '../services/storage';
-import type { IScssDocument, ScssImport, ScssMixin, ScssUse } from '../types/symbols';
+import type { IScssDocument, ScssForward, ScssImport, ScssMixin, ScssUse } from '../types/symbols';
 
 import { getCurrentWord, getLimitedString, getTextBeforePosition, asDollarlessVariable } from '../utils/string';
 import { getVariableColor } from '../utils/color';
@@ -137,7 +137,9 @@ function createCompletionContext(document: TextDocument, offset: number, setting
 function createVariableCompletionItems(
 	scssDocument: IScssDocument,
 	currentDocument: TextDocument,
-	context: CompletionContext
+	context: CompletionContext,
+	hiddenSymbols: string[] = [],
+	prefix = ''
 ): CompletionItem[] {
 	const completions: CompletionItem[] = [];
 
@@ -147,6 +149,9 @@ function createVariableCompletionItems(
 
 		let documentation = getLimitedString(color ? color.toString() : variable.value || '');
 		let detail = `Variable declared in ${scssDocument.fileName}`;
+
+		let filterText = variable.name;
+		let insertText = variable.name;
 		if (variable.mixin) {
 			// Add 'argument from MIXIN_NAME' suffix if Variable is Mixin argument
 			detail = `Argument from ${variable.mixin}, ${detail.toLowerCase()}`;
@@ -158,6 +163,13 @@ function createVariableCompletionItems(
 				continue;
 			}
 
+			if (hiddenSymbols.includes(variable.name)) {
+				continue;
+			}
+
+			filterText = `${prefix}${variable.name}`;
+			insertText = filterText;
+
 			const sassdoc = applySassDoc(
 				variable,
 				{ displayOptions: { description: true, deprecated: true, type: true }}
@@ -167,12 +179,9 @@ function createVariableCompletionItems(
 			}
 		}
 
-		let filterText = variable.name;
-		let insertText = variable.name;
-
 		if (context.namespace) {
-			filterText = `${context.namespace}.${variable.name}`;
-			insertText = `.${variable.name}`;
+			filterText = `${context.namespace}.${prefix}${variable.name}`;
+			insertText = `.${prefix}${variable.name}`;
 		}
 
 		completions.push({
@@ -196,7 +205,9 @@ function createVariableCompletionItems(
 function createMixinCompletionItems(
 	scssDocument: IScssDocument,
 	currentDocument: TextDocument,
-	context: CompletionContext
+	context: CompletionContext,
+	hiddenSymbols: string[] = [],
+	prefix = ''
 ): CompletionItem[] {
 	const completions: CompletionItem[] = [];
 
@@ -205,6 +216,10 @@ function createMixinCompletionItems(
 		const isFromCurrentDocument = scssDocument.uri === currentDocument.uri;
 		if (isPrivate && !isFromCurrentDocument) {
 			// Don't suggest private mixins from other files
+			continue;
+		}
+
+		if (hiddenSymbols.includes(mixin.name)) {
 			continue;
 		}
 
@@ -220,8 +235,8 @@ function createMixinCompletionItems(
 		// Client needs the namespace as part of the text that is matched,
 		// and inserted text needs to include the `.` which will otherwise
 		// be replaced.
-		const filterText = context.namespace ? `${context.namespace}.${mixin.name}` : mixin.name;
-		let insertText = context.namespace ? `.${mixin.name}` : mixin.name;
+		const filterText = context.namespace ? `${context.namespace}.${prefix}${mixin.name}` : mixin.name;
+		let insertText = context.namespace ? `.${prefix}${mixin.name}` : mixin.name;
 
 		// Use the SnippetString syntax to provide smart completions of parameter names
 		let labelDetails: CompletionItemLabelDetails | undefined = undefined;
@@ -266,7 +281,9 @@ function createMixinCompletionItems(
 function createFunctionCompletionItems(
 	scssDocument: IScssDocument,
 	currentDocument: TextDocument,
-	context: CompletionContext
+	context: CompletionContext,
+	hiddenSymbols: string[] = [],
+	prefix = ''
 ): CompletionItem[] {
 	const completions: CompletionItem[] = [];
 
@@ -278,11 +295,15 @@ function createFunctionCompletionItems(
 			continue;
 		}
 
+		if (hiddenSymbols.includes(func.name)) {
+			continue;
+		}
+
 		// Client needs the namespace as part of the text that is matched,
 		// and inserted text needs to include the `.` which will otherwise
 		// be replaced.
-		const filterText = context.namespace ? `${context.namespace}.${func.name}` : func.name;
-		let insertText = context.namespace ? `.${func.name}` : func.name;
+		const filterText = context.namespace ? `${prefix}${context.namespace}.${func.name}` : func.name;
+		let insertText = context.namespace ? `.${prefix}${func.name}` : func.name;
 
 		// Use the SnippetString syntax to provide smart completions of parameter names
 		let labelDetails: CompletionItemLabelDetails | undefined = undefined;
@@ -334,26 +355,19 @@ export function doCompletion(
 	settings: ISettings,
 	storage: StorageService
 ): CompletionList {
-	const completions = CompletionList.create([], false);
 	const context = createCompletionContext(document, offset, settings);
 
 	// Drop suggestions inside `//` and `/* */` comments
 	if (context.comment) {
-		return completions;
+		return CompletionList.create([], false);
 	}
 
-	let iterator: IterableIterator<IScssDocument> = storage.values();
 	if (context.namespace) {
-		const scssDocument = storage.get(document.uri);
-		if (scssDocument) {
-			const namespacedIterator = buildNamespacedIterator(scssDocument, context, storage);
-			if (namespacedIterator) {
-				iterator = namespacedIterator;
-			}
-		}
+		return doNamespacedCompletion(document, settings, context, storage);
 	}
 
-	for (const scssDocument of iterator) {
+	const completions = CompletionList.create([], false);
+	for (const scssDocument of storage.values()) {
 		if (settings.suggestVariables && context.variable) {
 			const variables = createVariableCompletionItems(scssDocument, document, context);
 			completions.items = completions.items.concat(variables);
@@ -371,11 +385,17 @@ export function doCompletion(
 	return completions;
 }
 
-function buildNamespacedIterator(document: IScssDocument, context: CompletionContext, storage: StorageService): IterableIterator<IScssDocument> | null {
+
+function doNamespacedCompletion(document: TextDocument, settings: ISettings, context: CompletionContext, storage: StorageService): CompletionList {
+	const completions = CompletionList.create([], false);
+	const scssDocument = storage.get(document.uri);
+	if (!scssDocument) {
+		return completions;
+	}
 	const namespace = context.namespace;
 
 	let use: ScssUse | null = null;
-	for (const candidate of document.uses.values()) {
+	for (const candidate of scssDocument.uses.values()) {
 		if (candidate.namespace === namespace || candidate.namespace === `_${namespace}`) {
 			use = candidate;
 			break;
@@ -383,25 +403,50 @@ function buildNamespacedIterator(document: IScssDocument, context: CompletionCon
 	}
 
 	if (!use || !use.link.target) {
-		return null;
+		return completions;
 	}
 
 	const namespaceRootDocument = storage.get(use.link.target);
 	if (!namespaceRootDocument) {
-		return null;
+		return completions;
 	}
 
-	const accumulator: Map<string, IScssDocument> = new Map();
-	traverseTree(accumulator, namespaceRootDocument, storage);
+	const accumulator: Map<string, CompletionItem[]> = new Map();
+	traverseTree(document, settings, context, storage, accumulator, namespaceRootDocument);
 
-	return accumulator.values();
+	completions.items = [...accumulator.values()].flat();
+
+	return completions;
 }
 
-function traverseTree(accumulator: Map<string, IScssDocument>, leaf: IScssDocument, storage: StorageService) {
-	if (!accumulator.has(leaf.uri)) {
-		accumulator.set(leaf.uri, leaf);
+function traverseTree(document: TextDocument, settings: ISettings, context: CompletionContext, storage: StorageService, accumulator: Map<string, CompletionItem[]>, leaf: IScssDocument, hiddenSymbols: string[] = [], accumulatedPrefix = "") {
+	if (accumulator.has(leaf.uri)) {
+		return;
 	}
 
+	const scssDocument = storage.get(leaf.uri);
+	if (!scssDocument) {
+		return;
+	}
+
+	let completionItems: CompletionItem[] = [];
+
+	if (settings.suggestVariables && context.variable) {
+		const variables = createVariableCompletionItems(scssDocument, document, context, hiddenSymbols, accumulatedPrefix);
+		completionItems = completionItems.concat(variables);
+	}
+	if (settings.suggestMixins && context.mixin) {
+		const mixins = createMixinCompletionItems(scssDocument, document, context, hiddenSymbols, accumulatedPrefix);
+		completionItems = completionItems.concat(mixins);
+	}
+	if (settings.suggestFunctions && context.function) {
+		const functions = createFunctionCompletionItems(scssDocument, document, context, hiddenSymbols, accumulatedPrefix);
+		completionItems = completionItems.concat(functions);
+	}
+
+	accumulator.set(leaf.uri, completionItems);
+
+	// Check to see if we have to go deeper
 	for (const child of leaf.getLinks()) {
 		if (!child.link.target || (child as ScssImport).dynamic || (child as ScssImport).css) {
 			continue;
@@ -412,6 +457,17 @@ function traverseTree(accumulator: Map<string, IScssDocument>, leaf: IScssDocume
 			continue;
 		}
 
-		traverseTree(accumulator, childDocument, storage);
+		let hidden = hiddenSymbols;
+		if ((child as ScssForward).hide && (child as ScssForward).hide.length) {
+			hidden = hiddenSymbols.concat((child as ScssForward).hide);
+		}
+
+
+		let prefix = accumulatedPrefix;
+		if ((child as ScssForward).prefix) {
+			prefix += (child as ScssForward).prefix;
+		}
+
+		traverseTree(document, settings, context, storage, accumulator, childDocument, hidden, prefix);
 	}
 }

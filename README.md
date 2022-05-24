@@ -62,13 +62,17 @@ In JSON, all settings should be prefixed with `somesass.`, for instance `somesas
 
 ## Recommended settings
 
+**Improved code suggestions for variables under namespaces**
+
 ```jsonc
 {
   // When providing code suggestions under namespaces (`@use "~namespace"`, then typing `namespace.$`)
   // you may see the default word-based suggestions appear again. VS Code seems to think of `$` as a
   // new fresh start for suggestions, so it will start matching any variable in the current document.
-  // I'm trying to figure out a workaround that does _not_ involve tweaking default settings in VS Code,
-  // but for now the best experience is had with word based suggestions turned off.
+  // I'm trying to figure out a workaround that does _not_ involve tweaking default settings in VS Code.
+  // You may choose to turn off word based suggestions, but know that you don't actually need
+  // to type the dollar sign for the matches to work. Just type the variable name without `$`
+  // and use the provided suggestion.
   "editor.wordBasedSuggestions": false
 }
 ```

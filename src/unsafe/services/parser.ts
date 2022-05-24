@@ -190,7 +190,10 @@ function ensurePartial(target: string): string {
 }
 
 function urlMatches(url: string, linkTarget: string): boolean {
-	const safeUrl = url.replace(/[~@]/g, '');
+	let safeUrl = url;
+	while (safeUrl.match(/^[./~@]/)) {
+		safeUrl = safeUrl.substring(1);
+	}
 	let match = linkTarget.includes(safeUrl);
 	if (!match) {
 		let lastSlash = safeUrl.lastIndexOf('/');

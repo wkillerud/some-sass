@@ -16,6 +16,7 @@ import { URI } from 'vscode-uri';
 export const reModuleAtRule = /@[use|forward|import]/;
 export const reUse = /@use ["|'](?<url>.+)["|'](?: as (?<namespace>\*|\w+))?;/;
 export const reForward = /@forward ["|'](?<url>.+)["|'](?: as (?<prefix>\w+-)\*)?(?: hide (?<hide>.+))?;/;
+export const reImport = /@import ["|'](?<url>.+)["|']/;
 
 const reDynamicPath = /[#{}\*]/;
 
@@ -68,31 +69,42 @@ async function findDocumentSymbols(document: TextDocument, ast: INode, workspace
 
 			const matchUse = reUse.exec(line);
 			if (matchUse) {
-				const { namespace } = matchUse.groups as { namespace?: string };
-				result.uses.set(link.target, {
-					link,
-					namespace: namespace || getFilenameFromLink(link),
-					isAliased: Boolean(namespace),
-				});
+				const url = matchUse.groups?.["url"];
+				if (link.target.includes(url as string)) {
+					const namespace = matchUse.groups?.["namespace"];
+					result.uses.set(link.target, {
+						link,
+						namespace: namespace || getFilenameFromLink(link),
+						isAliased: Boolean(namespace),
+					});
+				}
 				continue;
 			}
 
 			const matchForward = reForward.exec(line);
 			if (matchForward) {
-				const { prefix, hide } = matchForward.groups as { url: string; prefix?: string; hide?: string };
-				result.forwards.set(link.target, {
-					link,
-					prefix,
-					hide: hide ? hide.split(',').map(s => s.trim()) : []
-				});
+				const url = matchForward.groups?.["url"];
+				if (link.target.includes(url as string)) {
+					result.forwards.set(link.target, {
+						link,
+						prefix: matchForward.groups?.["prefix"],
+						hide: matchForward.groups?.["hide"] ? matchForward.groups["hide"].split(',').map(s => s.trim()) : []
+					});
+				}
 				continue;
 			}
 
-			result.imports.set(link.target, {
-				link,
-				dynamic: reDynamicPath.test(link.target),
-				css: link.target.endsWith('.css')
-			});
+			const matchImport = reImport.exec(line);
+			if (matchImport) {
+				const url = matchImport.groups?.["url"];
+				if (link.target.includes(url as string)) {
+					result.imports.set(link.target, {
+						link,
+						dynamic: reDynamicPath.test(link.target),
+						css: link.target.endsWith('.css')
+					});
+				}
+			}
 		}
 	}
 

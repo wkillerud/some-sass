@@ -9,6 +9,7 @@ import { URI } from 'vscode-uri';
 
 import { parseDocument, reForward, reModuleAtRule, reUse } from '../../services/parser';
 import StorageService from '../../services/storage';
+import * as fsUtils from '../../utils/fs';
 import * as helpers from '../helpers';
 
 const storage = new StorageService();
@@ -16,12 +17,15 @@ const storage = new StorageService();
 describe('Services/Parser', () => {
 	describe('.parseDocument', () => {
 		let statStub: sinon.SinonStub;
+		let fileExistsStub: sinon.SinonStub;
 
 		beforeEach(() => {
+			fileExistsStub = sinon.stub(fsUtils, 'fileExists');
 			statStub = sinon.stub(fs, 'stat').yields(null, new Stats());
 		});
 
 		afterEach(() => {
+			fileExistsStub.restore();
 			statStub.restore();
 		});
 
@@ -66,6 +70,37 @@ describe('Services/Parser', () => {
 
 			assert.strictEqual(functions[0]?.parameters[1]?.name, '$b');
 			assert.strictEqual(functions[0]?.parameters[1]?.value, null);
+		});
+
+		it('should return links', async () => {
+			fileExistsStub.resolves(true);
+
+			await helpers.makeDocument(storage, ['$var: 1px;'], { uri: 'variables.scss' });
+			await helpers.makeDocument(storage, ['$tr: 2px;'], { uri: 'corners.scss' });
+			await helpers.makeDocument(storage, ['$b: #000;'], { uri: 'color.scss' });
+
+			const document = await helpers.makeDocument(storage, [
+				'@use "variables" as vars;',
+				'@use "corners" as *;',
+				'@forward "colors" as color-* hide $varslingsfarger, varslingsfarge;'
+			]);
+
+			const symbols = await parseDocument(document, URI.parse(''));
+
+			// Uses
+			const uses = [...symbols.uses.values()];
+			assert.strictEqual(uses.length, 2, 'expected to find two uses');
+			assert.strictEqual(uses[0]?.namespace, 'vars');
+			assert.strictEqual(uses[0]?.isAliased, true);
+
+			assert.strictEqual(uses[1]?.namespace, '*');
+			assert.strictEqual(uses[1]?.isAliased, true);
+
+			// Forward
+			const forwards = [...symbols.forwards.values()];
+			assert.strictEqual(forwards.length, 1, 'expected to find one forward');
+			assert.strictEqual(forwards[0]?.prefix, 'color-');
+			assert.deepStrictEqual(forwards[0]?.hide, ['$varslingsfarger', 'varslingsfarge']);
 		});
 	});
 

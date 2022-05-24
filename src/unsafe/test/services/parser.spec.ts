@@ -111,6 +111,10 @@ describe('Services/Parser', () => {
 
 			assert.ok(reUse.test('@use "variables" as vars;'), "should match a @use with an alias");
 			assert.ok(reUse.test('@use "src/corners" as *;'), "should match a @use with a wildcard as alias");
+
+			const match = reUse.exec('@use "variables" as vars;');
+			assert.strictEqual(match!.groups!["url"] as string, "variables");
+			assert.strictEqual(match!.groups!["namespace"] as string, "vars");
 		});
 
 		it ("for forward", () => {
@@ -126,6 +130,11 @@ describe('Services/Parser', () => {
 			assert.ok(reForward.test('@forward "colors" as color-* hide $varslingsfarger, varslingsfarge;'), "should match a @forward with an alias and several hide");
 			assert.ok(reForward.test('@forward "shadow";'), "should match a @forward with no alias and no hide");
 			assert.ok(reForward.test('@forward "spacing" hide $spacing-new;'), "should match a @forward with no alias and a hide");
+
+			const match = reForward.exec('@forward "colors" as color-* hide $varslingsfarger, varslingsfarge;');
+			assert.strictEqual(match!.groups!["url"] as string, "colors");
+			assert.strictEqual(match!.groups!["prefix"] as string, "color-");
+			assert.strictEqual(match!.groups!["hide"] as string, "$varslingsfarger, varslingsfarge");
 		});
 	});
 });

@@ -14,8 +14,8 @@ import { fileExists } from '../utils/fs';
 import { URI } from 'vscode-uri';
 
 export const reModuleAtRule = /@[use|forward|import]/;
-export const reUse = /@use ["|'](?<url>.+)["|'](?: as (?<namespace>\*|\w+))?/;
-export const reForward = /@forward ["|'](?<url>.+)["|'](?: as (?<prefix>\w+-)\*)?(?: hide (?<hide>.+))?/;
+export const reUse = /@use ["|'](?<url>.+)["|'](?: as (?<namespace>\*|\w+))?;/;
+export const reForward = /@forward ["|'](?<url>.+)["|'](?: as (?<prefix>\w+-)\*)?(?: hide (?<hide>.+))?;/;
 
 const reDynamicPath = /[#{}\*]/;
 
@@ -66,7 +66,7 @@ async function findDocumentSymbols(document: TextDocument, ast: INode, workspace
 				link.target = partial;
 			}
 
-			const matchUse = line.match(reUse);
+			const matchUse = reUse.exec(line);
 			if (matchUse) {
 				const { namespace } = matchUse.groups as { namespace?: string };
 				result.uses.set(link.target, {
@@ -77,7 +77,7 @@ async function findDocumentSymbols(document: TextDocument, ast: INode, workspace
 				continue;
 			}
 
-			const matchForward = line.match(reForward);
+			const matchForward = reForward.exec(line);
 			if (matchForward) {
 				const { prefix, hide } = matchForward.groups as { url: string; prefix?: string; hide?: string };
 				result.forwards.set(link.target, {

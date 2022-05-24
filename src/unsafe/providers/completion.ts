@@ -150,8 +150,10 @@ function createVariableCompletionItems(
 		let documentation = getLimitedString(color ? color.toString() : variable.value || '');
 		let detail = `Variable declared in ${scssDocument.fileName}`;
 
-		let filterText = variable.name;
-		let insertText = variable.name;
+		let label = variable.name;
+		let filterText = label;
+		let insertText = label;
+
 		if (variable.mixin) {
 			// Add 'argument from MIXIN_NAME' suffix if Variable is Mixin argument
 			detail = `Argument from ${variable.mixin}, ${detail.toLowerCase()}`;
@@ -167,9 +169,6 @@ function createVariableCompletionItems(
 				continue;
 			}
 
-			filterText = `${prefix}${variable.name}`;
-			insertText = filterText;
-
 			const sassdoc = applySassDoc(
 				variable,
 				{ displayOptions: { description: true, deprecated: true, type: true }}
@@ -180,12 +179,15 @@ function createVariableCompletionItems(
 		}
 
 		if (context.namespace) {
-			filterText = `${context.namespace}.${prefix}${variable.name}`;
-			insertText = `.${prefix}${variable.name}`;
+			// Avoid ending up with namespace.prefix-$variable
+			label = `$${prefix}${asDollarlessVariable(variable.name)}`;
+			// The `.` in the namespace gets replaced unless we have a $ charachter after it
+			insertText = context.word.endsWith(".") ? `.${label}` : label;
+			filterText = `${context.namespace}${insertText}`;
 		}
 
 		completions.push({
-			label: variable.name,
+			label,
 			filterText,
 			insertText,
 			commitCharacters: [';', ','],

@@ -70,11 +70,11 @@ async function findDocumentSymbols(document: TextDocument, ast: INode, workspace
 			const matchUse = reUse.exec(line);
 			if (matchUse) {
 				const url = matchUse.groups?.["url"];
-				if (link.target.includes(url as string)) {
+				if (urlMatches(url as string, link.target)) {
 					const namespace = matchUse.groups?.["namespace"];
 					result.uses.set(link.target, {
 						link,
-						namespace: namespace || getFilenameFromLink(link),
+						namespace: namespace || getNamespaceFromLink(link),
 						isAliased: Boolean(namespace),
 					});
 				}
@@ -84,7 +84,7 @@ async function findDocumentSymbols(document: TextDocument, ast: INode, workspace
 			const matchForward = reForward.exec(line);
 			if (matchForward) {
 				const url = matchForward.groups?.["url"];
-				if (link.target.includes(url as string)) {
+				if (urlMatches(url as string, link.target)) {
 					result.forwards.set(link.target, {
 						link,
 						prefix: matchForward.groups?.["prefix"],
@@ -97,7 +97,7 @@ async function findDocumentSymbols(document: TextDocument, ast: INode, workspace
 			const matchImport = reImport.exec(line);
 			if (matchImport) {
 				const url = matchImport.groups?.["url"];
-				if (link.target.includes(url as string)) {
+				if (urlMatches(url as string, link.target)) {
 					result.imports.set(link.target, {
 						link,
 						dynamic: reDynamicPath.test(link.target),
@@ -156,14 +156,16 @@ async function findDocumentSymbols(document: TextDocument, ast: INode, workspace
 	return result;
 }
 
-function getFilenameFromLink(link: DocumentLink): string | undefined {
+function getNamespaceFromLink(link: DocumentLink): string | undefined {
 	if (!link.target) {
 		return undefined;
 	}
 
 	const lastSlash = link.target.lastIndexOf('/');
 	const extension = link.target.lastIndexOf('.');
-	return link.target.substring(lastSlash + 1, extension);
+	const candidate = link.target.substring(lastSlash + 1, extension);
+
+	return candidate.startsWith("_") ? candidate.substring(1) : candidate;
 }
 
 function ensureScssExtension(target: string): string {
@@ -185,6 +187,19 @@ function ensurePartial(target: string): string {
 	const path = target.substring(0, lastSlash + 1);
 	const extension = target.substring(lastDot);
 	return `${path}_${fileName}${extension}`;
+}
+
+function urlMatches(url: string, linkTarget: string): boolean {
+	const safeUrl = url.replace(/[~@]/g, '');
+	let match = linkTarget.includes(safeUrl);
+	if (!match) {
+		let lastSlash = safeUrl.lastIndexOf('/');
+		const toLastSlash = safeUrl.substring(0, lastSlash);
+		const restOfUrl = safeUrl.substring(lastSlash + 1)
+		const partial = `${toLastSlash}/_${restOfUrl}`;
+		match = linkTarget.includes(partial);
+	}
+	return match;
 }
 
 function getVariableValue(ast: INode, offset: number): string | null {

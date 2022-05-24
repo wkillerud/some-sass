@@ -102,6 +102,25 @@ describe('Services/Parser', () => {
 			assert.strictEqual(forwards[0]?.prefix, 'color-');
 			assert.deepStrictEqual(forwards[0]?.hide, ['$varslingsfarger', 'varslingsfarge']);
 		});
+
+		it('should return relative links', async () => {
+			fileExistsStub.resolves(true);
+
+			await helpers.makeDocument(storage, ['$var: 1px;'], { uri: 'upper.scss' });
+			await helpers.makeDocument(storage, ['$b: #000;'], { uri: 'middle/middle.scss' });
+			await helpers.makeDocument(storage, ['$tr: 2px;'], { uri: 'moddle/lower/lower.scss' });
+
+			const document = await helpers.makeDocument(storage, [
+				'@use "../upper";',
+				'@use "./middle";',
+				'@use "./lower/lower";',
+			], { uri: "middle/main.scss"});
+
+			const symbols = await parseDocument(document, URI.parse(''));
+			const uses = [...symbols.uses.values()];
+
+			assert.strictEqual(uses.length, 3, 'expected to find three uses');
+		});
 	});
 
 	describe("regular expressions", () => {

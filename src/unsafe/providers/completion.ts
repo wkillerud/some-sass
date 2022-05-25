@@ -314,7 +314,7 @@ function createFunctionCompletionItems(
 		// and inserted text needs to include the `.` which will otherwise
 		// be replaced.
 		let label = context.namespace ? `${prefix}${func.name}` : func.name;
-		const filterText = context.namespace ? `${prefix}${context.namespace}.${func.name}` : undefined;
+		const filterText = context.namespace ? `${context.namespace}.${prefix}${func.name}` : undefined;
 		let insertText = context.namespace ? `.${prefix}${func.name}` : undefined;
 		let sortText = isPrivate ? "y" : undefined;
 

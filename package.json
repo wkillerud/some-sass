@@ -60,6 +60,11 @@
 					"default": false,
 					"description": "Allows to display errors."
 				},
+				"somesass.suggestAllFromOpenDocument": {
+					"type": "boolean",
+					"default": false,
+					"description": "VS Code has built-in code suggestions for symbols declared in the open document. If you prefer the suggestions from Some Sass, you can opt in by turning on this setting. There will be duplicates."
+				},
 				"somesass.suggestVariables": {
 					"type": "boolean",
 					"default": true,

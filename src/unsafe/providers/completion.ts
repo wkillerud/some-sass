@@ -151,6 +151,7 @@ function createVariableCompletionItems(
 		let detail = `Variable declared in ${scssDocument.fileName}`;
 
 		let label = variable.name;
+		let sortText = undefined;
 		let filterText = undefined;
 		let insertText = undefined;
 
@@ -167,6 +168,10 @@ function createVariableCompletionItems(
 
 			if (hiddenSymbols.includes(variable.name)) {
 				continue;
+			}
+
+			if (isPrivate) {
+				sortText = "y";
 			}
 
 			const sassdoc = applySassDoc(
@@ -190,6 +195,7 @@ function createVariableCompletionItems(
 			label,
 			filterText,
 			insertText,
+			sortText,
 			commitCharacters: [';', ','],
 			kind: completionKind,
 			detail,
@@ -240,6 +246,7 @@ function createMixinCompletionItems(
 		let label = context.namespace ? `${prefix}${mixin.name}` : mixin.name;
 		const filterText = context.namespace ? `${context.namespace}.${prefix}${mixin.name}` : undefined;
 		let insertText = context.namespace ? `.${prefix}${mixin.name}` : undefined;
+		let sortText = isPrivate ? "y" : undefined;
 
 		// Use the SnippetString syntax to provide smart completions of parameter names
 		let labelDetails: CompletionItemLabelDetails | undefined = undefined;
@@ -266,6 +273,7 @@ function createMixinCompletionItems(
 			label,
 			labelDetails,
 			filterText,
+			sortText,
 			kind: CompletionItemKind.Snippet,
 			detail,
 			insertTextFormat: InsertTextFormat.Snippet,
@@ -308,6 +316,7 @@ function createFunctionCompletionItems(
 		let label = context.namespace ? `${prefix}${func.name}` : func.name;
 		const filterText = context.namespace ? `${prefix}${context.namespace}.${func.name}` : undefined;
 		let insertText = context.namespace ? `.${prefix}${func.name}` : undefined;
+		let sortText = isPrivate ? "y" : undefined;
 
 		// Use the SnippetString syntax to provide smart completions of parameter names
 		let labelDetails: CompletionItemLabelDetails | undefined = undefined;
@@ -338,6 +347,7 @@ function createFunctionCompletionItems(
 			label,
 			labelDetails,
 			filterText,
+			sortText,
 			kind: CompletionItemKind.Function,
 			detail,
 			insertTextFormat: InsertTextFormat.Snippet,
@@ -372,6 +382,10 @@ export function doCompletion(
 
 	const completions = CompletionList.create([], false);
 	for (const scssDocument of storage.values()) {
+		if (!settings.suggestAllFromOpenDocument && scssDocument.uri === document.uri) {
+			continue;
+		}
+
 		if (settings.suggestVariables && context.variable) {
 			const variables = createVariableCompletionItems(scssDocument, document, context);
 			completions.items = completions.items.concat(variables);
@@ -433,19 +447,22 @@ function traverseTree(document: TextDocument, settings: ISettings, context: Comp
 		return;
 	}
 
+
 	let completionItems: CompletionItem[] = [];
 
-	if (settings.suggestVariables && context.variable) {
-		const variables = createVariableCompletionItems(scssDocument, document, context, hiddenSymbols, accumulatedPrefix);
-		completionItems = completionItems.concat(variables);
-	}
-	if (settings.suggestMixins && context.mixin) {
-		const mixins = createMixinCompletionItems(scssDocument, document, context, hiddenSymbols, accumulatedPrefix);
-		completionItems = completionItems.concat(mixins);
-	}
-	if (settings.suggestFunctions && context.function) {
-		const functions = createFunctionCompletionItems(scssDocument, document, context, hiddenSymbols, accumulatedPrefix);
-		completionItems = completionItems.concat(functions);
+	if (settings.suggestAllFromOpenDocument || scssDocument.uri !== document.uri) {
+		if (settings.suggestVariables && context.variable) {
+			const variables = createVariableCompletionItems(scssDocument, document, context, hiddenSymbols, accumulatedPrefix);
+			completionItems = completionItems.concat(variables);
+		}
+		if (settings.suggestMixins && context.mixin) {
+			const mixins = createMixinCompletionItems(scssDocument, document, context, hiddenSymbols, accumulatedPrefix);
+			completionItems = completionItems.concat(mixins);
+		}
+		if (settings.suggestFunctions && context.function) {
+			const functions = createFunctionCompletionItems(scssDocument, document, context, hiddenSymbols, accumulatedPrefix);
+			completionItems = completionItems.concat(functions);
+		}
 	}
 
 	accumulator.set(leaf.uri, completionItems);

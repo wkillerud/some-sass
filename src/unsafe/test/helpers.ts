@@ -51,6 +51,7 @@ export function makeSettings(options?: Partial<ISettings>): ISettings {
 		scannerExclude: ['**/.git', '**/node_modules', '**/bower_components'],
 		scanImportedFiles: true,
 		showErrors: false,
+		suggestAllFromOpenDocument: false,
 		suggestVariables: true,
 		suggestMixins: true,
 		suggestFunctions: true,

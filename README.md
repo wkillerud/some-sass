@@ -30,7 +30,9 @@ To use this feature, either:
 
 #### Go to Symbol
 
-In the `Go` menu, choose either `Go to Symbol in Workspace` (`Cmd + Shift + R`) or `Go to Symbol in Editor` (`Cmd + R`) to use this feature.
+In the `Go` menu, choose [Go to Symbol](https://code.visualstudio.com/Docs/editor/editingevolved#_go-to-symbol)
+either for Workspace (`Cmd + T`) or for Editor (`Cmd + Shift + O`) to use this feature,
+depending on your keyboard settings.
 
 ![](images/workspace-symbols.gif)
 
@@ -40,42 +42,89 @@ The extension will suggest variables, mixins and functions as you type.
 
 For mixins and functions the extension will help you with signature information as you type.
 
-If you document your mixin using the `@content` [annotation from SassDoc](http://sassdoc.com/annotations/#content) the extension will use that information to autosuggest brackets and move focus inside the mixin contents.
+If you document your mixin using the `@content` [annotation from SassDoc](http://sassdoc.com/annotations/#content)
+the extension will use that information to autosuggest brackets and move focus inside the mixin contents.
 
 ![](images/suggestions-mixins.gif)
 
-## Settings
-
-
-| Name | Default | Type | Description |
-|------|---------|------|-------------|
-| scannerDepth | 30 | `number` | The maximum number of nested directories to scan. |
-| scannerExclude | `["**/.git", "**/node_modules", "**/bower_components"]` | `string[]` | List of [glob](https://github.com/mrmlnc/fast-glob) patterns for directories that are excluded when scanning. |
-| scanImportedFiles | `true` | `boolean` | Allows scan imported files. |
-| showErrors | `false` | `boolean` | Allows to display parsing errors from the internal scanner. |
-| suggestVariables | `true` | `boolean` | Include variables in suggestions. |
-| suggestMixins | `true` | `boolean` | Include mixins in suggestions. |
-| suggestFunctions | `true` | `boolean` | Include functions in suggestions. |
-| suggestFunctionsInStringContextAfterSymbols | ` (+-*%` | `string` | Suggest functions after the specified symbols when in a string context. For example, if you add the `/` symbol to this setting, then `background: url(images/he|)` could suggest a `hello()` function. |
-
-In JSON, all settings should be prefixed with `somesass.`, for instance `somesass.maxDepth`.
-
-## Recommended settings
+## Recommended settings for Visual Studio Code
 
 **Improved code suggestions for variables under namespaces**
 
+When providing code suggestions under namespaces (`@use "~namespace"`, then typing `namespace.$`)
+you may see the default word-based suggestions appear again. VS Code seems to think of `$` as a
+new fresh start for suggestions, so it will start matching any variable in the current document.
+
+You may choose to turn off word based suggestions, but know that you don't actually need
+to type the dollar sign for the matches to work. Just type the variable name without `$`
+and use the provided suggestion. This way you can keep word based suggestions if you like.
+
 ```jsonc
 {
-  // When providing code suggestions under namespaces (`@use "~namespace"`, then typing `namespace.$`)
-  // you may see the default word-based suggestions appear again. VS Code seems to think of `$` as a
-  // new fresh start for suggestions, so it will start matching any variable in the current document.
-  // I'm trying to figure out a workaround that does _not_ involve tweaking default settings in VS Code.
-  // You may choose to turn off word based suggestions, but know that you don't actually need
-  // to type the dollar sign for the matches to work. Just type the variable name without `$`
-  // and use the provided suggestion.
   "editor.wordBasedSuggestions": false
 }
 ```
+
+## Settings for Some Sass
+
+### Code suggestion
+
+#### Suggest variables, mixins, and functions from the open document
+
+Visual Studio Code has built-in suggestions for variables, mixins and functions created in the open document.
+
+By default Some Sass will _not_ send suggestions for the same symbols.
+If you prefer the suggestions from Some Sass (for instance if you use SassDoc), you can opt in by turning on this setting.
+There will unfortunately be duplicates.
+
+- JSON key: `somesass.suggestAllFromOpenDocument`
+- Default value: `false`.
+
+#### Control what types of symbols are suggested
+
+There are three settings that let you pick what types of symbols (variables, functions, mixins) should be suggested if you are only interested in some of them.
+By default, all of them are turned on.
+
+- JSON keys: `somesass.suggestFunctions`, `somesass.suggestMixins` and `somesass.suggestVariables`.
+- Default value: `true`.
+
+#### Decide when function suggestions should kick in
+
+Suggest functions after the specified symbols when in a string context.
+For example, if you add the `/` symbol to this setting, then `background: url(images/he|)`
+could suggest a `hello()` function (`|` in this case indicates cursor position).
+
+- JSON key: `somesass.suggestFunctionsInStringContextAfterSymbols`.
+- Default value: `" (+-*%"`.
+
+### Workspace scanner
+
+#### Exclude files or folders
+
+List of [glob](https://github.com/mrmlnc/fast-glob) patterns for directories that are excluded when scanning.
+
+- JSON key: `somesass.scannerExclude`.
+- Default value: `["**/.git", "**/node_modules", "**/bower_components"]`.
+
+#### Adjust scanner depth
+
+Depending on your project size, you may want to tweak this setting to control how many files are included.
+
+- JSON key: `somesass.scannerDepth`.
+- Default: `30`.
+
+
+#### Stop scanner from following links
+
+`@deprecated`
+
+If you don't want Some Sass to follow `@import`, `@use` or `@forward` links you can turn this setting off.
+This will severely limit functionality, and is not recommended. This setting will be removed at some point
+after `@import` becomes CSS-only.
+
+- JSON key: `somesass.scanImportedFiles`.
+- Default: `true`.
+
 
 ## What this extension does _not_ do
 

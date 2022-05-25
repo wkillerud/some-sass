@@ -4,10 +4,10 @@ import { Hover, MarkupContent, MarkupKind, SymbolKind } from 'vscode-languageser
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 
 import { NodeType } from '../types/nodes';
-import type { IScssDocument, ScssSymbol, ScssVariable, ScssMixin, ScssFunction } from '../types/symbols';
+import type { IScssDocument, ScssSymbol, ScssVariable, ScssMixin, ScssFunction, ScssImport, ScssForward } from '../types/symbols';
 import type StorageService from '../services/storage';
 
-import { getLimitedString } from '../utils/string';
+import { asDollarlessVariable, getLimitedString } from '../utils/string';
 import { applySassDoc} from '../utils/sassdoc';
 
 type Identifier = { kind: SymbolKind; name: string };
@@ -134,32 +134,7 @@ export async function doHover(document: TextDocument, offset: number, storage: S
 		return null;
 	}
 
-	let symbol: ScssSymbol | null = null;
-	let sourceDocument: IScssDocument | null = null;
-	for (const document of storage.values()) {
-		if (identifier.kind === SymbolKind.Variable) {
-			const variable = document.variables.get(identifier.name);
-			if (variable) {
-				symbol = variable;
-				sourceDocument = document;
-				break;
-			}
-		} else if (identifier.kind === SymbolKind.Method) {
-			const mixin = document.mixins.get(identifier.name);
-			if (mixin) {
-				symbol = mixin;
-				sourceDocument = document;
-				break;
-			}
-		} else if (identifier.kind === SymbolKind.Function) {
-			const func = document.functions.get(identifier.name);
-			if (func) {
-				symbol = func;
-				sourceDocument = document;
-				break;
-			}
-		}
-	}
+	const [symbol, sourceDocument] = doSymbolHunting(document, storage, identifier);
 
 	// Content for Hover popup
 	let contents: MarkupContent | undefined;
@@ -180,4 +155,84 @@ export async function doHover(document: TextDocument, offset: number, storage: S
 	return {
 		contents
 	};
+}
+
+function doSymbolHunting(document: TextDocument, storage: StorageService, identifier: Identifier): ([ScssSymbol, IScssDocument] | [null, null]) {
+	const scssDocument = storage.get(document.uri);
+	if (!scssDocument) {
+		return [null, null];
+	}
+
+	for (const use of scssDocument.uses.values()) {
+		const scssDocument = storage.get(use.link.target as string);
+		if (!scssDocument) {
+			continue;
+		}
+
+		const [symbol, sourceDocument] = traverseTree(scssDocument, identifier, storage);
+		if (symbol) {
+			return [symbol, sourceDocument];
+		}
+	}
+
+	// Fall back to the old way of doing things if we can't find the symbol via `@use`
+	for (const document of storage.values()) {
+		if (identifier.kind === SymbolKind.Variable) {
+			const variable = document.variables.get(identifier.name);
+			if (variable) {
+				return [variable, document];
+			}
+		} else if (identifier.kind === SymbolKind.Method) {
+			const mixin = document.mixins.get(identifier.name);
+			if (mixin) {
+				return [mixin, document];
+			}
+		} else if (identifier.kind === SymbolKind.Function) {
+			const func = document.functions.get(identifier.name);
+			if (func) {
+				return [func, document];
+			}
+		}
+	}
+
+	return [null, null]
+}
+
+function traverseTree(document: IScssDocument, identifier: Identifier, storage: StorageService, accumulatedPrefix = ""): ([ScssSymbol, IScssDocument] | [null, null]) {
+	const scssDocument = storage.get(document.uri);
+	if (!scssDocument) {
+		return [null, null];
+	}
+
+	for (const symbol of scssDocument.getSymbols()) {
+		const symbolName = `${accumulatedPrefix}${asDollarlessVariable(symbol.name)}`;
+		const identifierName = asDollarlessVariable(identifier.name);
+		if (symbolName === identifierName && symbol.kind === identifier.kind) {
+			return [symbol, scssDocument];
+		}
+	}
+
+	// Check to see if we have to go deeper
+	for (const child of scssDocument.getLinks()) {
+		if (!child.link.target || (child as ScssImport).dynamic || (child as ScssImport).css) {
+			continue;
+		}
+
+		const childDocument = storage.get(child.link.target);
+		if (!childDocument) {
+			continue;
+		}
+
+		let prefix = accumulatedPrefix;
+		if ((child as ScssForward).prefix) {
+			prefix += (child as ScssForward).prefix;
+		}
+
+		const [symbol, document] =  traverseTree(childDocument, identifier, storage, prefix);
+		if (symbol) {
+			return [symbol, document];
+		}
+	}
+
+	return [null, null];
 }

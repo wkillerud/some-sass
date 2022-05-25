@@ -4,10 +4,10 @@ import { MarkupKind, SignatureHelp, SignatureInformation } from 'vscode-language
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 import { tokenizer } from 'scss-symbols-parser';
 
-import type { ScssFunction, ScssMixin } from '../types/symbols';
+import type { IScssDocument, ScssForward, ScssFunction, ScssImport, ScssMixin } from '../types/symbols';
 import type StorageService from '../services/storage';
 
-import { getTextBeforePosition } from '../utils/string';
+import { asDollarlessVariable, getTextBeforePosition } from '../utils/string';
 import { hasInFacts } from '../utils/facts';
 import { applySassDoc } from '../utils/sassdoc';
 
@@ -143,7 +143,7 @@ export async function doSignatureHelp(
 	offset: number,
 	storage: StorageService
 ): Promise<SignatureHelp> {
-	const suggestions: Array<{ symbol: ScssMixin | ScssFunction; path: string | undefined }> = [];
+
 
 	const ret: SignatureHelp = {
 		activeSignature: 0,
@@ -164,14 +164,7 @@ export async function doSignatureHelp(
 
 	const symbolType = textBeforeWord.indexOf('@include') !== -1 ? 'mixin' : 'function';
 
-	for (const scssDocument of storage.values()) {
-		const symbols = symbolType === "mixin" ? scssDocument.mixins.values() : scssDocument.functions.values();
-		for (const symbol of symbols) {
-			if (entry.name === symbol.name && symbol.parameters.length >= entry.parameters) {
-				suggestions.push({ symbol, path: scssDocument.uri });
-			}
-		}
-	}
+	const suggestions: Array<ScssMixin | ScssFunction> = doSymbolHunting(document, storage, entry, symbolType);
 
 	if (suggestions.length === 0) {
 		return ret;
@@ -179,7 +172,7 @@ export async function doSignatureHelp(
 
 	ret.activeParameter = Math.max(0, entry.parameters);
 
-	for (let { symbol } of suggestions) {
+	for (const symbol of suggestions) {
 		const paramsString = symbol.parameters.map(x => `${x.name}: ${x.value}`).join(', ');
 		const signatureInfo = SignatureInformation.create(`${symbol.name} (${paramsString})`);
 
@@ -204,4 +197,73 @@ export async function doSignatureHelp(
 	}
 
 	return ret;
+}
+
+function doSymbolHunting(document: TextDocument, storage: StorageService, entry: IMixinEntry, entryType: "mixin" | "function"): Array<ScssFunction | ScssMixin> {
+	const result: Array<ScssFunction | ScssMixin> = [];
+
+	const scssDocument = storage.get(document.uri);
+	if (!scssDocument) {
+		return result;
+	}
+
+	for (const use of scssDocument.uses.values()) {
+		const scssDocument = storage.get(use.link.target as string);
+		if (!scssDocument) {
+			continue;
+		}
+
+		traverseTree(scssDocument, storage, result, entry, entryType);
+	}
+
+	if (result.length === 0) {
+		// If we didn't find any symbols with the modern method, fall back to the old way of searching
+		for (const scssDocument of storage.values()) {
+			const symbols = entryType === "mixin" ? scssDocument.mixins.values() : scssDocument.functions.values();
+			for (const symbol of symbols) {
+				if (entry.name === symbol.name && symbol.parameters.length >= entry.parameters) {
+					result.push(symbol);
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
+function traverseTree(document: IScssDocument, storage: StorageService, result: Array<ScssMixin | ScssFunction>, entry: IMixinEntry, entryType: "mixin" | "function", accumulatedPrefix = ""): Array<ScssFunction | ScssMixin> {
+	const scssDocument = storage.get(document.uri);
+	if (!scssDocument) {
+		return result;
+	}
+
+	const entryName = asDollarlessVariable(entry.name as string);
+	const symbols = entryType === "mixin" ? scssDocument.mixins.values() : scssDocument.functions.values();
+	for (const symbol of symbols) {
+		const symbolName = `${accumulatedPrefix}${asDollarlessVariable(symbol.name)}`;
+		if (symbolName === entryName && symbol.parameters.length >= entry.parameters && !result.find(x => x.name === symbol.name)) {
+			result.push(symbol);
+		}
+	}
+
+	// Check to see if we have to go deeper
+	for (const child of scssDocument.getLinks()) {
+		if (!child.link.target || (child as ScssImport).dynamic || (child as ScssImport).css) {
+			continue;
+		}
+
+		const childDocument = storage.get(child.link.target);
+		if (!childDocument) {
+			continue;
+		}
+
+		let prefix = accumulatedPrefix;
+		if ((child as ScssForward).prefix) {
+			prefix += (child as ScssForward).prefix;
+		}
+
+		traverseTree(childDocument, storage, result, entry, entryType, prefix);
+	}
+
+	return result;
 }

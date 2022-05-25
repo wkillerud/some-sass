@@ -69,6 +69,17 @@ and use the provided suggestion. This way you can keep word based suggestions if
 
 ### Code suggestion
 
+#### Only include suggestions from used modules
+
+If your project is on the modern module syntax (`@use` and `@forward` instead of `@import`), you may want to turn
+on this setting.
+
+With this setting turned on, Some Sass will only suggest variables, mixins and functions from the namespaces that are
+in use in the open document. This setting will be turned on by default at some point after `@import` becomes CSS-only.
+
+- JSON key: `somesass.suggestOnlyFromUse`.
+- Default value: `false`.
+
 #### Suggest variables, mixins, and functions from the open document
 
 Visual Studio Code has built-in suggestions for variables, mixins and functions created in the open document.

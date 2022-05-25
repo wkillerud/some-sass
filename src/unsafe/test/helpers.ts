@@ -52,6 +52,7 @@ export function makeSettings(options?: Partial<ISettings>): ISettings {
 		scanImportedFiles: true,
 		showErrors: false,
 		suggestAllFromOpenDocument: false,
+		suggestFromUseOnly: false,
 		suggestVariables: true,
 		suggestMixins: true,
 		suggestFunctions: true,

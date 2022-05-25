@@ -370,17 +370,24 @@ export function doCompletion(
 	storage: StorageService
 ): CompletionList {
 	const context = createCompletionContext(document, offset, settings);
+	const completions = CompletionList.create([], false);
 
 	// Drop suggestions inside `//` and `/* */` comments
 	if (context.comment) {
-		return CompletionList.create([], false);
+		return completions;
 	}
 
 	if (context.namespace) {
 		return doNamespacedCompletion(document, settings, context, storage);
 	}
 
-	const completions = CompletionList.create([], false);
+	// If at this point we're not in a namespace context,
+	// but the user only wants suggestions from namespaces
+	// (we consider `*` a namespace), we should return an empty list.
+	if (settings.suggestFromUseOnly) {
+		return completions;
+	}
+
 	for (const scssDocument of storage.values()) {
 		if (!settings.suggestAllFromOpenDocument && scssDocument.uri === document.uri) {
 			continue;

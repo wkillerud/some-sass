@@ -20,7 +20,7 @@ const reQuotedValueInString = /['"](?:[^'"\\]|\\.)*['"]/g;
 const reMixinReference = /.*@include\s+(.*)/;
 const reComment = /^(\/(\/|\*)|\*)/;
 const reQuotes = /['"]/;
-const rePrivate = /^\$[_-].*$/;
+const rePrivate = /^\$?[_-].*$/;
 
 /**
  * Return Mixin as string.

@@ -151,8 +151,8 @@ function createVariableCompletionItems(
 		let detail = `Variable declared in ${scssDocument.fileName}`;
 
 		let label = variable.name;
-		let filterText = label;
-		let insertText = label;
+		let filterText = undefined;
+		let insertText = undefined;
 
 		if (variable.mixin) {
 			// Add 'argument from MIXIN_NAME' suffix if Variable is Mixin argument
@@ -237,8 +237,9 @@ function createMixinCompletionItems(
 		// Client needs the namespace as part of the text that is matched,
 		// and inserted text needs to include the `.` which will otherwise
 		// be replaced.
-		const filterText = context.namespace ? `${context.namespace}.${prefix}${mixin.name}` : mixin.name;
-		let insertText = context.namespace ? `.${prefix}${mixin.name}` : mixin.name;
+		let label = context.namespace ? `${prefix}${mixin.name}` : mixin.name;
+		const filterText = context.namespace ? `${context.namespace}.${prefix}${mixin.name}` : undefined;
+		let insertText = context.namespace ? `.${prefix}${mixin.name}` : undefined;
 
 		// Use the SnippetString syntax to provide smart completions of parameter names
 		let labelDetails: CompletionItemLabelDetails | undefined = undefined;
@@ -262,7 +263,7 @@ function createMixinCompletionItems(
 		const detail = `Mixin declared in ${scssDocument.fileName}`;
 
 		completions.push({
-			label: mixin.name,
+			label,
 			labelDetails,
 			filterText,
 			kind: CompletionItemKind.Snippet,
@@ -304,8 +305,9 @@ function createFunctionCompletionItems(
 		// Client needs the namespace as part of the text that is matched,
 		// and inserted text needs to include the `.` which will otherwise
 		// be replaced.
-		const filterText = context.namespace ? `${prefix}${context.namespace}.${func.name}` : func.name;
-		let insertText = context.namespace ? `.${prefix}${func.name}` : func.name;
+		let label = context.namespace ? `${prefix}${func.name}` : func.name;
+		const filterText = context.namespace ? `${prefix}${context.namespace}.${func.name}` : undefined;
+		let insertText = context.namespace ? `.${prefix}${func.name}` : undefined;
 
 		// Use the SnippetString syntax to provide smart completions of parameter names
 		let labelDetails: CompletionItemLabelDetails | undefined = undefined;
@@ -333,7 +335,7 @@ function createFunctionCompletionItems(
 		const detail = `Function declared in ${scssDocument.fileName}`;
 
 		completions.push({
-			label: func.name,
+			label,
 			labelDetails,
 			filterText,
 			kind: CompletionItemKind.Function,

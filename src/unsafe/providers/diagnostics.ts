@@ -1,8 +1,9 @@
-import { Diagnostic, DiagnosticSeverity, DiagnosticTag, VersionedTextDocumentIdentifier } from 'vscode-languageserver-types';
+import { Diagnostic, DiagnosticSeverity, DiagnosticTag, SymbolKind, VersionedTextDocumentIdentifier } from 'vscode-languageserver-types';
 import { EXTENSION_NAME } from '../../constants';
 import type StorageService from '../services/storage';
 import { INode, NodeType } from '../types/nodes';
 import type { IScssDocument, ScssForward, ScssImport, ScssSymbol } from '../types/symbols';
+import { asDollarlessVariable } from '../utils/string';
 
 export async function doDiagnostics(
   document: VersionedTextDocumentIdentifier,
@@ -21,8 +22,26 @@ export async function doDiagnostics(
     return diagnostics;
   }
 
+  // Do traversal once, and then do diagnostics on the symbols for each reference
+  const symbols: ScssSymbol[] = [];
+  doSymbolHunting(openDocument, storage, symbols);
+
+
   for (const node of references) {
-    doSymbolHunting(openDocument, storage, diagnostics, node);
+    for (const symbol of symbols) {
+      const nodeKind: SymbolKind = node.type === NodeType.Function
+      ? SymbolKind.Function
+      : node.type === NodeType.MixinReference
+        ? SymbolKind.Method
+        : SymbolKind.Variable;
+
+      if (symbol.kind === nodeKind && node.getName() === symbol.name) {
+        const diagnostic = createDiagnostic(openDocument, node, symbol);
+        if (diagnostic) {
+          diagnostics.push(diagnostic);
+        }
+      }
+    }
   }
 
   return diagnostics;
@@ -51,32 +70,28 @@ function getVariableFunctionMixinReferences(fromNode: INode): INode[] {
     });
 }
 
-function doSymbolHunting(openDocument: IScssDocument, storage: StorageService, result: Diagnostic[], node: INode): Diagnostic[] {
-  traverseTree(openDocument, openDocument, storage, result, node);
+function doSymbolHunting(openDocument: IScssDocument, storage: StorageService, result: ScssSymbol[]): ScssSymbol[] {
+  traverseTree(openDocument, openDocument, storage, result);
 	return result;
 }
 
-function traverseTree(openDocument: IScssDocument, childDocument: IScssDocument, storage: StorageService, result: Diagnostic[], node: INode, accumulatedPrefix = ""): Diagnostic[] {
+function traverseTree(openDocument: IScssDocument, childDocument: IScssDocument, storage: StorageService, result: ScssSymbol[], accumulatedPrefix = ""): ScssSymbol[] {
 	const scssDocument = storage.get(childDocument.uri);
 	if (!scssDocument) {
 		return result;
 	}
 
-  const map = node.type === NodeType.Function
-    ? scssDocument.functions
-    : node.type === NodeType.MixinReference
-      ? scssDocument.mixins
-      : scssDocument.variables;
-
-
-  // Entry has prefix, so we need to strip that prefix away from entry
-  // before looking for a symbol as it has been named in the original document.
-  const symbolName = node.getName().replace(accumulatedPrefix, "");
-  if (map.has(symbolName)) {
-    const diagnostic = createDiagnostic(openDocument, node, map.get(symbolName)!);
-    if (diagnostic) {
-      result.push(diagnostic);
+  for (const symbol of scssDocument.getSymbols()) {
+    // The symbol may have a prefix in the open document, so we need to add it here
+    // so we can compare apples to apples later on.
+    let symbolName = `${accumulatedPrefix}${asDollarlessVariable(symbol.name)}`;
+    if (symbol.kind === SymbolKind.Variable) {
+      symbolName = `$${symbolName}`;
     }
+    result.push({
+      ...symbol,
+      name: symbolName,
+    })
   }
 
 	// Check to see if we have to go deeper
@@ -95,7 +110,7 @@ function traverseTree(openDocument: IScssDocument, childDocument: IScssDocument,
 			prefix += (child as ScssForward).prefix;
 		}
 
-		traverseTree(openDocument, childDocument, storage, result, node, prefix);
+		traverseTree(openDocument, childDocument, storage, result, prefix);
 	}
 
 	return result;

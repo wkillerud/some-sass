@@ -1,6 +1,11 @@
 # Some Sass for Visual Studio Code
 
-Some Sass provides autocompletion and refactoring for SCSS, with rich documentation through [SassDoc](http://sassdoc.com). Supports standalone SCSS, as well as style blocks inside Vue and Svelte components.
+Some Sass provides code suggestions, documentation and code navigation for SCSS.
+
+- Full support for `@use` and `@forward`, including aliases, prefixes and hiding.
+- Rich documentation through [SassDoc](http://sassdoc.com).
+
+Supports standalone SCSS, as well as style blocks inside Vue and Svelte components.
 
 Based on SCSS Intellisense by [Denis Malinochkin and contributors](https://github.com/mrmlnc/vscode-scss). Uses the built-in VS Code language server for SCSS.
 
@@ -11,6 +16,17 @@ Search for Some Sass (`SomewhatStationery.some-sass`) from the extension install
 If you have SCSS IntelliSense (`mrmlnc.vscode-scss`) installed you should disable or uninstall it. Otherwise the two extensions will both provide hover information and code suggestions.
 
 ## Usage
+
+### Code suggestions
+
+Get suggestions for variables, mixins and functions as you type.
+
+Completions work with and without `@use` namespaces, and there is support for `@follow` [prefixes](https://sass-lang.com/documentation/at-rules/forward#adding-a-prefix) and [hiding](https://sass-lang.com/documentation/at-rules/forward#controlling-visibility).
+
+If you document your mixin using the `@content` [annotation from SassDoc](http://sassdoc.com/annotations/#content)
+the extension will use that information to autosuggest brackets and move focus inside the mixin contents.
+
+![](images/suggestions-mixins.gif)
 
 ### Information on hover
 
@@ -35,17 +51,6 @@ either for Workspace (`Cmd + T`) or for Editor (`Cmd + Shift + O`) to use this f
 depending on your keyboard settings.
 
 ![](images/workspace-symbols.gif)
-
-### Code suggestions
-
-The extension will suggest variables, mixins and functions as you type.
-
-For mixins and functions the extension will help you with signature information as you type.
-
-If you document your mixin using the `@content` [annotation from SassDoc](http://sassdoc.com/annotations/#content)
-the extension will use that information to autosuggest brackets and move focus inside the mixin contents.
-
-![](images/suggestions-mixins.gif)
 
 ## Recommended settings for Visual Studio Code
 

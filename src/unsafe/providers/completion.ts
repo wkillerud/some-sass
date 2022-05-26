@@ -171,7 +171,7 @@ function createVariableCompletionItems(
 			}
 
 			if (isPrivate) {
-				sortText = "y";
+				sortText = label.replace(/^$[_-]/, '');
 			}
 
 			const sassdoc = applySassDoc(
@@ -188,7 +188,7 @@ function createVariableCompletionItems(
 			label = `$${prefix}${asDollarlessVariable(variable.name)}`;
 			// The `.` in the namespace gets replaced unless we have a $ charachter after it
 			insertText = context.word.endsWith(".") ? `.${label}` : label;
-			filterText = `${context.namespace}${insertText}`;
+			filterText = `${context.namespace !== "*" ? context.namespace : ""}${insertText}`;
 		}
 
 		completions.push({
@@ -243,10 +243,14 @@ function createMixinCompletionItems(
 		// Client needs the namespace as part of the text that is matched,
 		// and inserted text needs to include the `.` which will otherwise
 		// be replaced.
-		let label = context.namespace ? `${prefix}${mixin.name}` : mixin.name;
-		const filterText = context.namespace ? `${context.namespace}.${prefix}${mixin.name}` : undefined;
-		let insertText = context.namespace ? `.${prefix}${mixin.name}` : undefined;
-		let sortText = isPrivate ? "y" : undefined;
+		const label = context.namespace ? `${prefix}${mixin.name}` : mixin.name;
+		const filterText = context.namespace
+			? context.namespace !== "*"
+				? `${context.namespace}.${prefix}${mixin.name}`
+				: `${prefix}${mixin.name}`
+			: mixin.name;
+		let insertText = context.namespace && context.namespace !== "*" ? `.${prefix}${mixin.name}` : mixin.name;
+		const sortText = isPrivate ? label.replace(/^$[_-]/, '') : undefined;
 
 		// Use the SnippetString syntax to provide smart completions of parameter names
 		let labelDetails: CompletionItemLabelDetails | undefined = undefined;
@@ -263,7 +267,7 @@ function createMixinCompletionItems(
 
 		// Not all mixins have @content, but when they do, be smart about adding brackets
 		// and move the cursor to be ready to add said contents.
-		if (sassdoc && sassdoc.includes("@content")) {
+		if (mixin.sassdoc?.content) {
 			insertText += " {\n\t$0\n}"
 		}
 
@@ -313,10 +317,18 @@ function createFunctionCompletionItems(
 		// Client needs the namespace as part of the text that is matched,
 		// and inserted text needs to include the `.` which will otherwise
 		// be replaced.
-		let label = context.namespace ? `${prefix}${func.name}` : func.name;
-		const filterText = context.namespace ? `${context.namespace}.${prefix}${func.name}` : undefined;
-		let insertText = context.namespace ? `.${prefix}${func.name}` : undefined;
-		let sortText = isPrivate ? "y" : undefined;
+		const label = context.namespace ? `${prefix}${func.name}` : func.name;
+		const filterText = context.namespace
+			? `${context.namespace !== "*"
+				? context.namespace
+				: ""}.${prefix}${func.name}`
+			: func.name;
+		let insertText = context.namespace
+			? context.namespace !== "*"
+				? `.${prefix}${func.name}`
+				: `${prefix}${func.name}`
+			: func.name;
+		const sortText = isPrivate ? label.replace(/^$[_-]/, '') : undefined;
 
 		// Use the SnippetString syntax to provide smart completions of parameter names
 		let labelDetails: CompletionItemLabelDetails | undefined = undefined;
@@ -369,8 +381,9 @@ export function doCompletion(
 	settings: ISettings,
 	storage: StorageService
 ): CompletionList {
+	let completions = CompletionList.create([], false);
+
 	const context = createCompletionContext(document, offset, settings);
-	const completions = CompletionList.create([], false);
 
 	// Drop suggestions inside `//` and `/* */` comments
 	if (context.comment) {
@@ -378,7 +391,38 @@ export function doCompletion(
 	}
 
 	if (context.namespace) {
-		return doNamespacedCompletion(document, settings, context, storage);
+		completions = doNamespacedCompletion(document, settings, context, storage);
+	}
+
+	const scssDocument = storage.get(document.uri);
+	if (!scssDocument) {
+		// Don't know how this would happen, but ¯\_(ツ)_/¯
+		return completions;
+	}
+
+	const wildcardNamespaces: ScssUse[] = [];
+	for (const use of scssDocument.uses.values()) {
+		if (use.namespace === "*" && use.link.target) {
+			wildcardNamespaces.push(use);
+		}
+	}
+
+	if (wildcardNamespaces.length) {
+		const accumulator: Map<string, CompletionItem[]> = new Map();
+
+		for (const use of wildcardNamespaces) {
+			const namespaceRootDocument = storage.get(use.link.target!);
+			if (!namespaceRootDocument) {
+				continue;
+			}
+			const wildcardContext = {
+				...context,
+				namespace: "*",
+			};
+			traverseTree(document, settings, wildcardContext, storage, accumulator, namespaceRootDocument);
+		}
+
+		completions.items = completions.items.concat([...accumulator.values()].flat());
 	}
 
 	// If at this point we're not in a namespace context,

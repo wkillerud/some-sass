@@ -10,6 +10,8 @@ export interface ISettings {
 	showErrors: boolean;
 
 	// Suggestions
+	suggestAllFromOpenDocument: boolean;
+	suggestFromUseOnly: boolean;
 	suggestVariables: boolean;
 	suggestMixins: boolean;
 	suggestFunctions: boolean;

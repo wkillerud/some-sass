@@ -14,8 +14,9 @@ import { fileExists } from '../utils/fs';
 import { URI } from 'vscode-uri';
 
 export const reModuleAtRule = /@[use|forward|import]/;
-export const reUse = /@use ["|'](?<url>.+)["|'](?: as (?<namespace>\*|\w+))?/;
-export const reForward = /@forward ["|'](?<url>.+)["|'](?: as (?<prefix>\w+-)\*)?(?: hide (?<hide>.+))?/;
+export const reUse = /@use ["|'](?<url>.+)["|'](?: as (?<namespace>\*|\w+))?;/;
+export const reForward = /@forward ["|'](?<url>.+)["|'](?: as (?<prefix>\w+-)\*)?(?: hide (?<hide>.+))?;/;
+export const reImport = /@import ["|'](?<url>.+)["|']/;
 
 const reDynamicPath = /[#{}\*]/;
 
@@ -66,33 +67,44 @@ async function findDocumentSymbols(document: TextDocument, ast: INode, workspace
 				link.target = partial;
 			}
 
-			const matchUse = line.match(reUse);
+			const matchUse = reUse.exec(line);
 			if (matchUse) {
-				const { namespace } = matchUse.groups as { namespace?: string };
-				result.uses.set(link.target, {
-					link,
-					namespace: namespace || getFilenameFromLink(link),
-					isAliased: Boolean(namespace),
-				});
+				const url = matchUse.groups?.["url"];
+				if (urlMatches(url as string, link.target)) {
+					const namespace = matchUse.groups?.["namespace"];
+					result.uses.set(link.target, {
+						link,
+						namespace: namespace || getNamespaceFromLink(link),
+						isAliased: Boolean(namespace),
+					});
+				}
 				continue;
 			}
 
-			const matchForward = line.match(reForward);
+			const matchForward = reForward.exec(line);
 			if (matchForward) {
-				const { prefix, hide } = matchForward.groups as { url: string; prefix?: string; hide?: string };
-				result.forwards.set(link.target, {
-					link,
-					prefix,
-					hide: hide ? hide.split(',').map(s => s.trim()) : []
-				});
+				const url = matchForward.groups?.["url"];
+				if (urlMatches(url as string, link.target)) {
+					result.forwards.set(link.target, {
+						link,
+						prefix: matchForward.groups?.["prefix"],
+						hide: matchForward.groups?.["hide"] ? matchForward.groups["hide"].split(',').map(s => s.trim()) : []
+					});
+				}
 				continue;
 			}
 
-			result.imports.set(link.target, {
-				link,
-				dynamic: reDynamicPath.test(link.target),
-				css: link.target.endsWith('.css')
-			});
+			const matchImport = reImport.exec(line);
+			if (matchImport) {
+				const url = matchImport.groups?.["url"];
+				if (urlMatches(url as string, link.target)) {
+					result.imports.set(link.target, {
+						link,
+						dynamic: reDynamicPath.test(link.target),
+						css: link.target.endsWith('.css')
+					});
+				}
+			}
 		}
 	}
 
@@ -144,14 +156,16 @@ async function findDocumentSymbols(document: TextDocument, ast: INode, workspace
 	return result;
 }
 
-function getFilenameFromLink(link: DocumentLink): string | undefined {
+function getNamespaceFromLink(link: DocumentLink): string | undefined {
 	if (!link.target) {
 		return undefined;
 	}
 
 	const lastSlash = link.target.lastIndexOf('/');
 	const extension = link.target.lastIndexOf('.');
-	return link.target.substring(lastSlash + 1, extension);
+	const candidate = link.target.substring(lastSlash + 1, extension);
+
+	return candidate.startsWith("_") ? candidate.substring(1) : candidate;
 }
 
 function ensureScssExtension(target: string): string {
@@ -173,6 +187,22 @@ function ensurePartial(target: string): string {
 	const path = target.substring(0, lastSlash + 1);
 	const extension = target.substring(lastDot);
 	return `${path}_${fileName}${extension}`;
+}
+
+function urlMatches(url: string, linkTarget: string): boolean {
+	let safeUrl = url;
+	while (safeUrl.match(/^[./~@]/)) {
+		safeUrl = safeUrl.substring(1);
+	}
+	let match = linkTarget.includes(safeUrl);
+	if (!match) {
+		let lastSlash = safeUrl.lastIndexOf('/');
+		const toLastSlash = safeUrl.substring(0, lastSlash);
+		const restOfUrl = safeUrl.substring(lastSlash + 1)
+		const partial = `${toLastSlash}/_${restOfUrl}`;
+		match = linkTarget.includes(partial);
+	}
+	return match;
 }
 
 function getVariableValue(ast: INode, offset: number): string | null {

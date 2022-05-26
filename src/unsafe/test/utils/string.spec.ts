@@ -6,7 +6,8 @@ import {
 	getCurrentWord,
 	getTextBeforePosition,
 	getTextAfterPosition,
-	getLimitedString
+	getLimitedString,
+	asDollarlessVariable
 } from '../../utils/string';
 
 describe('Utils/String', () => {
@@ -36,5 +37,11 @@ describe('Utils/String', () => {
 
 		assert.strictEqual(getLimitedString(text).length, 141);
 		assert.strictEqual(getLimitedString(text, false).length, 140);
+	});
+
+	it('asDollarlessVariable', () => {
+		assert.strictEqual(asDollarlessVariable('$some-text'), 'some-text');
+		assert.strictEqual(asDollarlessVariable('$someText'), 'someText');
+		assert.strictEqual(asDollarlessVariable('$$$ (⌐■_■) $$$'), '$$ (⌐■_■) $$$');
 	});
 });

@@ -48,3 +48,8 @@ export function getLimitedString(str: string, ellipsis = true): string {
 
 	return str.slice(0, 140) + (ellipsis ? '\u2026' : '');
 }
+
+/** Strips the dollar prefix off a variable name */
+export function asDollarlessVariable(variable: string): string {
+	return variable.replace(/^\$/, '');
+}

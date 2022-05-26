@@ -93,8 +93,9 @@ function doSymbolHunting(document: TextDocument, storage: StorageService, identi
 		return [null, null];
 	}
 
-	for (const use of scssDocument.uses.values()) {
-		const scssDocument = storage.get(use.link.target as string);
+	// Don't follow forwards from the current document, since the current doc doesn't have access to its symbols
+	for (const { link } of scssDocument.getLinks({ forwards: false })) {
+		const scssDocument = storage.get(link.target as string);
 		if (!scssDocument) {
 			continue;
 		}

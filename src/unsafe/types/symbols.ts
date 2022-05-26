@@ -62,7 +62,7 @@ export interface IScssDocument extends TextDocument, IScssSymbols {
 	 * the fileName is `test.scss`.
 	 */
 	fileName: string;
-	getLinks: () => ScssLink[];
+	getLinks: (options?: { forwards: boolean }) => ScssLink[];
 	getSymbols: () => ScssSymbol[];
 	getNodeAt: (offset: number) => INode | null;
 	getNodeRange: (node: INode) => Range;

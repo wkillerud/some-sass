@@ -98,7 +98,7 @@ export class ScssDocument implements IScssDocument {
 		return symbols;
 	}
 
-	public getLinks(): ScssLink[] {
+	public getLinks(options = { forwards: true }): ScssLink[] {
 		const links: ScssLink[] = [];
 
 		for (const imp of this.imports.values()) {
@@ -109,8 +109,10 @@ export class ScssDocument implements IScssDocument {
 			links.push(use);
 		}
 
-		for (const forward of this.forwards.values()) {
-			links.push(forward);
+		if (options.forwards) {
+			for (const forward of this.forwards.values()) {
+				links.push(forward);
+			}
 		}
 
 		return links;

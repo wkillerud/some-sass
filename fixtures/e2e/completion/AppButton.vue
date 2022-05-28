@@ -28,4 +28,10 @@ $fonts: -apple-system;
   color: $;
 }
 
+@use '../variables' as var;
+
+.foo {
+  color: var.
+}
+
 </style>

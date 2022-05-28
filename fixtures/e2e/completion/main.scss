@@ -16,3 +16,9 @@ $fonts: -apple-system;
 .foo {
   color: $;
 }
+
+@use '../variables' as var;
+
+.foo {
+  color: var.
+}

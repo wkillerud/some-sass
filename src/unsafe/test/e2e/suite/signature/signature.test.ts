@@ -15,7 +15,7 @@ describe('SCSS Signature Help Test', () => {
 
 	describe('Mixin', () => {
 		it('should suggest all parameters of mixin', async () => {
-			await testSignature(docUri, position(5, 19), {
+			const expected = {
 				activeParameter: 0,
 				activeSignature: 0,
 				signatures: [
@@ -24,11 +24,15 @@ describe('SCSS Signature Help Test', () => {
 						parameters: [{ label: '$size' }, { label: '$radius' }]
 					}
 				]
-			});
+			};
+
+			await testSignature(docUri, position(5, 19), expected);
+			await testSignature(vueDocUri, position(14, 19), expected);
+			await testSignature(svelteDocUri, position(8, 19), expected);
 		});
 
 		it('should suggest the second parameter of mixin', async () => {
-			await testSignature(docUri, position(6, 21), {
+			const expected = {
 				activeParameter: 1,
 				activeSignature: 0,
 				signatures: [
@@ -37,65 +41,17 @@ describe('SCSS Signature Help Test', () => {
 						parameters: [{ label: '$size' }, { label: '$radius' }]
 					}
 				]
-			});
-		});
+			};
 
-		it('should suggest all parameters of mixin on vue file', async () => {
-			await testSignature(vueDocUri, position(14, 19), {
-				activeParameter: 0,
-				activeSignature: 0,
-				signatures: [
-					{
-						label: 'square ($size: null, $radius: 0)',
-						parameters: [{ label: '$size' }, { label: '$radius' }]
-					}
-				]
-			});
-		});
-
-		it('should suggest the second parameter of mixin on vue file', async () => {
-			await testSignature(vueDocUri, position(15, 21), {
-				activeParameter: 1,
-				activeSignature: 0,
-				signatures: [
-					{
-						label: 'square ($size: null, $radius: 0)',
-						parameters: [{ label: '$size' }, { label: '$radius' }]
-					}
-				]
-			});
-		});
-
-		it('should suggest all parameters of mixin on svelte file', async () => {
-			await testSignature(svelteDocUri, position(8, 19), {
-				activeParameter: 0,
-				activeSignature: 0,
-				signatures: [
-					{
-						label: 'square ($size: null, $radius: 0)',
-						parameters: [{ label: '$size' }, { label: '$radius' }]
-					}
-				]
-			});
-		});
-
-		it('should suggest the second parameter of mixin on svelte file', async () => {
-			await testSignature(svelteDocUri, position(9, 21), {
-				activeParameter: 1,
-				activeSignature: 0,
-				signatures: [
-					{
-						label: 'square ($size: null, $radius: 0)',
-						parameters: [{ label: '$size' }, { label: '$radius' }]
-					}
-				]
-			});
+			await testSignature(docUri, position(6, 21), expected);
+			await testSignature(vueDocUri, position(15, 21), expected);
+			await testSignature(svelteDocUri, position(9, 21), expected);
 		});
 	});
 
 	describe('Function', () => {
 		it('should suggest all parameters of function', async () => {
-			await testSignature(docUri, position(8, 16), {
+			const expected = {
 				activeParameter: 0,
 				activeSignature: 0,
 				signatures: [
@@ -104,11 +60,15 @@ describe('SCSS Signature Help Test', () => {
 						parameters: [{ label: '$base' }, { label: '$exponent' }]
 					}
 				]
-			});
+			};
+
+			await testSignature(docUri, position(8, 16), expected);
+			await testSignature(vueDocUri, position(17, 16), expected);
+			await testSignature(svelteDocUri, position(11, 16), expected);
 		});
 
 		it('should suggest the second parameter of function', async () => {
-			await testSignature(docUri, position(8, 26), {
+			const expected = {
 				activeParameter: 1,
 				activeSignature: 0,
 				signatures: [
@@ -117,59 +77,11 @@ describe('SCSS Signature Help Test', () => {
 						parameters: [{ label: '$base' }, { label: '$exponent' }]
 					}
 				]
-			});
-		});
+			};
 
-		it('should suggest all parameters of function on vue file', async () => {
-			await testSignature(vueDocUri, position(17, 16), {
-				activeParameter: 0,
-				activeSignature: 0,
-				signatures: [
-					{
-						label: 'pow ($base: null, $exponent: null)',
-						parameters: [{ label: '$base' }, { label: '$exponent' }]
-					}
-				]
-			});
-		});
-
-		it('should suggest the second parameter of function on vue file', async () => {
-			await testSignature(vueDocUri, position(17, 26), {
-				activeParameter: 1,
-				activeSignature: 0,
-				signatures: [
-					{
-						label: 'pow ($base: null, $exponent: null)',
-						parameters: [{ label: '$base' }, { label: '$exponent' }]
-					}
-				]
-			});
-		});
-
-		it('should suggest all parameters of function on svelte file', async () => {
-			await testSignature(svelteDocUri, position(11, 16), {
-				activeParameter: 0,
-				activeSignature: 0,
-				signatures: [
-					{
-						label: 'pow ($base: null, $exponent: null)',
-						parameters: [{ label: '$base' }, { label: '$exponent' }]
-					}
-				]
-			});
-		});
-
-		it('should suggest the second parameter of function on svelte file', async () => {
-			await testSignature(svelteDocUri, position(11, 26), {
-				activeParameter: 1,
-				activeSignature: 0,
-				signatures: [
-					{
-						label: 'pow ($base: null, $exponent: null)',
-						parameters: [{ label: '$base' }, { label: '$exponent' }]
-					}
-				]
-			});
+			await testSignature(docUri, position(8, 26), expected);
+			await testSignature(vueDocUri, position(17, 26), expected);
+			await testSignature(svelteDocUri, position(11, 26), expected);
 		});
 	});
 });

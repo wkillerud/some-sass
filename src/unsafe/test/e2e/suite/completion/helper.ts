@@ -22,7 +22,8 @@ export async function testCompletion(
 			assert.ok(
 				result.items.some(i => {
 					return i.label === ei;
-				})
+				}),
+				`Expected to find ${ei} among results: ${JSON.stringify(result.items)}`
 			);
 		} else {
 			const match = result.items.find(i => i.label === ei.label);
@@ -37,6 +38,9 @@ export async function testCompletion(
 			}
 			if (ei.detail) {
 				assert.strictEqual(match.detail, ei.detail);
+			}
+			if (ei.insertText) {
+				assert.strictEqual(JSON.stringify(match.insertText), ei.insertText, `Expected insertText to match ${ei.insertText}. Actual: ${JSON.stringify(match.insertText)}`);
 			}
 
 			if (ei.documentation) {

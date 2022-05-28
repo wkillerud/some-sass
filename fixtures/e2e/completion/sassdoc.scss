@@ -1,0 +1,36 @@
+@use "sass:math";
+
+///
+@mixin contentless {
+  color: limegreen;
+}
+
+///
+@mixin has-content {
+  @content;
+}
+
+///
+@mixin has-parameters($a: 1px, $b: 2px) {
+  font-size: math.calc($a + $b);
+}
+
+///
+@mixin has-parameters-and-content($a, $b) {
+  @media screen and (min-width: $a) and (max-width: #{$b - 1px}) {
+    @content;
+  }
+}
+
+///
+@function parameterless() {
+  @return 1px;
+}
+
+///
+@function parameterfull($a: 1px, $b: 2px) {
+  @return math.calc($a + $b);
+}
+
+///
+$variable: 1px;

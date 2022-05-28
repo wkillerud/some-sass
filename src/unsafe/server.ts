@@ -81,7 +81,7 @@ connection.onInitialize(
 				textDocumentSync: TextDocumentSyncKind.Incremental,
 				completionProvider: {
 					resolveProvider: false,
-				  triggerCharacters: ["@", " "] // For SassDoc annotation completion
+				  triggerCharacters: ["@", " ", "/"] // For SassDoc annotation completion
 				},
 				signatureHelpProvider: {
 					triggerCharacters: ['(', ',', ';']

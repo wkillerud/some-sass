@@ -10,15 +10,26 @@ import type { IScssDocument, ScssForward, ScssImport, ScssMixin, ScssUse } from 
 import { getCurrentWord, getLimitedString, getTextBeforePosition, asDollarlessVariable } from '../utils/string';
 import { getVariableColor } from '../utils/color';
 import { applySassDoc } from '../utils/sassdoc';
+import { sassDocAnnotations } from '../sassdocAnnotations';
 
-type CompletionContext = { word: string; comment: boolean; namespace: string | null; variable: boolean; function: boolean; mixin: boolean; };
+type CompletionContext = {
+	word: string;
+	textBeforeWord: string;
+	comment: boolean;
+	sassDoc: boolean;
+	namespace: string | null;
+	variable: boolean;
+	function: boolean;
+	mixin: boolean;
+};
 
 // RegExp's
 const rePropertyValue = /.*:\s*/;
 const reEmptyPropertyValue = /.*:\s*$/;
 const reQuotedValueInString = /['"](?:[^'"\\]|\\.)*['"]/g;
 const reMixinReference = /.*@include\s+(.*)/;
-const reComment = /^(\/(\/|\*)|\*)/;
+const reComment = /^.*(\/(\/|\*)|\*)/;
+const reSassDoc = /^[\\s]*\/\/\/.*$/;
 const reQuotes = /['"]/;
 const rePrivate = /^\$?[_-].*$/;
 
@@ -89,6 +100,10 @@ function isCommentContext(text: string): boolean {
 	return reComment.test(text.trim());
 }
 
+function isSassDocContext(text: string): boolean {
+	return reSassDoc.test(text);
+}
+
 function isInterpolationContext(text: string): boolean {
 	return text.includes('#{');
 }
@@ -118,7 +133,9 @@ function createCompletionContext(document: TextDocument, offset: number, setting
 
 	return {
 		word: currentWord,
+		textBeforeWord,
 		comment: isCommentContext(textBeforeWord),
+		sassDoc: isSassDocContext(textBeforeWord),
 		namespace,
 		variable: checkVariableContext(currentWord, isInterpolation, isPropertyValue, isEmptyValue, isQuotes, Boolean(namespace)),
 		function: checkFunctionContext(
@@ -385,6 +402,10 @@ export function doCompletion(
 
 	const context = createCompletionContext(document, offset, settings);
 
+	if (context.sassDoc) {
+		return doSassDocCompletion(context);
+	}
+
 	// Drop suggestions inside `//` and `/* */` comments
 	if (context.comment) {
 		return completions;
@@ -542,4 +563,54 @@ function traverseTree(document: TextDocument, settings: ISettings, context: Comp
 
 		traverseTree(document, settings, context, storage, accumulator, childDocument, hidden, prefix);
 	}
+}
+
+function doSassDocCompletion({ textBeforeWord }: CompletionContext): CompletionList {
+	const completions = CompletionList.create([], true);
+
+	if (textBeforeWord.includes("@example ")) {
+		completions.items.push({
+			label: 'scss',
+			sortText: '-',
+			kind: CompletionItemKind.Value,
+		});
+		completions.items.push({
+			label: 'css',
+			kind: CompletionItemKind.Value,
+		});
+		completions.items.push({
+			label: 'markup',
+			kind: CompletionItemKind.Value,
+		});
+		completions.items.push({
+			label: 'javascript',
+			sortText: 'y',
+			kind: CompletionItemKind.Value,
+		});
+		return completions;
+	}
+
+	for (const { annotation, aliases, insertText, insertTextFormat } of sassDocAnnotations) {
+		const item = {
+			label: annotation,
+			kind: CompletionItemKind.Keyword,
+			insertText,
+			insertTextFormat,
+			sortText: '-', // Push ourselves to the head of the list
+		};
+
+		completions.items.push(item);
+
+		if (aliases) {
+			for (const alias of aliases) {
+				completions.items.push({
+					...item,
+					label: alias,
+					insertText: insertText ? insertText.replace(annotation, alias) : insertText,
+				});
+			}
+		}
+	}
+
+	return completions;
 }

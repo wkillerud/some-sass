@@ -163,9 +163,18 @@ function getNamespaceFromLink(link: DocumentLink): string | undefined {
 
 	const lastSlash = link.target.lastIndexOf('/');
 	const extension = link.target.lastIndexOf('.');
-	const candidate = link.target.substring(lastSlash + 1, extension);
+	let candidate = link.target.substring(lastSlash + 1, extension);
 
-	return candidate.startsWith("_") ? candidate.substring(1) : candidate;
+	candidate = candidate.startsWith("_") ? candidate.substring(1) : candidate;
+
+	if (candidate === "index") {
+		// The link points to an index file. Use the folder name above as a namespace.
+		const linkOmitIndex = link.target.substring(0, lastSlash);
+		const newLastSlash = linkOmitIndex.lastIndexOf('/');
+		candidate = linkOmitIndex.substring(newLastSlash + 1);
+	}
+
+	return candidate;
 }
 
 function ensureScssExtension(target: string): string {

@@ -4,10 +4,18 @@ import * as vscode from 'vscode';
 import type { CompletionItem, MarkupContent } from 'vscode-languageclient';
 import { showFile } from '../util';
 
+type CompletionTestOptions = {
+	/**
+	 * @default false
+	 */
+	expectNoMatch: boolean;
+}
+
 export async function testCompletion(
 	docUri: vscode.Uri,
 	position: vscode.Position,
-	expectedItems: (string | CompletionItem)[]
+	expectedItems: (string | CompletionItem)[],
+	options: CompletionTestOptions = { expectNoMatch: false }
 ) {
 	await showFile(docUri);
 
@@ -19,16 +27,30 @@ export async function testCompletion(
 
 	expectedItems.forEach(ei => {
 		if (typeof ei === 'string') {
-			assert.ok(
-				result.items.some(i => {
-					return i.label === ei;
-				}),
-				`Expected to find ${ei} among results: ${JSON.stringify(result.items)}`
-			);
+			if (options.expectNoMatch) {
+				const match = result.items.find(i => i.label === ei);
+				if (!match) {
+					assert.ok(`Found no match for ${ei}`);
+				} else {
+					assert.fail(`Expected NOT to find ${ei} among results, but it's there: ${result.items.map(i => i.label)}`);
+				}
+				return;
+			} else {
+				assert.ok(
+					result.items.some(i => {
+						return i.label === ei;
+					}),
+					`Expected to find ${ei} among results: ${JSON.stringify(result.items)}`
+				);
+			}
 		} else {
 			const match = result.items.find(i => i.label === ei.label);
 			if (!match) {
-				assert.fail(`Can't find matching item for ${JSON.stringify(ei, null, 2)}`);
+				if (options.expectNoMatch) {
+					assert.ok(`Found no match for ${ei.label}`);
+				} else {
+					assert.fail(`Can't find matching item for ${JSON.stringify(ei, null, 2)}`);
+				}
 				return;
 			}
 

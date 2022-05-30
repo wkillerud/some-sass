@@ -31,12 +31,39 @@ describe('SCSS Completion Test', () => {
 		await testCompletion(svelteDocUri, position(20, 11), expectedCompletions);
 	});
 
-	it('Offers namespaces completions', async () => {
-		const expectedCompletions = [{ label: '$variable', detail: 'Variable declared in _variables.scss' }];
+	it('Offers namespaces completions including prefixes', async () => {
+		let expectedCompletions = [
+			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss' },
+			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss' }
+		];
 
-		await testCompletion(docUri, position(23, 14), expectedCompletions);
-		await testCompletion(vueDocUri, position(34, 14), expectedCompletions);
-		await testCompletion(svelteDocUri, position(26, 14), expectedCompletions);
+		await testCompletion(docUri, position(23, 13), expectedCompletions);
+		await testCompletion(vueDocUri, position(34, 13), expectedCompletions);
+		await testCompletion(svelteDocUri, position(26, 13), expectedCompletions);
+
+
+		expectedCompletions = [
+			{ label: 'mix-mix-mixin', detail: 'Mixin declared in _mixins.scss' },
+		];
+
+		await testCompletion(docUri, position(24, 15), expectedCompletions);
+		await testCompletion(vueDocUri, position(35, 15), expectedCompletions);
+		await testCompletion(svelteDocUri, position(27, 15), expectedCompletions);
+	});
+
+	// We can't test this until somesass.suggestOnlyFromUse: true becomes the default setting
+	it.skip('Offers no hidden items in namespace completions', async () => {
+		let expectedCompletions = ['$secret'];
+
+		await testCompletion(docUri, position(23, 13), expectedCompletions, { expectNoMatch: true });
+		await testCompletion(vueDocUri, position(34, 13), expectedCompletions, { expectNoMatch: true });
+		await testCompletion(svelteDocUri, position(26, 13), expectedCompletions, { expectNoMatch: true });
+
+		expectedCompletions = ['secret', 'other-secret', 'mix-secret', 'mix-other-secret'];
+
+		await testCompletion(docUri, position(24, 15), expectedCompletions, { expectNoMatch: true });
+		await testCompletion(vueDocUri, position(35, 15), expectedCompletions, { expectNoMatch: true });
+		await testCompletion(svelteDocUri, position(27, 15), expectedCompletions, { expectNoMatch: true });
 	});
 
 	it('Offers no completions on Vuelike file outside SCSS regions', async () => {

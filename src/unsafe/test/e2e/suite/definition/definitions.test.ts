@@ -39,4 +39,22 @@ describe('SCSS Definition Test', () => {
 		await testDefinition(vueDocUri, position(17, 12), expectedLocation);
 		await testDefinition(svelteDocUri, position(11, 14), expectedLocation);
 	});
+
+	it('should find symbol definition behind namespace', async () => {
+		const expectedDocumentUri = getDocUri('namespace/_variables.scss');
+		const expectedLocation = sameLineLocation(expectedDocumentUri, 1, 1, 18);
+
+		await testDefinition(docUri, position(14, 14), expectedLocation);
+		await testDefinition(vueDocUri, position(23, 14), expectedLocation);
+		await testDefinition(svelteDocUri, position(17, 14), expectedLocation);
+	});
+
+	it('should find symbol definition behind namespace and prefix', async () => {
+		const expectedDocumentUri = getDocUri('namespace/_mixins.scss');
+		const expectedLocation = sameLineLocation(expectedDocumentUri, 1, 1, 10);
+
+		await testDefinition(docUri, position(15, 17), expectedLocation);
+		await testDefinition(vueDocUri, position(24, 17), expectedLocation);
+		await testDefinition(svelteDocUri, position(18, 17), expectedLocation);
+	});
 });

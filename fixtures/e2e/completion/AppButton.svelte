@@ -20,10 +20,11 @@ $fonts: -apple-system;
   color: $;
 }
 
-@use '../variables' as var;
+@use '../namespace' as ns;
 
 .foo {
-  color: var.
+  color: ns.
+  @include ns.
 }
 
 </style>

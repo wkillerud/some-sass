@@ -42,4 +42,25 @@ describe('SCSS Hover Test', () => {
 		await testHover(vueDocUri, position(17, 12), expectedContents);
 		await testHover(svelteDocUri, position(11, 14), expectedContents);
 	});
+
+	it('shows hover for symbol behind namespace', async () => {
+		const expectedContents = {
+			contents: ['```scss\n$var-var-variable: \'value\';\n```\n____\nVariable declared in _variables.scss']
+		};
+
+		await testHover(docUri, position(14, 14), expectedContents);
+		await testHover(vueDocUri, position(23, 14), expectedContents);
+		await testHover(svelteDocUri, position(17, 14), expectedContents);
+	});
+
+	it('shows hover for symbol behind namespace and prefix', async () => {
+		// Prefixed symbols are shown with their original names
+		const expectedContents = {
+			contents: ['```scss\n@mixin mix-mixin()\n```\n____\nMixin declared in _mixins.scss']
+		};
+
+		await testHover(docUri, position(15, 17), expectedContents);
+		await testHover(vueDocUri, position(24, 17), expectedContents);
+		await testHover(svelteDocUri, position(18, 17), expectedContents);
+	});
 });

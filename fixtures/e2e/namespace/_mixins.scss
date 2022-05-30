@@ -1,0 +1,27 @@
+@mixin mix-mixin {
+  content: 'mixin';
+}
+
+/// Just here for the test
+/// @deprecated
+@mixin mix-ohno {
+  content: 'mixin';
+}
+
+@mixin mix-square($size, $radius: 0) {
+  width: $size;
+  height: $size;
+
+  @if $radius != 0 {
+    border-radius: $radius;
+  }
+}
+
+
+@mixin secret {
+  content: 'safe';
+}
+
+@mixin other-secret {
+  content: 'also-safe';
+}

@@ -17,6 +17,6 @@ export async function testDefinition(docUri: vscode.Uri, position: vscode.Positi
 		assert.fail("The 'result[0]' is undefined.");
 	}
 
-	assert.ok(result[0].range.isEqual(expectedLocation.range));
+	assert.ok(result[0].range.isEqual(expectedLocation.range), `Expected ${JSON.stringify(result[0].range)} to equal ${JSON.stringify(expectedLocation.range)} in ${docUri.fsPath}`);
 	assert.strictEqual(result[0].uri.fsPath, expectedLocation.uri.fsPath);
 }

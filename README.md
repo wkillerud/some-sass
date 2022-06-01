@@ -21,7 +21,7 @@ If you have SCSS IntelliSense (`mrmlnc.vscode-scss`) installed you should disabl
 
 Get suggestions for variables, mixins and functions as you type.
 
-Completions work with and without `@use` namespaces, and there is support for `@follow` [prefixes](https://sass-lang.com/documentation/at-rules/forward#adding-a-prefix) and [hiding](https://sass-lang.com/documentation/at-rules/forward#controlling-visibility).
+Completions work with and without `@use` namespaces, and there is support for `@follow` [prefixes](https://sass-lang.com/documentation/at-rules/forward#adding-a-prefix) and [hiding](https://sass-lang.com/documentation/at-rules/forward#controlling-visibility) (the latter only with `somesass.suggestOnlyFromUse` set to `true`).
 
 If you document your mixin using the `@content` [annotation from SassDoc](http://sassdoc.com/annotations/#content)
 the extension will use that information to autosuggest brackets and move focus inside the mixin contents.
@@ -66,7 +66,8 @@ and use the provided suggestion. This way you can keep word based suggestions if
 
 ```jsonc
 {
-  "editor.wordBasedSuggestions": false
+  "editor.wordBasedSuggestions": false,
+  "somesass.suggestOnlyFromUse": true
 }
 ```
 

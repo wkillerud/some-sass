@@ -2,27 +2,40 @@
 {
 	"version": "0.2.0",
 	"configurations": [
-	  {
-		"type": "extensionHost",
-		"request": "launch",
-		"name": "Launch Client",
-		"runtimeExecutable": "${execPath}",
-		"args": ["--extensionDevelopmentPath=${workspaceRoot}"],
-		"outFiles": ["${workspaceRoot}/dist/**/*.js"]
-	  },
-	  {
-		"type": "node",
-		"request": "attach",
-		"name": "Attach to Server",
-		"port": 6006,
-		"restart": true,
-		"outFiles": ["${workspaceRoot}/dist/unsafe/**/*.js"]
-	  }
+		{
+			"name": "Integration Tests",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionTestsPath=${workspaceFolder}/out/unsafe/test/e2e/suite",
+				"${workspaceFolder}/fixtures/e2e/"
+			],
+			"outFiles": ["${workspaceFolder}/out/unsafe/test/e2e/**/*.js"]
+
+		},
+		{
+			"type": "extensionHost",
+			"request": "launch",
+			"name": "Launch Client",
+			"runtimeExecutable": "${execPath}",
+			"args": ["--extensionDevelopmentPath=${workspaceRoot}"],
+			"outFiles": ["${workspaceRoot}/dist/**/*.js"]
+		},
+		{
+			"type": "node",
+			"request": "attach",
+			"name": "Attach to Server",
+			"port": 6006,
+			"restart": true,
+			"outFiles": ["${workspaceRoot}/dist/unsafe/**/*.js"]
+		}
 	],
 	"compounds": [
-	  {
-		"name": "Client + Server",
-		"configurations": ["Launch Client", "Attach to Server"]
-	  }
+		{
+			"name": "Client + Server",
+			"configurations": ["Launch Client", "Attach to Server"]
+		}
 	]
-  }
+}

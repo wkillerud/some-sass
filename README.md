@@ -19,7 +19,7 @@ If you have SCSS IntelliSense (`mrmlnc.vscode-scss`) installed you should disabl
 
 ### Code suggestions
 
-Get suggestions for variables, mixins and functions as you type.
+Get suggestions for variables, mixins, functions, and SassDoc as you type.
 
 Completions work with and without `@use` namespaces, and there is support for `@follow` [prefixes](https://sass-lang.com/documentation/at-rules/forward#adding-a-prefix) and [hiding](https://sass-lang.com/documentation/at-rules/forward#controlling-visibility) (the latter only with `somesass.suggestOnlyFromUse` set to `true`).
 
@@ -27,6 +27,10 @@ If you document your mixin using the `@content` [annotation from SassDoc](http:/
 the extension will use that information to autosuggest brackets and move focus inside the mixin contents.
 
 ![](images/suggestions-mixins.gif)
+
+Try documenting your mixins and functions with SassDoc comment blocks.
+
+![](images/suggestions-sassdoc.gif)
 
 ### Information on hover
 

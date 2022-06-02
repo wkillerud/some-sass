@@ -1,5 +1,5 @@
 import { sassDocAnnotations } from '../../../../sassdocAnnotations';
-import { getDocUri, showFile, position, sleep } from '../util';
+import { getDocUri, showFile, position } from '../util';
 import { testCompletion } from './helper';
 
 
@@ -12,7 +12,6 @@ describe('SCSS Completion Test', () => {
 		await showFile(docUri);
 		await showFile(vueDocUri);
 		await showFile(svelteDocUri);
-		await sleep(2000);
 	});
 
 	it('Offers completions from tilde imports', async () => {
@@ -85,7 +84,6 @@ describe('SassDoc Completion Test', () => {
 
 	before(async () => {
 		await showFile(docUri);
-		await sleep(1000);
 	});
 
 	it('Offers completions for SassDoc block on mixin without parameters or @content', async () => {

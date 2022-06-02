@@ -1,4 +1,4 @@
-import { getDocUri, showFile, position, sleep, sameLineLocation } from '../util';
+import { getDocUri, showFile, position, sameLineLocation } from '../util';
 import { testDefinition } from './helper';
 
 describe('SCSS Definition Test', () => {
@@ -10,7 +10,6 @@ describe('SCSS Definition Test', () => {
 		await showFile(docUri);
 		await showFile(vueDocUri);
 		await showFile(svelteDocUri);
-		await sleep(2000);
 	});
 
 	it('should find definition for variables', async () => {

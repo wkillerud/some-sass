@@ -2,6 +2,7 @@
 
 import { Hover, MarkupContent, MarkupKind, SymbolKind } from 'vscode-languageserver';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
+import { tokenizer } from 'scss-symbols-parser';
 
 import { NodeType } from '../types/nodes';
 import type { IScssDocument, ScssSymbol, ScssVariable, ScssMixin, ScssFunction, ScssImport, ScssForward } from '../types/symbols';
@@ -9,6 +10,7 @@ import type StorageService from '../services/storage';
 
 import { asDollarlessVariable, getLimitedString } from '../utils/string';
 import { applySassDoc} from '../utils/sassdoc';
+import { sassDocAnnotations } from '../sassdocAnnotations';
 
 type Identifier = { kind: SymbolKind; name: string };
 
@@ -128,6 +130,60 @@ export async function doHover(document: TextDocument, offset: number, storage: S
 			name: hoverNode.getName(),
 			kind: SymbolKind.Method,
 		};
+	} else if (hoverNode.type === NodeType.Stylesheet) {
+		// Hover information for SassDoc.
+		// SassDoc is considered a comment, which doesn't have its own NodeType.
+		// Tokenize the document and look for the closest non-space token to offset.
+		// If it's a comment, look for SassDoc annotations under the cursor.
+
+		type Token = [string, string, number | undefined];
+		const tokens: Array<Token> = tokenizer(document.getText());
+
+		let hoverToken: Token | null = null;
+		for (const token of tokens) {
+			const [type, text, tokenOffset] = token;
+			if (typeof tokenOffset !== 'number') {
+				continue;
+			}
+			if (tokenOffset > offset) {
+				break;
+			}
+			hoverToken = [type, text, tokenOffset];
+		}
+
+		if (hoverToken && hoverToken[0] === "comment") {
+			const commentText = hoverToken[1];
+			const candidate = sassDocAnnotations.find(({ annotation, aliases }) => {
+				return commentText.includes(annotation)
+					|| aliases?.some(alias => commentText.includes(alias));
+			});
+
+			if (candidate) {
+				const annotationPosition = commentText.indexOf(candidate.annotation);
+				const annotationOffset = hoverToken[2]! + annotationPosition;
+				if (offset < annotationOffset) {
+					// If offset is under the result of the above, we're hovering right before the annotation.
+					return null;
+				}
+
+				const annotationEnd = annotationOffset + candidate.annotation.length - 1;
+				if (annotationEnd < offset) {
+					// If offset is over the result of the above, we're hovering past the token.
+					return null;
+				}
+
+				return {
+					contents: {
+						kind: MarkupKind.Markdown,
+						value: [
+							candidate.annotation,
+							'____',
+							`[SassDoc reference](http://sassdoc.com/annotations/#${candidate.annotation.substring(1)})`,
+						].join('\n')
+					}
+				}
+			}
+		}
 	}
 
 	if (!identifier) {

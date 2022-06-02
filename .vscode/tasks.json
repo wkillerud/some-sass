@@ -3,6 +3,11 @@
 	"tasks": [
 		{
 			"type": "npm",
+			"script": "install",
+			"group": "none"
+		},
+		{
+			"type": "npm",
 			"script": "webpack",
 			"group": "build",
 			"presentation": {
@@ -12,7 +17,7 @@
 		},
 		{
 			"type": "npm",
-			"script": "webpack-dev",
+			"script": "dev",
 			"isBackground": true,
 			"group": {
 				"kind": "build",

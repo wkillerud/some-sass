@@ -79,7 +79,10 @@ connection.onInitialize(
 		return {
 			capabilities: {
 				textDocumentSync: TextDocumentSyncKind.Incremental,
-				completionProvider: { resolveProvider: false },
+				completionProvider: {
+					resolveProvider: false,
+				  triggerCharacters: ["@", " ", "/"] // For SassDoc annotation completion
+				},
 				signatureHelpProvider: {
 					triggerCharacters: ['(', ',', ';']
 				},

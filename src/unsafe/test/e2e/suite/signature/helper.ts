@@ -17,7 +17,7 @@ export async function testSignature(docUri: vscode.Uri, position: vscode.Positio
 		assert.fail("The 'result' is undefined.");
 	}
 
-	assert.strictEqual(result.activeParameter, signature.activeParameter, 'activeParameter');
+	assert.strictEqual(result.activeParameter, signature.activeParameter, `activeParameter in ${docUri.fsPath}`);
 	assert.strictEqual(result.activeSignature, signature.activeSignature, 'activeSignature');
 
 	assert.strictEqual(

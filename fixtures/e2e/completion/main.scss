@@ -16,3 +16,10 @@ $fonts: -apple-system;
 .foo {
   color: $;
 }
+
+@use '../namespace' as ns;
+
+.foo {
+  color: ns.
+  @include ns.
+}

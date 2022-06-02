@@ -24,7 +24,7 @@ export type MakeDocumentOptions = {
 export async function makeDocument(storage: StorageService, lines: string | string[],  options: MakeDocumentOptions = {}): Promise<TextDocument> {
 	const workspaceRootPath = path.resolve('');
 	const workspaceRootUri = URI.file(workspaceRootPath);
-	const uri = options.uri || URI.file(path.join(process.cwd(), 'index.scss')).toString();
+	const uri = URI.file(path.join(process.cwd(), options.uri || 'index.scss')).toString();
 	const document = TextDocument.create(
 		uri,
 		options.languageId || 'scss',

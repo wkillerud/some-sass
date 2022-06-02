@@ -10,4 +10,14 @@
 
   content: pow() + pow(1,);
 }
+
+@use '../namespace' as ns;
+
+.foo {
+  @include ns.mix-mix-square();
+  @include ns.mix-mix-square(1,);
+
+  content: ns.fun-fun-pow() + ns.fun-fun-pow(1,);
+}
+
 </style>

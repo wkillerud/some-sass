@@ -17,4 +17,11 @@ export default {};
   @include mixin();
 }
 
+@use '../namespace' as ns;
+
+.foo {
+  color: ns.$var-var-variable;
+  @include ns.mix-mix-mixin;
+}
+
 </style>

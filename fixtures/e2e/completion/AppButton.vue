@@ -28,4 +28,11 @@ $fonts: -apple-system;
   color: $;
 }
 
+@use '../namespace' as ns;
+
+.foo {
+  color: ns.
+  @include ns.
+}
+
 </style>

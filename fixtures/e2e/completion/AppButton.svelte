@@ -1,4 +1,4 @@
-<p class="foo" />
+<p class="foo"></p>
 
 <style lang="scss">
 $color: blue;
@@ -19,4 +19,12 @@ $fonts: -apple-system;
 .foo {
   color: $;
 }
+
+@use '../namespace' as ns;
+
+.foo {
+  color: ns.
+  @include ns.
+}
+
 </style>

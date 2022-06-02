@@ -14,3 +14,7 @@
   color: ns.$var-var-variable;
   @include ns.mix-mix-mixin;
 }
+
+/// Some wise words
+/// @type String
+$documented-variable: 'value';

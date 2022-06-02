@@ -63,4 +63,19 @@ describe('SCSS Hover Test', () => {
 		await testHover(vueDocUri, position(24, 17), expectedContents);
 		await testHover(svelteDocUri, position(18, 17), expectedContents);
 	});
+
+	it('shows hover for SassDoc annotations', async () => {
+		// Prefixed symbols are shown with their original names
+		const expectedContents = {
+			contents: ['@type\n____\n[SassDoc reference](http://sassdoc.com/annotations/#type)']
+		};
+
+		await testHover(docUri, position(19, 6), expectedContents);
+
+		const expectedEmpty = {
+			contents: ['']
+		}
+
+		await testHover(docUri, position(19, 5), expectedEmpty);
+	});
 });

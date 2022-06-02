@@ -14,7 +14,7 @@ export async function testHover(docUri: vscode.Uri, position: vscode.Position, e
 	)) as vscode.Hover[];
 
 	if (!result[0]) {
-		throw Error('Hover failed');
+		throw Error(`Hover failed at position ${JSON.stringify(position)}`);
 	}
 
 	const contents = result

@@ -13,7 +13,7 @@ import { parseString, ParseResult } from 'scss-sassdoc-parser';
 import { fileExists } from '../utils/fs';
 import { URI } from 'vscode-uri';
 
-export const reModuleAtRule = /@[use|forward|import]/;
+export const reModuleAtRule = /@(?:use|forward|import)/;
 export const reUse = /@use ["|'](?<url>.+)["|'](?: as (?<namespace>\*|\w+))?;/;
 export const reForward = /@forward ["|'](?<url>.+)["|'](?: as (?<prefix>\w+-)\*)?(?: hide (?<hide>.+))?;/;
 export const reImport = /@import ["|'](?<url>.+)["|']/;

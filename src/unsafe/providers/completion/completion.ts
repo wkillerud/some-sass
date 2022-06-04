@@ -12,6 +12,7 @@ import { getLimitedString, asDollarlessVariable } from '../../utils/string';
 import { getVariableColor } from '../../utils/color';
 import { applySassDoc } from '../../utils/sassdoc';
 import { doSassDocCompletion } from './sassdoc-completion';
+import { doImportCompletion } from './import-completion';
 
 export function doCompletion(
 	document: TextDocument,
@@ -31,6 +32,10 @@ export function doCompletion(
 	// Drop suggestions inside `//` and `/* */` comments
 	if (context.comment) {
 		return completions;
+	}
+
+	if (context.import) {
+		return doImportCompletion(document, settings, context, storage);
 	}
 
 	if (context.namespace) {

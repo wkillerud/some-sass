@@ -8,6 +8,7 @@ export type CompletionContext = {
 	comment: boolean;
 	sassDoc: boolean;
 	namespace: string | null;
+	import: boolean;
 	variable: boolean;
 	function: boolean;
 	mixin: boolean;
@@ -20,6 +21,7 @@ const reMixinReference = /.*@include\s+(.*)/;
 const reComment = /^.*(\/(\/|\*)|\*)/;
 const reSassDoc = /^[\\s]*\/\/\/.*$/;
 const reQuotes = /['"]/;
+const reImport = /^@(?:use|import)/;
 
 
 /**
@@ -100,6 +102,8 @@ export function createCompletionContext(text: string, offset: number, settings: 
 	const currentWord = getCurrentWord(text, offset);
 	const textBeforeWord = getTextBeforePosition(text, offset);
 
+	const isImport = reImport.test(textBeforeWord);
+
 	// Is "#{INTERPOLATION}"
 	const isInterpolation = isInterpolationContext(currentWord);
 
@@ -117,6 +121,7 @@ export function createCompletionContext(text: string, offset: number, settings: 
 		comment: isCommentContext(textBeforeWord),
 		sassDoc: isSassDocContext(textBeforeWord),
 		namespace,
+		import: isImport,
 		variable: checkVariableContext(currentWord, isInterpolation, isPropertyValue, isEmptyValue, isQuotes, Boolean(namespace)),
 		function: checkFunctionContext(
 			textBeforeWord,

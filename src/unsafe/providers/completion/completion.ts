@@ -35,7 +35,7 @@ export function doCompletion(
 	}
 
 	if (context.import) {
-		return doImportCompletion(document, settings, context, storage);
+		return doImportCompletion(context);
 	}
 
 	if (context.namespace) {
@@ -113,11 +113,15 @@ function doNamespacedCompletion(document: TextDocument, settings: ISettings, con
 
 	let use: ScssUse | null = null;
 	for (const candidate of scssDocument.uses.values()) {
+		// TODO: support sass modules in namespace check
 		if (candidate.namespace === namespace || candidate.namespace === `_${namespace}`) {
 			use = candidate;
 			break;
 		}
 	}
+
+	// TODO: if sass built-in, include ready-made completions
+	// TODO: make said completions
 
 	if (!use || !use.link.target) {
 		return completions;

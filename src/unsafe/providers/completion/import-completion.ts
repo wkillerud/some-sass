@@ -1,12 +1,19 @@
 import { CompletionList } from 'vscode-languageserver';
+import { sassBuiltInModules } from '../../sassBuiltInModules';
 
-import type { TextDocument } from 'vscode-languageserver-textdocument';
-import type StorageService from '../../services/storage';
-import type { ISettings } from '../../types/settings';
 import type { CompletionContext } from './completion-context';
 
-export function doImportCompletion(_: TextDocument, __: ISettings, ___: CompletionContext, ____: StorageService): CompletionList {
-	const completions = CompletionList.create([], false);
+const rePartialUse = /^@use (?:"|')/;
+
+export function doImportCompletion(context: CompletionContext): CompletionList {
+  const completions = CompletionList.create([], false);
+
+  if (rePartialUse.test(context.textBeforeWord)) {
+    completions.items = Object.entries(sassBuiltInModules).map(([moduleName, { summary }]) => ({
+      label: moduleName,
+      detail: summary,
+    }));
+  }
 
   return completions;
 }

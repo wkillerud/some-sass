@@ -21,13 +21,12 @@ const reMixinReference = /.*@include\s+(.*)/;
 const reComment = /^.*(\/(\/|\*)|\*)/;
 const reSassDoc = /^[\\s]*\/\/\/.*$/;
 const reQuotes = /['"]/;
-const reImport = /^@(?:use|import)/;
-
+const rePartialModuleAtRule = /@(?:use|forward|import) (?:"|')/;
 
 /**
  * Check context for Variables suggestions.
  */
- function checkVariableContext(
+function checkVariableContext(
 	word: string,
 	isInterpolation: boolean,
 	isPropertyValue: boolean,
@@ -102,7 +101,7 @@ export function createCompletionContext(text: string, offset: number, settings: 
 	const currentWord = getCurrentWord(text, offset);
 	const textBeforeWord = getTextBeforePosition(text, offset);
 
-	const isImport = reImport.test(textBeforeWord);
+	const isImport = rePartialModuleAtRule.test(textBeforeWord);
 
 	// Is "#{INTERPOLATION}"
 	const isInterpolation = isInterpolationContext(currentWord);
@@ -113,6 +112,7 @@ export function createCompletionContext(text: string, offset: number, settings: 
 	const isQuotes = reQuotes.test(textBeforeWord.replace(reQuotedValueInString, ''));
 
 	// Is namespace, e.g. `namespace.$var` or `@include namespace.mixin` or `namespace.func()`
+	// TODO: include sass modules in namespace check
 	const namespace = checkNamespaceContext(currentWord)
 
 	return {

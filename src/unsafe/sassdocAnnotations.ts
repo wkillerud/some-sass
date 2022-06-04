@@ -7,7 +7,7 @@ type SassDocAnnotation = {
 	insertTextFormat?: InsertTextFormat;
 }
 
-export const sassDocAnnotations: SassDocAnnotation[] = [
+export const sassDocAnnotations: readonly SassDocAnnotation[] = [
 	{
 		annotation: '@access',
 		insertText: '@access ${1|public,private|}',

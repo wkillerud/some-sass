@@ -134,7 +134,7 @@ describe('SCSS Signature Help Test', () => {
 			await testSignature(svelteDocUri, position(11, 26), expected);
 		});
 
-		it('should suggest all parameters of function behind namespace and prefix', async () => {
+		it('should suggest the second parameter of function behind namespace and prefix', async () => {
 			const expected = {
 				activeParameter: 1,
 				activeSignature: 0,
@@ -149,6 +149,51 @@ describe('SCSS Signature Help Test', () => {
 			await testSignature(docUri, position(17, 48), expected);
 			await testSignature(vueDocUri, position(26, 48), expected);
 			await testSignature(svelteDocUri, position(20, 48), expected);
+		});
+
+		it('should suggest all parameters of function from Sass built-in', async () => {
+			const expected = {
+				activeParameter: 0,
+				activeSignature: 0,
+				signatures: [
+					{
+						label: 'clamp ($min, $number, $max)',
+						parameters: [{ label: '$min' }, { label: '$number' }, { label: '$max' }]
+					}
+				]
+			};
+
+			await testSignature(docUri, position(23, 26), expected);
+		});
+
+		it('should suggest second and third parameters of function from Sass built-in', async () => {
+			const expected = {
+				activeParameter: 1,
+				activeSignature: 0,
+				signatures: [
+					{
+						label: 'clamp ($min, $number, $max)',
+						parameters: [{ label: '$min' }, { label: '$number' }, { label: '$max' }]
+					}
+				]
+			};
+
+			await testSignature(docUri, position(24, 28), expected);
+		});
+
+		it('should suggest third parameters of function from Sass built-in', async () => {
+			const expected = {
+				activeParameter: 2,
+				activeSignature: 0,
+				signatures: [
+					{
+						label: 'clamp ($min, $number, $max)',
+						parameters: [{ label: '$min' }, { label: '$number' }, { label: '$max' }]
+					}
+				]
+			};
+
+			await testSignature(docUri, position(25, 30), expected);
 		});
 	});
 });

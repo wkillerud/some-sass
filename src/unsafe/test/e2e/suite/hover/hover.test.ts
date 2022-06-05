@@ -77,4 +77,13 @@ describe('SCSS Hover Test', () => {
 
 		await testHover(docUri, position(19, 5), expectedEmpty);
 	});
+
+	it('shows hover for Sass built-in', async () => {
+		// Prefixed symbols are shown with their original names
+		const expectedContents = {
+			contents: ['Rounds down to the nearest whole number.\n\n[Sass reference](https://sass-lang.com/documentation/modules/math#floor)']
+		};
+
+		await testHover(docUri, position(25, 22), expectedContents);
+	});
 });

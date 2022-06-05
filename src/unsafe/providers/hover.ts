@@ -9,13 +9,14 @@ import type { IScssDocument, ScssSymbol, ScssVariable, ScssMixin, ScssFunction, 
 import type StorageService from '../services/storage';
 
 import { asDollarlessVariable, getLimitedString } from '../utils/string';
-import { applySassDoc} from '../utils/sassdoc';
+import { applySassDoc } from '../utils/sassdoc';
 import { sassDocAnnotations } from '../sassdocAnnotations';
+import { sassBuiltInModules } from '../sassBuiltInModules';
 
 type Identifier = { kind: SymbolKind; name: string };
 
 
-async function formatVariableMarkupContent(variable: ScssVariable, sourceDocument: IScssDocument): Promise<MarkupContent> {
+function formatVariableMarkupContent(variable: ScssVariable, sourceDocument: IScssDocument): MarkupContent {
 	const value = getLimitedString(variable.value || '');
 
 	const result = {
@@ -37,7 +38,7 @@ async function formatVariableMarkupContent(variable: ScssVariable, sourceDocumen
 	return result;
 }
 
-async function formatMixinMarkupContent(mixin: ScssMixin, sourceDocument: IScssDocument): Promise<MarkupContent> {
+function formatMixinMarkupContent(mixin: ScssMixin, sourceDocument: IScssDocument): MarkupContent {
 	const args = mixin.parameters.map(item => `${item.name}: ${item.value}`).join(', ');
 
 	const result = {
@@ -59,7 +60,7 @@ async function formatMixinMarkupContent(mixin: ScssMixin, sourceDocument: IScssD
 	return result;
 }
 
-async function formatFunctionMarkupContent(func: ScssFunction, sourceDocument: IScssDocument): Promise<MarkupContent> {
+function formatFunctionMarkupContent(func: ScssFunction, sourceDocument: IScssDocument): MarkupContent {
 	const args = func.parameters.map(item => `${item.name}: ${item.value}`).join(', ');
 
 	const result = {
@@ -81,7 +82,7 @@ async function formatFunctionMarkupContent(func: ScssFunction, sourceDocument: I
 	return result;
 }
 
-export async function doHover(document: TextDocument, offset: number, storage: StorageService): Promise<Hover | null> {
+export function doHover(document: TextDocument, offset: number, storage: StorageService): Hover | null {
 	const scssDocument = storage.get(document.uri);
 	if (!scssDocument) {
 		return null;
@@ -196,11 +197,28 @@ export async function doHover(document: TextDocument, offset: number, storage: S
 	let contents: MarkupContent | undefined;
 	if (symbol && sourceDocument) {
 		if (identifier.kind === SymbolKind.Variable) {
-			contents = await formatVariableMarkupContent(symbol as ScssVariable, sourceDocument);
+			contents = formatVariableMarkupContent(symbol as ScssVariable, sourceDocument);
 		} else if (identifier.kind === SymbolKind.Method) {
-			contents = await formatMixinMarkupContent(symbol as ScssMixin, sourceDocument);
+			contents = formatMixinMarkupContent(symbol as ScssMixin, sourceDocument);
 		} else if (identifier.kind === SymbolKind.Function) {
-			contents = await formatFunctionMarkupContent(symbol as ScssFunction, sourceDocument);
+			contents = formatFunctionMarkupContent(symbol as ScssFunction, sourceDocument);
+		}
+	}
+
+	for (const { reference, exports } of Object.values(sassBuiltInModules)) {
+		for (const [name, { description }] of Object.entries(exports)) {
+			if (name === identifier.name) {
+				return {
+					contents: {
+						kind: MarkupKind.Markdown,
+						value: [
+							description,
+							'',
+							`[Sass reference](${reference}#${name})`,
+						].join('\n')
+					},
+				};
+			}
 		}
 	}
 
@@ -285,7 +303,7 @@ function traverseTree(document: IScssDocument, identifier: Identifier, storage: 
 			prefix += (child as ScssForward).prefix;
 		}
 
-		const [symbol, document] =  traverseTree(childDocument, identifier, storage, prefix);
+		const [symbol, document] = traverseTree(childDocument, identifier, storage, prefix);
 		if (symbol) {
 			return [symbol, document];
 		}

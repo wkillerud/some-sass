@@ -7,6 +7,7 @@ import type { ISettings } from '../../types/settings';
 import type StorageService from '../../services/storage';
 import type { IScssDocument, ScssForward, ScssImport, ScssMixin, ScssUse } from '../../types/symbols';
 
+import { SassBuiltInModule, sassBuiltInModules } from '../../sassBuiltInModules';
 import { createCompletionContext, CompletionContext } from './completion-context';
 import { getLimitedString, asDollarlessVariable } from '../../utils/string';
 import { getVariableColor } from '../../utils/color';
@@ -109,26 +110,31 @@ function doNamespacedCompletion(document: TextDocument, settings: ISettings, con
 	if (!scssDocument) {
 		return completions;
 	}
-	const namespace = context.namespace;
+	const namespace = context.namespace as string;
 
 	let use: ScssUse | null = null;
 	for (const candidate of scssDocument.uses.values()) {
-		// TODO: support sass modules in namespace check
 		if (candidate.namespace === namespace || candidate.namespace === `_${namespace}`) {
 			use = candidate;
 			break;
 		}
 	}
 
-	// TODO: if sass built-in, include ready-made completions
-	// TODO: make said completions
-
 	if (!use || !use.link.target) {
+		// No match in either custom or built-in namespace, return an empty list
 		return completions;
 	}
 
 	const namespaceRootDocument = storage.get(use.link.target);
 	if (!namespaceRootDocument) {
+		// Look for matches in built-in namespaces, which do not appear in storage
+		for (const [builtIn, module] of Object.entries(sassBuiltInModules)) {
+			if (builtIn === use.link.target) {
+				return doBuiltInCompletion(context, module);
+			}
+		}
+
+		// No matches, return an empty list
 		return completions;
 	}
 
@@ -136,6 +142,40 @@ function doNamespacedCompletion(document: TextDocument, settings: ISettings, con
 	traverseTree(document, settings, context, storage, accumulator, namespaceRootDocument);
 
 	completions.items = [...accumulator.values()].flat();
+
+	return completions;
+}
+
+function doBuiltInCompletion(context: CompletionContext, module: SassBuiltInModule): CompletionList {
+	const completions = CompletionList.create([], false);
+	completions.items = Object.entries(module.exports).map(([name, { description, signature, returns }]) => {
+
+		const parametersSnippet = signature
+			? signature
+				.replace(/:.+(?:\$|\))/g, "") // Remove default values
+				.replace(/[().]/g, "") // Remove parentheses and ... list indicator
+				.split(",")
+				.map((p, index) => "${" + (index + 1) + ":" + asDollarlessVariable(p.trim()) + "}").join(", ")
+			: '';
+
+		return {
+			label: name,
+			filterText: `${context.namespace}.${name}`,
+			insertText: context.word.endsWith(".") ? `.${name}${signature ? `(${parametersSnippet})` : ''}` : name,
+			insertTextFormat: parametersSnippet ? InsertTextFormat.Snippet : InsertTextFormat.PlainText,
+			labelDetails: {
+				detail: signature && returns ? `${signature} => ${returns}` : signature,
+			},
+			documentation: {
+				kind: MarkupKind.Markdown,
+				value: [
+					description,
+					'',
+					`[Sass reference](${module.reference}#${name})`,
+				].join('\n'),
+			},
+		};
+	});
 
 	return completions;
 }
@@ -240,7 +280,7 @@ function createVariableCompletionItems(
 
 			const sassdoc = applySassDoc(
 				variable,
-				{ displayOptions: { description: true, deprecated: true, type: true }}
+				{ displayOptions: { description: true, deprecated: true, type: true } }
 			);
 			if (sassdoc) {
 				documentation += `\n\n${sassdoc}`;
@@ -277,7 +317,7 @@ function createVariableCompletionItems(
 /**
  * Return Mixin as string.
  */
- function makeMixinDocumentation(symbol: ScssMixin): string {
+function makeMixinDocumentation(symbol: ScssMixin): string {
 	const args = symbol.parameters.map(item => `${item.name}: ${item.value}`).join(', ');
 	return `${symbol.name}(${args})`;
 }
@@ -306,7 +346,7 @@ function createMixinCompletionItems(
 		let documentation = makeMixinDocumentation(mixin);
 		const sassdoc = applySassDoc(
 			mixin,
-			{ displayOptions: { content: true, description: true,  deprecated: true, output: true }}
+			{ displayOptions: { content: true, description: true, deprecated: true, output: true } }
 		);
 		if (sassdoc) {
 			documentation += `\n____\n${sassdoc}`;
@@ -327,8 +367,6 @@ function createMixinCompletionItems(
 		// Use the SnippetString syntax to provide smart completions of parameter names
 		let labelDetails: CompletionItemLabelDetails | undefined = undefined;
 		if (mixin.parameters.length > 0) {
-			// The snippet syntax does not like `-` in placeholder names, so make them camel case.
-			// These are not suggestions for keyword arguments, it's fine.
 			const parametersSnippet = mixin.parameters.map((p, index) => "${" + (index + 1) + ":" + asDollarlessVariable(p.name) + "}").join(", ")
 			const parameterSignature = mixin.parameters.map(p => p.name).join(", ");
 			insertText += `(${parametersSnippet})`;
@@ -405,8 +443,6 @@ function createFunctionCompletionItems(
 		// Use the SnippetString syntax to provide smart completions of parameter names
 		let labelDetails: CompletionItemLabelDetails | undefined = undefined;
 		if (func.parameters.length > 0) {
-			// The snippet syntax does not like `-` in placeholder names, so make them camel case.
-			// These are not suggestions for keyword arguments, it's fine.
 			const parametersSnippet = func.parameters.map((p, index) => "${" + (index + 1) + ":" + asDollarlessVariable(p.name) + "}").join(", ")
 			const functionSignature = func.parameters.map(p => p.name).join(", ");
 			insertText += `(${parametersSnippet})`;
@@ -419,7 +455,7 @@ function createFunctionCompletionItems(
 		let documentation = makeMixinDocumentation(func);
 		const sassdoc = applySassDoc(
 			func,
-			{ displayOptions: { description: true, deprecated: true, return: true }}
+			{ displayOptions: { description: true, deprecated: true, return: true } }
 		);
 		if (sassdoc) {
 			documentation += `\n____\n${sassdoc}`;

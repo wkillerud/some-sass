@@ -112,7 +112,6 @@ export function createCompletionContext(text: string, offset: number, settings: 
 	const isQuotes = reQuotes.test(textBeforeWord.replace(reQuotedValueInString, ''));
 
 	// Is namespace, e.g. `namespace.$var` or `@include namespace.mixin` or `namespace.func()`
-	// TODO: include sass modules in namespace check
 	const namespace = checkNamespaceContext(currentWord)
 
 	return {

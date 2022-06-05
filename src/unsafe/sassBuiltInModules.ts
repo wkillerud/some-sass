@@ -20,17 +20,19 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-type SassBuiltInModules = Record<string, {
+export type SassBuiltInExport = {
+  description: string;
+  signature?: string;
+  returns?: "string" | "number" | "boolean" | "function" | "color" | "list" | "map" | "selector";
+};
+
+export type SassBuiltInModule = {
   summary: string;
   reference: string;
-  exports: Record<string, {
-    description: string;
-    signature?: string;
-    returns?: "boolean" | "color" | "number" | "string" | "function" | "list" | "map" | "selector";
-  }>
-}>;
+  exports: Record<string, SassBuiltInExport>;
+};
 
-export const sassBuiltInModules: SassBuiltInModules = Object.freeze({
+export const sassBuiltInModules: Record<string, SassBuiltInModule> = Object.freeze({
   "sass:color": {
     summary: "Generate new colors based on existing ones",
     reference: "https://sass-lang.com/documentation/modules/color",
@@ -100,7 +102,7 @@ export const sassBuiltInModules: SassBuiltInModules = Object.freeze({
       },
       "mix": {
         description: "Returns a color that's a mixture of `$color1` and `$color2`.",
-        signature: "($color1, $color2, weight: 50%)",
+        signature: "($color1, $color2, $weight: 50%)",
         returns: "color",
       },
       "red": {
@@ -541,3 +543,5 @@ export const sassBuiltInModules: SassBuiltInModules = Object.freeze({
     },
   },
 });
+
+export const sassBuiltInModuleNames: string[] = Object.keys(sassBuiltInModules);

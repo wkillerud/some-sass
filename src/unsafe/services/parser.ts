@@ -1,6 +1,7 @@
 'use strict';
 
-import { SymbolKind, DocumentLink } from 'vscode-css-languageservice';
+import { URI } from 'vscode-uri';
+import { Position, Range, SymbolKind, DocumentLink } from 'vscode-css-languageservice';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 
 import { INode, NodeType } from '../types/nodes';
@@ -11,7 +12,7 @@ import { getLanguageService } from '../language-service';
 import { ScssDocument } from '../document';
 import { parseString, ParseResult } from 'scss-sassdoc-parser';
 import { fileExists } from '../utils/fs';
-import { URI } from 'vscode-uri';
+import { sassBuiltInModuleNames } from '../sassBuiltInModules';
 
 export const reModuleAtRule = /@(?:use|forward|import)/;
 export const reUse = /@use ["|'](?<url>.+)["|'](?: as (?<namespace>\*|\w+))?;/;
@@ -105,6 +106,29 @@ async function findDocumentSymbols(document: TextDocument, ast: INode, workspace
 					});
 				}
 			}
+		}
+
+		// Look for any usage of built-in modules like @use "sass:math";
+		const matchUse = reUse.exec(line);
+		if (matchUse) {
+			const url = matchUse.groups?.["url"];
+			const builtIn = sassBuiltInModuleNames.find(module => module === url);
+			if (builtIn) {
+				const namespace = matchUse.groups?.["namespace"];
+				result.uses.set(builtIn, {
+					// Fake link with builtin as target
+					link: DocumentLink.create(
+						Range.create(
+							Position.create(1, 1),
+							Position.create(1, 1),
+						),
+						builtIn
+					),
+					namespace: namespace || builtIn.split(":")[1],
+					isAliased: Boolean(namespace),
+				});
+			}
+			continue;
 		}
 	}
 

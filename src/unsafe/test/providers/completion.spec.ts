@@ -134,3 +134,17 @@ describe('Providers/Completion - Import', () => {
 		);
 	});
 });
+
+describe('Providers/Completion - Built-in', () => {
+	it('Suggests items from built-in Sass modules', async () => {
+		const actual = await getCompletionList([
+			'@use "sass:color" as magic;',
+			'.a { color: magic.ch|; }'
+		]);
+
+		assert.ok(
+			actual.items.some((item) => item.label === 'change'),
+			'Expected to find a change-function in the Sass built-in color module, but it\'s missing'
+		);
+	});
+});

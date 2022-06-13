@@ -105,6 +105,7 @@
 		"eslint": "8.17.0",
 		"eslint-config-mrmlnc": "2.1.0",
 		"mocha": "10.0.0",
+		"nyc": "15.1.0",
 		"rimraf": "3.0.2",
 		"sinon": "14.0.0",
 		"ts-loader": "9.3.0",
@@ -135,6 +136,7 @@
 		"test:clean": "rimraf out",
 		"test:compile": "tsc -p ./",
 		"test:unit": "mocha \"out/**/*.spec.js\"",
+		"test:coverage": "nyc npm run test:unit",
 		"test:e2e": "npm run webpack && node ./out/unsafe/test/e2e/runTest.js"
 	},
 	"__metadata": {

@@ -13,6 +13,8 @@ out/
 *.vsix
 .vscode-test
 .eslintcache
+.nyc_output
+coverage/
 
 # Configuration
 .eslintcache

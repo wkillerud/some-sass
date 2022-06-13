@@ -16,3 +16,11 @@
 
   content: ns.fun-fun-pow() + ns.fun-fun-pow(1,);
 }
+
+@use 'sass:math' as magic;
+
+.foo {
+  font-size: magic.clamp();
+  font-size: magic.clamp(1,);
+  font-size: magic.clamp(1,2,);
+}

@@ -4,6 +4,7 @@ Some Sass provides code suggestions, documentation and code navigation for SCSS.
 
 - Full support for `@use` and `@forward`, including aliases, prefixes and hiding.
 - Rich documentation through [SassDoc](http://sassdoc.com).
+- Suggestions and hover info for built-in Sass modules, when used with `@use`.
 
 Supports standalone SCSS, as well as style blocks inside Vue and Svelte components.
 
@@ -21,7 +22,7 @@ If you have SCSS IntelliSense (`mrmlnc.vscode-scss`) installed you should disabl
 
 Get suggestions for variables, mixins, functions, and SassDoc as you type.
 
-Completions work with and without `@use` namespaces, and there is support for `@follow` [prefixes](https://sass-lang.com/documentation/at-rules/forward#adding-a-prefix) and [hiding](https://sass-lang.com/documentation/at-rules/forward#controlling-visibility) (the latter only with `somesass.suggestOnlyFromUse` set to `true`).
+Completions work with and without `@use` namespaces (including from built-in Sass modules). There is also support for `@follow` [prefixes](https://sass-lang.com/documentation/at-rules/forward#adding-a-prefix) and [hiding](https://sass-lang.com/documentation/at-rules/forward#controlling-visibility) (the latter only with `somesass.suggestOnlyFromUse` set to `true`).
 
 If you document your mixin using the `@content` [annotation from SassDoc](http://sassdoc.com/annotations/#content)
 the extension will use that information to autosuggest brackets and move focus inside the mixin contents.
@@ -44,15 +45,13 @@ Documentation written with SassDoc will be included in the hover information. Ad
 
 To use this feature, either:
 
-- Hold down `Cmd` and click a variable, mixin or function
-- Right-click a variable, mixin or function and choose `Go to Definition`
-- Press `F12` when the cursor is at a variable, mixin or function
+- Hold down `Cmd` and click a variable, mixin or function.
+- Right-click a variable, mixin or function and choose `Go to Definition`.
+- Press `F12` when the cursor is at a variable, mixin or function.
 
 #### Go to Symbol
 
-In the `Go` menu, choose [Go to Symbol](https://code.visualstudio.com/Docs/editor/editingevolved#_go-to-symbol)
-either for Workspace (`Cmd + T`) or for Editor (`Cmd + Shift + O`) to use this feature,
-depending on your keyboard settings.
+To use this feature – in the `Go` menu – choose [Go to Symbol](https://code.visualstudio.com/Docs/editor/editingevolved#_go-to-symbol) either for Workspace (`Cmd + T`) or for Editor (`Cmd + Shift + O`).
 
 ![](images/workspace-symbols.gif)
 
@@ -163,3 +162,5 @@ Visit the [release section on GitHub](https://github.com/wkillerud/vscode-scss/r
 This software is released under the terms of the MIT license.
 
 The logo is [owned by the Sass](https://sass-lang.com/styleguide/brand) project and licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+
+Includes documentation from [sass/sass-site](https://github.com/sass/sass-site) (MIT).

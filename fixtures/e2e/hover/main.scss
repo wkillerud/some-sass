@@ -18,3 +18,9 @@
 /// Some wise words
 /// @type String
 $documented-variable: 'value';
+
+@use 'sass:math' as magic;
+
+.foo {
+  font-size: magic.floor(19.5px);
+}

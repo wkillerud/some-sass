@@ -10,6 +10,7 @@ import type StorageService from '../services/storage';
 import { asDollarlessVariable, getTextBeforePosition } from '../utils/string';
 import { hasInFacts } from '../utils/facts';
 import { applySassDoc } from '../utils/sassdoc';
+import { sassBuiltInModules } from '../sassBuiltInModules';
 
 // RegExp's
 const reNestedParenthesis = /\(([\w-]+)\(/;
@@ -162,15 +163,46 @@ export async function doSignatureHelp(
 		return ret;
 	}
 
+	ret.activeParameter = Math.max(0, entry.parameters);
+
 	const symbolType = textBeforeWord.indexOf('@include') !== -1 ? 'mixin' : 'function';
 
 	const suggestions: Array<ScssMixin | ScssFunction> = doSymbolHunting(document, storage, entry, symbolType);
 
 	if (suggestions.length === 0) {
+
+		// Look for built-ins
+		for (const { reference, exports } of Object.values(sassBuiltInModules)) {
+			for (const [name, { signature, description }] of Object.entries(exports)) {
+				if (name === entry.name) {
+					const signatureInfo = SignatureInformation.create(`${name} ${signature}`);
+
+					signatureInfo.documentation = {
+						kind: MarkupKind.Markdown,
+						value: [
+							description,
+							'',
+							`[Sass reference](${reference}#${name})`,
+						].join('\n')
+					};
+
+					if (signature) {
+						const params = signature
+							.replace(/:.+(?:\$|\))/g, "") // Remove default values
+							.replace(/[().]/g, "") // Remove parentheses and ... list indicator
+							.split(",");
+
+						signatureInfo.parameters = params.map(p => ({ label: p }));
+					}
+
+					ret.signatures.push(signatureInfo);
+					break;
+				}
+			}
+		}
+
 		return ret;
 	}
-
-	ret.activeParameter = Math.max(0, entry.parameters);
 
 	for (const symbol of suggestions) {
 		const paramsString = symbol.parameters.map(x => `${x.name}: ${x.value}`).join(', ');
@@ -178,7 +210,7 @@ export async function doSignatureHelp(
 
 		const sassdoc = applySassDoc(
 			symbol,
-			{ displayOptions: { description: true, deprecated: true, return: true }}
+			{ displayOptions: { description: true, deprecated: true, return: true } }
 		);
 
 		signatureInfo.documentation = {

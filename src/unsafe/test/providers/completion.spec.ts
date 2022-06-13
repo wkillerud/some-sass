@@ -10,6 +10,7 @@ import { doCompletion } from '../../providers/completion';
 import * as helpers from '../helpers';
 import type { ISettings } from '../../types/settings';
 import { ScssDocument } from '../../document';
+import { sassBuiltInModules } from '../../sassBuiltInModules';
 
 const storage = new StorageService();
 
@@ -24,10 +25,10 @@ storage.set('one.scss', new ScssDocument(
 			['$word', { name: '$word', kind: SymbolKind.Variable, value: 'red', offset: 0, position: { line: 1, character: 1 } }]
 		]),
 		mixins: new Map(
-			[["test", { name: 'test',kind: SymbolKind.Method, parameters: [], offset: 0, position: { line: 1, character: 1 } } ]]
+			[["test", { name: 'test', kind: SymbolKind.Method, parameters: [], offset: 0, position: { line: 1, character: 1 } }]]
 		),
 		functions: new Map(
-			[["make", { name: 'make', kind: SymbolKind.Function, parameters: [], offset: 0, position: { line: 1, character: 1 } } ]]
+			[["make", { name: 'make', kind: SymbolKind.Function, parameters: [], offset: 0, position: { line: 1, character: 1 } }]]
 		),
 		imports: new Map(),
 		uses: new Map(),
@@ -116,5 +117,34 @@ describe('Providers/Completion - Context', () => {
 		assert.strictEqual(actual?.items[2]?.kind, CompletionItemKind.Color);
 		assert.strictEqual(actual?.items[3]?.kind, CompletionItemKind.Color);
 		assert.strictEqual(actual?.items[4]?.kind, CompletionItemKind.Color);
+	});
+});
+
+describe('Providers/Completion - Import', () => {
+	it('Suggests built-in Sass modules', async () => {
+		const expectedCompletionLabels = Object.keys(sassBuiltInModules);
+
+		const actual = await getCompletionList(['@use "|']);
+
+		assert.ok(
+			expectedCompletionLabels.every(expectedLabel => {
+				return actual.items.some((item) => item.label === expectedLabel);
+			}),
+			'Expected to find all Sass built-in modules, but some or all are missing'
+		);
+	});
+});
+
+describe('Providers/Completion - Built-in', () => {
+	it('Suggests items from built-in Sass modules', async () => {
+		const actual = await getCompletionList([
+			'@use "sass:color" as magic;',
+			'.a { color: magic.ch|; }'
+		]);
+
+		assert.ok(
+			actual.items.some((item) => item.label === 'change'),
+			'Expected to find a change-function in the Sass built-in color module, but it\'s missing'
+		);
 	});
 });

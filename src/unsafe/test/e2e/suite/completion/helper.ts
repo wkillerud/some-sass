@@ -40,7 +40,7 @@ export async function testCompletion(
 					result.items.some(i => {
 						return i.label === ei;
 					}),
-					`Expected to find ${ei} among results: ${JSON.stringify(result.items)}`
+					`Expected to find ${ei} among results`
 				);
 			}
 		} else {

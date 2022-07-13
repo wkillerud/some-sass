@@ -25,6 +25,7 @@ import { goDefinition } from './providers/goDefinition';
 import { searchWorkspaceSymbol } from './providers/workspaceSymbol';
 import { findFiles } from './utils/fs';
 import { getSCSSRegionsDocument } from './utils/vue-svelte';
+import { provideReferences } from './providers/references';
 
 interface InitializationOption {
 	workspace: string;
@@ -79,6 +80,7 @@ connection.onInitialize(
 		return {
 			capabilities: {
 				textDocumentSync: TextDocumentSyncKind.Incremental,
+				referencesProvider: true,
 				completionProvider: {
 					resolveProvider: false,
 					triggerCharacters: [
@@ -189,6 +191,24 @@ connection.onDefinition(textDocumentPosition => {
 		return null;
 	}
 	return goDefinition(document, offset, storageService);
+});
+
+connection.onReferences(referenceParams => {
+	const uri = documents.get(referenceParams.textDocument.uri);
+	if (uri === undefined) {
+		return undefined;
+	}
+
+	const { document, offset } = getSCSSRegionsDocument(
+		uri,
+		referenceParams.position
+	);
+	if (!document) {
+		return null;
+	}
+
+	const options = referenceParams.context;
+	return provideReferences(document, offset, storageService, options)
 });
 
 connection.onWorkspaceSymbol(workspaceSymbolParams => {

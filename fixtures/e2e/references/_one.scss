@@ -1,0 +1,6 @@
+@use "dev";
+
+.a {
+	// Here it comes!
+	content: dev.fun-hello(dev.$fun-name);
+}

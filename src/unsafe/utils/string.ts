@@ -53,3 +53,15 @@ export function getLimitedString(str: string, ellipsis = true): string {
 export function asDollarlessVariable(variable: string): string {
 	return variable.replace(/^\$/, '');
 }
+
+export function stripTrailingComma(string: string): string {
+	return stripTrailingCharacter(string, ",");
+}
+
+export function stripParentheses(string: string): string {
+	return string.replace(/[()]/g, '');
+}
+
+function stripTrailingCharacter(string: string, char: string): string {
+	return string.endsWith(char) ? string.substring(0, string.length - char.length) : string;
+}

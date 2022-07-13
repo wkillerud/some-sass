@@ -3,7 +3,7 @@
 import { Location, SymbolKind } from 'vscode-languageserver';
 import type { TextDocument, Position } from 'vscode-languageserver-textdocument';
 
-import { NodeType } from '../types/nodes';
+import { INode, NodeType } from '../types/nodes';
 import type StorageService from '../services/storage';
 
 import type { IScssDocument, ScssForward, ScssImport, ScssSymbol } from '../types/symbols';
@@ -23,7 +23,7 @@ function samePosition(a: Position | undefined, b: Position): boolean {
 	return a.line === b.line && a.character === b.character;
 }
 
-export async function goDefinition(document: TextDocument, offset: number, storage: StorageService): Promise<Location | null> {
+export function goDefinition(document: TextDocument, offset: number, storage: StorageService): Location | null {
 	const currentScssDocument = storage.get(document.uri);
 	if (!currentScssDocument) {
 		return null;
@@ -34,43 +34,12 @@ export async function goDefinition(document: TextDocument, offset: number, stora
 		return null;
 	}
 
-	let identifier: Identifier | null = null;
-	if (hoverNode.type === NodeType.VariableName) {
-		const parent = hoverNode.getParent();
-		if (parent.type !== NodeType.FunctionParameter && parent.type !== NodeType.VariableDeclaration) {
-			identifier = {
-				name: hoverNode.getName(),
-				position: document.positionAt(hoverNode.offset),
-				kind: SymbolKind.Variable,
-			};
-		}
-	} else if (hoverNode.type === NodeType.Identifier) {
-		let i = 0;
-		let node = hoverNode;
-		while (node.type !== NodeType.MixinReference && node.type !== NodeType.Function && i !== 2) {
-			node = node.getParent();
-			i++;
-		}
-
-		if (node && (node.type === NodeType.MixinReference || node.type === NodeType.Function)) {
-			let kind: SymbolKind = SymbolKind.Method;
-			if (node.type === NodeType.Function) {
-				kind = SymbolKind.Function;
-			}
-
-			identifier = {
-				name: node.getName(),
-				position: document.positionAt(node.offset),
-				kind
-			};
-		}
-	}
-
+	const identifier: Identifier | null = getIdentifier(document, hoverNode);
 	if (!identifier) {
 		return null;
 	}
 
-	const [definition, sourceDocument] = doSymbolHunting(document, storage, identifier);
+	const [definition, sourceDocument] = getDefinitionSymbol(document, storage, identifier);
 
 	if (!definition || !sourceDocument) {
 		return null;
@@ -87,10 +56,71 @@ export async function goDefinition(document: TextDocument, offset: number, stora
 	return symbol;
 }
 
-function doSymbolHunting(document: TextDocument, storage: StorageService, identifier: Identifier): ([ScssSymbol, IScssDocument] | [null, null]) {
+function getIdentifier(document: TextDocument, hoverNode: INode): Identifier | null {
+	let identifier: Identifier | null = null;
+
+	if (hoverNode.type === NodeType.VariableName) {
+		const parent = hoverNode.getParent();
+
+		const isFunctionParameter = parent.type === NodeType.FunctionParameter;
+		const isDeclaration = parent.type === NodeType.VariableDeclaration;
+
+		if (!isFunctionParameter && !isDeclaration) {
+			identifier = {
+				name: hoverNode.getName(),
+				position: document.positionAt(hoverNode.offset),
+				kind: SymbolKind.Variable,
+			};
+		}
+	} else if (hoverNode.type === NodeType.Identifier) {
+		let i = 0;
+		let node = hoverNode;
+		let isMixin = false;
+		let isFunction = false;
+
+		while (!isMixin && !isFunction && i !== 2) {
+			node = node.getParent();
+
+			isMixin = node.type === NodeType.MixinReference;
+			isFunction = node.type === NodeType.Function;
+
+			i++;
+		}
+
+		if (node && (isMixin || isFunction)) {
+			let kind: SymbolKind = SymbolKind.Method;
+
+			if (isFunction) {
+				kind = SymbolKind.Function;
+			}
+
+			identifier = {
+				name: node.getName(),
+				position: document.positionAt(node.offset),
+				kind
+			};
+		}
+	}
+
+	if (!identifier) {
+		return null;
+	}
+
+	return identifier;
+}
+
+export function getDefinitionSymbol(document: TextDocument, storage: StorageService, identifier: Identifier): ([ScssSymbol, IScssDocument] | [null, null]) {
 	const scssDocument = storage.get(document.uri);
 	if (!scssDocument) {
 		return [null, null];
+	}
+
+	for (const symbol of scssDocument.getSymbols()) {
+		const symbolName = asDollarlessVariable(symbol.name);
+		const identifierName = asDollarlessVariable(identifier.name);
+		if (symbolName === identifierName && symbol.kind === identifier.kind) {
+			return [symbol, scssDocument];
+		}
 	}
 
 	// Don't follow forwards from the current document, since the current doc doesn't have access to its symbols
@@ -158,7 +188,7 @@ function traverseTree(document: IScssDocument, identifier: Identifier, storage: 
 			prefix += (child as ScssForward).prefix;
 		}
 
-		const [symbol, document] =  traverseTree(childDocument, identifier, storage, prefix);
+		const [symbol, document] = traverseTree(childDocument, identifier, storage, prefix);
 		if (symbol) {
 			return [symbol, document];
 		}

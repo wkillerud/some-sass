@@ -24,8 +24,10 @@ export function getDocumentPath(currentPath: string, symbolsPath: string | undef
 	return docPath.replace(/\\/g, '/');
 }
 
+export const reNewline = /\r\n|\r|\n/;
+
 export function getLinesFromText(text: string): string[] {
-	return text.split(/\r\n|\r|\n/);
+	return text.split(reNewline);
 }
 
 /*---------------------------------------------------------------------------------------------
@@ -52,13 +54,13 @@ function resolvePathToModule(_moduleName: string, _relativeTo: string): string |
 }
 
 function resolve(from: string, to: string): string {
-  const resolvedUrl = new URL(to, new URL(from, 'resolve://'));
-  if (resolvedUrl.protocol === 'resolve:') {
-    // `from` is a relative URL.
-    const { pathname, search, hash } = resolvedUrl;
-    return pathname + search + hash;
-  }
-  return resolvedUrl.toString();
+	const resolvedUrl = new URL(to, new URL(from, 'resolve://'));
+	if (resolvedUrl.protocol === 'resolve:') {
+		// `from` is a relative URL.
+		const { pathname, search, hash } = resolvedUrl;
+		return pathname + search + hash;
+	}
+	return resolvedUrl.toString();
 }
 
 export function buildDocumentContext(documentUri: string, workspaceRoot: URI): DocumentContext {

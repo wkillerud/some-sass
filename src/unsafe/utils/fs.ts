@@ -39,3 +39,7 @@ export function readFile(filepath: string): Promise<string> {
 export function statFile(filepath: string): Promise<fs.Stats> {
 	return fs.promises.stat(filepath);
 }
+
+export async function realPath(symlink: string): Promise<string> {
+	return fs.promises.realpath(symlink);
+}

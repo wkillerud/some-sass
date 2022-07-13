@@ -1,0 +1,6 @@
+@function hello($var) {
+	@return $var;
+}
+
+$name: "there";
+$reply: "general";

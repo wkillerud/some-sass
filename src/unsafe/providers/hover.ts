@@ -12,6 +12,7 @@ import { asDollarlessVariable, getLimitedString } from '../utils/string';
 import { applySassDoc } from '../utils/sassdoc';
 import { sassDocAnnotations } from '../sassdocAnnotations';
 import { sassBuiltInModules } from '../sassBuiltInModules';
+import type { Token } from '../types/tokens';
 
 type Identifier = { kind: SymbolKind; name: string };
 
@@ -137,7 +138,6 @@ export function doHover(document: TextDocument, offset: number, storage: Storage
 		// Tokenize the document and look for the closest non-space token to offset.
 		// If it's a comment, look for SassDoc annotations under the cursor.
 
-		type Token = [string, string, number | undefined];
 		const tokens: Array<Token> = tokenizer(document.getText());
 
 		let hoverToken: Token | null = null;

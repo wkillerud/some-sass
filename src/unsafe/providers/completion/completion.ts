@@ -375,12 +375,6 @@ function createMixinCompletionItems(
 			};
 		}
 
-		// Not all mixins have @content, but when they do, be smart about adding brackets
-		// and move the cursor to be ready to add said contents.
-		if (mixin.sassdoc?.content) {
-			insertText += " {\n\t$0\n}"
-		}
-
 		const detail = `Mixin declared in ${scssDocument.fileName}`;
 
 		completions.push({
@@ -398,6 +392,29 @@ function createMixinCompletionItems(
 				value: documentation,
 			}
 		});
+
+		// Not all mixins have @content, but when they do, be smart about adding brackets
+		// and move the cursor to be ready to add said contents.
+		// Include as separate suggestion since content may not always be needed or wanted.
+		if (mixin.sassdoc?.content) {
+			const details = { ...labelDetails };
+			details.detail = details.detail ? details.detail + ' { }' : ' { }';
+			completions.push({
+				label,
+				labelDetails: details,
+				filterText,
+				sortText,
+				kind: CompletionItemKind.Snippet,
+				detail,
+				insertTextFormat: InsertTextFormat.Snippet,
+				insertText: insertText += " {\n\t$0\n}",
+				tags: Boolean(mixin.sassdoc?.deprecated) ? [CompletionItemTag.Deprecated] : [],
+				documentation: {
+					kind: MarkupKind.Markdown,
+					value: documentation,
+				}
+			});
+		}
 	}
 
 	return completions;

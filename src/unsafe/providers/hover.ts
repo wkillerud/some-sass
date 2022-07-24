@@ -208,16 +208,22 @@ export function doHover(document: TextDocument, offset: number, storage: Storage
 	for (const { reference, exports } of Object.values(sassBuiltInModules)) {
 		for (const [name, { description }] of Object.entries(exports)) {
 			if (name === identifier.name) {
-				return {
-					contents: {
-						kind: MarkupKind.Markdown,
-						value: [
-							description,
-							'',
-							`[Sass reference](${reference}#${name})`,
-						].join('\n')
-					},
-				};
+				// Make sure we're not just hovering over a CSS function.
+				// Confirm we are looking at something that is the child of a module.
+				const isModule = hoverNode.getParent().type === NodeType.Module ||
+					hoverNode.getParent().getParent().type === NodeType.Module;
+				if (isModule) {
+					return {
+						contents: {
+							kind: MarkupKind.Markdown,
+							value: [
+								description,
+								'',
+								`[Sass reference](${reference}#${name})`,
+							].join('\n')
+						},
+					};
+				}
 			}
 		}
 	}

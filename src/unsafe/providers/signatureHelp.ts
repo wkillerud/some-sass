@@ -175,6 +175,16 @@ export async function doSignatureHelp(
 		for (const { reference, exports } of Object.values(sassBuiltInModules)) {
 			for (const [name, { signature, description }] of Object.entries(exports)) {
 				if (name === entry.name) {
+					// Make sure we don't accidentaly match with CSS functions by checking
+					// for hints of a module name before the entry. Essentially look for ".".
+					// We could look for the module names, but that may be aliased away.
+					// Do an includes-check in case signature har more than one parameter.
+					const isNamespaced = textBeforeWord.includes(`.${name}(`);
+					if (!isNamespaced) {
+						continue;
+					}
+
+
 					const signatureInfo = SignatureInformation.create(`${name} ${signature}`);
 
 					signatureInfo.documentation = {

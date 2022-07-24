@@ -121,10 +121,10 @@ could suggest a `hello()` function (`|` in this case indicates cursor position).
 
 #### Exclude files or folders
 
-List of [glob](https://github.com/mrmlnc/fast-glob) patterns for directories that are excluded when scanning.
+List of [micromatch](https://github.com/micromatch/micromatch) patterns for directories that are excluded when scanning.
 
 - JSON key: `somesass.scannerExclude`.
-- Default value: `["**/.git", "**/node_modules", "**/bower_components"]`.
+- Default value: `["**/.git/**", "**/node_modules/**", "**/bower_components/**"]`.
 
 #### Adjust scanner depth
 

@@ -44,9 +44,9 @@
 						"type": "string"
 					},
 					"default": [
-						"**/.git",
-						"**/node_modules",
-						"**/bower_components"
+						"**/.git/**",
+						"**/node_modules/**",
+						"**/bower_components/**"
 					],
 					"description": "List of glob patterns for directories that are excluded when scanning."
 				},
@@ -97,6 +97,7 @@
 		"@nodelib/fs.macchiato": "1.0.4",
 		"@types/color": "3.0.3",
 		"@types/color-name": "1.1.1",
+		"@types/micromatch": "^2.3.31",
 		"@types/mocha": "9.1.1",
 		"@types/node": "16.11.43",
 		"@types/sinon": "10.0.12",

@@ -10,6 +10,7 @@ import type { IScssDocument, ScssSymbol } from '../../types/symbols';
 import type { Token } from '../../types/tokens';
 import { asDollarlessVariable, stripTrailingComma, stripParentheses } from '../../utils/string';
 import { INode, NodeType } from '../../types/nodes';
+import { sassBuiltInModules } from '../../sassBuiltInModules';
 
 export async function provideReferences(document: TextDocument, offset: number, storage: StorageService, context: ReferenceContext): Promise<Location[] | null> {
 	const scssDocument = storage.get(document.uri);
@@ -44,12 +45,29 @@ export async function provideReferences(document: TextDocument, offset: number, 
 		[definitionSymbol, definitionDocument] = getDefinitionSymbol(document, storage, referenceIdentifier);
 	}
 
+	let builtin: [string, string] | null = null;
 	if (!definitionSymbol || !definitionDocument) {
+		// If we don't have a definition anywhere we might be dealing with a built-in.
+		// Check to see if that's the case.
+
+		for (const [module, { exports }] of Object.entries(sassBuiltInModules)) {
+			for (const [name] of Object.entries(exports)) {
+				if (name === referenceIdentifier.name) {
+					builtin = [module.split(":")[1] as string, name];
+				}
+			}
+		}
+
+		if (!builtin) {
+			return null;
+		}
+	}
+
+	if (!builtin && !definitionDocument && !definitionSymbol) {
 		return null;
 	}
 
 	const references: Location[] = [];
-
 	for (const scssDocument of storage.values()) {
 		const text = scssDocument.getText();
 		const tokens: Token[] = tokenizer(text);
@@ -64,7 +82,7 @@ export async function provideReferences(document: TextDocument, offset: number, 
 			// Strip them before comparing.
 			const trailingCommalessText = stripTrailingComma(text);
 			const parentheseslessText = stripParentheses(text);
-			const dollarlessDefinition = stripTrailingComma(asDollarlessVariable(definitionSymbol.name));
+			const dollarlessDefinition = stripTrailingComma(asDollarlessVariable(builtin ? builtin[1] : definitionSymbol!.name));
 
 			const isWordMatch = tokenType === 'word' && trailingCommalessText.endsWith(dollarlessDefinition);
 			const isParameterMatch = tokenType === 'brackets' && text.includes(dollarlessDefinition);
@@ -84,7 +102,17 @@ export async function provideReferences(document: TextDocument, offset: number, 
 				// We do this in case the same identifier name is used in more than one namespace.
 				// foo.$var is not the same as bar.$var.
 				const definition = getDefinition(scssDocument, adjustedOffset, storage, context);
-				if (!definition) {
+				if (!definition || !definitionDocument || !definitionSymbol) {
+					// If we don't have a definition anywhere we might be dealing with a built-in.
+					// If that's the case, add the reference even without the definition.
+					if (builtin) {
+						const [module, exports] = builtin;
+						// Only support modern modules with this feature as well.
+						if (text === `${module}.${exports}`) {
+							const reference = createReference(scssDocument, adjustedOffset, adjustedText);
+							references.push(reference);
+						}
+					}
 					continue;
 				}
 
@@ -92,11 +120,8 @@ export async function provideReferences(document: TextDocument, offset: number, 
 				// and the definition we found to begin with, we have a reference to report.
 				const isSameFile = await isSameRealPath(definition.uri, definitionDocument, storage);
 				if (isSameFile && isSamePosition(definitionSymbol.position, definition.range.start)) {
-					const start = scssDocument.positionAt(adjustedOffset);
-					const end = scssDocument.positionAt(adjustedOffset + adjustedText.length);
-					const range = Range.create(start, end);
-					const location = Location.create(scssDocument.uri, range);
-					references.push(location);
+					const reference = createReference(scssDocument, adjustedOffset, adjustedText);
+					references.push(reference);
 				}
 			}
 		}
@@ -110,6 +135,14 @@ interface Identifier {
 	kind: SymbolKind;
 	position: Position;
 	name: string;
+}
+
+function createReference(scssDocument: IScssDocument, adjustedOffset: number, adjustedText: string): Location {
+	const start = scssDocument.positionAt(adjustedOffset);
+	const end = scssDocument.positionAt(adjustedOffset + adjustedText.length);
+	const range = Range.create(start, end);
+	const location = Location.create(scssDocument.uri, range);
+	return location;
 }
 
 function getIdentifier(document: TextDocument, hoverNode: INode, context: ReferenceContext): Identifier | null {

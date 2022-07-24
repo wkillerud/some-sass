@@ -589,4 +589,55 @@ describe('Providers/References', () => {
 		assert.ok(hello, 'provideReferences returned null for a function excluding declarations');
 		assert.strictEqual(hello?.length, 1, 'Expected one reference to hello');
 	});
+
+	it('provideReferences - Sass built-in', async () => {
+		const usage = await helpers.makeDocument(storage, [
+			'@use "sass:color";',
+			'$_color: color.scale($color: "#1b1917", $alpha: -75%);',
+			'.a {',
+			'	color: $_color;',
+			'	transform: scale(1.1);',
+			'}',
+		], {
+			uri: 'one.scss',
+		});
+
+		await helpers.makeDocument(storage, [
+			'@use "sass:color";',
+			'$_other-color: color.scale($color: "#1b1917", $alpha: -75%);',
+		], {
+			uri: 'two.scss',
+		});
+
+		const references = await provideReferences(usage, 34, storage, { includeDeclaration: true });
+		assert.ok(references, 'provideReferences returned null for Sass built-in');
+
+		assert.strictEqual(references?.length, 2, 'Expected two references to scale');
+
+		const [one, two] = references;
+
+		assert.ok(one?.uri.endsWith('one.scss'));
+		assert.deepStrictEqual(one?.range, {
+			start: {
+				line: 1,
+				character: 15,
+			},
+			end: {
+				line: 1,
+				character: 20,
+			},
+		});
+
+		assert.ok(two?.uri.endsWith('two.scss'));
+		assert.deepStrictEqual(two?.range, {
+			start: {
+				line: 1,
+				character: 21,
+			},
+			end: {
+				line: 1,
+				character: 26,
+			},
+		});
+	});
 });

@@ -70,7 +70,11 @@ export default class ScannerService {
 					continue;
 				}
 
-				await this.parse(URI.parse(symbol.link.target).fsPath, workspaceRoot, depth + 1);
+				try {
+					await this.parse(URI.parse(symbol.link.target).fsPath, workspaceRoot, depth + 1);
+				} catch (e) {
+					console.error((e as Error)?.message);
+				}
 			}
 		} catch (e) {
 			console.error((e as Error)?.message);

@@ -19,10 +19,10 @@ storage.set('one.scss', new ScssDocument(
 			[["$a", { name: '$a', kind: SymbolKind.Variable, value: '1', offset: 0, position: { line: 1, character: 1 } }]]
 		),
 		mixins: new Map(
-			[["mixin", { name: 'mixin',kind: SymbolKind.Method, parameters: [], offset: 0, position: { line: 1, character: 1 } } ]]
+			[["mixin", { name: 'mixin', kind: SymbolKind.Method, parameters: [], offset: 0, position: { line: 1, character: 1 } }]]
 		),
 		functions: new Map(
-			[["make", { name: 'make', kind: SymbolKind.Function, parameters: [], offset: 0, position: { line: 1, character: 1 } } ]]
+			[["make", { name: 'make', kind: SymbolKind.Function, parameters: [], offset: 0, position: { line: 1, character: 1 } }]]
 		),
 		imports: new Map(),
 		uses: new Map(),
@@ -34,7 +34,7 @@ describe('Providers/GoDefinition', () => {
 	it('doGoDefinition - Variables', async () => {
 		const document = await helpers.makeDocument(storage, '.a { content: $a; }');
 
-		const actual = await goDefinition(document, 15, storage);
+		const actual = goDefinition(document, 15, storage);
 
 		assert.ok(actual);
 		assert.strictEqual(actual?.uri, './one.scss');
@@ -47,7 +47,7 @@ describe('Providers/GoDefinition', () => {
 	it('doGoDefinition - Variable definition', async () => {
 		const document = await helpers.makeDocument(storage, '$a: 1;');
 
-		const actual = await goDefinition(document, 2, storage);
+		const actual = goDefinition(document, 2, storage);
 
 		assert.strictEqual(actual, null);
 	});
@@ -55,7 +55,7 @@ describe('Providers/GoDefinition', () => {
 	it('doGoDefinition - Mixins', async () => {
 		const document = await helpers.makeDocument(storage, '.a { @include mixin(); }');
 
-		const actual = await goDefinition(document, 16, storage);
+		const actual = goDefinition(document, 16, storage);
 
 		assert.ok(actual);
 		assert.strictEqual(actual?.uri, './one.scss');
@@ -68,7 +68,7 @@ describe('Providers/GoDefinition', () => {
 	it('doGoDefinition - Mixin definition', async () => {
 		const document = await helpers.makeDocument(storage, '@mixin mixin($a) {}');
 
-		const actual = await goDefinition(document, 8, storage);
+		const actual = goDefinition(document, 8, storage);
 
 		assert.strictEqual(actual, null);
 	});
@@ -76,7 +76,7 @@ describe('Providers/GoDefinition', () => {
 	it('doGoDefinition - Mixin Arguments', async () => {
 		const document = await helpers.makeDocument(storage, '@mixin mixin($a) {}');
 
-		const actual = await goDefinition(document, 10, storage);
+		const actual = goDefinition(document, 10, storage);
 
 		assert.strictEqual(actual, null);
 	});
@@ -84,7 +84,7 @@ describe('Providers/GoDefinition', () => {
 	it('doGoDefinition - Functions', async () => {
 		const document = await helpers.makeDocument(storage, '.a { content: make(1); }');
 
-		const actual = await goDefinition(document, 16, storage);
+		const actual = goDefinition(document, 16, storage);
 
 		assert.ok(actual);
 		assert.strictEqual(actual?.uri, './one.scss');
@@ -97,7 +97,7 @@ describe('Providers/GoDefinition', () => {
 	it('doGoDefinition - Function definition', async () => {
 		const document = await helpers.makeDocument(storage, '@function make($a) {}');
 
-		const actual = await goDefinition(document, 8, storage);
+		const actual = goDefinition(document, 8, storage);
 
 		assert.strictEqual(actual, null);
 	});
@@ -105,7 +105,7 @@ describe('Providers/GoDefinition', () => {
 	it('doGoDefinition - Function Arguments', async () => {
 		const document = await helpers.makeDocument(storage, '@function make($a) {}');
 
-		const actual = await goDefinition(document, 13, storage);
+		const actual = goDefinition(document, 13, storage);
 
 		assert.strictEqual(actual, null);
 	});

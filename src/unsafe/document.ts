@@ -1,4 +1,5 @@
 import { Range } from 'vscode-languageserver-types';
+import { URI } from 'vscode-uri';
 
 import { getLanguageService } from './language-service';
 import { getNodeAtOffset } from './utils/ast';
@@ -7,6 +8,7 @@ import { getLinesFromText } from './utils/document';
 import type { IScssDocument, IScssSymbols, ScssForward, ScssFunction, ScssImport, ScssLink, ScssMixin, ScssSymbol, ScssUse, ScssVariable } from './types/symbols';
 import type { Position, TextDocument } from 'vscode-languageserver-textdocument';
 import type { INode } from './types/nodes';
+import { realPath } from './utils/fs';
 
 const ls = getLanguageService();
 
@@ -22,6 +24,8 @@ export class ScssDocument implements IScssDocument {
 	public mixins: Map<string, ScssMixin> = new Map();
 	public functions: Map<string, ScssFunction> = new Map();
 
+	private _realPath: string | null = null;
+
 	constructor(document: TextDocument, symbols: IScssSymbols, ast?: INode) {
 		this.textDocument = document;
 		this.ast = ast ?? ls.parseStylesheet(document) as INode;
@@ -36,6 +40,25 @@ export class ScssDocument implements IScssDocument {
 
 	public get uri(): string {
 		return this.textDocument.uri;
+	}
+
+	public get filePath(): string {
+		return URI.parse(this.textDocument.uri).fsPath;
+	}
+
+	public async getRealPath(): Promise<string | null> {
+		if (this._realPath) {
+			return this._realPath;
+		}
+
+		try {
+			const path = await realPath(this.filePath);
+			this._realPath = path;
+		} catch (e) {
+			// Do nothing
+		}
+
+		return this._realPath;
 	}
 
 	private getFileName(): string {

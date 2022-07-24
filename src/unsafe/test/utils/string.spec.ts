@@ -7,7 +7,8 @@ import {
 	getTextBeforePosition,
 	getTextAfterPosition,
 	getLimitedString,
-	asDollarlessVariable
+	asDollarlessVariable,
+	stripTrailingComma
 } from '../../utils/string';
 
 describe('Utils/String', () => {
@@ -44,4 +45,9 @@ describe('Utils/String', () => {
 		assert.strictEqual(asDollarlessVariable('$someText'), 'someText');
 		assert.strictEqual(asDollarlessVariable('$$$ (⌐■_■) $$$'), '$$ (⌐■_■) $$$');
 	});
+
+	it('stripTrailingComma', () => {
+		assert.strictEqual(stripTrailingComma('dev.$fun-day,'), 'dev.$fun-day');
+		assert.strictEqual(stripTrailingComma('dev.$fun-day'), 'dev.$fun-day');
+	})
 });

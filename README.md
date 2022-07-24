@@ -10,6 +10,8 @@ Supports standalone SCSS, as well as style blocks inside Vue and Svelte componen
 
 Based on SCSS Intellisense by [Denis Malinochkin and contributors](https://github.com/mrmlnc/vscode-scss). Uses the built-in VS Code language server for SCSS.
 
+Visit the [release section on GitHub](https://github.com/wkillerud/vscode-scss/releases) to see what has changed between versions.
+
 ## Setup
 
 Search for Some Sass (`SomewhatStationery.some-sass`) from the extension installer within VS Code or install from [the Marketplace](https://marketplace.visualstudio.com/items?itemName=SomewhatStationery.some-sass).
@@ -41,7 +43,9 @@ Documentation written with SassDoc will be included in the hover information. Ad
 
 ![](images/sassdoc-hover.gif)
 
-### Go to definition
+### Code navigation
+
+#### Go to Definition
 
 To use this feature, either:
 
@@ -54,6 +58,24 @@ To use this feature, either:
 To use this feature – in the `Go` menu – choose [Go to Symbol](https://code.visualstudio.com/Docs/editor/editingevolved#_go-to-symbol) either for Workspace (`Cmd + T`) or for Editor (`Cmd + Shift + O`).
 
 ![](images/workspace-symbols.gif)
+
+#### Go to References
+
+Shows an inline view of all references to the variable, mixin or function designed
+for quick navigation.
+
+To use this feature, either:
+
+- Right-click a variable, mixin or function and choose `Go to References`.
+- Place the cursor on the variable, moxin or function, open the `Go` menu and choose `Go to References`
+
+#### Find All References
+
+Opens a pane in your workbench with a list of all references to the variable,
+mixin or function.
+
+To use this feature, right-click a variable, mixin or function and choose
+`Find All References`.
 
 ## Recommended settings for Visual Studio Code
 
@@ -121,10 +143,10 @@ could suggest a `hello()` function (`|` in this case indicates cursor position).
 
 #### Exclude files or folders
 
-List of [glob](https://github.com/mrmlnc/fast-glob) patterns for directories that are excluded when scanning.
+List of [micromatch](https://github.com/micromatch/micromatch) patterns for directories that are excluded when scanning.
 
 - JSON key: `somesass.scannerExclude`.
-- Default value: `["**/.git", "**/node_modules", "**/bower_components"]`.
+- Default value: `["**/.git/**", "**/node_modules/**", "**/bower_components/**"]`.
 
 #### Adjust scanner depth
 

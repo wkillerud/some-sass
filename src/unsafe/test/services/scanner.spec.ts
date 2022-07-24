@@ -3,6 +3,7 @@
 import assert from 'assert';
 import path from 'path';
 import fs from 'fs';
+import { isMatch } from 'micromatch';
 
 import sinon from 'sinon';
 import { Stats } from '@nodelib/fs.macchiato';
@@ -79,8 +80,8 @@ describe('Services/Scanner', () => {
 			await scanner.scan([indexDocumentPath], workspaceRootUri);
 
 			const expected = new Map([
-					[indexDocumentUri, indexDocumentUri],
-					[variablesDocumentUri, variablesDocumentUri]
+				[indexDocumentUri, indexDocumentUri],
+				[variablesDocumentUri, variablesDocumentUri]
 			]);
 			assert.deepStrictEqual(storage.keys(), expected.keys());
 
@@ -110,6 +111,11 @@ describe('Services/Scanner', () => {
 
 			assert.strictEqual(fileExistsStub.callCount, 2, "File exists was not called twice");  // Scanner only calls once, but parser does as well
 			assert.strictEqual(readFileStub.callCount, 1, "Read file was not called once");
+		});
+
+		it('exclude matcher works as expected', () => {
+			assert.ok(isMatch('/home/user/project/.git/index', '**/.git/**'));
+			assert.ok(isMatch('/home/user/project/node_modules/package/some.scss', '**/node_modules/**'));
 		});
 	});
 });

@@ -22,7 +22,7 @@ export interface ScssMixin extends ScssSymbol {
 	parameters: Omit<ScssVariable, 'position' | 'kind'>[];
 }
 
-export interface ScssFunction extends ScssMixin {}
+export interface ScssFunction extends ScssMixin { }
 
 export interface ScssLink {
 	link: DocumentLink;
@@ -56,12 +56,15 @@ export interface IScssSymbols {
 export interface IScssDocument extends TextDocument, IScssSymbols {
 	textDocument: TextDocument;
 	ast: INode;
+	filePath: string;
 	/**
 	 * The last part of the URI, including extension.
 	 * For instance, given the URI `file:///home/test.scss`,
 	 * the fileName is `test.scss`.
 	 */
 	fileName: string;
+	/** Find and cache the real path (as opposed to symlinked) */
+	getRealPath: () => Promise<string | null>;
 	getLinks: (options?: { forwards: boolean }) => ScssLink[];
 	getSymbols: () => ScssSymbol[];
 	getNodeAt: (offset: number) => INode | null;

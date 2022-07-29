@@ -1,6 +1,9 @@
 import { getCurrentWord, getTextBeforePosition } from '../../utils/string';
 
+import type { TextDocument } from 'vscode-languageserver-textdocument';
 import type { ISettings } from '../../types/settings';
+
+type SupportedExtensions = 'scss' | 'vue' | 'svelte' | 'astro';
 
 export type CompletionContext = {
 	word: string;
@@ -12,6 +15,7 @@ export type CompletionContext = {
 	variable: boolean;
 	function: boolean;
 	mixin: boolean;
+	originalExtension: SupportedExtensions;
 };
 
 const rePropertyValue = /.*:\s*/;
@@ -97,7 +101,7 @@ function checkNamespaceContext(currentWord: string): string | null {
 	return currentWord.substring(0, currentWord.indexOf("."));
 }
 
-export function createCompletionContext(text: string, offset: number, settings: ISettings): CompletionContext {
+export function createCompletionContext(document: TextDocument, text: string, offset: number, settings: ISettings): CompletionContext {
 	const currentWord = getCurrentWord(text, offset);
 	const textBeforeWord = getTextBeforePosition(text, offset);
 
@@ -113,6 +117,9 @@ export function createCompletionContext(text: string, offset: number, settings: 
 
 	// Is namespace, e.g. `namespace.$var` or `@include namespace.mixin` or `namespace.func()`
 	const namespace = checkNamespaceContext(currentWord)
+
+	const lastDot = document.uri.lastIndexOf('.');
+	const originalExtension = document.uri.substring(lastDot + 1) as SupportedExtensions;
 
 	return {
 		word: currentWord,
@@ -131,6 +138,7 @@ export function createCompletionContext(text: string, offset: number, settings: 
 			Boolean(namespace),
 			settings
 		),
-		mixin: checkMixinContext(textBeforeWord, isPropertyValue)
+		mixin: checkMixinContext(textBeforeWord, isPropertyValue),
+		originalExtension,
 	};
 }

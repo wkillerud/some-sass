@@ -17,9 +17,11 @@ describe('SCSS Completion Test', () => {
 	});
 
 	it('Offers completions from tilde imports', async () => {
-		const expectedCompletions = [{ label: '$tilde', detail: 'Variable declared in bar.scss' }];
-
+		let expectedCompletions = [{ label: '$tilde', detail: 'Variable declared in bar.scss', insertText: '"$tilde"' }];
 		await testCompletion(docUri, position(11, 11), expectedCompletions);
+
+		// For Vue, Svelte and Astro, the existing $ is not replaced by VS Code, so omit it from insertText
+		expectedCompletions = [{ label: '$tilde', detail: 'Variable declared in bar.scss', insertText: '"tilde"' }];
 		await testCompletion(vueDocUri, position(22, 11), expectedCompletions);
 		await testCompletion(svelteDocUri, position(14, 11), expectedCompletions);
 		await testCompletion(astroDocUri, position(17, 11), expectedCompletions);
@@ -36,21 +38,34 @@ describe('SCSS Completion Test', () => {
 
 	it('Offers namespaces completions including prefixes', async () => {
 		let expectedCompletions = [
-			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss' },
-			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss' }
+			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss', insertText: '".$var-var-variable"' },
+			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":".fun-fun-function"}' }
 		];
 
 		await testCompletion(docUri, position(23, 13), expectedCompletions);
+
+		// For Vue, Svelte and Astro, the existing . from the namespace and $ from the variable is not replaced by VS Code, so omit them from insertText.
+		expectedCompletions = [
+			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss', insertText: '"var-var-variable"' },
+			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":"fun-fun-function"}' }
+		]
+
 		await testCompletion(vueDocUri, position(34, 13), expectedCompletions);
 		await testCompletion(svelteDocUri, position(26, 13), expectedCompletions);
 		await testCompletion(astroDocUri, position(29, 13), expectedCompletions);
 
 
 		expectedCompletions = [
-			{ label: 'mix-mix-mixin', detail: 'Mixin declared in _mixins.scss' },
+			{ label: 'mix-mix-mixin', detail: 'Mixin declared in _mixins.scss', insertText: '{"_tabstop":1,"value":".mix-mix-mixin"}' },
 		];
 
 		await testCompletion(docUri, position(24, 15), expectedCompletions);
+
+		// Same as for functions with regards to the . from the namespace.
+		expectedCompletions = [
+			{ label: 'mix-mix-mixin', detail: 'Mixin declared in _mixins.scss', insertText: '{"_tabstop":1,"value":"mix-mix-mixin"}' },
+		];
+
 		await testCompletion(vueDocUri, position(35, 15), expectedCompletions);
 		await testCompletion(svelteDocUri, position(27, 15), expectedCompletions);
 		await testCompletion(astroDocUri, position(30, 15), expectedCompletions);

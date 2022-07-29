@@ -24,7 +24,7 @@ export function doCompletion(
 	let completions = CompletionList.create([], false);
 
 	const text = document.getText();
-	const context = createCompletionContext(text, offset, settings);
+	const context = createCompletionContext(document, text, offset, settings);
 
 	if (context.sassDoc) {
 		return doSassDocCompletion(text, offset, context);
@@ -287,12 +287,21 @@ function createVariableCompletionItems(
 			}
 		}
 
+		const isEmbedded = context.originalExtension !== "scss";
 		if (context.namespace) {
 			// Avoid ending up with namespace.prefix-$variable
 			label = `$${prefix}${asDollarlessVariable(variable.name)}`;
-			// The `.` in the namespace gets replaced unless we have a $ charachter after it
-			insertText = context.word.endsWith(".") ? `.${label}` : label;
+			// The `.` in the namespace gets replaced unless we have a $ charachter after it.
+			// Except when we're embedded in Vue, Svelte or Astro.
+			// Also, in those embedded scenarios, the existing $ sign is **not** replaced, so exclude it from the completion.
+			insertText = isEmbedded
+				? asDollarlessVariable(label)
+				: context.word.endsWith(".")
+					? `.${label}`
+					: label;
 			filterText = `${context.namespace !== "*" ? context.namespace : ""}${insertText}`;
+		} else if (isEmbedded) {
+			insertText = asDollarlessVariable(label);
 		}
 
 		completions.push({
@@ -354,14 +363,20 @@ function createMixinCompletionItems(
 
 		// Client needs the namespace as part of the text that is matched,
 		// and inserted text needs to include the `.` which will otherwise
-		// be replaced.
+		// be replaced (except when we're embedded in Vue, Svelte or Astro).
 		const label = context.namespace ? `${prefix}${mixin.name}` : mixin.name;
 		const filterText = context.namespace
 			? context.namespace !== "*"
 				? `${context.namespace}.${prefix}${mixin.name}`
 				: `${prefix}${mixin.name}`
 			: mixin.name;
-		let insertText = context.namespace && context.namespace !== "*" ? `.${prefix}${mixin.name}` : mixin.name;
+
+		const isEmbedded = context.originalExtension !== "scss";
+		let insertText = context.namespace
+			? context.namespace !== "*" && !isEmbedded
+				? `.${prefix}${mixin.name}`
+				: `${prefix}${mixin.name}`
+			: mixin.name;
 		const sortText = isPrivate ? label.replace(/^$[_-]/, '') : undefined;
 
 		// Use the SnippetString syntax to provide smart completions of parameter names
@@ -443,15 +458,16 @@ function createFunctionCompletionItems(
 
 		// Client needs the namespace as part of the text that is matched,
 		// and inserted text needs to include the `.` which will otherwise
-		// be replaced.
+		// be replaced (except when we're embedded in Vue, Svelte or Astro).
 		const label = context.namespace ? `${prefix}${func.name}` : func.name;
 		const filterText = context.namespace
 			? `${context.namespace !== "*"
 				? context.namespace
 				: ""}.${prefix}${func.name}`
 			: func.name;
+		const isEmbedded = context.originalExtension !== "scss";
 		let insertText = context.namespace
-			? context.namespace !== "*"
+			? context.namespace !== "*" && !isEmbedded
 				? `.${prefix}${func.name}`
 				: `${prefix}${func.name}`
 			: func.name;

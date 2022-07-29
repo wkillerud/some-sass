@@ -33,6 +33,7 @@ $fonts: -apple-system;
 .foo {
   color: ns.
   @include ns.
+  --runtime-var: var(--other-var, #{ns.})
 }
 
 </style>

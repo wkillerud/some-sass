@@ -7,11 +7,13 @@ describe('SCSS Completion Test', () => {
 	const docUri = getDocUri('completion/main.scss');
 	const vueDocUri = getDocUri('completion/AppButton.vue');
 	const svelteDocUri = getDocUri('completion/AppButton.svelte');
+	const astroDocUri = getDocUri('completion/AppButton.astro');
 
 	before(async () => {
 		await showFile(docUri);
 		await showFile(vueDocUri);
 		await showFile(svelteDocUri);
+		await showFile(astroDocUri);
 	});
 
 	it('Offers completions from tilde imports', async () => {
@@ -20,6 +22,7 @@ describe('SCSS Completion Test', () => {
 		await testCompletion(docUri, position(11, 11), expectedCompletions);
 		await testCompletion(vueDocUri, position(22, 11), expectedCompletions);
 		await testCompletion(svelteDocUri, position(14, 11), expectedCompletions);
+		await testCompletion(astroDocUri, position(17, 11), expectedCompletions);
 	});
 
 	it('Offers completions from partial file', async () => {
@@ -28,6 +31,7 @@ describe('SCSS Completion Test', () => {
 		await testCompletion(docUri, position(17, 11), expectedCompletions);
 		await testCompletion(vueDocUri, position(28, 11), expectedCompletions);
 		await testCompletion(svelteDocUri, position(20, 11), expectedCompletions);
+		await testCompletion(astroDocUri, position(23, 11), expectedCompletions);
 	});
 
 	it('Offers namespaces completions including prefixes', async () => {
@@ -39,6 +43,7 @@ describe('SCSS Completion Test', () => {
 		await testCompletion(docUri, position(23, 13), expectedCompletions);
 		await testCompletion(vueDocUri, position(34, 13), expectedCompletions);
 		await testCompletion(svelteDocUri, position(26, 13), expectedCompletions);
+		await testCompletion(astroDocUri, position(29, 13), expectedCompletions);
 
 
 		expectedCompletions = [
@@ -48,6 +53,7 @@ describe('SCSS Completion Test', () => {
 		await testCompletion(docUri, position(24, 15), expectedCompletions);
 		await testCompletion(vueDocUri, position(35, 15), expectedCompletions);
 		await testCompletion(svelteDocUri, position(27, 15), expectedCompletions);
+		await testCompletion(astroDocUri, position(30, 15), expectedCompletions);
 	});
 
 	// We can't test this until somesass.suggestOnlyFromUse: true becomes the default setting
@@ -57,18 +63,21 @@ describe('SCSS Completion Test', () => {
 		await testCompletion(docUri, position(23, 13), expectedCompletions, { expectNoMatch: true });
 		await testCompletion(vueDocUri, position(34, 13), expectedCompletions, { expectNoMatch: true });
 		await testCompletion(svelteDocUri, position(26, 13), expectedCompletions, { expectNoMatch: true });
+		await testCompletion(astroDocUri, position(29, 13), expectedCompletions, { expectNoMatch: true });
 
 		expectedCompletions = ['secret', 'other-secret', 'mix-secret', 'mix-other-secret'];
 
 		await testCompletion(docUri, position(24, 15), expectedCompletions, { expectNoMatch: true });
 		await testCompletion(vueDocUri, position(35, 15), expectedCompletions, { expectNoMatch: true });
 		await testCompletion(svelteDocUri, position(27, 15), expectedCompletions, { expectNoMatch: true });
+		await testCompletion(astroDocUri, position(30, 15), expectedCompletions, { expectNoMatch: true });
 	});
 
 	it('Offers no completions on Vuelike file outside SCSS regions', async () => {
 		await testCompletion(vueDocUri, position(2, 9), []);
 		await testCompletion(vueDocUri, position(6, 8), []);
 		await testCompletion(svelteDocUri, position(1, 16), []);
+		await testCompletion(astroDocUri, position(4, 16), []);
 	});
 
 	it('Offers variable completions on Vuelike file', async () => {
@@ -76,6 +85,7 @@ describe('SCSS Completion Test', () => {
 
 		await testCompletion(vueDocUri, position(16, 11), expectedCompletions);
 		await testCompletion(svelteDocUri, position(8, 11), expectedCompletions);
+		await testCompletion(astroDocUri, position(11, 11), expectedCompletions);
 	});
 });
 

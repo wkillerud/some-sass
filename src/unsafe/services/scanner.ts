@@ -5,6 +5,7 @@ import { URI } from 'vscode-uri';
 
 import type { ISettings } from '../types/settings';
 import type { ScssImport } from '../types/symbols';
+import { getSCSSRegionsDocument, isFileWhereScssCanBeEmbedded } from '../utils/embedded';
 import { readFile, fileExists } from '../utils/fs';
 import { parseDocument } from './parser';
 import type StorageService from './storage';
@@ -31,7 +32,11 @@ export default class ScannerService {
 	}
 
 	public async update(document: TextDocument, workspaceRoot: URI): Promise<void> {
-		const scssDocument = await parseDocument(document, workspaceRoot);
+		const scssRegions = this.getScssRegionsOfDocument(document);
+		if (!scssRegions) {
+			return;
+		}
+		const scssDocument = await parseDocument(scssRegions, workspaceRoot);
 		this._storage.set(scssDocument.uri, scssDocument);
 	}
 
@@ -57,7 +62,11 @@ export default class ScannerService {
 		try {
 			const content = await readFile(filepath);
 			const document = TextDocument.create(uri, 'scss', 1, content);
-			const scssDocument = await parseDocument(document, workspaceRoot);
+			const scssRegions = this.getScssRegionsOfDocument(document);
+			if (!scssRegions) {
+				return;
+			}
+			const scssDocument = await parseDocument(scssRegions, workspaceRoot);
 			// TODO: be inspired by the way the LSP sample handles document storage and cache invalidation? Documents can be renamed, deleted.
 			this._storage.set(scssDocument.uri, scssDocument);
 
@@ -80,6 +89,19 @@ export default class ScannerService {
 			console.error((e as Error)?.message);
 			// Something went wrong parsing this file. Try to parse the others.
 			return;
+		}
+	}
+
+	protected getScssRegionsOfDocument(document: TextDocument): TextDocument | null {
+		if (isFileWhereScssCanBeEmbedded(document.uri)) {
+			const regions = getSCSSRegionsDocument(document);
+			if (regions.document) {
+				return regions.document;
+			} else {
+				return null;
+			}
+		} else {
+			return document;
 		}
 	}
 }

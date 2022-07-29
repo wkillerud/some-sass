@@ -34,6 +34,11 @@ async function main() {
 			stdio: 'inherit'
 		});
 
+		cp.spawnSync(cli, [...args, '--install-extension', 'astro-build.astro-vscode'], {
+			encoding: 'utf-8',
+			stdio: 'inherit'
+		});
+
 		await runTests({
 			vscodeExecutablePath,
 			version: 'insiders',

@@ -65,7 +65,7 @@ This method of debugging is **not recommended** if you want to debug the functio
 
 If you still want to debug the integration tests there are a few things to keep in mind, since tests run in this way use your main stable install of VS Code (not Insiders, like from the terminal):
 
-- You will need to install Vetur (`octref.vetur`) and Svelte for VS Code (`svelte.svelte-vscode`)
+- You will need to install Vetur (`octref.vetur`), Astro (`astro-build.astro-vscode`) and Svelte for VS Code (`svelte.svelte-vscode`).
 - You **must** use default settings for Some Sass. Tip: use the included Workspace Settings.
 - To compile changes in test code, run `npm run test:compile`
 

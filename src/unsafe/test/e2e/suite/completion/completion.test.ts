@@ -38,15 +38,16 @@ describe('SCSS Completion Test', () => {
 
 	it('Offers namespaces completions including prefixes', async () => {
 		let expectedCompletions = [
-			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss', insertText: '".$var-var-variable"' },
+			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss', insertText: '".$var-var-variable"', filterText: '"ns.$var-var-variable"' },
 			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":".fun-fun-function"}' }
 		];
 
 		await testCompletion(docUri, position(23, 13), expectedCompletions);
 
-		// For Vue, Svelte and Astro, the existing . from the namespace and $ from the variable is not replaced by VS Code, so omit them from insertText.
+		// For Vue, Svelte and Astro, the existing . from the namespace is not replaced by VS Code, so omit them from insertText.
+		// However, we still need them both in the filter text.
 		expectedCompletions = [
-			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss', insertText: '"var-var-variable"' },
+			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss', insertText: '"$var-var-variable"', filterText: '"ns.$var-var-variable"' },
 			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":"fun-fun-function"}' }
 		]
 
@@ -96,7 +97,12 @@ describe('SCSS Completion Test', () => {
 	});
 
 	it('Offers variable completions on Vuelike file', async () => {
-		const expectedCompletions = ['$color', '$fonts'];
+		// In Vue, Svelte and Astro files:
+		// For variables _without_ a namespace ($color as opposed to namespace.$color),
+		// VS Code does not replace the existing $ when using the completion.
+		// The insertText must be without one to avoid $$color. However, filterText
+		// still need the $ sign for the suggestion to match.
+		const expectedCompletions = [{ label: '$color', insertText: '"color"', filterText: undefined }, { label: '$fonts', insertText: '"fonts"', filterText: undefined }];
 
 		await testCompletion(vueDocUri, position(16, 11), expectedCompletions);
 		await testCompletion(svelteDocUri, position(8, 11), expectedCompletions);

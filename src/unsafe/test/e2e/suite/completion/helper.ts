@@ -65,6 +65,11 @@ export async function testCompletion(
 				assert.strictEqual(JSON.stringify(match.insertText), ei.insertText, `Expected insertText to match ${ei.insertText}. Actual: ${JSON.stringify(match.insertText)}`);
 			}
 
+			// This may deliberatly be undefined, in which case the filter matches the label
+			if ((ei as Object).hasOwnProperty("filterText")) {
+				assert.strictEqual(JSON.stringify(match.filterText), ei.filterText, `Expected filterText to match ${ei.filterText}. Actual: ${JSON.stringify(match.filterText)}`);
+			}
+
 			if (ei.documentation) {
 				if (typeof match.documentation === 'string') {
 					assert.strictEqual(match.documentation, ei.documentation);

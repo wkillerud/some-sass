@@ -81,7 +81,7 @@ To use this feature, right-click a variable, mixin or function and choose
 
 **Improved code suggestions for variables under namespaces**
 
-When providing code suggestions under namespaces (`@use "~namespace"`, then typing `namespace.$`)
+When providing code suggestions under namespaces (`@use "namespace"`, then typing `namespace.$`)
 you may see the default word-based suggestions appear again. VS Code seems to think of `$` as a
 new fresh start for suggestions, so it will start matching any variable in the current document.
 
@@ -91,8 +91,19 @@ and use the provided suggestion. This way you can keep word based suggestions if
 
 ```jsonc
 {
-  "editor.wordBasedSuggestions": false,
-  "somesass.suggestOnlyFromUse": true
+	// Recommended if you don't rely on @import
+	"somesass.suggestOnlyFromUse": true,
+
+	// Optional, if you get suggestions from the current document after namespace.$ (you don't need the $ for narrowing down suggestions)
+	"editor.wordBasedSuggestions": false,
+
+	// Add `scss` to the list of excluded languages for Emmet to avoid suggestions in Vue, Svelte or Astro files.
+	// VS Code understands that <style lang="scss">`blocks are SCSS, and so won't show Emmet suggestions in that block.
+	"emmet.excludeLanguages": [
+		// Markdown is excluded by default in VS Code
+		"markdown",
+		"scss"
+	]
 }
 ```
 

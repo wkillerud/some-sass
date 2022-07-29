@@ -291,7 +291,7 @@ function createVariableCompletionItems(
 		if (context.namespace) {
 			// Avoid ending up with namespace.prefix-$variable
 			label = `$${prefix}${asDollarlessVariable(variable.name)}`;
-			// The `.` in the namespace gets replaced unless we have a $ charachter after it.
+			// The `.` in the namespace gets replaced unless we have a $ character after it.
 			// Except when we're embedded in Vue, Svelte or Astro.
 			// Also, in those embedded scenarios, the existing $ sign is **not** replaced, so exclude it from the completion.
 			insertText = isEmbedded

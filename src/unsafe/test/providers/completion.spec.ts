@@ -11,6 +11,7 @@ import * as helpers from '../helpers';
 import type { ISettings } from '../../types/settings';
 import { ScssDocument } from '../../document';
 import { sassBuiltInModules } from '../../sassBuiltInModules';
+import { parseStringLiteralChoices } from '../../providers/completion/completion-utils';
 
 const storage = new StorageService();
 
@@ -146,5 +147,21 @@ describe('Providers/Completion - Built-in', () => {
 			actual.items.some((item) => item.label === 'change'),
 			'Expected to find a change-function in the Sass built-in color module, but it\'s missing'
 		);
+	});
+});
+
+describe('Providers/Completion - Utils', () => {
+	it('parseStringLiteralChoices returns an array of string literals from a docstring', () => {
+		let result = parseStringLiteralChoices('"foo"');
+		assert.strictEqual(result.join(', '), '"foo"');
+
+		result = parseStringLiteralChoices('"foo" | "bar"');
+		assert.strictEqual(result.join(', '), '"foo", "bar"');
+
+		result = parseStringLiteralChoices('String | Number');
+		assert.strictEqual(result.join(', '), '');
+
+		result = parseStringLiteralChoices('"String" | "Number"');
+		assert.strictEqual(result.join(', '), '"String", "Number"');
 	});
 });

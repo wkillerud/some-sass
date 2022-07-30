@@ -1,6 +1,6 @@
 'use strict';
 
-import type { ParseResult } from 'scss-sassdoc-parser';
+import type { Parameter, ParseResult } from 'scss-sassdoc-parser';
 import type { Position, TextDocument } from 'vscode-languageserver-textdocument';
 import type { DocumentLink, Range, SymbolKind } from 'vscode-languageserver-types';
 import type { INode } from './nodes';
@@ -18,7 +18,9 @@ export interface ScssVariable extends ScssSymbol {
 	value: string | null;
 }
 
-export type ScssParameter = Omit<ScssVariable, 'position' | 'kind'>;
+export interface ScssParameter extends Omit<ScssVariable, 'position' | 'kind' | 'sassdoc'> {
+	sassdoc?: Parameter;
+}
 
 export interface ScssMixin extends ScssSymbol {
 	parameters: ScssParameter[];

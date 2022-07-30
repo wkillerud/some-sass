@@ -1,5 +1,5 @@
 import { sassDocAnnotations } from '../../../../sassdocAnnotations';
-import { getDocUri, showFile, position, sleepWindowsCI } from '../util';
+import { getDocUri, showFile, position, sleepCI } from '../util';
 import { testCompletion } from './helper';
 
 
@@ -14,7 +14,7 @@ describe('SCSS Completion Test', () => {
 		await showFile(vueDocUri);
 		await showFile(svelteDocUri);
 		await showFile(astroDocUri);
-		await sleepWindowsCI();
+		await sleepCI();
 	});
 
 	it('Offers completions from tilde imports', async () => {

@@ -34,9 +34,9 @@ export async function showFile(docUri: vscode.Uri) {
 	return await vscode.window.showTextDocument(doc);
 }
 
-// Try to work around some instabilities on CI for Windows runner
-export async function sleepWindowsCI(ms = 3000): Promise<void> {
-	if (process.env['RUNNER_OS'] === 'Windows') {
+// Try to work around some instabilities on CI
+export async function sleepCI(ms = 3000): Promise<void> {
+	if (process.env['CI']) {
 		return await sleep(ms);
 	}
 	return Promise.resolve();

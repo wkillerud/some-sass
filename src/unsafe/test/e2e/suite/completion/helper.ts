@@ -44,7 +44,12 @@ export async function testCompletion(
 				);
 			}
 		} else {
-			const match = result.items.find(i => i.label === ei.label);
+			const match = result.items.find(i => {
+				if (typeof i.label === 'string') {
+					return i.label === ei.label;
+				}
+				return i.label.label === ei.label;
+			});
 			if (!match) {
 				if (options.expectNoMatch) {
 					assert.ok(`Found no match for ${ei.label}`);
@@ -54,7 +59,12 @@ export async function testCompletion(
 				return;
 			}
 
-			assert.strictEqual(match.label, ei.label);
+			if (typeof match.label === 'string') {
+				assert.strictEqual(match.label, ei.label);
+			} else {
+				assert.strictEqual(match.label.label, ei.label);
+			}
+
 			if (ei.kind) {
 				assert.strictEqual(match.kind, ei.kind);
 			}
@@ -63,6 +73,11 @@ export async function testCompletion(
 			}
 			if (ei.insertText) {
 				assert.strictEqual(JSON.stringify(match.insertText), ei.insertText, `Expected insertText to match ${ei.insertText}. Actual: ${JSON.stringify(match.insertText)}`);
+			}
+
+			// This may deliberatly be undefined, in which case the filter matches the label
+			if ((ei as Object).hasOwnProperty("filterText")) {
+				assert.strictEqual(JSON.stringify(match.filterText), ei.filterText, `Expected filterText to match ${ei.filterText}. Actual: ${JSON.stringify(match.filterText)}`);
 			}
 
 			if (ei.documentation) {

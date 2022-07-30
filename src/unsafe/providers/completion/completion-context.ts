@@ -1,6 +1,9 @@
 import { getCurrentWord, getTextBeforePosition } from '../../utils/string';
 
+import type { TextDocument } from 'vscode-languageserver-textdocument';
 import type { ISettings } from '../../types/settings';
+
+type SupportedExtensions = 'scss' | 'vue' | 'svelte' | 'astro';
 
 export type CompletionContext = {
 	word: string;
@@ -12,6 +15,7 @@ export type CompletionContext = {
 	variable: boolean;
 	function: boolean;
 	mixin: boolean;
+	originalExtension: SupportedExtensions;
 };
 
 const rePropertyValue = /.*:\s*/;
@@ -90,14 +94,15 @@ function isInterpolationContext(text: string): boolean {
 	return text.includes('#{');
 }
 
-function checkNamespaceContext(currentWord: string): string | null {
+function checkNamespaceContext(currentWord: string, isInterpolation: boolean): string | null {
 	if (currentWord.length === 0 || !currentWord.includes(".")) {
 		return null;
 	}
-	return currentWord.substring(0, currentWord.indexOf("."));
+	// Skip #{ if this is interpolation
+	return currentWord.substring(isInterpolation ? 2 : 0, currentWord.indexOf("."));
 }
 
-export function createCompletionContext(text: string, offset: number, settings: ISettings): CompletionContext {
+export function createCompletionContext(document: TextDocument, text: string, offset: number, settings: ISettings): CompletionContext {
 	const currentWord = getCurrentWord(text, offset);
 	const textBeforeWord = getTextBeforePosition(text, offset);
 
@@ -112,7 +117,10 @@ export function createCompletionContext(text: string, offset: number, settings: 
 	const isQuotes = reQuotes.test(textBeforeWord.replace(reQuotedValueInString, ''));
 
 	// Is namespace, e.g. `namespace.$var` or `@include namespace.mixin` or `namespace.func()`
-	const namespace = checkNamespaceContext(currentWord)
+	const namespace = checkNamespaceContext(currentWord, isInterpolation)
+
+	const lastDot = document.uri.lastIndexOf('.');
+	const originalExtension = document.uri.substring(lastDot + 1) as SupportedExtensions;
 
 	return {
 		word: currentWord,
@@ -131,6 +139,7 @@ export function createCompletionContext(text: string, offset: number, settings: 
 			Boolean(namespace),
 			settings
 		),
-		mixin: checkMixinContext(textBeforeWord, isPropertyValue)
+		mixin: checkMixinContext(textBeforeWord, isPropertyValue),
+		originalExtension,
 	};
 }

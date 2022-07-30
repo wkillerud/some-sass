@@ -1,12 +1,7 @@
-<template>
-	<p class="foo"></p>
-</template>
+---
+---
 
-<script>
-export default {
-
-}
-</script>
+<p class="foo"></p>
 
 <style lang="scss">
 $color: blue;
@@ -16,13 +11,13 @@ $fonts: -apple-system;
   color: $;
 }
 
-@import '~foo/bar.scss';
+@import "~foo/bar.scss";
 
 .foo {
   color: $;
 }
 
-@import './partial';
+@import "./partial";
 
 .foo {
   color: $;
@@ -35,5 +30,4 @@ $fonts: -apple-system;
   @include ns.
   --runtime-var: var(--other-var, #{ns.})
 }
-
 </style>

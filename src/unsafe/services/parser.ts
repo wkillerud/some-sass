@@ -13,6 +13,7 @@ import { ScssDocument } from '../document';
 import { parseString, ParseResult } from 'scss-sassdoc-parser';
 import { fileExists } from '../utils/fs';
 import { sassBuiltInModuleNames } from '../sassBuiltInModules';
+import { asDollarlessVariable } from '../utils/string';
 
 export const reModuleAtRule = /@(?:use|forward|import)/;
 export const reUse = /@use ["|'](?<url>.+)["|'](?: as (?<namespace>\*|\w+))?;/;
@@ -161,7 +162,7 @@ async function findDocumentSymbols(document: TextDocument, ast: INode, workspace
 				kind: SymbolKind.Method,
 				offset,
 				position,
-				parameters: getMethodParameters(ast, offset),
+				parameters: getMethodParameters(ast, offset, docs),
 				sassdoc: docs,
 			});
 		} else if (symbol.kind === SymbolKind.Function) {
@@ -171,7 +172,7 @@ async function findDocumentSymbols(document: TextDocument, ast: INode, workspace
 				kind: SymbolKind.Function,
 				offset,
 				position,
-				parameters: getMethodParameters(ast, offset),
+				parameters: getMethodParameters(ast, offset, docs),
 				sassdoc: docs,
 			});
 		}
@@ -250,7 +251,7 @@ function getVariableValue(ast: INode, offset: number): string | null {
 	return parent?.getValue()?.getText() || null;
 }
 
-function getMethodParameters(ast: INode, offset: number) {
+function getMethodParameters(ast: INode, offset: number, sassDoc: ParseResult | undefined) {
 	const node = getNodeAtOffset(ast, offset);
 
 	if (node === null) {
@@ -264,12 +265,17 @@ function getMethodParameters(ast: INode, offset: number) {
 			const defaultValueNode = child.getDefaultValue();
 
 			const value = defaultValueNode === undefined ? null : defaultValueNode.getText();
+			const name = child.getName();
+
+			const dollarlessName = asDollarlessVariable(name);
+			const docs = sassDoc ? sassDoc.parameter?.find(p => p.name === dollarlessName) : undefined;
 
 			return {
-				name: child.getName(),
+				name,
 				offset: child.offset,
 				value,
 				kind: SymbolKind.Variable,
+				sassdoc: docs,
 			};
 		});
 }

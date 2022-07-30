@@ -25,11 +25,19 @@ export function getDocUri(p: string) {
 	return vscode.Uri.file(getDocPath(p));
 }
 
-export function sleep(ms: number) {
+export function sleep(ms: number): Promise<void> {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export async function showFile(docUri: vscode.Uri) {
 	const doc = await vscode.workspace.openTextDocument(docUri);
 	return await vscode.window.showTextDocument(doc);
+}
+
+// Try to work around some instabilities on CI
+export async function sleepCI(ms = 3000): Promise<void> {
+	if (process.env['CI']) {
+		return await sleep(ms);
+	}
+	return await sleep(0);
 }

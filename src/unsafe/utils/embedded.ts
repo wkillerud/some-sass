@@ -2,8 +2,8 @@ import { TextDocument, Position } from 'vscode-languageserver-textdocument';
 
 type Region = [number, number];
 
-export function isVueOrSvelteFile(path: string) {
-	return path.endsWith('.vue') || path.endsWith('.svelte');
+export function isFileWhereScssCanBeEmbedded(path: string) {
+	return path.endsWith('.vue') || path.endsWith('.svelte') || path.endsWith('.astro');
 }
 
 export function getSCSSRegions(content: string) {
@@ -40,15 +40,19 @@ function convertTextDocument(document: TextDocument, regions: Region[]) {
 	return TextDocument.create(document.uri, 'scss', document.version, getSCSSContent(document.getText(), regions));
 }
 
-export function getSCSSRegionsDocument(document: TextDocument, position: Position) {
-	const offset = document.offsetAt(position);
-	if (!isVueOrSvelteFile(document.uri)) {
+export function getSCSSRegionsDocument(document: TextDocument, position?: Position) {
+	const offset = position ? document.offsetAt(position) : 0;
+	if (!isFileWhereScssCanBeEmbedded(document.uri)) {
 		return { document, offset };
 	}
 
-	const vueSCSSRegions = getSCSSRegions(document.getText());
-	if (vueSCSSRegions.some(region => region[0] <= offset && region[1] >= offset)) {
-		return { document: convertTextDocument(document, vueSCSSRegions), offset };
+	const scssRegions = getSCSSRegions(document.getText());
+
+	if (typeof position === "undefined") {
+		return { document: convertTextDocument(document, scssRegions), offset };
+	} else if (scssRegions.some(region => region[0] <= offset && region[1] >= offset)) {
+		return { document: convertTextDocument(document, scssRegions), offset };
 	}
+
 	return { document: null, offset };
 }

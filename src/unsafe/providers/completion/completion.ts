@@ -1,19 +1,20 @@
 'use strict';
 
-import { CompletionList, CompletionItemKind, CompletionItem, MarkupKind, InsertTextFormat, CompletionItemTag, CompletionItemLabelDetails } from 'vscode-languageserver';
+import { CompletionList, CompletionItem, MarkupKind, InsertTextFormat } from 'vscode-languageserver';
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 
 import type { ISettings } from '../../types/settings';
 import type StorageService from '../../services/storage';
-import type { IScssDocument, ScssForward, ScssImport, ScssMixin, ScssUse } from '../../types/symbols';
+import type { IScssDocument, ScssForward, ScssImport, ScssUse } from '../../types/symbols';
 
 import { SassBuiltInModule, sassBuiltInModules } from '../../sassBuiltInModules';
 import { createCompletionContext, CompletionContext } from './completion-context';
-import { getLimitedString, asDollarlessVariable } from '../../utils/string';
-import { getVariableColor } from '../../utils/color';
-import { applySassDoc } from '../../utils/sassdoc';
+import { asDollarlessVariable } from '../../utils/string';
 import { doSassDocCompletion } from './sassdoc-completion';
 import { doImportCompletion } from './import-completion';
+import { createFunctionCompletionItems } from './function-completion';
+import { createMixinCompletionItems } from './mixin-completion';
+import { createVariableCompletionItems } from './variable-completion';
 
 export function doCompletion(
 	document: TextDocument,
@@ -24,7 +25,7 @@ export function doCompletion(
 	let completions = CompletionList.create([], false);
 
 	const text = document.getText();
-	const context = createCompletionContext(text, offset, settings);
+	const context = createCompletionContext(document, text, offset, settings);
 
 	if (context.sassDoc) {
 		return doSassDocCompletion(text, offset, context);
@@ -234,268 +235,4 @@ function traverseTree(document: TextDocument, settings: ISettings, context: Comp
 
 		traverseTree(document, settings, context, storage, accumulator, childDocument, hidden, prefix);
 	}
-}
-
-const rePrivate = /^\$?[_-].*$/;
-
-function createVariableCompletionItems(
-	scssDocument: IScssDocument,
-	currentDocument: TextDocument,
-	context: CompletionContext,
-	hiddenSymbols: string[] = [],
-	prefix = ''
-): CompletionItem[] {
-	const completions: CompletionItem[] = [];
-
-	for (let variable of scssDocument.variables.values()) {
-		const color = variable.value ? getVariableColor(variable.value) : null;
-		const completionKind = color ? CompletionItemKind.Color : CompletionItemKind.Variable;
-
-		let documentation = getLimitedString(color ? color.toString() : variable.value || '');
-		let detail = `Variable declared in ${scssDocument.fileName}`;
-
-		let label = variable.name;
-		let sortText = undefined;
-		let filterText = undefined;
-		let insertText = undefined;
-
-		if (variable.mixin) {
-			// Add 'argument from MIXIN_NAME' suffix if Variable is Mixin argument
-			detail = `Argument from ${variable.mixin}, ${detail.toLowerCase()}`;
-		} else {
-			const isPrivate = variable.name.match(rePrivate);
-			const isFromCurrentDocument = scssDocument.uri === currentDocument.uri;
-
-			if (isPrivate && !isFromCurrentDocument) {
-				continue;
-			}
-
-			if (hiddenSymbols.includes(variable.name)) {
-				continue;
-			}
-
-			if (isPrivate) {
-				sortText = label.replace(/^$[_-]/, '');
-			}
-
-			const sassdoc = applySassDoc(
-				variable,
-				{ displayOptions: { description: true, deprecated: true, type: true } }
-			);
-			if (sassdoc) {
-				documentation += `\n\n${sassdoc}`;
-			}
-		}
-
-		if (context.namespace) {
-			// Avoid ending up with namespace.prefix-$variable
-			label = `$${prefix}${asDollarlessVariable(variable.name)}`;
-			// The `.` in the namespace gets replaced unless we have a $ charachter after it
-			insertText = context.word.endsWith(".") ? `.${label}` : label;
-			filterText = `${context.namespace !== "*" ? context.namespace : ""}${insertText}`;
-		}
-
-		completions.push({
-			label,
-			filterText,
-			insertText,
-			sortText,
-			commitCharacters: [';', ','],
-			kind: completionKind,
-			detail,
-			tags: Boolean(variable.sassdoc?.deprecated) ? [CompletionItemTag.Deprecated] : [],
-			documentation: {
-				kind: MarkupKind.Markdown,
-				value: documentation,
-			},
-		});
-	}
-
-	return completions;
-}
-
-/**
- * Return Mixin as string.
- */
-function makeMixinDocumentation(symbol: ScssMixin): string {
-	const args = symbol.parameters.map(item => `${item.name}: ${item.value}`).join(', ');
-	return `${symbol.name}(${args})`;
-}
-
-function createMixinCompletionItems(
-	scssDocument: IScssDocument,
-	currentDocument: TextDocument,
-	context: CompletionContext,
-	hiddenSymbols: string[] = [],
-	prefix = ''
-): CompletionItem[] {
-	const completions: CompletionItem[] = [];
-
-	for (let mixin of scssDocument.mixins.values()) {
-		const isPrivate = mixin.name.match(rePrivate);
-		const isFromCurrentDocument = scssDocument.uri === currentDocument.uri;
-		if (isPrivate && !isFromCurrentDocument) {
-			// Don't suggest private mixins from other files
-			continue;
-		}
-
-		if (hiddenSymbols.includes(mixin.name)) {
-			continue;
-		}
-
-		let documentation = makeMixinDocumentation(mixin);
-		const sassdoc = applySassDoc(
-			mixin,
-			{ displayOptions: { content: true, description: true, deprecated: true, output: true } }
-		);
-		if (sassdoc) {
-			documentation += `\n____\n${sassdoc}`;
-		}
-
-		// Client needs the namespace as part of the text that is matched,
-		// and inserted text needs to include the `.` which will otherwise
-		// be replaced.
-		const label = context.namespace ? `${prefix}${mixin.name}` : mixin.name;
-		const filterText = context.namespace
-			? context.namespace !== "*"
-				? `${context.namespace}.${prefix}${mixin.name}`
-				: `${prefix}${mixin.name}`
-			: mixin.name;
-		let insertText = context.namespace && context.namespace !== "*" ? `.${prefix}${mixin.name}` : mixin.name;
-		const sortText = isPrivate ? label.replace(/^$[_-]/, '') : undefined;
-
-		// Use the SnippetString syntax to provide smart completions of parameter names
-		let labelDetails: CompletionItemLabelDetails | undefined = undefined;
-		if (mixin.parameters.length > 0) {
-			const parametersSnippet = mixin.parameters.map((p, index) => "${" + (index + 1) + ":" + asDollarlessVariable(p.name) + "}").join(", ")
-			const parameterSignature = mixin.parameters.map(p => p.name).join(", ");
-			insertText += `(${parametersSnippet})`;
-			labelDetails = {
-				detail: `(${parameterSignature})`,
-			};
-		}
-
-		const detail = `Mixin declared in ${scssDocument.fileName}`;
-
-		completions.push({
-			label,
-			labelDetails,
-			filterText,
-			sortText,
-			kind: CompletionItemKind.Snippet,
-			detail,
-			insertTextFormat: InsertTextFormat.Snippet,
-			insertText,
-			tags: Boolean(mixin.sassdoc?.deprecated) ? [CompletionItemTag.Deprecated] : [],
-			documentation: {
-				kind: MarkupKind.Markdown,
-				value: documentation,
-			}
-		});
-
-		// Not all mixins have @content, but when they do, be smart about adding brackets
-		// and move the cursor to be ready to add said contents.
-		// Include as separate suggestion since content may not always be needed or wanted.
-		if (mixin.sassdoc?.content) {
-			const details = { ...labelDetails };
-			details.detail = details.detail ? details.detail + ' { }' : ' { }';
-			completions.push({
-				label,
-				labelDetails: details,
-				filterText,
-				sortText,
-				kind: CompletionItemKind.Snippet,
-				detail,
-				insertTextFormat: InsertTextFormat.Snippet,
-				insertText: insertText += " {\n\t$0\n}",
-				tags: Boolean(mixin.sassdoc?.deprecated) ? [CompletionItemTag.Deprecated] : [],
-				documentation: {
-					kind: MarkupKind.Markdown,
-					value: documentation,
-				}
-			});
-		}
-	}
-
-	return completions;
-}
-
-function createFunctionCompletionItems(
-	scssDocument: IScssDocument,
-	currentDocument: TextDocument,
-	context: CompletionContext,
-	hiddenSymbols: string[] = [],
-	prefix = ''
-): CompletionItem[] {
-	const completions: CompletionItem[] = [];
-
-	for (let func of scssDocument.functions.values()) {
-		const isPrivate = func.name.match(rePrivate);
-		const isFromCurrentDocument = scssDocument.uri === currentDocument.uri;
-		if (isPrivate && !isFromCurrentDocument) {
-			// Don't suggest private functions from other files
-			continue;
-		}
-
-		if (hiddenSymbols.includes(func.name)) {
-			continue;
-		}
-
-		// Client needs the namespace as part of the text that is matched,
-		// and inserted text needs to include the `.` which will otherwise
-		// be replaced.
-		const label = context.namespace ? `${prefix}${func.name}` : func.name;
-		const filterText = context.namespace
-			? `${context.namespace !== "*"
-				? context.namespace
-				: ""}.${prefix}${func.name}`
-			: func.name;
-		let insertText = context.namespace
-			? context.namespace !== "*"
-				? `.${prefix}${func.name}`
-				: `${prefix}${func.name}`
-			: func.name;
-		const sortText = isPrivate ? label.replace(/^$[_-]/, '') : undefined;
-
-		// Use the SnippetString syntax to provide smart completions of parameter names
-		let labelDetails: CompletionItemLabelDetails | undefined = undefined;
-		if (func.parameters.length > 0) {
-			const parametersSnippet = func.parameters.map((p, index) => "${" + (index + 1) + ":" + asDollarlessVariable(p.name) + "}").join(", ")
-			const functionSignature = func.parameters.map(p => p.name).join(", ");
-			insertText += `(${parametersSnippet})`;
-			labelDetails = {
-				detail: `(${functionSignature})`,
-			};
-		}
-
-
-		let documentation = makeMixinDocumentation(func);
-		const sassdoc = applySassDoc(
-			func,
-			{ displayOptions: { description: true, deprecated: true, return: true } }
-		);
-		if (sassdoc) {
-			documentation += `\n____\n${sassdoc}`;
-		}
-
-		const detail = `Function declared in ${scssDocument.fileName}`;
-
-		completions.push({
-			label,
-			labelDetails,
-			filterText,
-			sortText,
-			kind: CompletionItemKind.Function,
-			detail,
-			insertTextFormat: InsertTextFormat.Snippet,
-			insertText,
-			tags: Boolean(func.sassdoc?.deprecated) ? [CompletionItemTag.Deprecated] : [],
-			documentation: {
-				kind: MarkupKind.Markdown,
-				value: documentation,
-			}
-		});
-	};
-
-	return completions;
 }

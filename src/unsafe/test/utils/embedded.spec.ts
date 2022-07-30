@@ -3,29 +3,34 @@
 import assert from 'assert';
 
 import {
-	isVueOrSvelteFile,
+	isFileWhereScssCanBeEmbedded,
 	getSCSSRegions,
 	getSCSSContent,
 	getSCSSRegionsDocument
-} from '../../utils/vue-svelte';
+} from '../../utils/embedded';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { Position } from 'vscode-languageserver';
 
 describe('Utils/VueSvelte', () => {
-	it('isVueOrSvelteFile', () => {
-		assert.strictEqual(isVueOrSvelteFile('sdasdsa/AppButton.vue'), true);
-		assert.strictEqual(isVueOrSvelteFile('sdasdsa/AppButton.scss.vue'), true);
-		assert.strictEqual(isVueOrSvelteFile('sdasdsa/AppButton.vue.ts'), false);
-		assert.strictEqual(isVueOrSvelteFile('sdasdsa/sdadsf.ts'), false);
-		assert.strictEqual(isVueOrSvelteFile('sda.vue/AppButton.scss'), false);
-		assert.strictEqual(isVueOrSvelteFile('sdasdsa/AppButton.vue.scss'), false);
+	it('isFileWhereScssCanBeEmbedded', () => {
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sdasdsa/AppButton.vue'), true);
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sdasdsa/AppButton.scss.vue'), true);
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sdasdsa/AppButton.vue.ts'), false);
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sdasdsa/sdadsf.ts'), false);
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sda.vue/AppButton.scss'), false);
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sdasdsa/AppButton.vue.scss'), false);
 
-		assert.strictEqual(isVueOrSvelteFile('sdasdsa/AppButton.svelte'), true);
-		assert.strictEqual(isVueOrSvelteFile('sdasdsa/AppButton.scss.svelte'), true);
-		assert.strictEqual(isVueOrSvelteFile('sdasdsa/AppButton.svelte.ts'), false);
-		assert.strictEqual(isVueOrSvelteFile('sdasdsa/sdadsf.ts'), false);
-		assert.strictEqual(isVueOrSvelteFile('sda.vue/AppButton.scss'), false);
-		assert.strictEqual(isVueOrSvelteFile('sdasdsa/AppButton.svelte.scss'), false);
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sdasdsa/AppButton.svelte'), true);
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sdasdsa/AppButton.scss.svelte'), true);
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sdasdsa/AppButton.svelte.ts'), false);
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sda.svelte/AppButton.scss'), false);
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sdasdsa/AppButton.svelte.scss'), false);
+
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sdasdsa/AppButton.astro'), true);
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sdasdsa/AppButton.scss.astro'), true);
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sdasdsa/AppButton.astro.ts'), false);
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sda.astro/AppButton.scss'), false);
+		assert.strictEqual(isFileWhereScssCanBeEmbedded('sdasdsa/AppButton.astro.scss'), false);
 	});
 
 	it('getSCSSRegions', () => {
@@ -43,10 +48,10 @@ describe('Utils/VueSvelte', () => {
 
 		assert.deepStrictEqual(getSCSSRegions(
 			`<template><p>style lang=\'scss\'</p></template><script></script></script><style lang=\'scss\'>a { color: white; }</style><style lang=\'scss\' module>a { color: white; }</style>\n`)
-		, [[90, 109], [143, 162]]);
+			, [[90, 109], [143, 162]]);
 		assert.deepStrictEqual(getSCSSRegions(
 			`<template><p>style lang=\'scss\'</p></template><script></script></script><style lang=\'scss\'>a { color: white; }</style><style lang=\'scss\' module>a { color: white; }</style>\n\n<style lang=\'scss\' module="a">a { color: white; }</style>`)
-		, [[90, 109], [143, 162], [202, 221]]);
+			, [[90, 109], [143, 162], [202, 221]]);
 
 		assert.deepStrictEqual(getSCSSRegions('<style lang="sass"></style>'), []);
 		assert.deepStrictEqual(getSCSSRegions('<style lang="stylus"></style>'), []);

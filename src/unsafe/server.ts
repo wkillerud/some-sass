@@ -24,7 +24,7 @@ import { doSignatureHelp } from './providers/signatureHelp';
 import { goDefinition } from './providers/goDefinition';
 import { searchWorkspaceSymbol } from './providers/workspaceSymbol';
 import { findFiles } from './utils/fs';
-import { getSCSSRegionsDocument } from './utils/vue-svelte';
+import { getSCSSRegionsDocument } from './utils/embedded';
 import { provideReferences } from './providers/references';
 
 interface InitializationOption {
@@ -63,7 +63,7 @@ connection.onInitialize(
 		storageService = new StorageService();
 		scannerService = new ScannerService(storageService, settings);
 
-		const files = await findFiles('**/*.scss', {
+		const files = await findFiles('**/*.{scss,svelte,astro,vue}', {
 			cwd: workspaceRoot.fsPath,
 			deep: settings.scannerDepth,
 			ignore: settings.scannerExclude

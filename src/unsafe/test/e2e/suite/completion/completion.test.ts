@@ -1,5 +1,5 @@
 import { sassDocAnnotations } from '../../../../sassdocAnnotations';
-import { getDocUri, showFile, position } from '../util';
+import { getDocUri, showFile, position, sleepCI } from '../util';
 import { testCompletion } from './helper';
 
 
@@ -7,19 +7,25 @@ describe('SCSS Completion Test', () => {
 	const docUri = getDocUri('completion/main.scss');
 	const vueDocUri = getDocUri('completion/AppButton.vue');
 	const svelteDocUri = getDocUri('completion/AppButton.svelte');
+	const astroDocUri = getDocUri('completion/AppButton.astro');
 
 	before(async () => {
 		await showFile(docUri);
 		await showFile(vueDocUri);
 		await showFile(svelteDocUri);
+		await showFile(astroDocUri);
+		await sleepCI();
 	});
 
 	it('Offers completions from tilde imports', async () => {
-		const expectedCompletions = [{ label: '$tilde', detail: 'Variable declared in bar.scss' }];
-
+		let expectedCompletions = [{ label: '$tilde', detail: 'Variable declared in bar.scss', insertText: '"$tilde"' }];
 		await testCompletion(docUri, position(11, 11), expectedCompletions);
+
+		// For Vue, Svelte and Astro, the existing $ is not replaced by VS Code, so omit it from insertText
+		expectedCompletions = [{ label: '$tilde', detail: 'Variable declared in bar.scss', insertText: '"tilde"' }];
 		await testCompletion(vueDocUri, position(22, 11), expectedCompletions);
 		await testCompletion(svelteDocUri, position(14, 11), expectedCompletions);
+		await testCompletion(astroDocUri, position(17, 11), expectedCompletions);
 	});
 
 	it('Offers completions from partial file', async () => {
@@ -28,26 +34,43 @@ describe('SCSS Completion Test', () => {
 		await testCompletion(docUri, position(17, 11), expectedCompletions);
 		await testCompletion(vueDocUri, position(28, 11), expectedCompletions);
 		await testCompletion(svelteDocUri, position(20, 11), expectedCompletions);
+		await testCompletion(astroDocUri, position(23, 11), expectedCompletions);
 	});
 
 	it('Offers namespaces completions including prefixes', async () => {
 		let expectedCompletions = [
-			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss' },
-			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss' }
+			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss', insertText: '".$var-var-variable"', filterText: '"ns.$var-var-variable"' },
+			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":".fun-fun-function()"}' }
 		];
 
 		await testCompletion(docUri, position(23, 13), expectedCompletions);
+
+		// For Vue, Svelte and Astro, the existing . from the namespace is not replaced by VS Code, so omit them from insertText.
+		// However, we still need them both in the filter text.
+		expectedCompletions = [
+			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss', insertText: '"$var-var-variable"', filterText: '"ns.$var-var-variable"' },
+			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":"fun-fun-function()"}' }
+		]
+
 		await testCompletion(vueDocUri, position(34, 13), expectedCompletions);
 		await testCompletion(svelteDocUri, position(26, 13), expectedCompletions);
+		await testCompletion(astroDocUri, position(29, 13), expectedCompletions);
 
 
 		expectedCompletions = [
-			{ label: 'mix-mix-mixin', detail: 'Mixin declared in _mixins.scss' },
+			{ label: 'mix-mix-mixin', detail: 'Mixin declared in _mixins.scss', insertText: '{"_tabstop":1,"value":".mix-mix-mixin"}' },
 		];
 
 		await testCompletion(docUri, position(24, 15), expectedCompletions);
+
+		// Same as for functions with regards to the . from the namespace.
+		expectedCompletions = [
+			{ label: 'mix-mix-mixin', detail: 'Mixin declared in _mixins.scss', insertText: '{"_tabstop":1,"value":"mix-mix-mixin"}' },
+		];
+
 		await testCompletion(vueDocUri, position(35, 15), expectedCompletions);
 		await testCompletion(svelteDocUri, position(27, 15), expectedCompletions);
+		await testCompletion(astroDocUri, position(30, 15), expectedCompletions);
 	});
 
 	// We can't test this until somesass.suggestOnlyFromUse: true becomes the default setting
@@ -57,25 +80,54 @@ describe('SCSS Completion Test', () => {
 		await testCompletion(docUri, position(23, 13), expectedCompletions, { expectNoMatch: true });
 		await testCompletion(vueDocUri, position(34, 13), expectedCompletions, { expectNoMatch: true });
 		await testCompletion(svelteDocUri, position(26, 13), expectedCompletions, { expectNoMatch: true });
+		await testCompletion(astroDocUri, position(29, 13), expectedCompletions, { expectNoMatch: true });
 
 		expectedCompletions = ['secret', 'other-secret', 'mix-secret', 'mix-other-secret'];
 
 		await testCompletion(docUri, position(24, 15), expectedCompletions, { expectNoMatch: true });
 		await testCompletion(vueDocUri, position(35, 15), expectedCompletions, { expectNoMatch: true });
 		await testCompletion(svelteDocUri, position(27, 15), expectedCompletions, { expectNoMatch: true });
+		await testCompletion(astroDocUri, position(30, 15), expectedCompletions, { expectNoMatch: true });
 	});
 
 	it('Offers no completions on Vuelike file outside SCSS regions', async () => {
 		await testCompletion(vueDocUri, position(2, 9), []);
 		await testCompletion(vueDocUri, position(6, 8), []);
 		await testCompletion(svelteDocUri, position(1, 16), []);
+		await testCompletion(astroDocUri, position(4, 16), []);
 	});
 
 	it('Offers variable completions on Vuelike file', async () => {
-		const expectedCompletions = ['$color', '$fonts'];
+		// In Vue, Svelte and Astro files:
+		// For variables _without_ a namespace ($color as opposed to namespace.$color),
+		// VS Code does not replace the existing $ when using the completion.
+		// The insertText must be without one to avoid $$color. However, filterText
+		// still need the $ sign for the suggestion to match.
+		const expectedCompletions = [{ label: '$color', insertText: '"color"', filterText: undefined }, { label: '$fonts', insertText: '"fonts"', filterText: undefined }];
 
 		await testCompletion(vueDocUri, position(16, 11), expectedCompletions);
 		await testCompletion(svelteDocUri, position(8, 11), expectedCompletions);
+		await testCompletion(astroDocUri, position(11, 11), expectedCompletions);
+	});
+
+	it('Offers namespace completion inside string interpolation', async () => {
+		let expectedCompletions = [
+			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss', insertText: '".$var-var-variable"', filterText: '"ns.$var-var-variable"' },
+			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":".fun-fun-function()"}' }
+		];
+
+		await testCompletion(docUri, position(25, 40), expectedCompletions);
+
+		// For Vue, Svelte and Astro, the existing . from the namespace is not replaced by VS Code, so omit them from insertText.
+		// However, we still need them both in the filter text.
+		expectedCompletions = [
+			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss', insertText: '"$var-var-variable"', filterText: '"ns.$var-var-variable"' },
+			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":"fun-fun-function()"}' }
+		]
+
+		await testCompletion(vueDocUri, position(36, 40), expectedCompletions);
+		await testCompletion(svelteDocUri, position(28, 40), expectedCompletions);
+		await testCompletion(astroDocUri, position(31, 40), expectedCompletions);
 	});
 });
 

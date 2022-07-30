@@ -18,8 +18,10 @@ export interface ScssVariable extends ScssSymbol {
 	value: string | null;
 }
 
+export type ScssParameter = Omit<ScssVariable, 'position' | 'kind'>;
+
 export interface ScssMixin extends ScssSymbol {
-	parameters: Omit<ScssVariable, 'position' | 'kind'>[];
+	parameters: ScssParameter[];
 }
 
 export interface ScssFunction extends ScssMixin { }

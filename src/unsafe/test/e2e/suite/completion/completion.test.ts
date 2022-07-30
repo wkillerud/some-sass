@@ -40,7 +40,7 @@ describe('SCSS Completion Test', () => {
 	it('Offers namespaces completions including prefixes', async () => {
 		let expectedCompletions = [
 			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss', insertText: '".$var-var-variable"', filterText: '"ns.$var-var-variable"' },
-			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":".fun-fun-function"}' }
+			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":".fun-fun-function()"}' }
 		];
 
 		await testCompletion(docUri, position(23, 13), expectedCompletions);
@@ -49,7 +49,7 @@ describe('SCSS Completion Test', () => {
 		// However, we still need them both in the filter text.
 		expectedCompletions = [
 			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss', insertText: '"$var-var-variable"', filterText: '"ns.$var-var-variable"' },
-			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":"fun-fun-function"}' }
+			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":"fun-fun-function()"}' }
 		]
 
 		await testCompletion(vueDocUri, position(34, 13), expectedCompletions);
@@ -113,7 +113,7 @@ describe('SCSS Completion Test', () => {
 	it('Offers namespace completion inside string interpolation', async () => {
 		let expectedCompletions = [
 			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss', insertText: '".$var-var-variable"', filterText: '"ns.$var-var-variable"' },
-			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":".fun-fun-function"}' }
+			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":".fun-fun-function()"}' }
 		];
 
 		await testCompletion(docUri, position(25, 40), expectedCompletions);
@@ -122,7 +122,7 @@ describe('SCSS Completion Test', () => {
 		// However, we still need them both in the filter text.
 		expectedCompletions = [
 			{ label: '$var-var-variable', detail: 'Variable declared in _variables.scss', insertText: '"$var-var-variable"', filterText: '"ns.$var-var-variable"' },
-			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":"fun-fun-function"}' }
+			{ label: 'fun-fun-function', detail: 'Function declared in _functions.scss', insertText: '{"_tabstop":1,"value":"fun-fun-function()"}' }
 		]
 
 		await testCompletion(vueDocUri, position(36, 40), expectedCompletions);

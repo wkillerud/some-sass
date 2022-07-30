@@ -44,7 +44,12 @@ export async function testCompletion(
 				);
 			}
 		} else {
-			const match = result.items.find(i => i.label === ei.label);
+			const match = result.items.find(i => {
+				if (typeof i.label === 'string') {
+					return i.label === ei.label;
+				}
+				return i.label.label === ei.label;
+			});
 			if (!match) {
 				if (options.expectNoMatch) {
 					assert.ok(`Found no match for ${ei.label}`);
@@ -54,7 +59,12 @@ export async function testCompletion(
 				return;
 			}
 
-			assert.strictEqual(match.label, ei.label);
+			if (typeof match.label === 'string') {
+				assert.strictEqual(match.label, ei.label);
+			} else {
+				assert.strictEqual(match.label.label, ei.label);
+			}
+
 			if (ei.kind) {
 				assert.strictEqual(match.kind, ei.kind);
 			}

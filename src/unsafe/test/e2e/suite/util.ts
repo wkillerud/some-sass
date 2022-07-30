@@ -35,7 +35,7 @@ export async function showFile(docUri: vscode.Uri) {
 }
 
 // Try to work around some instabilities on CI
-export async function sleepCI(ms = 3000): Promise<void> {
+export async function sleepCI(ms = 2000): Promise<void> {
 	if (process.env['CI']) {
 		return await sleep(ms);
 	}

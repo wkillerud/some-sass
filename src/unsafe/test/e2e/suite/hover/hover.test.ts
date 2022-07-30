@@ -1,4 +1,4 @@
-import { getDocUri, showFile, position } from '../util';
+import { getDocUri, showFile, position, sleepWindowsCI } from '../util';
 import { testHover } from './helper';
 
 describe('SCSS Hover Test', () => {
@@ -12,6 +12,7 @@ describe('SCSS Hover Test', () => {
 		await showFile(vueDocUri);
 		await showFile(svelteDocUri);
 		await showFile(astroDocUri);
+		await sleepWindowsCI();
 	});
 
 	it('shows hover for variables', async () => {

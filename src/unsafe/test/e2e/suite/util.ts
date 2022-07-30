@@ -39,5 +39,5 @@ export async function sleepCI(ms = 3000): Promise<void> {
 	if (process.env['CI']) {
 		return await sleep(ms);
 	}
-	return Promise.resolve();
+	return await sleep(0);
 }

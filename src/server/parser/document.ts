@@ -1,7 +1,7 @@
-import fs from "fs";
 import path from "path";
 import type { DocumentContext } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
+import { fileExistsSync } from "../node-fs";
 
 /**
  * Returns the path to the document, relative to the current document.
@@ -52,7 +52,7 @@ function resolvePathToModule(
 		_moduleName,
 		"package.json",
 	);
-	if (fs.existsSync(packPath)) {
+	if (fileExistsSync(packPath)) {
 		return URI.file(packPath).toString();
 	}
 

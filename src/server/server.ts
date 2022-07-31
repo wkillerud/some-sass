@@ -10,12 +10,12 @@ import type {
 } from "vscode-languageserver/node";
 import { URI } from "vscode-uri";
 import { doCompletion } from "./features/completion";
-import { doDiagnostics } from "./features/diagnostics";
-import { goDefinition } from "./features/go-definition";
-import { doHover } from "./features/hover";
+import { doDiagnostics } from "./features/diagnostics/diagnostics";
+import { goDefinition } from "./features/go-definition/go-definition";
+import { doHover } from "./features/hover/hover";
 import { provideReferences } from "./features/references";
-import { doSignatureHelp } from "./features/signature-help";
-import { searchWorkspaceSymbol } from "./features/workspace-symbol";
+import { doSignatureHelp } from "./features/signature-help/signature-help";
+import { searchWorkspaceSymbol } from "./features/workspace-symbols/workspace-symbol";
 import ScannerService from "./scanner";
 import type { ISettings } from "./settings";
 import StorageService from "./storage";

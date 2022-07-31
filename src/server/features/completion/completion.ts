@@ -11,11 +11,11 @@ import type {
 	ScssImport,
 	ScssUse,
 } from "../../parser";
-import { sassBuiltInModules } from "../../sass-built-in-modules";
-import type { SassBuiltInModule } from "../../sass-built-in-modules";
 import type { ISettings } from "../../settings";
 import type StorageService from "../../storage";
 import { asDollarlessVariable } from "../../utils/string";
+import { sassBuiltInModules } from "../sass-built-in-modules";
+import type { SassBuiltInModule } from "../sass-built-in-modules";
 import { createCompletionContext } from "./completion-context";
 import type { CompletionContext } from "./completion-context";
 import { createFunctionCompletionItems } from "./function-completion";

@@ -7,17 +7,17 @@ import type {
 	Diagnostic,
 	VersionedTextDocumentIdentifier,
 } from "vscode-languageserver-types";
-import { EXTENSION_NAME } from "../../shared/constants";
-import { NodeType } from "../parser";
+import { EXTENSION_NAME } from "../../../shared/constants";
+import { NodeType } from "../../parser";
 import type {
 	INode,
 	IScssDocument,
 	ScssForward,
 	ScssImport,
 	ScssSymbol,
-} from "../parser";
-import type StorageService from "../storage";
-import { asDollarlessVariable } from "../utils/string";
+} from "../../parser";
+import type StorageService from "../../storage";
+import { asDollarlessVariable } from "../../utils/string";
 
 export async function doDiagnostics(
 	document: VersionedTextDocumentIdentifier,

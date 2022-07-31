@@ -1,7 +1,7 @@
 import assert from "assert";
 import { SymbolKind } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { goDefinition } from "../../server/features/go-definition";
+import { goDefinition } from "../../server/features/go-definition/go-definition";
 import { ScssDocument } from "../../server/parser";
 import StorageService from "../../server/storage";
 import * as helpers from "../helpers";

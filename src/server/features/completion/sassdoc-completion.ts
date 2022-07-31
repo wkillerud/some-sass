@@ -4,8 +4,8 @@ import {
 	CompletionList,
 	InsertTextFormat,
 } from "vscode-languageserver-types";
-import { sassDocAnnotations } from "../../sassdoc-annotations";
 import { getLinesFromText } from "../../utils/string";
+import { sassDocAnnotations } from "../sassdoc-annotations";
 import type { CompletionContext } from "./completion-context";
 
 export function doSassDocCompletion(

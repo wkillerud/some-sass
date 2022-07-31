@@ -11,13 +11,13 @@ import {
 	ScssFunction,
 	ScssImport,
 	ScssForward,
-} from "../parser";
+} from "../../parser";
+import type StorageService from "../../storage";
+import type { Token } from "../../tokens";
+import { applySassDoc } from "../../utils/sassdoc";
+import { asDollarlessVariable, getLimitedString } from "../../utils/string";
 import { sassBuiltInModules } from "../sass-built-in-modules";
 import { sassDocAnnotations } from "../sassdoc-annotations";
-import type StorageService from "../storage";
-import type { Token } from "../tokens";
-import { applySassDoc } from "../utils/sassdoc";
-import { asDollarlessVariable, getLimitedString } from "../utils/string";
 
 interface Identifier {
 	kind: SymbolKind;

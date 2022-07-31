@@ -2,7 +2,7 @@ import assert from "assert";
 import fs, { Stats } from "fs";
 import { stub, SinonStub } from "sinon";
 import { DiagnosticSeverity, DiagnosticTag } from "vscode-languageserver-types";
-import { doDiagnostics } from "../../server/features/diagnostics";
+import { doDiagnostics } from "../../server/features/diagnostics/diagnostics";
 import StorageService from "../../server/storage";
 import * as fsUtils from "../../server/utils/fs";
 import { EXTENSION_NAME } from "../../shared/constants";

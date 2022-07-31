@@ -1,5 +1,5 @@
 import { CompletionList, MarkupKind } from "vscode-languageserver";
-import { sassBuiltInModules } from "../../sass-built-in-modules";
+import { sassBuiltInModules } from "../sass-built-in-modules";
 import type { CompletionContext } from "./completion-context";
 
 const rePartialUse = /^@use ["']/;

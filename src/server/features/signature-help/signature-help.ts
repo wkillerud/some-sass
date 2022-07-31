@@ -8,12 +8,15 @@ import type {
 	ScssFunction,
 	ScssImport,
 	ScssMixin,
-} from "../parser";
+} from "../../parser";
+import type StorageService from "../../storage";
+import { hasInFacts } from "../../utils/facts";
+import { applySassDoc } from "../../utils/sassdoc";
+import {
+	asDollarlessVariable,
+	getTextBeforePosition,
+} from "../../utils/string";
 import { sassBuiltInModules } from "../sass-built-in-modules";
-import type StorageService from "../storage";
-import { hasInFacts } from "../utils/facts";
-import { applySassDoc } from "../utils/sassdoc";
-import { asDollarlessVariable, getTextBeforePosition } from "../utils/string";
 
 // RegExp's
 const reNestedParenthesis = /\(([\w-]+)\(/;

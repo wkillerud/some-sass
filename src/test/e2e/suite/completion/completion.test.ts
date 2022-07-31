@@ -1,4 +1,4 @@
-import { sassDocAnnotations } from "../../../../server/sassdoc-annotations";
+import { sassDocAnnotations } from "../../../../server/features/sassdoc-annotations";
 import { getDocUri, showFile, position, sleepCI } from "../util";
 import { testCompletion } from "./helper";
 

@@ -1,1 +1,1 @@
-export { doCompletion } from "./completion";
+export * from "./completion";

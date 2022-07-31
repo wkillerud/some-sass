@@ -8,7 +8,7 @@ import {
 } from "vscode-css-languageservice";
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
-import { sassBuiltInModuleNames } from "../sass-built-in-modules";
+import { sassBuiltInModuleNames } from "../features/sass-built-in-modules";
 import { fileExists } from "../utils/fs";
 import { asDollarlessVariable, getLinesFromText } from "../utils/string";
 import { getNodeAtOffset, getParentNodeByType } from "./ast";

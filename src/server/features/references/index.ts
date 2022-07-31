@@ -1,1 +1,1 @@
-export { provideReferences } from "./references";
+export * from "./references";

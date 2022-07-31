@@ -4,7 +4,6 @@ import type { Position, ReferenceContext } from "vscode-languageserver-types";
 import { Location, Range, SymbolKind } from "vscode-languageserver-types";
 import type { INode, IScssDocument, ScssSymbol } from "../../parser";
 import { NodeType } from "../../parser";
-import { sassBuiltInModules } from "../../sass-built-in-modules";
 import type StorageService from "../../storage";
 import type { Token } from "../../tokens";
 import {
@@ -12,7 +11,8 @@ import {
 	stripTrailingComma,
 	stripParentheses,
 } from "../../utils/string";
-import { getDefinitionSymbol } from "../go-definition";
+import { getDefinitionSymbol } from "../go-definition/go-definition";
+import { sassBuiltInModules } from "../sass-built-in-modules";
 
 export async function provideReferences(
 	document: TextDocument,

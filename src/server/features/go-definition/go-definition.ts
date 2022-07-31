@@ -3,16 +3,16 @@ import type {
 	TextDocument,
 	Position,
 } from "vscode-languageserver-textdocument";
-import { NodeType } from "../parser";
+import { NodeType } from "../../parser";
 import type {
 	INode,
 	IScssDocument,
 	ScssForward,
 	ScssImport,
 	ScssSymbol,
-} from "../parser";
-import type StorageService from "../storage";
-import { asDollarlessVariable } from "../utils/string";
+} from "../../parser";
+import type StorageService from "../../storage";
+import { asDollarlessVariable } from "../../utils/string";
 
 interface Identifier {
 	kind: SymbolKind;

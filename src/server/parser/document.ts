@@ -26,12 +26,6 @@ export function getDocumentPath(
 	return docPath.replace(/\\/g, "/");
 }
 
-export const reNewline = /\r\n|\r|\n/;
-
-export function getLinesFromText(text: string): string[] {
-	return text.split(reNewline);
-}
-
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License.

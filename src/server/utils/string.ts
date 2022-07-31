@@ -50,6 +50,12 @@ export function getLimitedString(str: string, ellipsis = true): string {
 	return str.slice(0, 140) + (ellipsis ? "\u2026" : "");
 }
 
+export const reNewline = /\r\n|\r|\n/;
+
+export function getLinesFromText(text: string): string[] {
+	return text.split(reNewline);
+}
+
 /** Strips the dollar prefix off a variable name */
 export function asDollarlessVariable(variable: string): string {
 	return variable.replace(/^\$/, "");

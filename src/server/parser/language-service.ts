@@ -4,7 +4,7 @@ import type {
 	FileSystemProvider,
 } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
-import { statFile } from "./utils/fs";
+import { statFile } from "../utils/fs";
 
 const fileSystemProvider: FileSystemProvider = {
 	async stat(uri: string) {

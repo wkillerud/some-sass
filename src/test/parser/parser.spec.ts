@@ -4,17 +4,14 @@ import { Stats } from "@nodelib/fs.macchiato";
 import { stub, SinonStub } from "sinon";
 import { URI } from "vscode-uri";
 import {
-	getNodeAtOffset,
-	getParentNodeByType,
-	NodeType,
 	parseDocument,
 	reForward,
 	reModuleAtRule,
 	reUse,
-} from "../server/parser";
-import StorageService from "../server/storage";
-import * as fsUtils from "../server/utils/fs";
-import * as helpers from "./helpers";
+} from "../../server/parser";
+import StorageService from "../../server/storage";
+import * as fsUtils from "../../server/utils/fs";
+import * as helpers from "../helpers";
 
 const storage = new StorageService();
 
@@ -343,26 +340,5 @@ describe("Services/Parser", () => {
 				"$varslingsfarger, varslingsfarge",
 			);
 		});
-	});
-});
-
-describe("Utils/Ast", () => {
-	it("getNodeAtOffset", async () => {
-		const ast = await helpers.makeAst(storage, [".a {}"]);
-
-		const node = getNodeAtOffset(ast, 4);
-
-		assert.strictEqual(node?.type, NodeType.Declarations);
-		assert.strictEqual(node?.getText(), "{}");
-	});
-
-	it("getParentNodeByType", async () => {
-		const ast = await helpers.makeAst(storage, [".a {}"]);
-
-		const node = getNodeAtOffset(ast, 4);
-		const parentNode = getParentNodeByType(node, NodeType.Ruleset);
-
-		assert.strictEqual(parentNode?.type, NodeType.Ruleset);
-		assert.strictEqual(parentNode?.getText(), ".a {}");
 	});
 });

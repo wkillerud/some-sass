@@ -1,5 +1,5 @@
 import assert from "assert";
-import { getDocumentPath } from "../../server/utils/document";
+import { getDocumentPath } from "../../server/parser/document";
 
 describe("Utils/Document", () => {
 	it("getDocumentPath", () => {

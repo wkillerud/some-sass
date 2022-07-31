@@ -9,7 +9,7 @@ import {
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
 import { sassBuiltInModuleNames } from "../features/sass-built-in-modules";
-import { fileExists } from "../node-fs";
+import type { FileSystemProvider } from "../file-system";
 import { asDollarlessVariable, getLinesFromText } from "../utils/string";
 import { getNodeAtOffset, getParentNodeByType } from "./ast";
 import { buildDocumentContext } from "./document";
@@ -26,22 +26,23 @@ export const reImport = /@import ["'|](?<url>.+)["'|]/;
 
 const reDynamicPath = /[#*{}]/;
 
-const ls = getLanguageService();
-
 export async function parseDocument(
 	document: TextDocument,
 	workspaceRoot: URI,
+	fs: FileSystemProvider,
 ): Promise<ScssDocument> {
+	const ls = getLanguageService(fs);
 	const ast = ls.parseStylesheet(document) as INode;
-	const symbols = await findDocumentSymbols(document, ast, workspaceRoot);
+	const symbols = await findDocumentSymbols(document, ast, workspaceRoot, fs);
 
-	return new ScssDocument(document, symbols, ast);
+	return new ScssDocument(fs, document, symbols, ast);
 }
 
 async function findDocumentSymbols(
 	document: TextDocument,
 	ast: INode,
 	workspaceRoot: URI,
+	fs: FileSystemProvider,
 ): Promise<IScssSymbols> {
 	const result: IScssSymbols = {
 		functions: new Map(),
@@ -52,6 +53,7 @@ async function findDocumentSymbols(
 		forwards: new Map(),
 	};
 
+	const ls = getLanguageService(fs);
 	const links = await ls.findDocumentLinks2(
 		document,
 		ast,
@@ -73,14 +75,14 @@ async function findDocumentSymbols(
 
 			link.target = ensureScssExtension(link.target);
 
-			const targetFsPath = URI.parse(link.target).fsPath;
-			const targetExists = await fileExists(targetFsPath);
+			const targetUri = URI.parse(link.target);
+			const targetExists = await fs.exists(targetUri);
 			if (!targetExists) {
 				// The target string may be a partial without its _ prefix,
 				// so try looking for it by that name.
 				const partial = ensurePartial(link.target);
-				const partialFsPath = URI.parse(partial).fsPath;
-				const partialExists = await fileExists(partialFsPath);
+				const partialUri = URI.parse(partial);
+				const partialExists = await fs.exists(partialUri);
 				if (!partialExists) {
 					// We tried to resolve the file as a partial, but it doesn't exist.
 					continue;

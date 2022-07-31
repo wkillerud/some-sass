@@ -64,7 +64,6 @@ export interface IScssSymbols {
 export interface IScssDocument extends TextDocument, IScssSymbols {
 	textDocument: TextDocument;
 	ast: INode;
-	filePath: string;
 	/**
 	 * The last part of the URI, including extension.
 	 * For instance, given the URI `file:///home/test.scss`,

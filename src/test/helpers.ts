@@ -10,6 +10,7 @@ import type { INode } from "../server/parser";
 import { parseDocument } from "../server/parser";
 import type { ISettings } from "../server/settings";
 import type StorageService from "../server/storage";
+import type { TestFileSystem } from "./test-file-system";
 
 const ls = getSCSSLanguageService();
 
@@ -26,20 +27,22 @@ export interface MakeDocumentOptions {
 export async function makeDocument(
 	storage: StorageService,
 	lines: string[] | string,
+	fs: TestFileSystem,
 	options: MakeDocumentOptions = {},
 ): Promise<TextDocument> {
+	const text = Array.isArray(lines) ? lines.join("\n") : lines;
 	const workspaceRootPath = path.resolve("");
 	const workspaceRootUri = URI.file(workspaceRootPath);
-	const uri = URI.file(
-		path.join(process.cwd(), options.uri || "index.scss"),
-	).toString();
+	const uri = URI.file(path.join(process.cwd(), options.uri || "index.scss"));
 	const document = TextDocument.create(
-		uri,
+		uri.toString(),
 		options.languageId || "scss",
 		options.version || 1,
-		Array.isArray(lines) ? lines.join("\n") : lines,
+		text,
 	);
-	const scssDocument = await parseDocument(document, workspaceRootUri);
+
+	const scssDocument = await parseDocument(document, workspaceRootUri, fs);
+
 	storage.set(uri, scssDocument);
 	return document;
 }
@@ -47,8 +50,9 @@ export async function makeDocument(
 export async function makeAst(
 	storage: StorageService,
 	lines: string[],
+	fs: TestFileSystem,
 ): Promise<INode> {
-	const document = await makeDocument(storage, lines);
+	const document = await makeDocument(storage, lines, fs);
 	return ls.parseStylesheet(document) as INode;
 }
 

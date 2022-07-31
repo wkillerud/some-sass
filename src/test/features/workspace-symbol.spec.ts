@@ -4,12 +4,14 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 import { searchWorkspaceSymbol } from "../../server/features/workspace-symbols/workspace-symbol";
 import { ScssDocument } from "../../server/parser";
 import StorageService from "../../server/storage";
+import { TestFileSystem } from "../test-file-system";
 
 const storage = new StorageService();
+const fs = new TestFileSystem(storage);
 
 storage.set(
 	"one.scss",
-	new ScssDocument(TextDocument.create("./one.scss", "scss", 1, ""), {
+	new ScssDocument(fs, TextDocument.create("./one.scss", "scss", 1, ""), {
 		variables: new Map([
 			[
 				"$a",

@@ -7,12 +7,14 @@ import { doSignatureHelp } from "../../server/features/signature-help/signature-
 import { ScssDocument } from "../../server/parser";
 import StorageService from "../../server/storage";
 import * as helpers from "../helpers";
+import { TestFileSystem } from "../test-file-system";
 
 const storage = new StorageService();
+const fs = new TestFileSystem(storage);
 
 storage.set(
 	"one.scss",
-	new ScssDocument(TextDocument.create("./one.scss", "scss", 1, ""), {
+	new ScssDocument(fs, TextDocument.create("./one.scss", "scss", 1, ""), {
 		variables: new Map(),
 		mixins: new Map([
 			[
@@ -87,7 +89,7 @@ storage.set(
 async function getSignatureHelp(lines: string[]): Promise<SignatureHelp> {
 	const text = lines.join("\n");
 
-	const document = await helpers.makeDocument(storage, text);
+	const document = await helpers.makeDocument(storage, text, fs);
 	const offset = text.indexOf("|");
 
 	return doSignatureHelp(document, offset, storage);

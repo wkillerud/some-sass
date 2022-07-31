@@ -6,12 +6,14 @@ import { doHover } from "../../server/features/hover/hover";
 import { ScssDocument } from "../../server/parser";
 import StorageService from "../../server/storage";
 import * as helpers from "../helpers";
+import { TestFileSystem } from "../test-file-system";
 
 const storage = new StorageService();
+const fs = new TestFileSystem(storage);
 
 storage.set(
 	"file.scss",
-	new ScssDocument(TextDocument.create("./file.scss", "scss", 1, ""), {
+	new ScssDocument(fs, TextDocument.create("./file.scss", "scss", 1, ""), {
 		variables: new Map([
 			[
 				"$variable",
@@ -59,7 +61,7 @@ async function getHover(lines: string[]): Promise<Hover | null> {
 	const offset = text.indexOf("|");
 	text = text.replace("|", "");
 
-	const document = await helpers.makeDocument(storage, text);
+	const document = await helpers.makeDocument(storage, text, fs);
 
 	return doHover(document, offset, storage);
 }

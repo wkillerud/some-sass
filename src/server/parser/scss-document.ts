@@ -1,7 +1,7 @@
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import { Position, Range } from "vscode-languageserver-types";
 import { URI } from "vscode-uri";
-import { realPath } from "../node-fs";
+import type { FileSystemProvider } from "../file-system";
 import { getLinesFromText } from "../utils/string";
 import { getNodeAtOffset } from "./ast";
 import { getLanguageService } from "./language-service";
@@ -19,12 +19,11 @@ import type {
 	ScssVariable,
 } from "./scss-symbol";
 
-const ls = getLanguageService();
-
 export class ScssDocument implements IScssDocument {
 	public textDocument: TextDocument;
 	public ast: INode;
 	public fileName: string;
+	public uri: string;
 
 	public imports: Map<string, ScssImport> = new Map();
 	public uses: Map<string, ScssUse> = new Map();
@@ -33,11 +32,20 @@ export class ScssDocument implements IScssDocument {
 	public mixins: Map<string, ScssMixin> = new Map();
 	public functions: Map<string, ScssFunction> = new Map();
 
-	private _realPath: string | null = null;
+	private fs: FileSystemProvider;
+	private realPath: string | null = null;
 
-	constructor(document: TextDocument, symbols: IScssSymbols, ast?: INode) {
-		this.textDocument = document;
+	constructor(
+		fs: FileSystemProvider,
+		document: TextDocument,
+		symbols: IScssSymbols,
+		ast?: INode,
+	) {
+		const ls = getLanguageService(fs);
 		this.ast = ast ?? (ls.parseStylesheet(document) as INode);
+		this.fs = fs;
+		this.textDocument = document;
+		this.uri = document.uri;
 		this.imports = symbols.imports;
 		this.uses = symbols.uses;
 		this.forwards = symbols.forwards;
@@ -47,27 +55,19 @@ export class ScssDocument implements IScssDocument {
 		this.fileName = this.getFileName();
 	}
 
-	public get uri(): string {
-		return this.textDocument.uri;
-	}
-
-	public get filePath(): string {
-		return URI.parse(this.textDocument.uri).fsPath;
-	}
-
 	public async getRealPath(): Promise<string | null> {
-		if (this._realPath) {
-			return this._realPath;
+		if (this.realPath) {
+			return this.realPath;
 		}
 
 		try {
-			const path = await realPath(this.filePath);
-			this._realPath = path;
+			const path = await this.fs.realPath(URI.parse(this.uri));
+			this.realPath = path;
 		} catch {
 			// Do nothing
 		}
 
-		return this._realPath;
+		return this.realPath;
 	}
 
 	private getFileName(): string {

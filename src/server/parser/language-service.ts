@@ -1,54 +1,40 @@
 import { FileType, getSCSSLanguageService } from "vscode-css-languageservice";
 import type {
 	LanguageService,
-	FileSystemProvider,
+	FileSystemProvider as CSSFileSystemProvider,
 } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
-import { statFile } from "../node-fs";
+import type { FileSystemProvider } from "../file-system";
 
-const fileSystemProvider: FileSystemProvider = {
-	async stat(uri: string) {
-		const filePath = URI.parse(uri).fsPath;
+let ls: LanguageService | null = null;
 
-		try {
-			const stats = await statFile(filePath);
+export function getLanguageService(fs: FileSystemProvider): LanguageService {
+	if (ls) {
+		return ls;
+	}
 
-			let type = FileType.Unknown;
-			if (stats.isFile()) {
-				type = FileType.File;
-			} else if (stats.isDirectory()) {
-				type = FileType.Directory;
-			} else if (stats.isSymbolicLink()) {
-				type = FileType.SymbolicLink;
+	const fileSystemProvider: CSSFileSystemProvider = {
+		async stat(uri: string) {
+			try {
+				return await fs.stat(URI.parse(uri));
+			} catch (error) {
+				if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+					throw error;
+				}
+				return {
+					type: FileType.Unknown,
+					ctime: -1,
+					mtime: -1,
+					size: -1,
+				};
 			}
+		},
+	};
 
-			return {
-				type,
-				ctime: stats.ctime.getTime(),
-				mtime: stats.mtime.getTime(),
-				size: stats.size,
-			};
-		} catch (error) {
-			if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-				throw error;
-			}
+	ls = getSCSSLanguageService({ fileSystemProvider });
 
-			return {
-				type: FileType.Unknown,
-				ctime: -1,
-				mtime: -1,
-				size: -1,
-			};
-		}
-	},
-};
-
-const ls = getSCSSLanguageService({ fileSystemProvider });
-
-ls.configure({
-	validate: false,
-});
-
-export function getLanguageService(): LanguageService {
+	ls.configure({
+		validate: false,
+	});
 	return ls;
 }

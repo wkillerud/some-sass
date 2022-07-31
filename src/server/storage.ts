@@ -1,40 +1,44 @@
+import type { URI } from "vscode-uri";
 import type { IScssDocument } from "./parser";
 
 export type Storage = Map<StorageItemKey, StorageItemValue>;
 export type StorageItemEntry = [StorageItemKey, StorageItemValue];
 
-type SCSSDocumentUrl = string;
-export type StorageItemKey = SCSSDocumentUrl;
+export type StorageItemKey = string;
 export type StorageItemValue = IScssDocument;
 
 export default class StorageService {
-	private readonly _storage: Storage = new Map();
+	private readonly storage: Storage = new Map();
 
-	public get(key: StorageItemKey): StorageItemValue | undefined {
-		return this._storage.get(key);
+	public get(key: StorageItemKey | URI): StorageItemValue | undefined {
+		return this.storage.get(this.toKey(key));
 	}
 
-	public set(key: StorageItemKey, value: StorageItemValue): void {
-		this._storage.set(key, value);
+	public set(key: StorageItemKey | URI, value: StorageItemValue): void {
+		this.storage.set(this.toKey(key), value);
 	}
 
-	public delete(key: SCSSDocumentUrl): void {
-		this._storage.delete(key);
+	public delete(key: StorageItemKey | URI): void {
+		this.storage.delete(this.toKey(key));
 	}
 
 	public clear(): void {
-		this._storage.clear();
+		this.storage.clear();
 	}
 
 	public keys(): IterableIterator<StorageItemKey> {
-		return this._storage.keys();
+		return this.storage.keys();
 	}
 
 	public values(): IterableIterator<StorageItemValue> {
-		return this._storage.values();
+		return this.storage.values();
 	}
 
 	public entries(): IterableIterator<StorageItemEntry> {
-		return this._storage.entries();
+		return this.storage.entries();
+	}
+
+	private toKey(key: StorageItemKey | URI): StorageItemKey {
+		return key.toString();
 	}
 }

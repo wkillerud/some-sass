@@ -1,14 +1,15 @@
 import assert from "assert";
-import fs from "fs";
 import path from "path";
-import { Stats } from "@nodelib/fs.macchiato";
 import { isMatch } from "micromatch";
 import { stub, SinonStub } from "sinon";
+import { FileType } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
-import * as fsUtils from "../server/node-fs";
+import { NodeFileSystem } from "../server/node-file-system";
 import ScannerService from "../server/scanner";
 import StorageService from "../server/storage";
 import * as helpers from "./helpers";
+
+const fs = new NodeFileSystem();
 
 describe("Services/Scanner", () => {
 	describe(".scan", () => {
@@ -17,9 +18,14 @@ describe("Services/Scanner", () => {
 		let readFileStub: SinonStub;
 
 		beforeEach(() => {
-			statStub = stub(fs, "stat").yields(null, new Stats());
-			fileExistsStub = stub(fsUtils, "fileExists");
-			readFileStub = stub(fsUtils, "readFile");
+			statStub = stub(fs, "stat").yields(null, {
+				type: FileType.Unknown,
+				ctime: -1,
+				mtime: -1,
+				size: -1,
+			});
+			fileExistsStub = stub(fs, "exists");
+			readFileStub = stub(fs, "readFile");
 		});
 
 		afterEach(() => {
@@ -32,28 +38,28 @@ describe("Services/Scanner", () => {
 			const workspaceRootPath = path.resolve("");
 			const workspaceRootUri = URI.file(workspaceRootPath);
 			const indexDocumentPath = path.resolve("index.scss").toLowerCase();
-			const indexDocumentUri = URI.file(indexDocumentPath).toString();
+			const indexDocumentUri = URI.file(indexDocumentPath);
 			const variablesDocumentPath = path
 				.resolve("variables.scss")
 				.toLowerCase();
-			const variablesDocumentUri = URI.file(variablesDocumentPath).toString();
+			const variablesDocumentUri = URI.file(variablesDocumentPath);
 
 			const storage = new StorageService();
 			const settings = helpers.makeSettings();
-			const scanner = new ScannerService(storage, settings);
+			const scanner = new ScannerService(storage, fs, settings);
 
 			fileExistsStub.resolves(true);
 			readFileStub.onFirstCall().resolves("$name: value;");
 			readFileStub.onSecondCall().resolves("");
 
 			await scanner.scan(
-				[indexDocumentPath, variablesDocumentPath],
+				[indexDocumentUri, variablesDocumentUri],
 				workspaceRootUri,
 			);
 
 			const expected = new Map([
-				[indexDocumentUri, indexDocumentUri],
-				[variablesDocumentUri, variablesDocumentUri],
+				[indexDocumentUri.toString(), indexDocumentUri],
+				[variablesDocumentUri.toString(), variablesDocumentUri],
 			]);
 			assert.deepStrictEqual(storage.keys(), expected.keys());
 			assert.strictEqual(storage.get(indexDocumentUri)?.variables.size, 1);
@@ -74,25 +80,25 @@ describe("Services/Scanner", () => {
 			const workspaceRootPath = path.resolve("");
 			const workspaceRootUri = URI.file(workspaceRootPath);
 			const indexDocumentPath = path.resolve("index.scss").toLowerCase();
-			const indexDocumentUri = URI.file(indexDocumentPath).toString();
+			const indexDocumentUri = URI.file(indexDocumentPath);
 			const variablesDocumentPath = path
 				.resolve("variables.scss")
 				.toLowerCase();
-			const variablesDocumentUri = URI.file(variablesDocumentPath).toString();
+			const variablesDocumentUri = URI.file(variablesDocumentPath);
 
 			const storage = new StorageService();
 			const settings = helpers.makeSettings();
-			const scanner = new ScannerService(storage, settings);
+			const scanner = new ScannerService(storage, fs, settings);
 
 			fileExistsStub.resolves(true);
 			readFileStub.onFirstCall().resolves('@import "variables.scss";');
 			readFileStub.onSecondCall().resolves("");
 
-			await scanner.scan([indexDocumentPath], workspaceRootUri);
+			await scanner.scan([indexDocumentUri], workspaceRootUri);
 
 			const expected = new Map([
-				[indexDocumentUri, indexDocumentUri],
-				[variablesDocumentUri, variablesDocumentUri],
+				[indexDocumentUri.toString(), indexDocumentUri],
+				[variablesDocumentUri.toString(), variablesDocumentUri],
 			]);
 			assert.deepStrictEqual(storage.keys(), expected.keys());
 
@@ -114,16 +120,18 @@ describe("Services/Scanner", () => {
 
 			const storage = new StorageService();
 			const settings = helpers.makeSettings({ scanImportedFiles: false });
-			const scanner = new ScannerService(storage, settings);
+			const scanner = new ScannerService(storage, fs, settings);
 
 			fileExistsStub.resolves(true);
 			readFileStub.onFirstCall().resolves('@import "variables.scss";');
 			readFileStub.onSecondCall().resolves("");
 
-			await scanner.scan(["index.scss"], workspaceRootUri);
+			const indexDocumentUri = URI.file("index.scss");
+			await scanner.scan([indexDocumentUri], workspaceRootUri);
 
-			const indexDocumentUri = URI.file("index.scss").toString();
-			const expected = new Map([[indexDocumentUri, indexDocumentUri]]);
+			const expected = new Map([
+				[indexDocumentUri.toString(), indexDocumentUri],
+			]);
 			assert.deepStrictEqual(storage.keys(), expected.keys());
 
 			assert.strictEqual(

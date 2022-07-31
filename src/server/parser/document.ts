@@ -1,30 +1,6 @@
 import path from "path";
 import type { DocumentContext } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
-import { fileExistsSync } from "../node-fs";
-
-/**
- * Returns the path to the document, relative to the current document.
- */
-export function getDocumentPath(
-	currentPath: string,
-	symbolsPath: string | undefined,
-): string {
-	if (symbolsPath === undefined) {
-		throw new Error(
-			"Unexpected behaviour. The 'symbolsPath' argument is undefined.",
-		);
-	}
-
-	const rootUri = path.dirname(currentPath);
-	const docPath = path.relative(rootUri, symbolsPath);
-
-	if (docPath === path.basename(currentPath)) {
-		return "current";
-	}
-
-	return docPath.replace(/\\/g, "/");
-}
 
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
@@ -40,23 +16,20 @@ function getModuleNameFromPath(path: string) {
 	return path.slice(0, Math.max(0, path.indexOf("/")));
 }
 
-function resolvePathToModule(
-	_moduleName: string,
-	_relativeTo: string,
-): string | undefined {
+function resolvePathToModule(moduleName: string, relativeTo: string): string {
 	// Resolve the module relative to the document. We can't use `require` here as the code is webpacked.
-	const documentFolder = path.dirname(URI.parse(_relativeTo).fsPath);
+	// fsPath use is OK here since we never reach this function unless the URI is a file://.
+	const documentFolder = path.dirname(URI.parse(relativeTo).fsPath);
+
+	// Assume this path exists. If not, let VS Code deal with the "404" and have the user fix a typo or install node_modules.
 	const packPath = path.join(
 		documentFolder,
 		"node_modules",
-		_moduleName,
+		moduleName,
 		"package.json",
 	);
-	if (fileExistsSync(packPath)) {
-		return URI.file(packPath).toString();
-	}
 
-	return undefined;
+	return URI.file(packPath).toString();
 }
 
 function resolve(from: string, to: string): string {
@@ -66,7 +39,6 @@ function resolve(from: string, to: string): string {
 		const { pathname, search, hash } = resolvedUrl;
 		return pathname + search + hash;
 	}
-
 	return resolvedUrl.toString();
 }
 
@@ -91,7 +63,7 @@ export function buildDocumentContext(
 		resolveReference: (ref, base = documentUri) => {
 			if (
 				ref.startsWith("/") && // Resolve absolute path against the current workspace folder
-				base.startsWith("file://")
+				base.startsWith("file://") // Only support this extra custom resolving in a Node environment
 			) {
 				const folderUri = getRootFolder();
 				if (folderUri) {

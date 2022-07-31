@@ -9,12 +9,14 @@ import { ScssDocument } from "../../server/parser";
 import type { ISettings } from "../../server/settings";
 import StorageService from "../../server/storage";
 import * as helpers from "../helpers";
+import { TestFileSystem } from "../test-file-system";
 
 const storage = new StorageService();
+const fs = new TestFileSystem(storage);
 
 storage.set(
 	"one.scss",
-	new ScssDocument(TextDocument.create("./one.scss", "scss", 1, ""), {
+	new ScssDocument(fs, TextDocument.create("./one.scss", "scss", 1, ""), {
 		variables: new Map([
 			[
 				"$one",
@@ -104,7 +106,7 @@ async function getCompletionList(
 	const text = lines.join("\n");
 
 	const settings = helpers.makeSettings(options);
-	const document = await helpers.makeDocument(storage, text);
+	const document = await helpers.makeDocument(storage, text, fs);
 	const offset = text.indexOf("|");
 
 	return doCompletion(document, offset, settings, storage);

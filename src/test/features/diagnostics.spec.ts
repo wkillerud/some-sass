@@ -1,35 +1,21 @@
 import assert from "assert";
-import fs, { Stats } from "fs";
-import { stub, SinonStub } from "sinon";
 import { DiagnosticSeverity, DiagnosticTag } from "vscode-languageserver-types";
 import { doDiagnostics } from "../../server/features/diagnostics/diagnostics";
-import * as fsUtils from "../../server/node-fs";
 import StorageService from "../../server/storage";
 import { EXTENSION_NAME } from "../../shared/constants";
 import * as helpers from "../helpers";
+import { TestFileSystem } from "../test-file-system";
 
 const storage = new StorageService();
+const fs = new TestFileSystem(storage);
 
 describe("Providers/Diagnostics", () => {
-	let statStub: SinonStub;
-	let fileExistsStub: SinonStub;
-
-	beforeEach(() => {
-		fileExistsStub = stub(fsUtils, "fileExists");
-		statStub = stub(fs, "stat").yields(null, new Stats());
-	});
-
-	afterEach(() => {
-		fileExistsStub.restore();
-		statStub.restore();
-	});
-
 	it("doDiagnostics - Variables", async () => {
-		const document = await helpers.makeDocument(storage, [
-			"/// @deprecated Use something else",
-			"$a: 1;",
-			".a { content: $a; }",
-		]);
+		const document = await helpers.makeDocument(
+			storage,
+			["/// @deprecated Use something else", "$a: 1;", ".a { content: $a; }"],
+			fs,
+		);
 
 		const actual = await doDiagnostics(document, storage);
 
@@ -48,13 +34,17 @@ describe("Providers/Diagnostics", () => {
 	});
 
 	it("doDiagnostics - Functions", async () => {
-		const document = await helpers.makeDocument(storage, [
-			"/// @deprecated Use something else",
-			"@function old-function() {",
-			"  @return 1;",
-			"}",
-			".a { content: old-function(); }",
-		]);
+		const document = await helpers.makeDocument(
+			storage,
+			[
+				"/// @deprecated Use something else",
+				"@function old-function() {",
+				"  @return 1;",
+				"}",
+				".a { content: old-function(); }",
+			],
+			fs,
+		);
 
 		const actual = await doDiagnostics(document, storage);
 
@@ -73,13 +63,17 @@ describe("Providers/Diagnostics", () => {
 	});
 
 	it("doDiagnostics - Mixins", async () => {
-		const document = await helpers.makeDocument(storage, [
-			"/// @deprecated Use something else",
-			"@mixin old-mixin {",
-			"  content: 'mixin';",
-			"}",
-			".a { @include old-mixin(); }",
-		]);
+		const document = await helpers.makeDocument(
+			storage,
+			[
+				"/// @deprecated Use something else",
+				"@mixin old-mixin {",
+				"  content: 'mixin';",
+				"}",
+				".a { @include old-mixin(); }",
+			],
+			fs,
+		);
 
 		const actual = await doDiagnostics(document, storage);
 
@@ -98,23 +92,27 @@ describe("Providers/Diagnostics", () => {
 	});
 
 	it("doDiagnostics - all of the above", async () => {
-		const document = await helpers.makeDocument(storage, [
-			"/// @deprecated Use something else",
-			"$a: 1;",
-			".a { content: $a; }",
-			"",
-			"/// @deprecated Use something else",
-			"@function old-function() {",
-			"  @return 1;",
-			"}",
-			".a { content: old-function(); }",
-			"",
-			"/// @deprecated Use something else",
-			"@mixin old-mixin {",
-			"  content: 'mixin';",
-			"}",
-			".a { @include old-mixin(); }",
-		]);
+		const document = await helpers.makeDocument(
+			storage,
+			[
+				"/// @deprecated Use something else",
+				"$a: 1;",
+				".a { content: $a; }",
+				"",
+				"/// @deprecated Use something else",
+				"@function old-function() {",
+				"  @return 1;",
+				"}",
+				".a { content: old-function(); }",
+				"",
+				"/// @deprecated Use something else",
+				"@mixin old-mixin {",
+				"  content: 'mixin';",
+				"}",
+				".a { @include old-mixin(); }",
+			],
+			fs,
+		);
 
 		const actual = await doDiagnostics(document, storage);
 
@@ -127,23 +125,27 @@ describe("Providers/Diagnostics", () => {
 	});
 
 	it("doDiagnostics - support annotation without description", async () => {
-		const document = await helpers.makeDocument(storage, [
-			"/// @deprecated",
-			"$a: 1;",
-			".a { content: $a; }",
-			"",
-			"/// @deprecated",
-			"@function old-function() {",
-			"  @return 1;",
-			"}",
-			".a { content: old-function(); }",
-			"",
-			"/// @deprecated",
-			"@mixin old-mixin {",
-			"  content: 'mixin';",
-			"}",
-			".a { @include old-mixin(); }",
-		]);
+		const document = await helpers.makeDocument(
+			storage,
+			[
+				"/// @deprecated",
+				"$a: 1;",
+				".a { content: $a; }",
+				"",
+				"/// @deprecated",
+				"@function old-function() {",
+				"  @return 1;",
+				"}",
+				".a { content: old-function(); }",
+				"",
+				"/// @deprecated",
+				"@mixin old-mixin {",
+				"  content: 'mixin';",
+				"}",
+				".a { @include old-mixin(); }",
+			],
+			fs,
+		);
 
 		const actual = await doDiagnostics(document, storage);
 
@@ -157,19 +159,19 @@ describe("Providers/Diagnostics", () => {
 	});
 
 	it("doDiagnostics - support namespaces with prefix", async () => {
-		fileExistsStub.resolves(true);
-
-		await helpers.makeDocument(storage, ["/// @deprecated", "$old-a: 1;"], {
+		await helpers.makeDocument(storage, ["/// @deprecated", "$old-a: 1;"], fs, {
 			uri: "variables.scss",
 		});
 		await helpers.makeDocument(
 			storage,
 			["/// @deprecated", "@function old-function() {", "  @return 1;", "}"],
+			fs,
 			{ uri: "functions.scss" },
 		);
 		await helpers.makeDocument(
 			storage,
 			["/// @deprecated", "@mixin old-mixin {", "  content: 'mixin';", "}"],
+			fs,
 			{ uri: "mixins.scss" },
 		);
 		await helpers.makeDocument(
@@ -179,17 +181,22 @@ describe("Providers/Diagnostics", () => {
 				"@forward './mixins' as mix-* hide secret, other-secret;",
 				"@forward './variables' hide $secret;",
 			],
+			fs,
 			{ uri: "namespace.scss" },
 		);
 
-		const document = await helpers.makeDocument(storage, [
-			"@use 'namespace' as ns;",
-			".foo {",
-			"  color: ns.$old-a;",
-			"  line-height: ns.fun-old-function();",
-			"  @include ns.mix-old-mixin;",
-			"}",
-		]);
+		const document = await helpers.makeDocument(
+			storage,
+			[
+				"@use 'namespace' as ns;",
+				".foo {",
+				"  color: ns.$old-a;",
+				"  line-height: ns.fun-old-function();",
+				"  @include ns.mix-old-mixin;",
+				"}",
+			],
+			fs,
+		);
 
 		const actual = await doDiagnostics(document, storage);
 

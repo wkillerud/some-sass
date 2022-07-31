@@ -5,12 +5,14 @@ import { goDefinition } from "../../server/features/go-definition/go-definition"
 import { ScssDocument } from "../../server/parser";
 import StorageService from "../../server/storage";
 import * as helpers from "../helpers";
+import { TestFileSystem } from "../test-file-system";
 
 const storage = new StorageService();
+const fs = new TestFileSystem(storage);
 
 storage.set(
 	"one.scss",
-	new ScssDocument(TextDocument.create("./one.scss", "scss", 1, ""), {
+	new ScssDocument(fs, TextDocument.create("./one.scss", "scss", 1, ""), {
 		variables: new Map([
 			[
 				"$a",
@@ -55,7 +57,11 @@ storage.set(
 
 describe("Providers/GoDefinition", () => {
 	it("doGoDefinition - Variables", async () => {
-		const document = await helpers.makeDocument(storage, ".a { content: $a; }");
+		const document = await helpers.makeDocument(
+			storage,
+			".a { content: $a; }",
+			fs,
+		);
 
 		const actual = goDefinition(document, 15, storage);
 
@@ -68,7 +74,7 @@ describe("Providers/GoDefinition", () => {
 	});
 
 	it("doGoDefinition - Variable definition", async () => {
-		const document = await helpers.makeDocument(storage, "$a: 1;");
+		const document = await helpers.makeDocument(storage, "$a: 1;", fs);
 
 		const actual = goDefinition(document, 2, storage);
 
@@ -79,6 +85,7 @@ describe("Providers/GoDefinition", () => {
 		const document = await helpers.makeDocument(
 			storage,
 			".a { @include mixin(); }",
+			fs,
 		);
 
 		const actual = goDefinition(document, 16, storage);
@@ -92,7 +99,11 @@ describe("Providers/GoDefinition", () => {
 	});
 
 	it("doGoDefinition - Mixin definition", async () => {
-		const document = await helpers.makeDocument(storage, "@mixin mixin($a) {}");
+		const document = await helpers.makeDocument(
+			storage,
+			"@mixin mixin($a) {}",
+			fs,
+		);
 
 		const actual = goDefinition(document, 8, storage);
 
@@ -100,7 +111,11 @@ describe("Providers/GoDefinition", () => {
 	});
 
 	it("doGoDefinition - Mixin Arguments", async () => {
-		const document = await helpers.makeDocument(storage, "@mixin mixin($a) {}");
+		const document = await helpers.makeDocument(
+			storage,
+			"@mixin mixin($a) {}",
+			fs,
+		);
 
 		const actual = goDefinition(document, 10, storage);
 
@@ -111,6 +126,7 @@ describe("Providers/GoDefinition", () => {
 		const document = await helpers.makeDocument(
 			storage,
 			".a { content: make(1); }",
+			fs,
 		);
 
 		const actual = goDefinition(document, 16, storage);
@@ -127,6 +143,7 @@ describe("Providers/GoDefinition", () => {
 		const document = await helpers.makeDocument(
 			storage,
 			"@function make($a) {}",
+			fs,
 		);
 
 		const actual = goDefinition(document, 8, storage);
@@ -138,6 +155,7 @@ describe("Providers/GoDefinition", () => {
 		const document = await helpers.makeDocument(
 			storage,
 			"@function make($a) {}",
+			fs,
 		);
 
 		const actual = goDefinition(document, 13, storage);

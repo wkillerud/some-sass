@@ -1,35 +1,27 @@
 import assert from "assert";
-import fs, { Stats } from "fs";
-import { stub, SinonStub } from "sinon";
 import { provideReferences } from "../../server/features/references";
-import * as fsUtils from "../../server/node-fs";
 import StorageService from "../../server/storage";
 import * as helpers from "../helpers";
+import { TestFileSystem } from "../test-file-system";
 
 describe("Providers/References", () => {
-	let statStub: SinonStub;
-	let fileExistsStub: SinonStub;
 	let storage: StorageService;
+	let fs: TestFileSystem;
 
 	beforeEach(() => {
 		storage = new StorageService();
-		fileExistsStub = stub(fsUtils, "fileExists").resolves(true);
-		statStub = stub(fs, "stat").yields(null, new Stats());
-	});
-
-	afterEach(() => {
-		fileExistsStub.restore();
-		statStub.restore();
+		fs = new TestFileSystem(storage);
 	});
 
 	it("provideReferences - Variables", async () => {
-		await helpers.makeDocument(storage, '$day: "monday";', {
+		await helpers.makeDocument(storage, '$day: "monday";', fs, {
 			uri: "ki.scss",
 		});
 
 		const firstUsage = await helpers.makeDocument(
 			storage,
 			['@use "ki";', "", ".a::after {", " content: ki.$day;", "}"],
+			fs,
 			{
 				uri: "helen.scss",
 			},
@@ -45,6 +37,7 @@ describe("Providers/References", () => {
 				" content: ki.$day;",
 				"}",
 			],
+			fs,
 			{
 				uri: "gato.scss",
 			},
@@ -101,17 +94,18 @@ describe("Providers/References", () => {
 	});
 
 	it("provideReferences - @forward variable with prefix", async () => {
-		await helpers.makeDocument(storage, '$day: "monday";', {
+		await helpers.makeDocument(storage, '$day: "monday";', fs, {
 			uri: "ki.scss",
 		});
 
-		await helpers.makeDocument(storage, '@forward "ki" as ki-*;', {
+		await helpers.makeDocument(storage, '@forward "ki" as ki-*;', fs, {
 			uri: "dev.scss",
 		});
 
 		const firstUsage = await helpers.makeDocument(
 			storage,
 			['@use "dev";', "", ".a::after {", " content: dev.$ki-day;", "}"],
+			fs,
 			{
 				uri: "coast.scss",
 			},
@@ -127,6 +121,7 @@ describe("Providers/References", () => {
 				" content: ki.$day;",
 				"}",
 			],
+			fs,
 			{
 				uri: "winter.scss",
 			},
@@ -186,13 +181,19 @@ describe("Providers/References", () => {
 	});
 
 	it("provideReferences - Functions", async () => {
-		await helpers.makeDocument(storage, "@function hello() { @return 1; }", {
-			uri: "func.scss",
-		});
+		await helpers.makeDocument(
+			storage,
+			"@function hello() { @return 1; }",
+			fs,
+			{
+				uri: "func.scss",
+			},
+		);
 
 		const firstUsage = await helpers.makeDocument(
 			storage,
 			['@use "func";', "", ".a {", " line-height: func.hello();", "}"],
+			fs,
 			{
 				uri: "one.scss",
 			},
@@ -208,6 +209,7 @@ describe("Providers/References", () => {
 				" line-height: func.hello();",
 				"}",
 			],
+			fs,
 			{
 				uri: "two.scss",
 			},
@@ -264,17 +266,23 @@ describe("Providers/References", () => {
 	});
 
 	it("provideReferences - @forward function with prefix", async () => {
-		await helpers.makeDocument(storage, "@function hello() { @return 1; }", {
-			uri: "func.scss",
-		});
+		await helpers.makeDocument(
+			storage,
+			"@function hello() { @return 1; }",
+			fs,
+			{
+				uri: "func.scss",
+			},
+		);
 
-		await helpers.makeDocument(storage, '@forward "func" as fun-*;', {
+		await helpers.makeDocument(storage, '@forward "func" as fun-*;', fs, {
 			uri: "dev.scss",
 		});
 
 		const firstUsage = await helpers.makeDocument(
 			storage,
 			['@use "dev";', "", ".a {", " line-height: dev.fun-hello();", "}"],
+			fs,
 			{
 				uri: "one.scss",
 			},
@@ -290,6 +298,7 @@ describe("Providers/References", () => {
 				" line-height: func.hello();",
 				"}",
 			],
+			fs,
 			{
 				uri: "two.scss",
 			},
@@ -352,6 +361,7 @@ describe("Providers/References", () => {
 		await helpers.makeDocument(
 			storage,
 			["@mixin hello() {", "	line-height: 1;", "}"],
+			fs,
 			{
 				uri: "mix.scss",
 			},
@@ -360,6 +370,7 @@ describe("Providers/References", () => {
 		const firstUsage = await helpers.makeDocument(
 			storage,
 			['@use "mix";', "", ".a {", " @include mix.hello();", "}"],
+			fs,
 			{
 				uri: "one.scss",
 			},
@@ -375,6 +386,7 @@ describe("Providers/References", () => {
 				" @include mix.hello;",
 				"}",
 			],
+			fs,
 			{
 				uri: "two.scss",
 			},
@@ -434,18 +446,20 @@ describe("Providers/References", () => {
 		await helpers.makeDocument(
 			storage,
 			["@mixin hello() {", "	line-height: 1;", "}"],
+			fs,
 			{
 				uri: "mix.scss",
 			},
 		);
 
-		await helpers.makeDocument(storage, '@forward "mix" as mix-*;', {
+		await helpers.makeDocument(storage, '@forward "mix" as mix-*;', fs, {
 			uri: "dev.scss",
 		});
 
 		const firstUsage = await helpers.makeDocument(
 			storage,
 			['@use "dev";', "", ".a {", " @include dev.mix-hello();", "}"],
+			fs,
 			{
 				uri: "one.scss",
 			},
@@ -461,6 +475,7 @@ describe("Providers/References", () => {
 				" @include mix.hello();",
 				"}",
 			],
+			fs,
 			{
 				uri: "two.scss",
 			},
@@ -524,12 +539,13 @@ describe("Providers/References", () => {
 				'$name: "there";',
 				'$reply: "general";',
 			],
+			fs,
 			{
 				uri: "fun.scss",
 			},
 		);
 
-		await helpers.makeDocument(storage, '@forward "fun" as fun-*;', {
+		await helpers.makeDocument(storage, '@forward "fun" as fun-*;', fs, {
 			uri: "dev.scss",
 		});
 
@@ -543,6 +559,7 @@ describe("Providers/References", () => {
 				" content: dev.fun-hello(dev.$fun-name);",
 				"}",
 			],
+			fs,
 			{
 				uri: "one.scss",
 			},
@@ -576,12 +593,13 @@ describe("Providers/References", () => {
 		await helpers.makeDocument(
 			storage,
 			["@function hello() { @return 1; }", '$day: "monday";'],
+			fs,
 			{
 				uri: "fun.scss",
 			},
 		);
 
-		await helpers.makeDocument(storage, '@forward "fun" as fun-*;', {
+		await helpers.makeDocument(storage, '@forward "fun" as fun-*;', fs, {
 			uri: "dev.scss",
 		});
 
@@ -595,6 +613,7 @@ describe("Providers/References", () => {
 				' "goodbye": dev.fun-hello(),',
 				");",
 			],
+			fs,
 			{
 				uri: "one.scss",
 			},
@@ -638,12 +657,13 @@ describe("Providers/References", () => {
 		await helpers.makeDocument(
 			storage,
 			["@function hello() { @return 1; }", '$day: "monday";'],
+			fs,
 			{
 				uri: "fun.scss",
 			},
 		);
 
-		await helpers.makeDocument(storage, '@forward "fun" as fun-*;', {
+		await helpers.makeDocument(storage, '@forward "fun" as fun-*;', fs, {
 			uri: "dev.scss",
 		});
 
@@ -657,6 +677,7 @@ describe("Providers/References", () => {
 				' "goodbye": dev.fun-hello(),',
 				");",
 			],
+			fs,
 			{
 				uri: "one.scss",
 			},
@@ -693,6 +714,7 @@ describe("Providers/References", () => {
 				"	transform: scale(1.1);",
 				"}",
 			],
+			fs,
 			{
 				uri: "one.scss",
 			},
@@ -704,6 +726,7 @@ describe("Providers/References", () => {
 				'@use "sass:color";',
 				'$_other-color: color.scale($color: "#1b1917", $alpha: -75%);',
 			],
+			fs,
 			{
 				uri: "two.scss",
 			},

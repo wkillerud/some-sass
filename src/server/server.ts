@@ -16,7 +16,7 @@ import { doHover } from "./features/hover/hover";
 import { provideReferences } from "./features/references";
 import { doSignatureHelp } from "./features/signature-help/signature-help";
 import { searchWorkspaceSymbol } from "./features/workspace-symbols/workspace-symbol";
-import { findFiles } from "./node-fs";
+import type { FileSystemProvider } from "./file-system";
 import ScannerService from "./scanner";
 import type { ISettings } from "./settings";
 import StorageService from "./storage";
@@ -29,9 +29,11 @@ interface InitializationOption {
 
 export class SomeSassServer {
 	private readonly connection: Connection;
+	private readonly fs: FileSystemProvider;
 
-	constructor(connection: Connection) {
+	constructor(connection: Connection, fs: FileSystemProvider) {
 		this.connection = connection;
+		this.fs = fs;
 	}
 
 	public listen(): void {
@@ -58,13 +60,12 @@ export class SomeSassServer {
 				settings = options.settings;
 
 				storageService = new StorageService();
-				scannerService = new ScannerService(storageService, settings);
+				scannerService = new ScannerService(storageService, this.fs, settings);
 
-				const files = await findFiles("**/*.{scss,svelte,astro,vue}", {
-					cwd: workspaceRoot.fsPath,
-					deep: settings.scannerDepth,
-					ignore: settings.scannerExclude,
-				});
+				const files = await this.fs.findFiles(
+					"**/*.{scss,svelte,astro,vue}",
+					settings.scannerExclude,
+				);
 
 				try {
 					await scannerService.scan(files, workspaceRoot);
@@ -131,7 +132,7 @@ export class SomeSassServer {
 		});
 
 		this.connection.onDidChangeWatchedFiles((event) => {
-			const files = event.changes.map((file) => URI.parse(file.uri).fsPath);
+			const files = event.changes.map((file) => URI.parse(file.uri));
 			return scannerService.scan(files, workspaceRoot);
 		});
 

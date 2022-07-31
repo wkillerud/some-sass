@@ -2,8 +2,8 @@ import assert from "assert";
 import fs, { Stats } from "fs";
 import { stub, SinonStub } from "sinon";
 import { provideReferences } from "../../server/features/references";
+import * as fsUtils from "../../server/node-fs";
 import StorageService from "../../server/storage";
-import * as fsUtils from "../../server/utils/fs";
 import * as helpers from "../helpers";
 
 describe("Providers/References", () => {

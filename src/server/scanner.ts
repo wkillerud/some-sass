@@ -1,6 +1,7 @@
 import path from "path";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
+import { readFile, fileExists } from "./node-fs";
 import type { ScssImport } from "./parser";
 import { parseDocument } from "./parser";
 import type { ISettings } from "./settings";
@@ -9,7 +10,6 @@ import {
 	getSCSSRegionsDocument,
 	isFileWhereScssCanBeEmbedded,
 } from "./utils/embedded";
-import { readFile, fileExists } from "./utils/fs";
 
 export default class ScannerService {
 	private readonly maxDepth: number;

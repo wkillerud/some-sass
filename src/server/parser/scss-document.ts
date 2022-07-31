@@ -1,7 +1,7 @@
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import { Position, Range } from "vscode-languageserver-types";
 import { URI } from "vscode-uri";
-import { realPath } from "../utils/fs";
+import { realPath } from "../node-fs";
 import { getLinesFromText } from "../utils/string";
 import { getNodeAtOffset } from "./ast";
 import { getLanguageService } from "./language-service";

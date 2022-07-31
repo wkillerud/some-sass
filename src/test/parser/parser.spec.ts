@@ -3,6 +3,7 @@ import fs from "fs";
 import { Stats } from "@nodelib/fs.macchiato";
 import { stub, SinonStub } from "sinon";
 import { URI } from "vscode-uri";
+import * as fsUtils from "../../server/node-fs";
 import {
 	parseDocument,
 	reForward,
@@ -10,7 +11,6 @@ import {
 	reUse,
 } from "../../server/parser";
 import StorageService from "../../server/storage";
-import * as fsUtils from "../../server/utils/fs";
 import * as helpers from "../helpers";
 
 const storage = new StorageService();

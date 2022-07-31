@@ -9,7 +9,7 @@ import {
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
 import { sassBuiltInModuleNames } from "../features/sass-built-in-modules";
-import { fileExists } from "../utils/fs";
+import { fileExists } from "../node-fs";
 import { asDollarlessVariable, getLinesFromText } from "../utils/string";
 import { getNodeAtOffset, getParentNodeByType } from "./ast";
 import { buildDocumentContext } from "./document";

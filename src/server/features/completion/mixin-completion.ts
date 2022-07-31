@@ -9,7 +9,7 @@ import type {
 	CompletionItemLabelDetails,
 } from "vscode-languageserver";
 import type { TextDocument } from "vscode-languageserver-textdocument";
-import type { IScssDocument, ScssMixin } from "../../symbols";
+import type { IScssDocument, ScssMixin } from "../../parser";
 import { applySassDoc } from "../../utils/sassdoc";
 import type { CompletionContext } from "./completion-context";
 import {

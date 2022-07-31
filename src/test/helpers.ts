@@ -6,7 +6,7 @@ import {
 } from "vscode-css-languageservice";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
-import type { INode } from "../server/nodes";
+import type { INode } from "../server/parser";
 import { parseDocument } from "../server/parser";
 import type { ISettings } from "../server/settings";
 import type StorageService from "../server/storage";

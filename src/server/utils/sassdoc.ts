@@ -1,4 +1,4 @@
-import type { ScssSymbol } from "../symbols";
+import type { ScssSymbol } from "../parser";
 
 interface IApplySassDocOptions {
 	displayOptions?: {

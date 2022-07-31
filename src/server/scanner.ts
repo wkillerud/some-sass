@@ -1,10 +1,10 @@
 import path from "path";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
+import type { ScssImport } from "./parser";
 import { parseDocument } from "./parser";
 import type { ISettings } from "./settings";
 import type StorageService from "./storage";
-import type { ScssImport } from "./symbols";
 import {
 	getSCSSRegionsDocument,
 	isFileWhereScssCanBeEmbedded,

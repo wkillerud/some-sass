@@ -3,15 +3,15 @@ import type {
 	TextDocument,
 	Position,
 } from "vscode-languageserver-textdocument";
-import { NodeType } from "../nodes";
-import type { INode } from "../nodes";
-import type StorageService from "../storage";
+import { NodeType } from "../parser";
 import type {
+	INode,
 	IScssDocument,
 	ScssForward,
 	ScssImport,
 	ScssSymbol,
-} from "../symbols";
+} from "../parser";
+import type StorageService from "../storage";
 import { asDollarlessVariable } from "../utils/string";
 
 interface Identifier {

@@ -2,8 +2,8 @@ import assert from "assert";
 import { SymbolKind } from "vscode-languageserver";
 import type { SignatureHelp } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { ScssDocument } from "../../server/document";
 import { doSignatureHelp } from "../../server/features/signature-help";
+import { ScssDocument } from "../../server/parser";
 import StorageService from "../../server/storage";
 import * as helpers from "../helpers";
 

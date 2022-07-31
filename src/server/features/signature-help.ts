@@ -2,15 +2,15 @@ import { tokenizer } from "scss-symbols-parser";
 import { MarkupKind, SignatureInformation } from "vscode-languageserver";
 import type { SignatureHelp } from "vscode-languageserver";
 import type { TextDocument } from "vscode-languageserver-textdocument";
-import { sassBuiltInModules } from "../sass-built-in-modules";
-import type StorageService from "../storage";
 import type {
 	IScssDocument,
 	ScssForward,
 	ScssFunction,
 	ScssImport,
 	ScssMixin,
-} from "../symbols";
+} from "../parser";
+import { sassBuiltInModules } from "../sass-built-in-modules";
+import type StorageService from "../storage";
 import { hasInFacts } from "../utils/facts";
 import { applySassDoc } from "../utils/sassdoc";
 import { asDollarlessVariable, getTextBeforePosition } from "../utils/string";

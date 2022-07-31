@@ -2,11 +2,8 @@ import { tokenizer } from "scss-symbols-parser";
 import { MarkupKind, SymbolKind } from "vscode-languageserver";
 import type { Hover, MarkupContent } from "vscode-languageserver";
 import type { TextDocument } from "vscode-languageserver-textdocument";
-import { NodeType } from "../nodes";
-import { sassBuiltInModules } from "../sass-built-in-modules";
-import { sassDocAnnotations } from "../sassdoc-annotations";
-import type StorageService from "../storage";
-import type {
+import {
+	NodeType,
 	IScssDocument,
 	ScssSymbol,
 	ScssVariable,
@@ -14,7 +11,10 @@ import type {
 	ScssFunction,
 	ScssImport,
 	ScssForward,
-} from "../symbols";
+} from "../parser";
+import { sassBuiltInModules } from "../sass-built-in-modules";
+import { sassDocAnnotations } from "../sassdoc-annotations";
+import type StorageService from "../storage";
 import type { Token } from "../tokens";
 import { applySassDoc } from "../utils/sassdoc";
 import { asDollarlessVariable, getLimitedString } from "../utils/string";

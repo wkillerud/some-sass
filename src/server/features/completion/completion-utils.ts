@@ -1,4 +1,4 @@
-import type { ScssMixin, ScssParameter } from "../../symbols";
+import type { ScssMixin, ScssParameter } from "../../parser";
 import { asDollarlessVariable } from "../../utils/string";
 
 export const rePrivate = /^\$?[_-].*$/;

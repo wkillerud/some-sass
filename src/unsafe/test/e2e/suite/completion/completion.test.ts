@@ -3,7 +3,9 @@ import { getDocUri, showFile, position, sleepCI } from '../util';
 import { testCompletion } from './helper';
 
 
-describe('SCSS Completion Test', () => {
+describe('SCSS Completion Test', function () {
+	this.timeout(30_000);
+
 	const docUri = getDocUri('completion/main.scss');
 	const vueDocUri = getDocUri('completion/AppButton.vue');
 	const svelteDocUri = getDocUri('completion/AppButton.svelte');

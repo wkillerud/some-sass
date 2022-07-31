@@ -1,7 +1,9 @@
 import { getDocUri, showFile, position, sameLineLocation, sleepCI } from '../util';
 import { testDefinition } from './helper';
 
-describe('SCSS Definition Test', () => {
+describe('SCSS Definition Test', function () {
+	this.timeout(30_000);
+
 	const docUri = getDocUri('definition/main.scss');
 	const vueDocUri = getDocUri('definition/AppButton.vue');
 	const svelteDocUri = getDocUri('definition/AppButton.svelte');

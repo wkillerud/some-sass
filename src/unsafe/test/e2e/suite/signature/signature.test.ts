@@ -1,7 +1,9 @@
 import { getDocUri, showFile, position, sleepCI } from '../util';
 import { testSignature } from './helper';
 
-describe('SCSS Signature Help Test', () => {
+describe('SCSS Signature Help Test', function () {
+	this.timeout(30_000);
+
 	const docUri = getDocUri('signature/main.scss');
 	const vueDocUri = getDocUri('signature/AppButton.vue');
 	const svelteDocUri = getDocUri('signature/AppButton.svelte');

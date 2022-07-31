@@ -8,16 +8,16 @@ import {
 } from "vscode-css-languageservice";
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
-import { ScssDocument } from "../document";
-import { getLanguageService } from "../language-service";
-import { sassBuiltInModuleNames } from "../sass-built-in-modules";
-import { NodeType } from "../types/nodes";
-import type { INode } from "../types/nodes";
-import type { IScssSymbols } from "../types/symbols";
-import { getNodeAtOffset, getParentNodeByType } from "../utils/ast";
-import { buildDocumentContext, getLinesFromText } from "../utils/document";
-import { fileExists } from "../utils/fs";
-import { asDollarlessVariable } from "../utils/string";
+import { ScssDocument } from "./document";
+import { getLanguageService } from "./language-service";
+import { NodeType } from "./nodes";
+import type { INode } from "./nodes";
+import { sassBuiltInModuleNames } from "./sass-built-in-modules";
+import type { IScssSymbols } from "./symbols";
+import { getNodeAtOffset, getParentNodeByType } from "./utils/ast";
+import { buildDocumentContext, getLinesFromText } from "./utils/document";
+import { fileExists } from "./utils/fs";
+import { asDollarlessVariable } from "./utils/string";
 
 export const reModuleAtRule = /@(?:use|forward|import)/;
 export const reUse = /@use ["'|](?<url>.+)["'|](?: as (?<namespace>\*|\w+))?;/;

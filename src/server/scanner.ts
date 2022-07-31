@@ -1,15 +1,15 @@
 import path from "path";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
-import type { ISettings } from "../settings";
-import type { ScssImport } from "../types/symbols";
+import { parseDocument } from "./parser";
+import type { ISettings } from "./settings";
+import type StorageService from "./storage";
+import type { ScssImport } from "./symbols";
 import {
 	getSCSSRegionsDocument,
 	isFileWhereScssCanBeEmbedded,
-} from "../utils/embedded";
-import { readFile, fileExists } from "../utils/fs";
-import { parseDocument } from "./parser";
-import type StorageService from "./storage";
+} from "./utils/embedded";
+import { readFile, fileExists } from "./utils/fs";
 
 export default class ScannerService {
 	private readonly maxDepth: number;

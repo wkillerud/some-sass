@@ -5,7 +5,7 @@ import {
 	MarkupKind,
 } from "vscode-languageserver-types";
 import type { CompletionItem } from "vscode-languageserver-types";
-import type { IScssDocument } from "../../types/symbols";
+import type { IScssDocument } from "../../symbols";
 import { getVariableColor } from "../../utils/color";
 import { applySassDoc } from "../../utils/sassdoc";
 import { asDollarlessVariable, getLimitedString } from "../../utils/string";

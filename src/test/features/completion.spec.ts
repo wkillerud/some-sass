@@ -6,8 +6,8 @@ import { ScssDocument } from "../../server/document";
 import { doCompletion } from "../../server/features/completion";
 import { parseStringLiteralChoices } from "../../server/features/completion/completion-utils";
 import { sassBuiltInModules } from "../../server/sass-built-in-modules";
-import StorageService from "../../server/services/storage";
 import type { ISettings } from "../../server/settings";
+import StorageService from "../../server/storage";
 import * as helpers from "../helpers";
 
 const storage = new StorageService();

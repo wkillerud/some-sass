@@ -5,7 +5,7 @@ import type {
 import { Range } from "vscode-languageserver-types";
 import { URI } from "vscode-uri";
 import { getLanguageService } from "./language-service";
-import type { INode } from "./types/nodes";
+import type { INode } from "./nodes";
 import type {
 	IScssDocument,
 	IScssSymbols,
@@ -17,7 +17,7 @@ import type {
 	ScssSymbol,
 	ScssUse,
 	ScssVariable,
-} from "./types/symbols";
+} from "./symbols";
 import { getNodeAtOffset } from "./utils/ast";
 import { getLinesFromText } from "./utils/document";
 import { realPath } from "./utils/fs";

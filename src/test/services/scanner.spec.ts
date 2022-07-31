@@ -5,8 +5,8 @@ import { Stats } from "@nodelib/fs.macchiato";
 import { isMatch } from "micromatch";
 import { stub, SinonStub } from "sinon";
 import { URI } from "vscode-uri";
-import ScannerService from "../../server/services/scanner";
-import StorageService from "../../server/services/storage";
+import ScannerService from "../../server/scanner";
+import StorageService from "../../server/storage";
 import * as fsUtils from "../../server/utils/fs";
 import * as helpers from "../helpers";
 

@@ -2,7 +2,7 @@ import assert from "assert";
 import fs, { Stats } from "fs";
 import { stub, SinonStub } from "sinon";
 import { provideReferences } from "../../server/features/references";
-import StorageService from "../../server/services/storage";
+import StorageService from "../../server/storage";
 import * as fsUtils from "../../server/utils/fs";
 import * as helpers from "../helpers";
 

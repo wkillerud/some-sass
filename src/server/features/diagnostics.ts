@@ -8,15 +8,15 @@ import type {
 	VersionedTextDocumentIdentifier,
 } from "vscode-languageserver-types";
 import { EXTENSION_NAME } from "../../shared/constants";
-import type StorageService from "../services/storage";
-import { NodeType } from "../types/nodes";
-import type { INode } from "../types/nodes";
+import { NodeType } from "../nodes";
+import type { INode } from "../nodes";
+import type StorageService from "../storage";
 import type {
 	IScssDocument,
 	ScssForward,
 	ScssImport,
 	ScssSymbol,
-} from "../types/symbols";
+} from "../symbols";
 import { asDollarlessVariable } from "../utils/string";
 
 export async function doDiagnostics(

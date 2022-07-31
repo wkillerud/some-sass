@@ -2,12 +2,12 @@ import { tokenizer } from "scss-symbols-parser";
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import type { Position, ReferenceContext } from "vscode-languageserver-types";
 import { Location, Range, SymbolKind } from "vscode-languageserver-types";
+import { NodeType } from "../../nodes";
+import type { INode } from "../../nodes";
 import { sassBuiltInModules } from "../../sass-built-in-modules";
-import type StorageService from "../../services/storage";
-import { NodeType } from "../../types/nodes";
-import type { INode } from "../../types/nodes";
-import type { IScssDocument, ScssSymbol } from "../../types/symbols";
-import type { Token } from "../../types/tokens";
+import type StorageService from "../../storage";
+import type { IScssDocument, ScssSymbol } from "../../symbols";
+import type { Token } from "../../tokens";
 import {
 	asDollarlessVariable,
 	stripTrailingComma,

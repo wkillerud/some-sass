@@ -1,6 +1,6 @@
 import assert from "assert";
-import StorageService from "../../server/services/storage";
-import { NodeType } from "../../server/types/nodes";
+import { NodeType } from "../../server/nodes";
+import StorageService from "../../server/storage";
 import { getNodeAtOffset, getParentNodeByType } from "../../server/utils/ast";
 import * as helpers from "../helpers";
 

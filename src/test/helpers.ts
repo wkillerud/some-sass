@@ -6,10 +6,10 @@ import {
 } from "vscode-css-languageservice";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
-import { parseDocument } from "../server/services/parser";
-import type StorageService from "../server/services/storage";
+import type { INode } from "../server/nodes";
+import { parseDocument } from "../server/parser";
 import type { ISettings } from "../server/settings";
-import type { INode } from "../server/types/nodes";
+import type StorageService from "../server/storage";
 
 const ls = getSCSSLanguageService();
 

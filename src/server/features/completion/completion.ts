@@ -7,14 +7,14 @@ import type { CompletionItem } from "vscode-languageserver";
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import { sassBuiltInModules } from "../../sass-built-in-modules";
 import type { SassBuiltInModule } from "../../sass-built-in-modules";
-import type StorageService from "../../services/storage";
 import type { ISettings } from "../../settings";
+import type StorageService from "../../storage";
 import type {
 	IScssDocument,
 	ScssForward,
 	ScssImport,
 	ScssUse,
-} from "../../types/symbols";
+} from "../../symbols";
 import { asDollarlessVariable } from "../../utils/string";
 import { createCompletionContext } from "./completion-context";
 import type { CompletionContext } from "./completion-context";

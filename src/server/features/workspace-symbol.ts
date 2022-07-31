@@ -1,5 +1,5 @@
 import type { SymbolInformation } from "vscode-languageserver";
-import type StorageService from "../services/storage";
+import type StorageService from "../storage";
 
 export async function searchWorkspaceSymbol(
 	query: string,

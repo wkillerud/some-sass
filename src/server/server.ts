@@ -16,9 +16,9 @@ import { doHover } from "./features/hover";
 import { provideReferences } from "./features/references";
 import { doSignatureHelp } from "./features/signature-help";
 import { searchWorkspaceSymbol } from "./features/workspace-symbol";
-import ScannerService from "./services/scanner";
-import StorageService from "./services/storage";
+import ScannerService from "./scanner";
 import type { ISettings } from "./settings";
+import StorageService from "./storage";
 import { getSCSSRegionsDocument } from "./utils/embedded";
 import { findFiles } from "./utils/fs";
 

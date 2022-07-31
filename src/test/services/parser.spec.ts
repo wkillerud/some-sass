@@ -8,8 +8,8 @@ import {
 	reForward,
 	reModuleAtRule,
 	reUse,
-} from "../../server/services/parser";
-import StorageService from "../../server/services/storage";
+} from "../../server/parser";
+import StorageService from "../../server/storage";
 import * as fsUtils from "../../server/utils/fs";
 import * as helpers from "../helpers";
 

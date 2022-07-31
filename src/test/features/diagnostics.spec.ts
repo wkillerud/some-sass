@@ -3,7 +3,7 @@ import fs, { Stats } from "fs";
 import { stub, SinonStub } from "sinon";
 import { DiagnosticSeverity, DiagnosticTag } from "vscode-languageserver-types";
 import { doDiagnostics } from "../../server/features/diagnostics";
-import StorageService from "../../server/services/storage";
+import StorageService from "../../server/storage";
 import * as fsUtils from "../../server/utils/fs";
 import { EXTENSION_NAME } from "../../shared/constants";
 import * as helpers from "../helpers";

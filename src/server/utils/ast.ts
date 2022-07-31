@@ -1,5 +1,5 @@
-import { NodeType } from "../types/nodes";
-import type { INode } from "../types/nodes";
+import { NodeType } from "../nodes";
+import type { INode } from "../nodes";
 
 /**
  * Get Node by offset position.

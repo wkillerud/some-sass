@@ -4,7 +4,7 @@ import type { Hover } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { ScssDocument } from "../../server/document";
 import { doHover } from "../../server/features/hover";
-import StorageService from "../../server/services/storage";
+import StorageService from "../../server/storage";
 import * as helpers from "../helpers";
 
 const storage = new StorageService();

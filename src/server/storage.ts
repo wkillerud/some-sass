@@ -1,4 +1,4 @@
-import type { IScssDocument } from "../types/symbols";
+import type { IScssDocument } from "./symbols";
 
 export type Storage = Map<StorageItemKey, StorageItemValue>;
 export type StorageItemEntry = [StorageItemKey, StorageItemValue];

@@ -4,7 +4,7 @@ import type { SignatureHelp } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { ScssDocument } from "../../server/document";
 import { doSignatureHelp } from "../../server/features/signature-help";
-import StorageService from "../../server/services/storage";
+import StorageService from "../../server/storage";
 import * as helpers from "../helpers";
 
 const storage = new StorageService();

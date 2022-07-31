@@ -27,11 +27,6 @@ interface InitializationOption {
 	settings: ISettings;
 }
 
-let workspaceRoot: URI;
-let settings: ISettings;
-let storageService: StorageService;
-let scannerService: ScannerService;
-
 export class SomeSassServer {
 	private readonly connection: Connection;
 
@@ -40,6 +35,11 @@ export class SomeSassServer {
 	}
 
 	public listen(): void {
+		let workspaceRoot: URI;
+		let settings: ISettings;
+		let storageService: StorageService;
+		let scannerService: ScannerService;
+
 		// Create a simple text document manager. The text document manager
 		// _supports full document sync only
 		const documents = new TextDocuments(TextDocument);

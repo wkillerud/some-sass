@@ -1,16 +1,8 @@
 import path from "path";
 import vscode from "vscode";
-import {
-	LanguageClient,
-	TransportKind,
-	RevealOutputChannelOn,
-} from "vscode-languageclient/node";
-import type {
-	LanguageClientOptions,
-	ServerOptions,
-} from "vscode-languageclient/node";
-import type { URI } from "vscode-uri";
+import { LanguageClient, TransportKind } from "vscode-languageclient/node";
 import { EXTENSION_ID, EXTENSION_NAME } from "../shared/constants";
+import { buildClientOptions } from "./client";
 
 const EXTENSION_SERVER_MODULE_PATH = path.join(__dirname, "./node-server.js");
 
@@ -69,7 +61,24 @@ async function changeActiveTextEditorEventHandler(
 async function initializeClient(
 	workspace: vscode.WorkspaceFolder,
 ): Promise<LanguageClient> {
-	const client = buildClient(workspace.uri);
+	const client = new LanguageClient(
+		EXTENSION_ID,
+		EXTENSION_NAME,
+		{
+			run: {
+				module: EXTENSION_SERVER_MODULE_PATH,
+				transport: TransportKind.ipc,
+			},
+			debug: {
+				module: EXTENSION_SERVER_MODULE_PATH,
+				transport: TransportKind.ipc,
+				options: {
+					execArgv: ["--nolazy", "--inspect=6006"],
+				},
+			},
+		},
+		buildClientOptions(workspace.uri),
+	);
 
 	clients.set(workspace.uri.toString(), client);
 
@@ -92,62 +101,4 @@ async function initializeClient(
 			return client;
 		},
 	);
-}
-
-function buildClient(workspace: URI): LanguageClient {
-	return new LanguageClient(
-		EXTENSION_ID,
-		EXTENSION_NAME,
-		buildServerOptions(),
-		buildClientOptions(workspace),
-	);
-}
-
-function buildServerOptions(): ServerOptions {
-	return {
-		run: {
-			module: EXTENSION_SERVER_MODULE_PATH,
-			transport: TransportKind.ipc,
-		},
-		debug: {
-			module: EXTENSION_SERVER_MODULE_PATH,
-			transport: TransportKind.ipc,
-			options: {
-				execArgv: ["--nolazy", "--inspect=6006"],
-			},
-		},
-	};
-}
-
-function buildClientOptions(workspace: URI): LanguageClientOptions {
-	/**
-	 * The workspace path is used to separate clients in multi-workspace environment.
-	 * Otherwise, each client will participate in each workspace.
-	 */
-	const pattern = `${workspace.fsPath.replace(/\\/g, "/")}/**`;
-
-	return {
-		documentSelector: [
-			{ scheme: "file", language: "scss", pattern },
-			{ scheme: "file", language: "vue", pattern },
-			{ scheme: "file", language: "svelte", pattern },
-			{ scheme: "file", language: "astro", pattern },
-		],
-		synchronize: {
-			configurationSection: ["somesass"],
-			fileEvents: vscode.workspace.createFileSystemWatcher({
-				baseUri: workspace,
-				base: workspace.fsPath,
-				pattern: "**/*.scss",
-			}),
-		},
-		initializationOptions: {
-			workspace: workspace.fsPath,
-			settings: vscode.workspace.getConfiguration("somesass", workspace),
-		},
-		diagnosticCollectionName: EXTENSION_ID,
-		outputChannel: vscode.window.createOutputChannel(EXTENSION_ID),
-		// Don't open the output console (very annoying) in case of error
-		revealOutputChannelOn: RevealOutputChannelOn.Never,
-	};
 }

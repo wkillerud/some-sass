@@ -9,13 +9,13 @@ import type {
 	InitializeResult,
 } from "vscode-languageserver/node";
 import { URI } from "vscode-uri";
-import { doCompletion } from "./providers/completion";
-import { doDiagnostics } from "./providers/diagnostics";
-import { goDefinition } from "./providers/go-definition";
-import { doHover } from "./providers/hover";
-import { provideReferences } from "./providers/references";
-import { doSignatureHelp } from "./providers/signature-help";
-import { searchWorkspaceSymbol } from "./providers/workspace-symbol";
+import { doCompletion } from "./features/completion";
+import { doDiagnostics } from "./features/diagnostics";
+import { goDefinition } from "./features/go-definition";
+import { doHover } from "./features/hover";
+import { provideReferences } from "./features/references";
+import { doSignatureHelp } from "./features/signature-help";
+import { searchWorkspaceSymbol } from "./features/workspace-symbol";
 import ScannerService from "./services/scanner";
 import StorageService from "./services/storage";
 import type { ISettings } from "./types/settings";

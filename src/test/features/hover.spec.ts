@@ -3,7 +3,7 @@ import { MarkupKind, SymbolKind } from "vscode-languageserver";
 import type { Hover } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { ScssDocument } from "../../server/document";
-import { doHover } from "../../server/providers/hover";
+import { doHover } from "../../server/features/hover";
 import StorageService from "../../server/services/storage";
 import * as helpers from "../helpers";
 

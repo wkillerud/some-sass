@@ -2,7 +2,7 @@ import assert from "assert";
 import { SymbolKind } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { ScssDocument } from "../../server/document";
-import { searchWorkspaceSymbol } from "../../server/providers/workspace-symbol";
+import { searchWorkspaceSymbol } from "../../server/features/workspace-symbol";
 import StorageService from "../../server/services/storage";
 
 const storage = new StorageService();

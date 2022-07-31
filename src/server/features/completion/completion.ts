@@ -8,7 +8,7 @@ import type { TextDocument } from "vscode-languageserver-textdocument";
 import { sassBuiltInModules } from "../../sass-built-in-modules";
 import type { SassBuiltInModule } from "../../sass-built-in-modules";
 import type StorageService from "../../services/storage";
-import type { ISettings } from "../../types/settings";
+import type { ISettings } from "../../settings";
 import type {
 	IScssDocument,
 	ScssForward,

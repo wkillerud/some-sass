@@ -1,5 +1,5 @@
 import type { TextDocument } from "vscode-languageserver-textdocument";
-import type { ISettings } from "../../types/settings";
+import type { ISettings } from "../../settings";
 import { getCurrentWord, getTextBeforePosition } from "../../utils/string";
 
 type SupportedExtensions = "astro" | "scss" | "svelte" | "vue";

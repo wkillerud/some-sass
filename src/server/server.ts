@@ -18,7 +18,7 @@ import { doSignatureHelp } from "./features/signature-help";
 import { searchWorkspaceSymbol } from "./features/workspace-symbol";
 import ScannerService from "./services/scanner";
 import StorageService from "./services/storage";
-import type { ISettings } from "./types/settings";
+import type { ISettings } from "./settings";
 import { getSCSSRegionsDocument } from "./utils/embedded";
 import { findFiles } from "./utils/fs";
 

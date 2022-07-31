@@ -7,7 +7,7 @@ import { doCompletion } from "../../server/features/completion";
 import { parseStringLiteralChoices } from "../../server/features/completion/completion-utils";
 import { sassBuiltInModules } from "../../server/sass-built-in-modules";
 import StorageService from "../../server/services/storage";
-import type { ISettings } from "../../server/types/settings";
+import type { ISettings } from "../../server/settings";
 import * as helpers from "../helpers";
 
 const storage = new StorageService();

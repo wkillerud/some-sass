@@ -1,7 +1,7 @@
 import path from "path";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
-import type { ISettings } from "../types/settings";
+import type { ISettings } from "../settings";
 import type { ScssImport } from "../types/symbols";
 import {
 	getSCSSRegionsDocument,

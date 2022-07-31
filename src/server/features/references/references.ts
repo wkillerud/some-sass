@@ -1,11 +1,9 @@
-import { tokenizer } from "scss-symbols-parser";
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import type { Position, ReferenceContext } from "vscode-languageserver-types";
 import { Location, Range, SymbolKind } from "vscode-languageserver-types";
 import type { INode, IScssDocument, ScssSymbol } from "../../parser";
-import { NodeType } from "../../parser";
+import { NodeType, tokenizer } from "../../parser";
 import type StorageService from "../../storage";
-import type { Token } from "../../tokens";
 import {
 	asDollarlessVariable,
 	stripTrailingComma,
@@ -84,7 +82,7 @@ export async function provideReferences(
 	const references: Location[] = [];
 	for (const scssDocument of storage.values()) {
 		const text = scssDocument.getText();
-		const tokens: Token[] = tokenizer(text);
+		const tokens = tokenizer(text);
 
 		for (const [tokenType, text, offset] of tokens) {
 			if (tokenType !== "word" && tokenType !== "brackets") {

@@ -1,4 +1,3 @@
-import { tokenizer } from "scss-symbols-parser";
 import { MarkupKind, SymbolKind } from "vscode-languageserver";
 import type { Hover, MarkupContent } from "vscode-languageserver";
 import type { TextDocument } from "vscode-languageserver-textdocument";
@@ -11,9 +10,10 @@ import {
 	ScssFunction,
 	ScssImport,
 	ScssForward,
+	tokenizer,
+	Token,
 } from "../../parser";
 import type StorageService from "../../storage";
-import type { Token } from "../../tokens";
 import { applySassDoc } from "../../utils/sassdoc";
 import { asDollarlessVariable, getLimitedString } from "../../utils/string";
 import { sassBuiltInModules } from "../sass-built-in-modules";
@@ -166,7 +166,7 @@ export function doHover(
 			// Tokenize the document and look for the closest non-space token to offset.
 			// If it's a comment, look for SassDoc annotations under the cursor.
 
-			const tokens: Token[] = tokenizer(document.getText());
+			const tokens = tokenizer(document.getText());
 
 			let hoverToken: Token | null = null;
 			for (const token of tokens) {

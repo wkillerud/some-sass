@@ -2,6 +2,7 @@ import assert from "assert";
 import { SymbolKind } from "vscode-languageserver";
 import type { SignatureHelp } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
+import { hasInFacts } from "../../server/features/signature-help/facts";
 import { doSignatureHelp } from "../../server/features/signature-help/signature-help";
 import { ScssDocument } from "../../server/parser";
 import StorageService from "../../server/storage";
@@ -261,5 +262,19 @@ describe("Providers/SignatureHelp - parseArgumentsAtLine for Functions", () => {
 
 		assert.strictEqual(actual.signatures.length, 1, "length");
 		assert.ok(actual.signatures[0]?.label.startsWith("make"), "name");
+	});
+});
+
+describe("Utils/Facts", () => {
+	it("Contains", () => {
+		assert.ok(hasInFacts("rgba"));
+		assert.ok(hasInFacts("selector-nest"));
+		assert.ok(hasInFacts("quote"));
+	});
+
+	it("Not contains", () => {
+		assert.ok(!hasInFacts("hello"));
+		assert.ok(!hasInFacts("from"));
+		assert.ok(!hasInFacts("panda"));
 	});
 });

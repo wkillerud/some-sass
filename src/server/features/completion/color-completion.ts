@@ -36,7 +36,7 @@ export function getVariableColor(value: string): string[] | null {
 /*
  * Find color from hexcode
  */
-export function findHex(text: string): string[] {
+function findHex(text: string): string[] {
 	let match = colorHex.exec(text);
 	const result = [];
 
@@ -60,7 +60,7 @@ export function findHex(text: string): string[] {
 /**
  * Find color from rgb/hsl
  */
-export function findFn(text: string): string[] {
+function findFn(text: string): string[] {
 	let match = colorFunctions.exec(text);
 	const result: string[] = [];
 
@@ -80,7 +80,7 @@ export function findFn(text: string): string[] {
 /**
  * Find color from words
  */
-export function findWords(text: string): string[] {
+function findWords(text: string): string[] {
 	let match = colorWeb.exec(text);
 	const result = [];
 

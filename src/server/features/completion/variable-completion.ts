@@ -6,9 +6,9 @@ import {
 } from "vscode-languageserver-types";
 import type { CompletionItem } from "vscode-languageserver-types";
 import type { IScssDocument } from "../../parser";
-import { getVariableColor } from "../../utils/color";
 import { applySassDoc } from "../../utils/sassdoc";
 import { asDollarlessVariable, getLimitedString } from "../../utils/string";
+import { getVariableColor } from "./color-completion";
 import type { CompletionContext } from "./completion-context";
 import { rePrivate } from "./completion-utils";
 

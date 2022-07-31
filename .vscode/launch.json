@@ -9,10 +9,10 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/out/unsafe/test/e2e/suite",
+				"--extensionTestsPath=${workspaceFolder}/out/test/e2e/suite",
 				"${workspaceFolder}/fixtures/e2e/"
 			],
-			"outFiles": ["${workspaceFolder}/out/unsafe/test/e2e/**/*.js"]
+			"outFiles": ["${workspaceFolder}/out/test/e2e/**/*.js"]
 
 		},
 		{
@@ -29,7 +29,7 @@
 			"name": "Attach to Server",
 			"port": 6006,
 			"restart": true,
-			"outFiles": ["${workspaceRoot}/dist/unsafe/**/*.js"]
+			"outFiles": ["${workspaceRoot}/dist/**/*.js"]
 		}
 	],
 	"compounds": [

@@ -5,9 +5,9 @@
 
 // @ts-check
 
-'use strict';
 
 const path = require('path');
+
 const webpack = require('webpack');
 
 /** @type {import('webpack').Configuration} */
@@ -15,23 +15,23 @@ const config = {
 	target: 'node', // VScode extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
 
 	entry: {
-		client: './src/client.ts',
-		'unsafe/server': './src/unsafe/server.ts'
+		'node-client': './src/client/node-client.ts',
+		'node-server': './src/server/node-server.ts',
 	},
 	output: {
 		path: path.resolve(__dirname, 'dist'),
 		filename: '[name].js',
 		libraryTarget: 'commonjs2',
 		devtoolModuleFilenameTemplate: '../[resource-path]',
-		clean: true
+		clean: true,
 	},
 	devtool: 'source-map',
 	externals: {
 		fsevents: 'require("fsevents")',
-		vscode: 'commonjs vscode' // The vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
+		vscode: 'commonjs vscode', // The vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
 	},
 	resolve: {
-		extensions: ['.ts', '.js']
+		extensions: ['.ts', '.js'],
 	},
 	module: {
 		rules: [{
@@ -41,15 +41,15 @@ const config = {
 				loader: 'ts-loader',
 				options: {
 					compilerOptions: {
-						module: 'es6' // Override `tsconfig.json` so that TypeScript emits native JavaScript modules.
-					}
-				}
-			}]
-		}]
+						module: 'es6', // Override `tsconfig.json` so that TypeScript emits native JavaScript modules.
+					},
+				},
+			}],
+		}],
 	},
 	plugins: [
-		new webpack.IgnorePlugin({ resourceRegExp: /vertx/ })
-	]
+		new webpack.IgnorePlugin({ resourceRegExp: /vertx/ }),
+	],
 };
 
 module.exports = config;

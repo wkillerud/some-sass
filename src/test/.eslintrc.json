@@ -1,0 +1,8 @@
+{
+	"root": false,
+  "rules": {
+    "no-template-curly-in-string": "off",
+		"@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/no-non-null-assertion": "off"
+  }
+}

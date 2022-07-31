@@ -8,7 +8,7 @@
   ],
   "exclude": [
     "**/*.d.ts",
-    "out/unsafe/test/**",
-    "src/unsafe/test/**"
+    "out/test/**",
+    "src/test/**"
   ]
 }

@@ -7,7 +7,6 @@ import type { URI } from "vscode-uri";
  */
 export interface FileSystemProvider {
 	exists(uri: URI): Promise<boolean>;
-	existsSync(uri: URI): boolean;
 	findFiles(
 		include: GlobPattern,
 		exclude?: GlobPattern | GlobPattern[] | null,

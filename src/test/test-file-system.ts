@@ -31,11 +31,7 @@ export class TestFileSystem implements FileSystemProvider {
 	}
 
 	exists(uri: URI) {
-		return Promise.resolve(this.existsSync(uri));
-	}
-
-	existsSync(uri: URI) {
-		return Boolean(this.storage.get(uri));
+		return Promise.resolve(Boolean(this.storage.get(uri)));
 	}
 
 	realPath(uri: URI) {

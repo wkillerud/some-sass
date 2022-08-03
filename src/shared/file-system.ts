@@ -1,5 +1,5 @@
-import type { FileStat } from "vscode-css-languageservice";
-import type { CancellationToken, GlobPattern } from "vscode-languageserver";
+import type { FileStat } from "vscode";
+import type { CancellationToken } from "vscode-languageserver";
 import type { URI } from "vscode-uri";
 
 /**
@@ -8,12 +8,12 @@ import type { URI } from "vscode-uri";
 export interface FileSystemProvider {
 	exists(uri: URI): Promise<boolean>;
 	findFiles(
-		include: GlobPattern,
-		exclude?: GlobPattern | GlobPattern[] | null,
+		include: string,
+		exclude?: string | string[] | null,
 		maxResults?: number,
 		token?: CancellationToken,
 	): Promise<URI[]>;
-	readFile(uri: URI): Promise<string>;
+	readFile(uri: URI, encoding?: BufferEncoding): Promise<string>;
 	stat(uri: URI): Promise<FileStat>;
 	realPath(uri: URI): Promise<string>;
 }

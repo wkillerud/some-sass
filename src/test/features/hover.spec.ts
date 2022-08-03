@@ -1,4 +1,4 @@
-import assert from "assert";
+import { deepStrictEqual } from "assert";
 import { MarkupKind, SymbolKind } from "vscode-languageserver";
 import type { Hover } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
@@ -70,7 +70,7 @@ describe("Providers/Hover", () => {
 	it("should suggest local symbols", async () => {
 		const actual = await getHover(["$one: 1;", ".a { content: $one|; }"]);
 
-		assert.deepStrictEqual(actual?.contents, {
+		deepStrictEqual(actual?.contents, {
 			kind: MarkupKind.Markdown,
 			value: [
 				"```scss",
@@ -85,7 +85,7 @@ describe("Providers/Hover", () => {
 	it("should suggest global variables", async () => {
 		const actual = await getHover([".a { content: $variable|; }"]);
 
-		assert.deepStrictEqual(actual?.contents, {
+		deepStrictEqual(actual?.contents, {
 			kind: MarkupKind.Markdown,
 			value: [
 				"```scss",
@@ -100,7 +100,7 @@ describe("Providers/Hover", () => {
 	it("should suggest global mixins", async () => {
 		const actual = await getHover([".a { @include mixin| }"]);
 
-		assert.deepStrictEqual(actual?.contents, {
+		deepStrictEqual(actual?.contents, {
 			kind: MarkupKind.Markdown,
 			value: [
 				"```scss",
@@ -115,7 +115,7 @@ describe("Providers/Hover", () => {
 	it("should suggest global functions", async () => {
 		const actual = await getHover([".a {", "	width: func|();", "}"]);
 
-		assert.deepStrictEqual(actual?.contents, {
+		deepStrictEqual(actual?.contents, {
 			kind: MarkupKind.Markdown,
 			value: [
 				"```scss",

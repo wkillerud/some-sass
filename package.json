@@ -114,6 +114,7 @@
 		"lint-staged": "13.0.3",
 		"mocha": "^10.0.0",
 		"nyc": "^15.1.0",
+		"patch-package": "6.4.7",
 		"prettier": "2.7.1",
 		"rimraf": "^3.0.2",
 		"sinon": "^14.0.0",
@@ -126,8 +127,11 @@
 		"color": "^4.2.3",
 		"color-name": "^1.1.4",
 		"fast-glob": "^3.2.11",
+		"path-browserify": "1.0.1",
+		"process": "0.11.10",
 		"scss-sassdoc-parser": "^1.0.2",
 		"scss-symbols-parser": "^2.0.1",
+		"util": "0.12.4",
 		"vscode-css-languageservice": "^6.0.1",
 		"vscode-languageclient": "^8.0.1",
 		"vscode-languageserver": "^8.0.1",
@@ -153,7 +157,8 @@
 		"test:compile": "tsc -p ./",
 		"test:unit": "mocha \"out/**/*.spec.js\"",
 		"test:coverage": "nyc npm run test:unit",
-		"test:e2e": "npm run build && node ./out/test/e2e/runTest.js"
+		"test:e2e": "npm run build && node ./out/test/e2e/runTest.js",
+		"postinstall": "patch-package"
 	},
 	"__metadata": {
 		"id": "6d35099c-3671-464c-ac0b-34a0c3823927",

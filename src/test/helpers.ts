@@ -1,4 +1,4 @@
-import path from "path";
+import { resolve, join } from "path";
 import {
 	getSCSSLanguageService,
 	Position,
@@ -31,9 +31,9 @@ export async function makeDocument(
 	options: MakeDocumentOptions = {},
 ): Promise<TextDocument> {
 	const text = Array.isArray(lines) ? lines.join("\n") : lines;
-	const workspaceRootPath = path.resolve("");
+	const workspaceRootPath = resolve("");
 	const workspaceRootUri = URI.file(workspaceRootPath);
-	const uri = URI.file(path.join(process.cwd(), options.uri || "index.scss"));
+	const uri = URI.file(join(process.cwd(), options.uri || "index.scss"));
 	const document = TextDocument.create(
 		uri.toString(),
 		options.languageId || "scss",

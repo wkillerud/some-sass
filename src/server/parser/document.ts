@@ -1,4 +1,4 @@
-import path from "path";
+import { dirname, join } from "path";
 import type { DocumentContext } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
 
@@ -19,10 +19,10 @@ function getModuleNameFromPath(path: string) {
 function resolvePathToModule(moduleName: string, relativeTo: string): string {
 	// Resolve the module relative to the document. We can't use `require` here as the code is webpacked.
 	// fsPath use is OK here since we never reach this function unless the URI is a file://.
-	const documentFolder = path.dirname(URI.parse(relativeTo).fsPath);
+	const documentFolder = dirname(URI.parse(relativeTo).fsPath);
 
 	// Assume this path exists. If not, let VS Code deal with the "404" and have the user fix a typo or install node_modules.
-	const packPath = path.join(
+	const packPath = join(
 		documentFolder,
 		"node_modules",
 		moduleName,

@@ -1,4 +1,4 @@
-import assert from "assert";
+import { strictEqual, ok } from "assert";
 import { CompletionItemKind, SymbolKind } from "vscode-languageserver";
 import type { CompletionList } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
@@ -116,13 +116,13 @@ describe("Providers/Completion - Basic", () => {
 	it("Variables", async () => {
 		const actual = await getCompletionList(["$|"]);
 
-		assert.strictEqual(actual.items.length, 5);
+		strictEqual(actual.items.length, 5);
 	});
 
 	it("Mixins", async () => {
 		const actual = await getCompletionList(["@include |"]);
 
-		assert.strictEqual(actual.items.length, 1);
+		strictEqual(actual.items.length, 1);
 	});
 });
 
@@ -130,7 +130,7 @@ describe("Providers/Completion - Context", () => {
 	it("Empty property value", async () => {
 		const actual = await getCompletionList([".a { content: | }"]);
 
-		assert.strictEqual(actual.items.length, 5);
+		strictEqual(actual.items.length, 5);
 	});
 
 	it("Non-empty property value without suggestions", async () => {
@@ -138,7 +138,7 @@ describe("Providers/Completion - Context", () => {
 			".a { background: url(../images/one|.png); }",
 		]);
 
-		assert.strictEqual(actual.items.length, 0);
+		strictEqual(actual.items.length, 0);
 	});
 
 	it("Non-empty property value with Variables", async () => {
@@ -146,7 +146,7 @@ describe("Providers/Completion - Context", () => {
 			".a { background: url(../images/#{$one|}/one.png); }",
 		]);
 
-		assert.strictEqual(actual.items.length, 5);
+		strictEqual(actual.items.length, 5);
 	});
 
 	it("Discard suggestions inside quotes", async () => {
@@ -156,7 +156,7 @@ describe("Providers/Completion - Context", () => {
 			"}",
 		]);
 
-		assert.strictEqual(actual.items.length, 0);
+		strictEqual(actual.items.length, 0);
 	});
 
 	it("Custom value for `suggestFunctionsInStringContextAfterSymbols` option", async () => {
@@ -167,29 +167,29 @@ describe("Providers/Completion - Context", () => {
 			},
 		);
 
-		assert.strictEqual(actual.items.length, 1);
+		strictEqual(actual.items.length, 1);
 	});
 
 	it("Discard suggestions inside single-line comments", async () => {
 		const actual = await getCompletionList(["// $|"]);
 
-		assert.strictEqual(actual.items.length, 0);
+		strictEqual(actual.items.length, 0);
 	});
 
 	it("Discard suggestions inside block comments", async () => {
 		const actual = await getCompletionList(["/* $| */"]);
 
-		assert.strictEqual(actual.items.length, 0);
+		strictEqual(actual.items.length, 0);
 	});
 
 	it("Identify color variables", async () => {
 		const actual = await getCompletionList(["$|"]);
 
-		assert.strictEqual(actual.items[0]?.kind, CompletionItemKind.Variable);
-		assert.strictEqual(actual.items[1]?.kind, CompletionItemKind.Variable);
-		assert.strictEqual(actual.items[2]?.kind, CompletionItemKind.Color);
-		assert.strictEqual(actual.items[3]?.kind, CompletionItemKind.Color);
-		assert.strictEqual(actual.items[4]?.kind, CompletionItemKind.Color);
+		strictEqual(actual.items[0]?.kind, CompletionItemKind.Variable);
+		strictEqual(actual.items[1]?.kind, CompletionItemKind.Variable);
+		strictEqual(actual.items[2]?.kind, CompletionItemKind.Color);
+		strictEqual(actual.items[3]?.kind, CompletionItemKind.Color);
+		strictEqual(actual.items[4]?.kind, CompletionItemKind.Color);
 	});
 });
 
@@ -199,7 +199,7 @@ describe("Providers/Completion - Import", () => {
 
 		const actual = await getCompletionList(['@use "|']);
 
-		assert.ok(
+		ok(
 			expectedCompletionLabels.every((expectedLabel) => {
 				return actual.items.some((item) => item.label === expectedLabel);
 			}),
@@ -215,7 +215,7 @@ describe("Providers/Completion - Built-in", () => {
 			".a { color: magic.ch|; }",
 		]);
 
-		assert.ok(
+		ok(
 			actual.items.some((item) => item.label === "change"),
 			"Expected to find a change-function in the Sass built-in color module, but it's missing",
 		);
@@ -225,15 +225,15 @@ describe("Providers/Completion - Built-in", () => {
 describe("Providers/Completion - Utils", () => {
 	it("parseStringLiteralChoices returns an array of string literals from a docstring", () => {
 		let result = parseStringLiteralChoices('"foo"');
-		assert.strictEqual(result.join(", "), '"foo"');
+		strictEqual(result.join(", "), '"foo"');
 
 		result = parseStringLiteralChoices('"foo" | "bar"');
-		assert.strictEqual(result.join(", "), '"foo", "bar"');
+		strictEqual(result.join(", "), '"foo", "bar"');
 
 		result = parseStringLiteralChoices("String | Number");
-		assert.strictEqual(result.join(", "), "");
+		strictEqual(result.join(", "), "");
 
 		result = parseStringLiteralChoices('"String" | "Number"');
-		assert.strictEqual(result.join(", "), '"String", "Number"');
+		strictEqual(result.join(", "), '"String", "Number"');
 	});
 });

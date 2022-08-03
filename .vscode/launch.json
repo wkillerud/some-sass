@@ -13,7 +13,6 @@
 				"${workspaceFolder}/fixtures/e2e/"
 			],
 			"outFiles": ["${workspaceFolder}/out/test/e2e/**/*.js"]
-
 		},
 		{
 			"type": "extensionHost",
@@ -30,6 +29,18 @@
 			"port": 6006,
 			"restart": true,
 			"outFiles": ["${workspaceRoot}/dist/**/*.js"]
+		},
+		{
+			"name": "Run Web Extension in VS Code",
+			"type": "pwa-extensionHost",
+			"debugWebWorkerHost": true,
+			"request": "launch",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionDevelopmentKind=web"
+			],
+			"outFiles": ["${workspaceFolder}/dist/browser-*.js"],
+			"preLaunchTask": "npm: dev"
 		}
 	],
 	"compounds": [

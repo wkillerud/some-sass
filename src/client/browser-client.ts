@@ -1,25 +1,23 @@
-import { join } from "path";
 import {
+	ExtensionContext,
+	ProgressLocation,
+	Uri,
 	window,
 	workspace,
-	ExtensionContext,
 	WorkspaceFolder,
-	ProgressLocation,
 } from "vscode";
 import {
 	BaseLanguageClient,
 	LanguageClient,
-	TransportKind,
-} from "vscode-languageclient/node";
+	LanguageClientOptions,
+} from "vscode-languageclient/browser";
 import { EXTENSION_ID, EXTENSION_NAME } from "../shared/constants";
-import { NodeFileSystem } from "../shared/node-file-system";
 import {
 	createLanguageClientOptions,
 	getCurrentWorkspace,
 	serveFileSystemRequests,
 } from "./client";
 
-const serverModulePath = join(__dirname, "./node-server.js");
 const clients: Map<string, BaseLanguageClient> = new Map<
 	string,
 	BaseLanguageClient
@@ -32,7 +30,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 			if (workspace === undefined || clients.has(workspace.uri.toString())) {
 				return;
 			}
-			await initializeClient(workspace);
+			await initializeClient(context, workspace);
 		}),
 		workspace.onDidChangeWorkspaceFolders((event) =>
 			Promise.all(
@@ -48,10 +46,11 @@ export async function activate(context: ExtensionContext): Promise<void> {
 	) {
 		return;
 	}
-	await initializeClient(currentWorkspace);
+	await initializeClient(context, currentWorkspace);
 }
 
 async function initializeClient(
+	context: ExtensionContext,
 	currentWorkspace: WorkspaceFolder,
 ): Promise<void> {
 	const clientOptions = createLanguageClientOptions(currentWorkspace);
@@ -59,22 +58,8 @@ async function initializeClient(
 		return;
 	}
 
-	const client = new LanguageClient(
-		EXTENSION_ID,
-		EXTENSION_NAME,
-		{
-			run: {
-				module: serverModulePath,
-				transport: TransportKind.ipc,
-			},
-			debug: {
-				module: serverModulePath,
-				transport: TransportKind.ipc,
-				options: {
-					execArgv: ["--nolazy", "--inspect=6006"],
-				},
-			},
-		},
+	const client: BaseLanguageClient = createWorkerLanguageClient(
+		context,
 		clientOptions,
 	);
 
@@ -89,7 +74,6 @@ async function initializeClient(
 			try {
 				await client.start();
 				serveFileSystemRequests(client, {
-					fs: new NodeFileSystem(),
 					TextDecoder,
 				});
 			} catch (error: unknown) {
@@ -100,6 +84,24 @@ async function initializeClient(
 				);
 			}
 		},
+	);
+}
+
+function createWorkerLanguageClient(
+	context: ExtensionContext,
+	clientOptions: LanguageClientOptions,
+) {
+	const serverMain = Uri.joinPath(
+		context.extensionUri,
+		"dist/browser-server.js",
+	);
+	const worker = new Worker(serverMain.toString(true));
+
+	return new LanguageClient(
+		EXTENSION_ID,
+		EXTENSION_NAME,
+		clientOptions,
+		worker,
 	);
 }
 

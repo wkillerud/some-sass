@@ -1,39 +1,12 @@
 {
 	"compilerOptions": {
 		"target": "es2020",
+		"lib": ["ES2020", "WebWorker"],
 		"sourceMap": true,
 		"module": "commonjs",
 		"moduleResolution": "node",
-		"esModuleInterop": true,
-		"resolveJsonModule": true,
-
 		"rootDir": "src",
 		"outDir": "out",
-
-		"strict": true,
-		"alwaysStrict": true,
-		"strictBindCallApply": true,
-		"strictFunctionTypes": true,
-		"strictNullChecks": true,
-		"strictPropertyInitialization": true,
-		"noImplicitAny": true,
-		"noImplicitReturns": true,
-		"noImplicitThis": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"noPropertyAccessFromIndexSignature": true,
-		"noUncheckedIndexedAccess": true,
-
-		"noFallthroughCasesInSwitch": true,
-		"forceConsistentCasingInFileNames": true,
-		"importsNotUsedAsValues": "error",
-
-		"emitDecoratorMetadata": true,
-		"experimentalDecorators": true,
-		"downlevelIteration": true,
-		"declaration": true,
-		"stripInternal": true,
-
-		"pretty": true
+		"strict": true
 	}
 }

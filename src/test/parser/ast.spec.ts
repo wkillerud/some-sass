@@ -1,4 +1,4 @@
-import assert from "assert";
+import { strictEqual } from "assert";
 import { NodeType } from "../../server/parser";
 import { getNodeAtOffset, getParentNodeByType } from "../../server/parser/ast";
 import StorageService from "../../server/storage";
@@ -14,8 +14,8 @@ describe("Utils/Ast", () => {
 
 		const node = getNodeAtOffset(ast, 4);
 
-		assert.strictEqual(node?.type, NodeType.Declarations);
-		assert.strictEqual(node?.getText(), "{}");
+		strictEqual(node?.type, NodeType.Declarations);
+		strictEqual(node?.getText(), "{}");
 	});
 
 	it("getParentNodeByType", async () => {
@@ -24,7 +24,7 @@ describe("Utils/Ast", () => {
 		const node = getNodeAtOffset(ast, 4);
 		const parentNode = getParentNodeByType(node, NodeType.Ruleset);
 
-		assert.strictEqual(parentNode?.type, NodeType.Ruleset);
-		assert.strictEqual(parentNode?.getText(), ".a {}");
+		strictEqual(parentNode?.type, NodeType.Ruleset);
+		strictEqual(parentNode?.getText(), ".a {}");
 	});
 });

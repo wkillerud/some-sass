@@ -1,7 +1,7 @@
 // Copied/mutated from https://github.com/sergiirocks/vscode-ext-color-highlight/tree/master/src/strategies
 
-import Color from "color";
-import webColors from "color-name";
+import * as Color from "color";
+import * as webColors from "color-name";
 
 const colorHex = /.?(#([\da-f]{6}([\da-f]{2})?|[\da-f]{3}([\da-f])?))\b/gi;
 const colorFunctions =

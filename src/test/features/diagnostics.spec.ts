@@ -1,4 +1,4 @@
-import assert from "assert";
+import { strictEqual, deepStrictEqual, ok } from "assert";
 import { DiagnosticSeverity, DiagnosticTag } from "vscode-languageserver-types";
 import { doDiagnostics } from "../../server/features/diagnostics/diagnostics";
 import StorageService from "../../server/storage";
@@ -19,7 +19,7 @@ describe("Providers/Diagnostics", () => {
 
 		const actual = await doDiagnostics(document, storage);
 
-		assert.deepStrictEqual(actual, [
+		deepStrictEqual(actual, [
 			{
 				message: "Use something else",
 				range: {
@@ -48,7 +48,7 @@ describe("Providers/Diagnostics", () => {
 
 		const actual = await doDiagnostics(document, storage);
 
-		assert.deepStrictEqual(actual, [
+		deepStrictEqual(actual, [
 			{
 				message: "Use something else",
 				range: {
@@ -77,7 +77,7 @@ describe("Providers/Diagnostics", () => {
 
 		const actual = await doDiagnostics(document, storage);
 
-		assert.deepStrictEqual(actual, [
+		deepStrictEqual(actual, [
 			{
 				message: "Use something else",
 				range: {
@@ -116,9 +116,9 @@ describe("Providers/Diagnostics", () => {
 
 		const actual = await doDiagnostics(document, storage);
 
-		assert.strictEqual(actual.length, 3);
+		strictEqual(actual.length, 3);
 
-		assert.ok(
+		ok(
 			actual.every((d) => Boolean(d.message)),
 			"Every diagnostic must have a message",
 		);
@@ -149,10 +149,10 @@ describe("Providers/Diagnostics", () => {
 
 		const actual = await doDiagnostics(document, storage);
 
-		assert.strictEqual(actual.length, 3);
+		strictEqual(actual.length, 3);
 
 		// Make sure we set a default message for the deprecated tag
-		assert.ok(
+		ok(
 			actual.every((d) => Boolean(d.message)),
 			"Every diagnostic must have a message",
 		);
@@ -203,10 +203,10 @@ describe("Providers/Diagnostics", () => {
 		// For some reason we get duplicate diagnostics for mixins.
 		// Haven't been able to track down why getVariableFunctionMixinReferences produces two of the same node.
 		// It's probably fine...
-		assert.strictEqual(actual.length, 4);
+		strictEqual(actual.length, 4);
 
 		// Make sure we set a default message for the deprecated tag
-		assert.ok(
+		ok(
 			actual.every((d) => Boolean(d.message)),
 			"Every diagnostic must have a message",
 		);

@@ -1,4 +1,4 @@
-import assert from "assert";
+import { strictEqual, deepStrictEqual, ok } from "assert";
 import { SymbolKind } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { goDefinition } from "../../server/features/go-definition/go-definition";
@@ -65,9 +65,9 @@ describe("Providers/GoDefinition", () => {
 
 		const actual = goDefinition(document, 15, storage);
 
-		assert.ok(actual);
-		assert.strictEqual(actual?.uri, "./one.scss");
-		assert.deepStrictEqual(actual?.range, {
+		ok(actual);
+		strictEqual(actual?.uri, "./one.scss");
+		deepStrictEqual(actual?.range, {
 			start: { line: 1, character: 1 },
 			end: { line: 1, character: 3 },
 		});
@@ -78,7 +78,7 @@ describe("Providers/GoDefinition", () => {
 
 		const actual = goDefinition(document, 2, storage);
 
-		assert.strictEqual(actual, null);
+		strictEqual(actual, null);
 	});
 
 	it("doGoDefinition - Mixins", async () => {
@@ -90,9 +90,9 @@ describe("Providers/GoDefinition", () => {
 
 		const actual = goDefinition(document, 16, storage);
 
-		assert.ok(actual);
-		assert.strictEqual(actual?.uri, "./one.scss");
-		assert.deepStrictEqual(actual?.range, {
+		ok(actual);
+		strictEqual(actual?.uri, "./one.scss");
+		deepStrictEqual(actual?.range, {
 			start: { line: 1, character: 1 },
 			end: { line: 1, character: 6 },
 		});
@@ -107,7 +107,7 @@ describe("Providers/GoDefinition", () => {
 
 		const actual = goDefinition(document, 8, storage);
 
-		assert.strictEqual(actual, null);
+		strictEqual(actual, null);
 	});
 
 	it("doGoDefinition - Mixin Arguments", async () => {
@@ -119,7 +119,7 @@ describe("Providers/GoDefinition", () => {
 
 		const actual = goDefinition(document, 10, storage);
 
-		assert.strictEqual(actual, null);
+		strictEqual(actual, null);
 	});
 
 	it("doGoDefinition - Functions", async () => {
@@ -131,9 +131,9 @@ describe("Providers/GoDefinition", () => {
 
 		const actual = goDefinition(document, 16, storage);
 
-		assert.ok(actual);
-		assert.strictEqual(actual?.uri, "./one.scss");
-		assert.deepStrictEqual(actual?.range, {
+		ok(actual);
+		strictEqual(actual?.uri, "./one.scss");
+		deepStrictEqual(actual?.range, {
 			start: { line: 1, character: 1 },
 			end: { line: 1, character: 5 },
 		});
@@ -148,7 +148,7 @@ describe("Providers/GoDefinition", () => {
 
 		const actual = goDefinition(document, 8, storage);
 
-		assert.strictEqual(actual, null);
+		strictEqual(actual, null);
 	});
 
 	it("doGoDefinition - Function Arguments", async () => {
@@ -160,6 +160,6 @@ describe("Providers/GoDefinition", () => {
 
 		const actual = goDefinition(document, 13, storage);
 
-		assert.strictEqual(actual, null);
+		strictEqual(actual, null);
 	});
 });

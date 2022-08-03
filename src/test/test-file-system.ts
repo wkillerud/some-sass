@@ -1,7 +1,7 @@
 import { FileType } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
-import type { FileSystemProvider } from "../server/file-system";
 import type StorageService from "../server/storage";
+import type { FileSystemProvider } from "../shared/file-system";
 
 export class TestFileSystem implements FileSystemProvider {
 	private readonly storage: StorageService;

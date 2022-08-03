@@ -1,15 +1,23 @@
-import fs from "fs";
-import fg from "fast-glob";
+import { promises, constants, existsSync } from "fs";
+import * as fg from "fast-glob";
 import { FileStat, FileType } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
 import type { FileSystemProvider } from "./file-system";
 
 export class NodeFileSystem implements FileSystemProvider {
-	async findFiles(pattern: string): Promise<URI[]> {
+	async findFiles(
+		pattern: string,
+		exclude?: string | string[] | null | undefined,
+	): Promise<URI[]> {
 		const matches = await fg(pattern, {
 			absolute: true,
 			dot: true,
 			suppressErrors: true,
+			ignore: exclude
+				? Array.isArray(exclude)
+					? exclude
+					: [exclude]
+				: undefined,
 		});
 		const result = matches.map((fsPath) => URI.file(fsPath));
 		return result;
@@ -17,10 +25,7 @@ export class NodeFileSystem implements FileSystemProvider {
 
 	async exists(uri: URI): Promise<boolean> {
 		try {
-			await fs.promises.access(
-				uri.fsPath,
-				fs.constants.R_OK | fs.constants.W_OK,
-			);
+			await promises.access(uri.fsPath, constants.R_OK | constants.W_OK);
 			return true;
 		} catch {
 			return false;
@@ -28,19 +33,19 @@ export class NodeFileSystem implements FileSystemProvider {
 	}
 
 	existsSync(uri: URI): boolean {
-		return fs.existsSync(uri.fsPath);
+		return existsSync(uri.fsPath);
 	}
 
-	readFile(uri: URI): Promise<string> {
-		return fs.promises.readFile(uri.fsPath, "utf8");
+	readFile(uri: URI, encoding: BufferEncoding = "utf-8"): Promise<string> {
+		return promises.readFile(uri.fsPath, encoding);
 	}
 
 	realPath(uri: URI): Promise<string> {
-		return fs.promises.realpath(uri.fsPath);
+		return promises.realpath(uri.fsPath);
 	}
 
 	async stat(uri: URI): Promise<FileStat> {
-		const stats = await fs.promises.stat(uri.fsPath);
+		const stats = await promises.stat(uri.fsPath);
 		let type = FileType.Unknown;
 		if (stats.isFile()) {
 			type = FileType.File;

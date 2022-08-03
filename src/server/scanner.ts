@@ -1,6 +1,6 @@
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
-import type { FileSystemProvider } from "./file-system";
+import type { FileSystemProvider } from "../shared/file-system";
 import type { ScssImport } from "./parser";
 import { parseDocument } from "./parser";
 import type { ISettings } from "./settings";

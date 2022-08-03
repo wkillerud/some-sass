@@ -1,12 +1,12 @@
-import assert from "assert";
-import path from "path";
+import { ok, strictEqual, deepStrictEqual } from "assert";
+import { resolve } from "path";
 import { isMatch } from "micromatch";
 import { stub, SinonStub } from "sinon";
 import { FileType } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
-import { NodeFileSystem } from "../server/node-file-system";
 import ScannerService from "../server/scanner";
 import StorageService from "../server/storage";
+import { NodeFileSystem } from "../shared/node-file-system";
 import * as helpers from "./helpers";
 
 const fs = new NodeFileSystem();
@@ -35,13 +35,11 @@ describe("Services/Scanner", () => {
 		});
 
 		it("should find files and update cache", async () => {
-			const workspaceRootPath = path.resolve("");
+			const workspaceRootPath = resolve("");
 			const workspaceRootUri = URI.file(workspaceRootPath);
-			const indexDocumentPath = path.resolve("index.scss").toLowerCase();
+			const indexDocumentPath = resolve("index.scss").toLowerCase();
 			const indexDocumentUri = URI.file(indexDocumentPath);
-			const variablesDocumentPath = path
-				.resolve("variables.scss")
-				.toLowerCase();
+			const variablesDocumentPath = resolve("variables.scss").toLowerCase();
 			const variablesDocumentUri = URI.file(variablesDocumentPath);
 
 			const storage = new StorageService();
@@ -61,29 +59,23 @@ describe("Services/Scanner", () => {
 				[indexDocumentUri.toString(), indexDocumentUri],
 				[variablesDocumentUri.toString(), variablesDocumentUri],
 			]);
-			assert.deepStrictEqual(storage.keys(), expected.keys());
-			assert.strictEqual(storage.get(indexDocumentUri)?.variables.size, 1);
+			deepStrictEqual(storage.keys(), expected.keys());
+			strictEqual(storage.get(indexDocumentUri)?.variables.size, 1);
 
-			assert.strictEqual(
+			strictEqual(
 				fileExistsStub.callCount,
 				2,
 				"File exists was not called twice",
 			);
-			assert.strictEqual(
-				readFileStub.callCount,
-				2,
-				"Read file was not called twice",
-			);
+			strictEqual(readFileStub.callCount, 2, "Read file was not called twice");
 		});
 
 		it("should find file and imported files", async () => {
-			const workspaceRootPath = path.resolve("");
+			const workspaceRootPath = resolve("");
 			const workspaceRootUri = URI.file(workspaceRootPath);
-			const indexDocumentPath = path.resolve("index.scss").toLowerCase();
+			const indexDocumentPath = resolve("index.scss").toLowerCase();
 			const indexDocumentUri = URI.file(indexDocumentPath);
-			const variablesDocumentPath = path
-				.resolve("variables.scss")
-				.toLowerCase();
+			const variablesDocumentPath = resolve("variables.scss").toLowerCase();
 			const variablesDocumentUri = URI.file(variablesDocumentPath);
 
 			const storage = new StorageService();
@@ -100,22 +92,18 @@ describe("Services/Scanner", () => {
 				[indexDocumentUri.toString(), indexDocumentUri],
 				[variablesDocumentUri.toString(), variablesDocumentUri],
 			]);
-			assert.deepStrictEqual(storage.keys(), expected.keys());
+			deepStrictEqual(storage.keys(), expected.keys());
 
-			assert.strictEqual(
+			strictEqual(
 				fileExistsStub.callCount,
 				3,
 				"File exists was not called three times",
 			); // Scanner only calls twice, but parser does as well
-			assert.strictEqual(
-				readFileStub.callCount,
-				2,
-				"Read file was not called twice",
-			);
+			strictEqual(readFileStub.callCount, 2, "Read file was not called twice");
 		});
 
 		it("should do not find imported files when it not required", async () => {
-			const workspaceRootPath = path.resolve("");
+			const workspaceRootPath = resolve("");
 			const workspaceRootUri = URI.file(workspaceRootPath);
 
 			const storage = new StorageService();
@@ -132,23 +120,19 @@ describe("Services/Scanner", () => {
 			const expected = new Map([
 				[indexDocumentUri.toString(), indexDocumentUri],
 			]);
-			assert.deepStrictEqual(storage.keys(), expected.keys());
+			deepStrictEqual(storage.keys(), expected.keys());
 
-			assert.strictEqual(
+			strictEqual(
 				fileExistsStub.callCount,
 				2,
 				"File exists was not called twice",
 			); // Scanner only calls once, but parser does as well
-			assert.strictEqual(
-				readFileStub.callCount,
-				1,
-				"Read file was not called once",
-			);
+			strictEqual(readFileStub.callCount, 1, "Read file was not called once");
 		});
 
 		it("exclude matcher works as expected", () => {
-			assert.ok(isMatch("/home/user/project/.git/index", "**/.git/**"));
-			assert.ok(
+			ok(isMatch("/home/user/project/.git/index", "**/.git/**"));
+			ok(
 				isMatch(
 					"/home/user/project/node_modules/package/some.scss",
 					"**/node_modules/**",

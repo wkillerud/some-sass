@@ -1,17 +1,17 @@
-import * as path from "path";
+import { resolve } from "path";
 import * as fg from "fast-glob";
 import * as Mocha from "mocha";
 
 const ONE_SECOND_IN_MS = 1 * 1000;
 
 export async function run(): Promise<void> {
-	const mocha = new Mocha.default({
+	const mocha = new Mocha({
 		ui: "bdd",
 		timeout: ONE_SECOND_IN_MS * 10,
 	});
 
-	const files = await fg.default("**/*.test.js", {
-		cwd: path.resolve(__dirname, ".."),
+	const files = await fg("**/*.test.js", {
+		cwd: resolve(__dirname, ".."),
 		absolute: true,
 	});
 

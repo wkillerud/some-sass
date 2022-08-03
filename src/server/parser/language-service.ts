@@ -4,7 +4,7 @@ import type {
 	FileSystemProvider as CSSFileSystemProvider,
 } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
-import type { FileSystemProvider } from "../file-system";
+import type { FileSystemProvider } from "../../shared/file-system";
 
 let ls: LanguageService | null = null;
 

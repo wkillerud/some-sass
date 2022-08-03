@@ -1,4 +1,4 @@
-import assert from "assert";
+import { strictEqual } from "assert";
 import { SymbolKind } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { searchWorkspaceSymbol } from "../../server/features/workspace-symbols/workspace-symbol";
@@ -58,12 +58,12 @@ describe("Providers/WorkspaceSymbol", () => {
 	it("searchWorkspaceSymbol - Empty query", async () => {
 		const actual = await searchWorkspaceSymbol("", storage, "");
 
-		assert.strictEqual(actual.length, 3);
+		strictEqual(actual.length, 3);
 	});
 
 	it("searchWorkspaceSymbol - Non-empty query", async () => {
 		const actual = await searchWorkspaceSymbol("$", storage, "");
 
-		assert.strictEqual(actual.length, 1);
+		strictEqual(actual.length, 1);
 	});
 });

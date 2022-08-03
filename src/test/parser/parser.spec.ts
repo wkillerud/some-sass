@@ -1,4 +1,4 @@
-import assert from "assert";
+import { strictEqual, deepStrictEqual, ok } from "assert";
 import { stub, SinonStub } from "sinon";
 import { FileType } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
@@ -50,36 +50,36 @@ describe("Services/Parser", () => {
 
 			// Variables
 			const variables = [...symbols.variables.values()];
-			assert.strictEqual(variables.length, 1);
+			strictEqual(variables.length, 1);
 
-			assert.strictEqual(variables[0]?.name, "$name");
-			assert.strictEqual(variables[0]?.value, '"value"');
+			strictEqual(variables[0]?.name, "$name");
+			strictEqual(variables[0]?.value, '"value"');
 
 			// Mixins
 			const mixins = [...symbols.mixins.values()];
-			assert.strictEqual(mixins.length, 1);
+			strictEqual(mixins.length, 1);
 
-			assert.strictEqual(mixins[0]?.name, "mixin");
-			assert.strictEqual(mixins[0]?.parameters.length, 2);
+			strictEqual(mixins[0]?.name, "mixin");
+			strictEqual(mixins[0]?.parameters.length, 2);
 
-			assert.strictEqual(mixins[0]?.parameters[0]?.name, "$a");
-			assert.strictEqual(mixins[0]?.parameters[0]?.value, "1");
+			strictEqual(mixins[0]?.parameters[0]?.name, "$a");
+			strictEqual(mixins[0]?.parameters[0]?.value, "1");
 
-			assert.strictEqual(mixins[0]?.parameters[1]?.name, "$b");
-			assert.strictEqual(mixins[0]?.parameters[1]?.value, null);
+			strictEqual(mixins[0]?.parameters[1]?.name, "$b");
+			strictEqual(mixins[0]?.parameters[1]?.value, null);
 
 			// Functions
 			const functions = [...symbols.functions.values()];
-			assert.strictEqual(functions.length, 1);
+			strictEqual(functions.length, 1);
 
-			assert.strictEqual(functions[0]?.name, "function");
-			assert.strictEqual(functions[0]?.parameters.length, 2);
+			strictEqual(functions[0]?.name, "function");
+			strictEqual(functions[0]?.parameters.length, 2);
 
-			assert.strictEqual(functions[0]?.parameters[0]?.name, "$a");
-			assert.strictEqual(functions[0]?.parameters[0]?.value, "1");
+			strictEqual(functions[0]?.parameters[0]?.name, "$a");
+			strictEqual(functions[0]?.parameters[0]?.value, "1");
 
-			assert.strictEqual(functions[0]?.parameters[1]?.name, "$b");
-			assert.strictEqual(functions[0]?.parameters[1]?.value, null);
+			strictEqual(functions[0]?.parameters[1]?.name, "$b");
+			strictEqual(functions[0]?.parameters[1]?.value, null);
 		});
 
 		it("should return links", async () => {
@@ -109,18 +109,18 @@ describe("Services/Parser", () => {
 
 			// Uses
 			const uses = [...symbols.uses.values()];
-			assert.strictEqual(uses.length, 2, "expected to find two uses");
-			assert.strictEqual(uses[0]?.namespace, "vars");
-			assert.strictEqual(uses[0]?.isAliased, true);
+			strictEqual(uses.length, 2, "expected to find two uses");
+			strictEqual(uses[0]?.namespace, "vars");
+			strictEqual(uses[0]?.isAliased, true);
 
-			assert.strictEqual(uses[1]?.namespace, "*");
-			assert.strictEqual(uses[1]?.isAliased, true);
+			strictEqual(uses[1]?.namespace, "*");
+			strictEqual(uses[1]?.isAliased, true);
 
 			// Forward
 			const forwards = [...symbols.forwards.values()];
-			assert.strictEqual(forwards.length, 1, "expected to find one forward");
-			assert.strictEqual(forwards[0]?.prefix, "color-");
-			assert.deepStrictEqual(forwards[0]?.hide, [
+			strictEqual(forwards.length, 1, "expected to find one forward");
+			strictEqual(forwards[0]?.prefix, "color-");
+			deepStrictEqual(forwards[0]?.hide, [
 				"$varslingsfarger",
 				"varslingsfarge",
 			]);
@@ -149,199 +149,187 @@ describe("Services/Parser", () => {
 			const symbols = await parseDocument(document, URI.parse(""), fs);
 			const uses = [...symbols.uses.values()];
 
-			assert.strictEqual(uses.length, 3, "expected to find three uses");
+			strictEqual(uses.length, 3, "expected to find three uses");
 		});
 	});
 
 	describe("regular expressions", () => {
 		it("for detecting module at rules", () => {
-			assert.ok(
-				reModuleAtRule.test('@use "file";'),
-				"should match a basic @use",
-			);
-			assert.ok(
+			ok(reModuleAtRule.test('@use "file";'), "should match a basic @use");
+			ok(
 				reModuleAtRule.test('  @use "file";'),
 				"should match an indented @use",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@use "~file";'),
 				"should match @use from node_modules",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test("@use 'file';"),
 				"should match @use with single quotes",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@use "../file";'),
 				"should match relative @use one level up",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@use "../../../file";'),
 				"should match relative @use several levels up",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@use "./file/other";'),
 				"should match relative @use one level down",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@use "./file/yet/another";'),
 				"should match relative @use several levels down",
 			);
 
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@forward "file";'),
 				"should match a basic @forward",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('  @forward "file";'),
 				"should match an indented @forward",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@forward "~file";'),
 				"should match @forward from node_modules",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test("@forward 'file';"),
 				"should match @forward with single quotes",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@forward "../file";'),
 				"should match relative @forward one level up",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@forward "../../../file";'),
 				"should match relative @forward several levels up",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@forward "./file/other";'),
 				"should match relative @forward one level down",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@forward "./file/yet/another";'),
 				"should match relative @forward several levels down",
 			);
 
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@import "file";'),
 				"should match a basic @import",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('  @import "file";'),
 				"should match an indented @import",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@import "~file";'),
 				"should match @import from node_modules",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test("@import 'file';"),
 				"should match @import with single quotes",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@import "../file";'),
 				"should match relative @import one level up",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@import "../../../file";'),
 				"should match relative @import several levels up",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@import "./file/other";'),
 				"should match relative @import one level down",
 			);
-			assert.ok(
+			ok(
 				reModuleAtRule.test('@import "./file/yet/another";'),
 				"should match relative @import several levels down",
 			);
 		});
 
 		it("for use", () => {
-			assert.ok(reUse.test('@use "file";'), "should match a basic @use");
-			assert.ok(reUse.test('  @use "file";'), "should match an indented @use");
-			assert.ok(
-				reUse.test('@use "~file";'),
-				"should match @use from node_modules",
-			);
-			assert.ok(
-				reUse.test("@use 'file';"),
-				"should match @use with single quotes",
-			);
-			assert.ok(
+			ok(reUse.test('@use "file";'), "should match a basic @use");
+			ok(reUse.test('  @use "file";'), "should match an indented @use");
+			ok(reUse.test('@use "~file";'), "should match @use from node_modules");
+			ok(reUse.test("@use 'file';"), "should match @use with single quotes");
+			ok(
 				reUse.test('@use "../file";'),
 				"should match relative @use one level up",
 			);
-			assert.ok(
+			ok(
 				reUse.test('@use "../../../file";'),
 				"should match relative @use several levels up",
 			);
-			assert.ok(
+			ok(
 				reUse.test('@use "./file/other";'),
 				"should match relative @use one level down",
 			);
-			assert.ok(
+			ok(
 				reUse.test('@use "./file/yet/another";'),
 				"should match relative @use several levels down",
 			);
 
-			assert.ok(
+			ok(
 				reUse.test('@use "variables" as vars;'),
 				"should match a @use with an alias",
 			);
-			assert.ok(
+			ok(
 				reUse.test('@use "src/corners" as *;'),
 				"should match a @use with a wildcard as alias",
 			);
 
 			const match = reUse.exec('@use "variables" as vars;');
-			assert.strictEqual(match!.groups!["url"] as string, "variables");
-			assert.strictEqual(match!.groups!["namespace"] as string, "vars");
+			strictEqual(match!.groups!["url"] as string, "variables");
+			strictEqual(match!.groups!["namespace"] as string, "vars");
 		});
 
 		it("for forward", () => {
-			assert.ok(
-				reForward.test('@forward "file";'),
-				"should match a basic @forward",
-			);
-			assert.ok(
+			ok(reForward.test('@forward "file";'), "should match a basic @forward");
+			ok(
 				reForward.test('  @forward "file";'),
 				"should match an indented @forward",
 			);
-			assert.ok(
+			ok(
 				reForward.test('@forward "~file";'),
 				"should match @forward from node_modules",
 			);
-			assert.ok(
+			ok(
 				reForward.test("@forward 'file';"),
 				"should match @forward with single quotes",
 			);
-			assert.ok(
+			ok(
 				reForward.test('@forward "../file";'),
 				"should match relative @forward one level up",
 			);
-			assert.ok(
+			ok(
 				reForward.test('@forward "../../../file";'),
 				"should match relative @forward several levels up",
 			);
-			assert.ok(
+			ok(
 				reForward.test('@forward "./file/other";'),
 				"should match relative @forward one level down",
 			);
-			assert.ok(
+			ok(
 				reForward.test('@forward "./file/yet/another";'),
 				"should match relative @forward several levels down",
 			);
 
-			assert.ok(
+			ok(
 				reForward.test(
 					'@forward "colors" as color-* hide $varslingsfarger, varslingsfarge;',
 				),
 				"should match a @forward with an alias and several hide",
 			);
-			assert.ok(
+			ok(
 				reForward.test('@forward "shadow";'),
 				"should match a @forward with no alias and no hide",
 			);
-			assert.ok(
+			ok(
 				reForward.test('@forward "spacing" hide $spacing-new;'),
 				"should match a @forward with no alias and a hide",
 			);
@@ -349,9 +337,9 @@ describe("Services/Parser", () => {
 			const match = reForward.exec(
 				'@forward "colors" as color-* hide $varslingsfarger, varslingsfarge;',
 			);
-			assert.strictEqual(match!.groups!["url"] as string, "colors");
-			assert.strictEqual(match!.groups!["prefix"] as string, "color-");
-			assert.strictEqual(
+			strictEqual(match!.groups!["url"] as string, "colors");
+			strictEqual(match!.groups!["prefix"] as string, "color-");
+			strictEqual(
 				match!.groups!["hide"] as string,
 				"$varslingsfarger, varslingsfarge",
 			);

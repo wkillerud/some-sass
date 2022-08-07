@@ -287,7 +287,6 @@ export function getFileSystemProvider(
 			if (handler) {
 				return handler.stat(uri);
 			}
-
 			try {
 				const res = await connection.sendRequest(
 					FsStatRequest.type,
@@ -295,7 +294,6 @@ export function getFileSystemProvider(
 				);
 				return res as FileStat;
 			} catch (e) {
-				console.error((e as Error).message);
 				return {
 					type: FileType.Unknown,
 					mtime: -1,
@@ -309,16 +307,11 @@ export function getFileSystemProvider(
 			if (handler) {
 				return await handler.readFile(uri);
 			}
-			try {
-				const res = await connection.sendRequest(FsReadFileRequest.type, {
-					uri: uri.toString(),
-					encoding,
-				});
-				return res;
-			} catch (e) {
-				console.error((e as Error).message);
-				return "";
-			}
+			const res = await connection.sendRequest(FsReadFileRequest.type, {
+				uri: uri.toString(),
+				encoding,
+			});
+			return res;
 		},
 		async findFiles(pattern, exclude) {
 			const handler = runtime.file;

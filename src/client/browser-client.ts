@@ -72,6 +72,7 @@ async function initializeClient(
 		},
 		async () => {
 			try {
+				client.registerProposedFeatures();
 				await client.start();
 				serveFileSystemRequests(client, {
 					TextDecoder,
@@ -95,7 +96,7 @@ function createWorkerLanguageClient(
 		context.extensionUri,
 		"dist/browser-server.js",
 	);
-	const worker = new Worker(serverMain.toString(true));
+	const worker = new Worker(serverMain.toString(/* skipEncoding */ true));
 
 	return new LanguageClient(
 		EXTENSION_ID,

@@ -75,7 +75,7 @@ export function createLanguageClientOptions(
 export namespace FsFindFilesRequest {
 	export const type: RequestType<
 		{ pattern: string; exclude: string[] },
-		string,
+		Uri[],
 		any
 	> = new RequestType(REQUEST_FS_FIND_FILES);
 }
@@ -98,14 +98,11 @@ export function serveFileSystemRequests(
 	client: BaseLanguageClient,
 	runtime: Runtime,
 ) {
-	client.registerProposedFeatures();
-
 	client.onRequest(FsStatRequest.type, (uriString: string) => {
 		const uri = Uri.parse(uriString);
 		if (uri.scheme === "file" && runtime.fs) {
 			return runtime.fs.stat(uri);
 		}
-		console.log("Hello Stat File!");
 		return workspace.fs.stat(uri);
 	});
 	client.onRequest(
@@ -115,19 +112,17 @@ export function serveFileSystemRequests(
 			if (uri.scheme === "file" && runtime.fs) {
 				return runtime.fs.readFile(uri);
 			}
-			console.log("Hello Read File!");
 			const buffer = await workspace.fs.readFile(uri);
 			return new runtime.TextDecoder(param.encoding).decode(buffer);
 		},
 	);
 	client.onRequest(
-		REQUEST_FS_FIND_FILES,
+		FsFindFilesRequest.type,
 		async (param: { pattern: string; exclude: string[] }) => {
 			if (runtime.fs) {
 				return runtime.fs.findFiles(param.pattern, param.exclude);
 			}
-			console.log("Hello Find Files!");
-			return workspace.findFiles(param.pattern);
+			return workspace.findFiles(param.pattern, "**/node_modules/**");
 		},
 	);
 }

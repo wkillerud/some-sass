@@ -47,6 +47,10 @@ export function createLanguageClientOptions(
 		{ scheme: "file", language: "vue", pattern },
 		{ scheme: "file", language: "svelte", pattern },
 		{ scheme: "file", language: "astro", pattern },
+		{ scheme: "vscode-vfs", language: "scss", pattern },
+		{ scheme: "vscode-vfs", language: "vue", pattern },
+		{ scheme: "vscode-vfs", language: "svelte", pattern },
+		{ scheme: "vscode-vfs", language: "astro", pattern },
 	];
 
 	const configuration = workspace.getConfiguration(
@@ -95,7 +99,7 @@ export function createLanguageClientOptions(
 			fileEvents: workspace.createFileSystemWatcher({
 				baseUri: currentWorkspace.uri,
 				base: currentWorkspace.uri.fsPath,
-				pattern: "**/*.scss",
+				pattern: "**/*.{scss,vue,svelte,astro}",
 			}),
 		},
 		initializationOptions: {
@@ -178,8 +182,6 @@ export function serveFileSystemRequests(
 					token,
 				);
 				log("workspace.findFiles is back!");
-				log("workspace.findFiles gave us " + result);
-				log("workspace.findFiles gave us " + result.length);
 				log("Result from client findFile: " + JSON.stringify(result));
 				return result.map((uri) => uri.toString());
 			} catch (e) {

@@ -7,7 +7,7 @@ const ONE_SECOND_IN_MS = 1 * 1000;
 export async function run(): Promise<void> {
 	const mocha = new Mocha({
 		ui: "bdd",
-		timeout: ONE_SECOND_IN_MS * 10,
+		timeout: ONE_SECOND_IN_MS * 30,
 	});
 
 	const files = await fg("**/*.test.js", {

@@ -2,8 +2,6 @@ import { getDocUri, showFile, position, sleepCI } from "../util";
 import { testHover } from "./helper";
 
 describe("SCSS Hover Test", function () {
-	this.timeout(30_000);
-
 	const docUri = getDocUri("hover/main.scss");
 	const vueDocUri = getDocUri("hover/AppButton.vue");
 	const svelteDocUri = getDocUri("hover/AppButton.svelte");

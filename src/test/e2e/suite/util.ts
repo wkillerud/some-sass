@@ -49,5 +49,5 @@ export async function sleepCI(ms = 2000): Promise<void> {
 		return;
 	}
 
-	await sleep(0);
+	await sleep(ms);
 }

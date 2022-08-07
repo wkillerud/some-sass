@@ -123,14 +123,7 @@ const browserServerConfig = {
 	resolve: {
 		mainFields: ["browser", "module", "main"],
 		extensions: [".ts", ".js"],
-		alias: {
-			fastestsmallesttextencoderdecoder: path.join(
-				__dirname,
-				"node_modules",
-				"fastestsmallesttextencoderdecoder",
-				"EncoderDecoderTogether.min.js",
-			),
-		},
+		alias: {},
 		fallback: {
 			path: require.resolve("path-browserify"),
 			util: require.resolve("util/"),

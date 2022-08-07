@@ -69,7 +69,7 @@ export class SomeSassServer {
 					this.runtime,
 				);
 
-				workspaceRoot = URI.file(options.workspace);
+				workspaceRoot = URI.parse(options.workspace);
 				settings = options.settings;
 
 				return {

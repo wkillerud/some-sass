@@ -9,11 +9,18 @@ import {
 import { defaultSettings, ISettings } from "../server/settings";
 import {
 	EXTENSION_ID,
+	EXTENSION_NAME,
 	REQUEST_FS_FIND_FILES,
 	REQUEST_FS_READ_FILE,
 	REQUEST_FS_STAT,
 } from "../shared/constants";
 import { Runtime } from "./runtime";
+
+const output = window.createOutputChannel(EXTENSION_NAME);
+
+export function log(message: string): void {
+	output.appendLine(message);
+}
 
 export function getCurrentWorkspace(
 	editor: TextEditor | undefined,
@@ -96,7 +103,7 @@ export function createLanguageClientOptions(
 			settings,
 		},
 		diagnosticCollectionName: EXTENSION_ID,
-		outputChannel: window.createOutputChannel(EXTENSION_ID),
+		outputChannel: output,
 		// Don't open the output console (very annoying) in case of error
 		revealOutputChannelOn: RevealOutputChannelOn.Never,
 	};
@@ -130,8 +137,8 @@ export function serveFileSystemRequests(
 	client: BaseLanguageClient,
 	runtime: Runtime,
 ) {
-	const debug = window.createOutputChannel("DEBUG");
 	client.onRequest(FsStatRequest.type, (uriString: string) => {
+		log("Got stat request for " + uriString);
 		const uri = Uri.parse(uriString);
 		if (uri.scheme === "file" && runtime.fs) {
 			return runtime.fs.stat(uri);
@@ -141,6 +148,7 @@ export function serveFileSystemRequests(
 	client.onRequest(
 		FsReadFileRequest.type,
 		async (param: { uri: string; encoding?: string }) => {
+			log("Got read file request for " + param.uri);
 			const uri = Uri.parse(param.uri);
 			if (uri.scheme === "file" && runtime.fs) {
 				return runtime.fs.readFile(uri);
@@ -151,20 +159,35 @@ export function serveFileSystemRequests(
 	);
 	client.onRequest(
 		FsFindFilesRequest.type,
-		async (param: { pattern: string; exclude: string[] }) => {
+		async (param: { pattern: string; exclude: string[] }, token) => {
+			log("Got find files request for " + param.pattern);
+
 			if (runtime.fs) {
+				log("Running fs.findFiles...");
 				const result = await runtime.fs.findFiles(param.pattern, param.exclude);
+				log("Result from client findFile: " + JSON.stringify(result));
 				return result.map((uri) => uri.toString());
 			}
 
-			const result = await workspace.findFiles(
-				param.pattern,
-				"**/node_modules/**",
-			);
-			debug.appendLine(
-				"Result from client findFile: " + JSON.stringify(result),
-			);
-			return result.map((uri) => uri.toString());
+			try {
+				log("Running workspace.findFiles...");
+				const result = await workspace.findFiles(
+					param.pattern,
+					"**/node_modules/**",
+					undefined,
+					token,
+				);
+				log("workspace.findFiles is back!");
+				log("workspace.findFiles gave us " + result);
+				log("workspace.findFiles gave us " + result.length);
+				log("Result from client findFile: " + JSON.stringify(result));
+				return result.map((uri) => uri.toString());
+			} catch (e) {
+				const error = e as Error;
+				log(error.message);
+				log(error.stack || "No stacktrace");
+				throw e;
+			}
 		},
 	);
 }

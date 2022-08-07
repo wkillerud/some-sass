@@ -15,6 +15,7 @@ import { EXTENSION_ID, EXTENSION_NAME } from "../shared/constants";
 import {
 	createLanguageClientOptions,
 	getCurrentWorkspace,
+	log,
 	serveFileSystemRequests,
 } from "./client";
 
@@ -73,7 +74,9 @@ async function initializeClient(
 		async () => {
 			try {
 				client.registerProposedFeatures();
+				log("Starting client...");
 				await client.start();
+				log("Registering request handlers...");
 				serveFileSystemRequests(client, {
 					TextDecoder,
 				});

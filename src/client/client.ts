@@ -75,7 +75,7 @@ export function createLanguageClientOptions(
 export namespace FsFindFilesRequest {
 	export const type: RequestType<
 		{ pattern: string; exclude: string[] },
-		Uri[],
+		string[],
 		any
 	> = new RequestType(REQUEST_FS_FIND_FILES);
 }
@@ -120,9 +120,15 @@ export function serveFileSystemRequests(
 		FsFindFilesRequest.type,
 		async (param: { pattern: string; exclude: string[] }) => {
 			if (runtime.fs) {
-				return runtime.fs.findFiles(param.pattern, param.exclude);
+				const result = await runtime.fs.findFiles(param.pattern, param.exclude);
+				return result.map((uri) => uri.toString());
 			}
-			return workspace.findFiles(param.pattern, "**/node_modules/**");
+
+			const result = await workspace.findFiles(
+				param.pattern,
+				"**/node_modules/**",
+			);
+			return result.map((uri) => uri.toString());
 		},
 	);
 }

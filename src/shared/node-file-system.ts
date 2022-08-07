@@ -63,7 +63,6 @@ export class NodeFileSystem implements FileSystemProvider {
 				size: stats.size,
 			};
 		} catch (e) {
-			console.error((e as Error).message);
 			return {
 				type: FileType.Unknown,
 				ctime: -1,

@@ -121,7 +121,7 @@ const browserServerConfig = {
 		library: "serverExportVar",
 	},
 	resolve: {
-		mainFields: ["module", "main"],
+		mainFields: ["browser", "module", "main"],
 		extensions: [".ts", ".js"],
 		alias: {
 			fastestsmallesttextencoderdecoder: path.join(

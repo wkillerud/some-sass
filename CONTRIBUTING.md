@@ -37,7 +37,7 @@ Every time you make a change you should restart the Launch Client task.
 
 Test your changes and see if they work. If they don't, it's time to do some debugging.
 
-## Debugging
+## Debugging the Node (or regular) version
 
 Changes often don't work on the first try. To get a better idea of what's happening, let's debug the _server_ portion of the extension.
 
@@ -45,9 +45,22 @@ In this extension there is a client part and a server part, and most of the work
 
 In the Run and Debug section you should find an Attach to Server configuration. Run that. You should end up with a badge showing the number 2 on the Run and Debug section.
 
-Now you can set breakpoints to inspect what is really happening in your code. Unfortunately, at time of writing you must set these breakpoints in the _compiled output_ in `dist/server.js`.
+Now you can set breakpoints to inspect what is really happening in your code. Unfortunately, at time of writing you must set these breakpoints in the _compiled output_ in `dist/node-server.js`.
 
-Open `dist/server.js`, search for a function name close to where you want to debug, and place breakpoints where you would like. Then test your changes in the Extension Development Host again. Hopefully you should see the code pause on your breakpoint. If not, confirm the Attach to Server task is running, or try to place breakpoints elsewhere. Something unexpected may stop you from reaching your code.
+Open `dist/node-server.js`, search for a function name close to where you want to debug, and place breakpoints where you would like. Then test your changes in the Extension Development Host again. Hopefully you should see the code pause on your breakpoint. If not, confirm the Attach to Server task is running, or try to place breakpoints elsewhere. Something unexpected may stop you from reaching your code.
+
+### Debugging the web version
+
+You may have noticed there are two versions of the extension in the `dist/` folder.
+
+- Node
+- Browser
+
+The browser files do just that – run in the browser as a [web extension](https://code.visualstudio.com/api/extension-guides/web-extensions). It works more or less the same as the regular Node version, except it doesn't have direct access to the file system.
+
+To debug the web version, pick the Run Web Extension in VS Code in the Run and Debug section. For the web version you can set breakpoints right in the TypeScript, at least for the client part.
+
+TODO: debug the server once you get it up and running, write down some notes.
 
 ### Debugging unit tests
 

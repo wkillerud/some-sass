@@ -30,7 +30,7 @@
 		"onLanguage:svelte",
 		"onLanguage:astro"
 	],
-	"main": "./dist/client.js",
+	"main": "./dist/node-client.js",
 	"contributes": {
 		"configuration": {
 			"properties": {
@@ -103,11 +103,19 @@
 		"@types/node": "^16.11.43",
 		"@types/sinon": "^10.0.12",
 		"@types/vscode": "^1.66.0",
+		"@typescript-eslint/eslint-plugin": "5.31.0",
+		"@typescript-eslint/parser": "5.31.0",
 		"@vscode/test-electron": "^2.1.5",
 		"eslint": "^8.19.0",
-		"eslint-config-mrmlnc": "^2.1.0",
+		"eslint-config-prettier": "8.5.0",
+		"eslint-plugin-import": "2.26.0",
+		"eslint-plugin-prettier": "4.2.1",
+		"husky": "8.0.1",
+		"lint-staged": "13.0.3",
 		"mocha": "^10.0.0",
 		"nyc": "^15.1.0",
+		"patch-package": "6.4.7",
+		"prettier": "2.7.1",
 		"rimraf": "^3.0.2",
 		"sinon": "^14.0.0",
 		"ts-loader": "^9.3.1",
@@ -119,8 +127,11 @@
 		"color": "^4.2.3",
 		"color-name": "^1.1.4",
 		"fast-glob": "^3.2.11",
+		"path-browserify": "1.0.1",
+		"process": "0.11.10",
 		"scss-sassdoc-parser": "^1.0.2",
 		"scss-symbols-parser": "^2.0.1",
+		"util": "0.12.4",
 		"vscode-css-languageservice": "^6.0.1",
 		"vscode-languageclient": "^8.0.1",
 		"vscode-languageserver": "^8.0.1",
@@ -128,18 +139,26 @@
 		"vscode-languageserver-types": "^3.17.1",
 		"vscode-uri": "^3.0.3"
 	},
+	"lint-staged": {
+		"src/**/*.ts": [
+			"prettier --write",
+			"eslint --fix"
+		]
+	},
 	"scripts": {
-		"vscode:prepublish": "npm run package",
-		"webpack": "webpack --mode development",
+		"prepare": "husky install",
+		"lint-staged": "lint-staged",
+		"vscode:prepublish": "npm run build",
+		"build": "webpack --mode production --devtool hidden-source-map",
 		"dev": "webpack --mode development --watch",
-		"package": "webpack --mode production --devtool hidden-source-map",
 		"lint": "eslint \"src/**/*.ts\" --cache",
 		"test": "npm run test:clean && npm run test:compile && npm run test:unit",
 		"test:clean": "rimraf out",
 		"test:compile": "tsc -p ./",
 		"test:unit": "mocha \"out/**/*.spec.js\"",
 		"test:coverage": "nyc npm run test:unit",
-		"test:e2e": "npm run webpack && node ./out/unsafe/test/e2e/runTest.js"
+		"test:e2e": "npm run build && node ./out/test/e2e/runTest.js",
+		"postinstall": "patch-package"
 	},
 	"__metadata": {
 		"id": "6d35099c-3671-464c-ac0b-34a0c3823927",

@@ -1,1 +1,0 @@
-export { doCompletion } from "./completion";

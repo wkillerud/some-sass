@@ -13,7 +13,8 @@
 			"presentation": {
 				"panel": "dedicated",
 				"reveal": "never"
-			}
+			},
+			"problemMatcher": ["$ts-webpack"]
 		},
 		{
 			"type": "npm",
@@ -26,7 +27,8 @@
 			"presentation": {
 				"panel": "dedicated",
 				"reveal": "never"
-			}
+			},
+			"problemMatcher": ["$ts-webpack-watch"]
 		}
 	]
 }

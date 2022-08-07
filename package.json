@@ -163,6 +163,7 @@
 		"test:coverage": "nyc npm run test:unit",
 		"test:e2e": "npm run build && node ./out/test/e2e/runTest.js",
 		"test:chrome": "npm run build && vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/test/web/suite/index.js ./fixtures/e2e",
+		"open:chrome": "npm run build && vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ./fixtures/e2e",
 		"postinstall": "patch-package"
 	},
 	"__metadata": {

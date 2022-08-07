@@ -6,6 +6,7 @@ import {
 	RequestType,
 	RevealOutputChannelOn,
 } from "vscode-languageclient";
+import { defaultSettings, ISettings } from "../server/settings";
 import {
 	EXTENSION_ID,
 	REQUEST_FS_FIND_FILES,
@@ -49,6 +50,45 @@ export function createLanguageClientOptions(
 		{ scheme: "file", language: "astro", pattern },
 	];
 
+	const configuration = workspace.getConfiguration(
+		"somesass",
+		currentWorkspace,
+	);
+
+	// The browser Worker stumbles if initializationOptions is given the WorkspaceConfiguration object directly.
+	// Map it to a POJSO with default settings as well so both browser and node client/server comminication will work.
+	const settings: ISettings = {
+		scannerDepth:
+			configuration.get<number>("scannerDepth") || defaultSettings.scannerDepth,
+		scannerExclude:
+			configuration.get<string[]>("scannerExclude") ||
+			defaultSettings.scannerExclude,
+		scanImportedFiles:
+			configuration.get<boolean>("scanImportedFiles") ||
+			defaultSettings.scanImportedFiles,
+		showErrors:
+			configuration.get<boolean>("showErrors") || defaultSettings.showErrors,
+		suggestAllFromOpenDocument:
+			configuration.get<boolean>("suggestAllFromOpenDocument") ||
+			defaultSettings.suggestAllFromOpenDocument,
+		suggestFromUseOnly:
+			configuration.get<boolean>("suggestFromUseOnly") ||
+			defaultSettings.suggestFromUseOnly,
+		suggestVariables:
+			configuration.get<boolean>("suggestVariables") ||
+			defaultSettings.suggestVariables,
+		suggestMixins:
+			configuration.get<boolean>("suggestMixins") ||
+			defaultSettings.suggestMixins,
+		suggestFunctions:
+			configuration.get<boolean>("suggestFunctions") ||
+			defaultSettings.suggestFunctions,
+		suggestFunctionsInStringContextAfterSymbols:
+			configuration.get<string>(
+				"suggestFunctionsInStringContextAfterSymbols",
+			) || defaultSettings.suggestFunctionsInStringContextAfterSymbols,
+	};
+
 	const clientOptions: LanguageClientOptions = {
 		documentSelector,
 		synchronize: {
@@ -61,7 +101,7 @@ export function createLanguageClientOptions(
 		},
 		initializationOptions: {
 			workspace: currentWorkspace.uri.fsPath,
-			settings: workspace.getConfiguration("somesass", currentWorkspace),
+			settings,
 		},
 		diagnosticCollectionName: EXTENSION_ID,
 		outputChannel: window.createOutputChannel(EXTENSION_ID),

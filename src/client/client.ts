@@ -23,14 +23,6 @@ export function getCurrentWorkspace(
 	}
 
 	const uri = editor.document.uri;
-	if (uri.scheme !== "file") {
-		/**
-		 * Here the `scheme` field may not be `file` when the active window is a panel like `output`.
-		 * The plugin only works with files, so other types of editors are ignored.
-		 */
-		return;
-	}
-
 	return workspace.getWorkspaceFolder(uri);
 }
 
@@ -138,6 +130,7 @@ export function serveFileSystemRequests(
 	client: BaseLanguageClient,
 	runtime: Runtime,
 ) {
+	const debug = window.createOutputChannel("DEBUG");
 	client.onRequest(FsStatRequest.type, (uriString: string) => {
 		const uri = Uri.parse(uriString);
 		if (uri.scheme === "file" && runtime.fs) {
@@ -167,6 +160,9 @@ export function serveFileSystemRequests(
 			const result = await workspace.findFiles(
 				param.pattern,
 				"**/node_modules/**",
+			);
+			debug.appendLine(
+				"Result from client findFile: " + JSON.stringify(result),
 			);
 			return result.map((uri) => uri.toString());
 		},

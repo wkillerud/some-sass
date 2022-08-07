@@ -1,3 +1,4 @@
+import type { Uri } from "vscode";
 import { FileStat, FileType } from "vscode-css-languageservice";
 import { Connection, RequestType } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
@@ -258,7 +259,7 @@ export class SomeSassServer {
 export namespace FsFindFilesRequest {
 	export const type: RequestType<
 		{ pattern: string; exclude: string[] },
-		URI[],
+		Uri[],
 		any
 	> = new RequestType(REQUEST_FS_FIND_FILES);
 }

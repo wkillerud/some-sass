@@ -295,6 +295,7 @@ export function getFileSystemProvider(
 				);
 				return res as FileStat;
 			} catch (e) {
+				console.error((e as Error).message);
 				return {
 					type: FileType.Unknown,
 					mtime: -1,
@@ -315,7 +316,7 @@ export function getFileSystemProvider(
 				});
 				return res;
 			} catch (e) {
-				console.error(e);
+				console.error((e as Error).message);
 				return "";
 			}
 		},
@@ -332,7 +333,7 @@ export function getFileSystemProvider(
 				});
 				return res;
 			} catch (e) {
-				console.error(e);
+				console.error((e as Error).message);
 				return [];
 			}
 		},

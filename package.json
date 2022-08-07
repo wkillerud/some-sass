@@ -30,6 +30,9 @@
 		"onLanguage:svelte",
 		"onLanguage:astro"
 	],
+	"capabilities": {
+		"virtualWorkspaces": true
+	},
 	"browser": "./dist/browser-client.js",
 	"main": "./dist/node-client.js",
 	"contributes": {

@@ -167,14 +167,12 @@ export function serveFileSystemRequests(
 				return result.map((uri) => uri.toString());
 			}
 
-			log("Running workspace.findFiles...");
 			const result = await workspace.findFiles(
 				param.pattern,
 				"**/node_modules/**",
 				undefined,
 				token,
 			);
-			log("workspace.findFiles is back!");
 			return result.map((uri) => uri.toString());
 		},
 	);

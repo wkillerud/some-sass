@@ -22,6 +22,7 @@ node_modules/
 
 # Source and test files
 .vscode-test/
+.vscode-test-web/
 .nyc_output/
 coverage/
 fixtures/

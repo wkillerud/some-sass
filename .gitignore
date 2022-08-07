@@ -12,6 +12,7 @@ dist/
 out/
 *.vsix
 .vscode-test
+.vscode-test-web
 .eslintcache
 .nyc_output
 coverage/

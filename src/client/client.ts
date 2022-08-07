@@ -142,7 +142,6 @@ export function serveFileSystemRequests(
 	runtime: Runtime,
 ) {
 	client.onRequest(FsStatRequest.type, (uriString: string) => {
-		log("Got stat request for " + uriString);
 		const uri = Uri.parse(uriString);
 		if (uri.scheme === "file" && runtime.fs) {
 			return runtime.fs.stat(uri);
@@ -152,7 +151,6 @@ export function serveFileSystemRequests(
 	client.onRequest(
 		FsReadFileRequest.type,
 		async (param: { uri: string; encoding?: string }) => {
-			log("Got read file request for " + param.uri);
 			const uri = Uri.parse(param.uri);
 			if (uri.scheme === "file" && runtime.fs) {
 				return runtime.fs.readFile(uri);
@@ -164,32 +162,20 @@ export function serveFileSystemRequests(
 	client.onRequest(
 		FsFindFilesRequest.type,
 		async (param: { pattern: string; exclude: string[] }, token) => {
-			log("Got find files request for " + param.pattern);
-
 			if (runtime.fs) {
-				log("Running fs.findFiles...");
 				const result = await runtime.fs.findFiles(param.pattern, param.exclude);
-				log("Result from client findFile: " + JSON.stringify(result));
 				return result.map((uri) => uri.toString());
 			}
 
-			try {
-				log("Running workspace.findFiles...");
-				const result = await workspace.findFiles(
-					param.pattern,
-					"**/node_modules/**",
-					undefined,
-					token,
-				);
-				log("workspace.findFiles is back!");
-				log("Result from client findFile: " + JSON.stringify(result));
-				return result.map((uri) => uri.toString());
-			} catch (e) {
-				const error = e as Error;
-				log(error.message);
-				log(error.stack || "No stacktrace");
-				throw e;
-			}
+			log("Running workspace.findFiles...");
+			const result = await workspace.findFiles(
+				param.pattern,
+				"**/node_modules/**",
+				undefined,
+				token,
+			);
+			log("workspace.findFiles is back!");
+			return result.map((uri) => uri.toString());
 		},
 	);
 }

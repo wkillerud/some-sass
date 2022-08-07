@@ -166,7 +166,7 @@ export function applySassDoc(
 	// Hint to related variables, functions, or mixins
 	if (displayOptions.see && doc.see) {
 		for (const see of doc.see) {
-			description += `\n\n@see \`${see}\``;
+			description += `\n\n@see \`${see.name}\``;
 		}
 	}
 

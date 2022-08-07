@@ -45,21 +45,31 @@ export class NodeFileSystem implements FileSystemProvider {
 	}
 
 	async stat(uri: URI): Promise<FileStat> {
-		const stats = await promises.stat(uri.fsPath);
-		let type = FileType.Unknown;
-		if (stats.isFile()) {
-			type = FileType.File;
-		} else if (stats.isDirectory()) {
-			type = FileType.Directory;
-		} else if (stats.isSymbolicLink()) {
-			type = FileType.SymbolicLink;
-		}
+		try {
+			const stats = await promises.stat(uri.fsPath);
+			let type = FileType.Unknown;
+			if (stats.isFile()) {
+				type = FileType.File;
+			} else if (stats.isDirectory()) {
+				type = FileType.Directory;
+			} else if (stats.isSymbolicLink()) {
+				type = FileType.SymbolicLink;
+			}
 
-		return {
-			type,
-			ctime: stats.ctime.getTime(),
-			mtime: stats.mtime.getTime(),
-			size: stats.size,
-		};
+			return {
+				type,
+				ctime: stats.ctime.getTime(),
+				mtime: stats.mtime.getTime(),
+				size: stats.size,
+			};
+		} catch (e) {
+			console.error((e as Error).message);
+			return {
+				type: FileType.Unknown,
+				ctime: -1,
+				mtime: -1,
+				size: -1,
+			};
+		}
 	}
 }

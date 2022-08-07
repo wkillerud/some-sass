@@ -30,6 +30,7 @@
 		"onLanguage:svelte",
 		"onLanguage:astro"
 	],
+	"browser": "./dist/browser-client.js",
 	"main": "./dist/node-client.js",
 	"contributes": {
 		"configuration": {

@@ -69,28 +69,8 @@ export class SomeSassServer {
 					this.runtime,
 				);
 
-				workspaceRoot = URI.file(options.workspace);
+				workspaceRoot = URI.parse(options.workspace);
 				settings = options.settings;
-
-				storageService = new StorageService();
-				scannerService = new ScannerService(
-					storageService,
-					fileSystemProvider,
-					settings,
-				);
-
-				const files = await fileSystemProvider.findFiles(
-					"**/*.{scss,svelte,astro,vue}",
-					settings.scannerExclude,
-				);
-
-				try {
-					await scannerService.scan(files, workspaceRoot);
-				} catch (error) {
-					if (settings.showErrors) {
-						this.connection.window.showErrorMessage(String(error));
-					}
-				}
 
 				return {
 					capabilities: {
@@ -119,6 +99,28 @@ export class SomeSassServer {
 				};
 			},
 		);
+
+		this.connection.onInitialized(async () => {
+			storageService = new StorageService();
+			scannerService = new ScannerService(
+				storageService,
+				fileSystemProvider,
+				settings,
+			);
+
+			const files = await fileSystemProvider.findFiles(
+				"**/*.{scss,svelte,astro,vue}",
+				settings.scannerExclude,
+			);
+
+			try {
+				await scannerService.scan(files, workspaceRoot);
+			} catch (error) {
+				if (settings.showErrors) {
+					this.connection.window.showErrorMessage(String(error));
+				}
+			}
+		});
 
 		documents.onDidChangeContent(async (change) => {
 			try {
@@ -258,7 +260,7 @@ export class SomeSassServer {
 export namespace FsFindFilesRequest {
 	export const type: RequestType<
 		{ pattern: string; exclude: string[] },
-		URI[],
+		string[],
 		any
 	> = new RequestType(REQUEST_FS_FIND_FILES);
 }
@@ -287,7 +289,6 @@ export function getFileSystemProvider(
 			if (handler) {
 				return handler.stat(uri);
 			}
-
 			try {
 				const res = await connection.sendRequest(
 					FsStatRequest.type,
@@ -308,16 +309,11 @@ export function getFileSystemProvider(
 			if (handler) {
 				return await handler.readFile(uri);
 			}
-			try {
-				const res = await connection.sendRequest(FsReadFileRequest.type, {
-					uri: uri.toString(),
-					encoding,
-				});
-				return res;
-			} catch (e) {
-				console.error(e);
-				return "";
-			}
+			const res = await connection.sendRequest(FsReadFileRequest.type, {
+				uri: uri.toString(),
+				encoding,
+			});
+			return res;
 		},
 		async findFiles(pattern, exclude) {
 			const handler = runtime.file;
@@ -330,9 +326,9 @@ export function getFileSystemProvider(
 					pattern,
 					exclude,
 				});
-				return res;
+				return res.map((stringUri) => URI.parse(stringUri));
 			} catch (e) {
-				console.error(e);
+				console.error((e as Error).message);
 				return [];
 			}
 		},
@@ -347,7 +343,8 @@ export function getFileSystemProvider(
 					FsStatRequest.type,
 					uri.toString(),
 				);
-				return res.type !== FileType.Unknown;
+				const exists = res.type !== FileType.Unknown;
+				return exists;
 			} catch {
 				return false;
 			}

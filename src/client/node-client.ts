@@ -87,6 +87,7 @@ async function initializeClient(
 		},
 		async () => {
 			try {
+				client.registerProposedFeatures();
 				await client.start();
 				serveFileSystemRequests(client, {
 					fs: new NodeFileSystem(),

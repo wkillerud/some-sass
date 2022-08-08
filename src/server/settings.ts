@@ -1,17 +1,34 @@
 export interface ISettings {
 	// Scanner
-	scannerDepth: number;
-	scannerExclude: string[];
-	scanImportedFiles: boolean;
+	readonly scannerDepth: number;
+	readonly scannerExclude: string[];
+	readonly scanImportedFiles: boolean;
 
 	// Display
-	showErrors: boolean;
+	readonly showErrors: boolean;
 
 	// Suggestions
-	suggestAllFromOpenDocument: boolean;
-	suggestFromUseOnly: boolean;
-	suggestVariables: boolean;
-	suggestMixins: boolean;
-	suggestFunctions: boolean;
-	suggestFunctionsInStringContextAfterSymbols: string;
+	readonly suggestAllFromOpenDocument: boolean;
+	readonly suggestFromUseOnly: boolean;
+	readonly suggestVariables: boolean;
+	readonly suggestMixins: boolean;
+	readonly suggestFunctions: boolean;
+	readonly suggestFunctionsInStringContextAfterSymbols: string;
 }
+
+export const defaultSettings: ISettings = Object.freeze({
+	scannerDepth: 30,
+	scannerExclude: [
+		"**/.git/**",
+		"**/node_modules/**",
+		"**/bower_components/**",
+	],
+	scanImportedFiles: true,
+	showErrors: false,
+	suggestAllFromOpenDocument: true,
+	suggestFromUseOnly: true,
+	suggestVariables: true,
+	suggestMixins: true,
+	suggestFunctions: true,
+	suggestFunctionsInStringContextAfterSymbols: " (+-*%",
+});

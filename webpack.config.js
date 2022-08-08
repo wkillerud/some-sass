@@ -61,6 +61,7 @@ const browserClientConfig = {
 	target: "webworker", // web extensions run in a webworker context
 	entry: {
 		"browser-client": "./src/client/browser-client.ts",
+		"test/web/suite/index": "./src/test/web/suite/index.ts", // source of the web extension test runner
 	},
 	output: {
 		filename: "[name].js",
@@ -120,16 +121,9 @@ const browserServerConfig = {
 		library: "serverExportVar",
 	},
 	resolve: {
-		mainFields: ["module", "main"],
+		mainFields: ["browser", "module", "main"],
 		extensions: [".ts", ".js"],
-		alias: {
-			fastestsmallesttextencoderdecoder: path.join(
-				__dirname,
-				"node_modules",
-				"fastestsmallesttextencoderdecoder",
-				"EncoderDecoderTogether.min.js",
-			),
-		},
+		alias: {},
 		fallback: {
 			path: require.resolve("path-browserify"),
 			util: require.resolve("util/"),

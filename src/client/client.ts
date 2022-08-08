@@ -6,13 +6,21 @@ import {
 	RequestType,
 	RevealOutputChannelOn,
 } from "vscode-languageclient";
+import { defaultSettings, ISettings } from "../server/settings";
 import {
 	EXTENSION_ID,
+	EXTENSION_NAME,
 	REQUEST_FS_FIND_FILES,
 	REQUEST_FS_READ_FILE,
 	REQUEST_FS_STAT,
 } from "../shared/constants";
 import { Runtime } from "./runtime";
+
+const output = window.createOutputChannel(EXTENSION_NAME);
+
+export function log(message: string): void {
+	output.appendLine(message);
+}
 
 export function getCurrentWorkspace(
 	editor: TextEditor | undefined,
@@ -22,14 +30,6 @@ export function getCurrentWorkspace(
 	}
 
 	const uri = editor.document.uri;
-	if (uri.scheme !== "file") {
-		/**
-		 * Here the `scheme` field may not be `file` when the active window is a panel like `output`.
-		 * The plugin only works with files, so other types of editors are ignored.
-		 */
-		return;
-	}
-
 	return workspace.getWorkspaceFolder(uri);
 }
 
@@ -47,7 +47,50 @@ export function createLanguageClientOptions(
 		{ scheme: "file", language: "vue", pattern },
 		{ scheme: "file", language: "svelte", pattern },
 		{ scheme: "file", language: "astro", pattern },
+		{ scheme: "vscode-vfs", language: "scss", pattern },
+		{ scheme: "vscode-vfs", language: "vue", pattern },
+		{ scheme: "vscode-vfs", language: "svelte", pattern },
+		{ scheme: "vscode-vfs", language: "astro", pattern },
 	];
+
+	const configuration = workspace.getConfiguration(
+		"somesass",
+		currentWorkspace,
+	);
+
+	// The browser Worker stumbles if initializationOptions is given the WorkspaceConfiguration object directly.
+	// Map it to a POJSO with default settings as well so both browser and node client/server comminication will work.
+	const settings: ISettings = {
+		scannerDepth:
+			configuration.get<number>("scannerDepth") || defaultSettings.scannerDepth,
+		scannerExclude:
+			configuration.get<string[]>("scannerExclude") ||
+			defaultSettings.scannerExclude,
+		scanImportedFiles:
+			configuration.get<boolean>("scanImportedFiles") ||
+			defaultSettings.scanImportedFiles,
+		showErrors:
+			configuration.get<boolean>("showErrors") || defaultSettings.showErrors,
+		suggestAllFromOpenDocument:
+			configuration.get<boolean>("suggestAllFromOpenDocument") ||
+			defaultSettings.suggestAllFromOpenDocument,
+		suggestFromUseOnly:
+			configuration.get<boolean>("suggestFromUseOnly") ||
+			defaultSettings.suggestFromUseOnly,
+		suggestVariables:
+			configuration.get<boolean>("suggestVariables") ||
+			defaultSettings.suggestVariables,
+		suggestMixins:
+			configuration.get<boolean>("suggestMixins") ||
+			defaultSettings.suggestMixins,
+		suggestFunctions:
+			configuration.get<boolean>("suggestFunctions") ||
+			defaultSettings.suggestFunctions,
+		suggestFunctionsInStringContextAfterSymbols:
+			configuration.get<string>(
+				"suggestFunctionsInStringContextAfterSymbols",
+			) || defaultSettings.suggestFunctionsInStringContextAfterSymbols,
+	};
 
 	const clientOptions: LanguageClientOptions = {
 		documentSelector,
@@ -56,15 +99,15 @@ export function createLanguageClientOptions(
 			fileEvents: workspace.createFileSystemWatcher({
 				baseUri: currentWorkspace.uri,
 				base: currentWorkspace.uri.fsPath,
-				pattern: "**/*.scss",
+				pattern: "**/*.{scss,vue,svelte,astro}",
 			}),
 		},
 		initializationOptions: {
-			workspace: currentWorkspace.uri.fsPath,
-			settings: workspace.getConfiguration("somesass", currentWorkspace),
+			workspace: currentWorkspace.uri.toString(),
+			settings,
 		},
 		diagnosticCollectionName: EXTENSION_ID,
-		outputChannel: window.createOutputChannel(EXTENSION_ID),
+		outputChannel: output,
 		// Don't open the output console (very annoying) in case of error
 		revealOutputChannelOn: RevealOutputChannelOn.Never,
 	};
@@ -75,7 +118,7 @@ export function createLanguageClientOptions(
 export namespace FsFindFilesRequest {
 	export const type: RequestType<
 		{ pattern: string; exclude: string[] },
-		string,
+		string[],
 		any
 	> = new RequestType(REQUEST_FS_FIND_FILES);
 }
@@ -98,14 +141,11 @@ export function serveFileSystemRequests(
 	client: BaseLanguageClient,
 	runtime: Runtime,
 ) {
-	client.registerProposedFeatures();
-
 	client.onRequest(FsStatRequest.type, (uriString: string) => {
 		const uri = Uri.parse(uriString);
 		if (uri.scheme === "file" && runtime.fs) {
 			return runtime.fs.stat(uri);
 		}
-		console.log("Hello Stat File!");
 		return workspace.fs.stat(uri);
 	});
 	client.onRequest(
@@ -115,19 +155,25 @@ export function serveFileSystemRequests(
 			if (uri.scheme === "file" && runtime.fs) {
 				return runtime.fs.readFile(uri);
 			}
-			console.log("Hello Read File!");
 			const buffer = await workspace.fs.readFile(uri);
 			return new runtime.TextDecoder(param.encoding).decode(buffer);
 		},
 	);
 	client.onRequest(
-		REQUEST_FS_FIND_FILES,
-		async (param: { pattern: string; exclude: string[] }) => {
+		FsFindFilesRequest.type,
+		async (param: { pattern: string; exclude: string[] }, token) => {
 			if (runtime.fs) {
-				return runtime.fs.findFiles(param.pattern, param.exclude);
+				const result = await runtime.fs.findFiles(param.pattern, param.exclude);
+				return result.map((uri) => uri.toString());
 			}
-			console.log("Hello Find Files!");
-			return workspace.findFiles(param.pattern);
+
+			const result = await workspace.findFiles(
+				param.pattern,
+				"**/node_modules/**",
+				undefined,
+				token,
+			);
+			return result.map((uri) => uri.toString());
 		},
 	);
 }

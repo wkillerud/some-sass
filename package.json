@@ -2,7 +2,7 @@
 	"name": "some-sass",
 	"displayName": "Some Sass",
 	"description": "Provides code suggestions, documentation and code navigation for modern SCSS",
-	"version": "2.5.0",
+	"version": "2.6.0",
 	"publisher": "SomewhatStationery",
 	"license": "MIT",
 	"engines": {
@@ -30,6 +30,10 @@
 		"onLanguage:svelte",
 		"onLanguage:astro"
 	],
+	"capabilities": {
+		"virtualWorkspaces": true
+	},
+	"browser": "./dist/browser-client.js",
 	"main": "./dist/node-client.js",
 	"contributes": {
 		"configuration": {
@@ -103,9 +107,12 @@
 		"@types/node": "^16.11.43",
 		"@types/sinon": "^10.0.12",
 		"@types/vscode": "^1.66.0",
+		"@types/webpack-env": "1.17.0",
 		"@typescript-eslint/eslint-plugin": "5.31.0",
 		"@typescript-eslint/parser": "5.31.0",
 		"@vscode/test-electron": "^2.1.5",
+		"@vscode/test-web": "^0.0.29",
+		"assert": "2.0.0",
 		"eslint": "^8.19.0",
 		"eslint-config-prettier": "8.5.0",
 		"eslint-plugin-import": "2.26.0",
@@ -158,6 +165,8 @@
 		"test:unit": "mocha \"out/**/*.spec.js\"",
 		"test:coverage": "nyc npm run test:unit",
 		"test:e2e": "npm run build && node ./out/test/e2e/runTest.js",
+		"test:chrome": "npm run build && vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/test/web/suite/index.js ./fixtures/e2e",
+		"open:chrome": "npm run build && vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ./fixtures/e2e",
 		"postinstall": "patch-package"
 	},
 	"__metadata": {

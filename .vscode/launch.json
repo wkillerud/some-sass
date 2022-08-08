@@ -31,8 +31,8 @@
 			"outFiles": ["${workspaceRoot}/dist/**/*.js"]
 		},
 		{
-			"name": "Run Web Extension in VS Code",
-			"type": "pwa-extensionHost",
+			"name": "Launch Web Extension in VS Code",
+			"type": "extensionHost",
 			"debugWebWorkerHost": true,
 			"request": "launch",
 			"args": [
@@ -40,6 +40,19 @@
 				"--extensionDevelopmentKind=web"
 			],
 			"outFiles": ["${workspaceFolder}/dist/browser-*.js"],
+			"preLaunchTask": "npm: dev"
+		},
+		{
+			"name": "Web Integration Tests in VS Code",
+			"type": "extensionHost",
+			"debugWebWorkerHost": true,
+			"request": "launch",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionDevelopmentKind=web",
+				"--extensionTestsPath=${workspaceFolder}/dist/test/web/suite/index"
+			],
+			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
 			"preLaunchTask": "npm: dev"
 		}
 	],

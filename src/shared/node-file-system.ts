@@ -32,8 +32,8 @@ export class NodeFileSystem implements FileSystemProvider {
 		}
 	}
 
-	existsSync(uri: URI): boolean {
-		return existsSync(uri.fsPath);
+	existsSync(path: string): boolean {
+		return existsSync(path);
 	}
 
 	readFile(uri: URI, encoding: BufferEncoding = "utf-8"): Promise<string> {

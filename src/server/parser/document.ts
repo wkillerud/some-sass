@@ -1,6 +1,8 @@
 import { dirname, join } from "path";
 import type { DocumentContext } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
+import { FileSystemProvider } from "../../shared/file-system";
+import type { NodeFileSystem } from "../../shared/node-file-system";
 
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
@@ -16,7 +18,11 @@ function getModuleNameFromPath(path: string) {
 	return path.slice(0, Math.max(0, path.indexOf("/")));
 }
 
-function resolvePathToModule(moduleName: string, relativeTo: string): string {
+function resolvePathToModule(
+	moduleName: string,
+	relativeTo: string,
+	fs: FileSystemProvider,
+): string | undefined {
 	// Resolve the module relative to the document. We can't use `require` here as the code is webpacked.
 	// fsPath use is OK here since we never reach this function unless the URI is a file://.
 	const documentFolder = dirname(URI.parse(relativeTo).fsPath);
@@ -29,7 +35,13 @@ function resolvePathToModule(moduleName: string, relativeTo: string): string {
 		"package.json",
 	);
 
-	return URI.file(packPath).toString();
+	if (Object.prototype.hasOwnProperty.call(fs, "existsSync")) {
+		if ((fs as NodeFileSystem).existsSync(packPath)) {
+			return URI.file(packPath).toString();
+		}
+	}
+
+	return undefined;
 }
 
 function resolve(from: string, to: string): string {
@@ -45,6 +57,7 @@ function resolve(from: string, to: string): string {
 export function buildDocumentContext(
 	documentUri: string,
 	workspaceRoot: URI,
+	fs: FileSystemProvider,
 ): DocumentContext {
 	function getRootFolder(): string | undefined {
 		let folderURI = workspaceRoot.toString();
@@ -79,7 +92,7 @@ export function buildDocumentContext(
 				ref = ref.slice(1);
 				if (base.startsWith("file://")) {
 					const moduleName = getModuleNameFromPath(ref);
-					const modulePath = resolvePathToModule(moduleName, base);
+					const modulePath = resolvePathToModule(moduleName, base, fs);
 					if (modulePath) {
 						const pathWithinModule = ref.slice(
 							Math.max(0, moduleName.length + 1),

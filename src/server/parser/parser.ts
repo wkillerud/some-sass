@@ -57,7 +57,7 @@ async function findDocumentSymbols(
 	const links = await ls.findDocumentLinks2(
 		document,
 		ast,
-		buildDocumentContext(document.uri, workspaceRoot),
+		buildDocumentContext(document.uri, workspaceRoot, fs),
 	);
 
 	const text = document.getText();

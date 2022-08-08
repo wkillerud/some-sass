@@ -103,7 +103,7 @@ export function createLanguageClientOptions(
 			}),
 		},
 		initializationOptions: {
-			workspace: currentWorkspace.uri.fsPath,
+			workspace: currentWorkspace.uri.toString(),
 			settings,
 		},
 		diagnosticCollectionName: EXTENSION_ID,

@@ -9,6 +9,7 @@ npm-debug.log*
 # Configuration
 .github/
 .vscode/
+.husky/
 .editorconfig
 .eslintrc.json
 .gitattributes
@@ -26,9 +27,11 @@ node_modules/
 .nyc_output/
 coverage/
 fixtures/
+dist/test/
 src/
 types/
 patches/
+CONTRIBUTING.md
 CHANGELOG.md
 
 # Build artifacts

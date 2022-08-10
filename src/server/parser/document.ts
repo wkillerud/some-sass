@@ -1,6 +1,5 @@
 import type { DocumentContext } from "vscode-css-languageservice";
 import { URI, Utils } from "vscode-uri";
-import { FileSystemProvider } from "../../shared/file-system";
 
 export function buildDocumentContext(
 	documentUri: string,

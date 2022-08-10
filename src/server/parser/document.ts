@@ -12,7 +12,12 @@ import type { NodeFileSystem } from "../../shared/node-file-system";
 function getModuleNameFromPath(path: string) {
 	// If a scoped module (starts with @) then get up until second instance of '/', otherwise get until first isntance of '/'
 	if (path.startsWith("@")) {
-		return path.slice(0, Math.max(0, path.indexOf("/", path.indexOf("/") + 1)));
+		const secondSlash = path.indexOf("/", path.indexOf("/") + 1);
+		// If there's no second slash (a use from the root of the scoped module) return the path as-is
+		if (secondSlash === -1) {
+			return path;
+		}
+		return path.slice(0, secondSlash);
 	}
 
 	return path.slice(0, Math.max(0, path.indexOf("/")));

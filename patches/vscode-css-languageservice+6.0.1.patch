@@ -1,0 +1,45 @@
+diff --git a/node_modules/vscode-css-languageservice/lib/esm/services/cssNavigation.js b/node_modules/vscode-css-languageservice/lib/esm/services/cssNavigation.js
+index 63b64d7..be64b1d 100644
+--- a/node_modules/vscode-css-languageservice/lib/esm/services/cssNavigation.js
++++ b/node_modules/vscode-css-languageservice/lib/esm/services/cssNavigation.js
+@@ -370,9 +370,14 @@ function toTwoDigitHex(n) {
+     return r.length !== 2 ? '0' + r : r;
+ }
+ function getModuleNameFromPath(path) {
+-    // If a scoped module (starts with @) then get up until second instance of '/', otherwise get until first instance of '/'
++    // If a scoped module (starts with @) then get up until second instance of '/', or to the end of the string for root-level imports.
+     if (path[0] === '@') {
+-        return path.substring(0, path.indexOf('/', path.indexOf('/') + 1));
++        const secondSlash = path.indexOf('/', path.indexOf('/') + 1);
++        if (secondSlash === -1) {
++            return path;
++        }
++        return path.substring(0, path.indexOf('/', path.indexOf('/') + 1));
+     }
+-    return path.substring(0, path.indexOf('/'));
++    // Otherwise get until first instance of '/'
++    return path.substring(0, path.indexOf('/'));
+ }
+diff --git a/node_modules/vscode-css-languageservice/lib/umd/services/cssNavigation.js b/node_modules/vscode-css-languageservice/lib/umd/services/cssNavigation.js
+index 3a42b53..d6725fd 100644
+--- a/node_modules/vscode-css-languageservice/lib/umd/services/cssNavigation.js
++++ b/node_modules/vscode-css-languageservice/lib/umd/services/cssNavigation.js
+@@ -382,10 +382,15 @@
+         return r.length !== 2 ? '0' + r : r;
+     }
+     function getModuleNameFromPath(path) {
+-        // If a scoped module (starts with @) then get up until second instance of '/', otherwise get until first instance of '/'
++        // If a scoped module (starts with @) then get up until second instance of '/', or to the end of the string for root-level imports.
+         if (path[0] === '@') {
+-            return path.substring(0, path.indexOf('/', path.indexOf('/') + 1));
++            const secondSlash = path.indexOf('/', path.indexOf('/') + 1);
++            if (secondSlash === -1) {
++                return path;
++            }
++            return path.substring(0, path.indexOf('/', path.indexOf('/') + 1));
+         }
+-        return path.substring(0, path.indexOf('/'));
++        // Otherwise get until first instance of '/'
++        return path.substring(0, path.indexOf('/'));
+     }
+ });

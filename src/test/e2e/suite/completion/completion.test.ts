@@ -209,6 +209,44 @@ describe("SCSS Completion Test", function () {
 		await testCompletion(svelteDocUri, position(28, 40), expectedCompletions);
 		await testCompletion(astroDocUri, position(31, 40), expectedCompletions);
 	});
+
+	it("Offers namespace completion inside string interpolation with preceeding non-space character", async () => {
+		const expectedCompletions = [
+			{
+				label: "$var-var-variable",
+				detail: "Variable declared in _variables.scss",
+				insertText: '".$var-var-variable"',
+				filterText: '"ns.$var-var-variable"',
+			},
+			{
+				label: "fun-fun-function",
+				detail: "Function declared in _functions.scss",
+				insertText: '{"_tabstop":1,"value":".fun-fun-function()"}',
+			},
+		];
+
+		await testCompletion(docUri, position(26, 20), expectedCompletions);
+	});
+
+	it("Offers namespace completion as part of math expression", async () => {
+		for (const line of [30, 34, 38]) {
+			const expectedCompletions = [
+				{
+					label: "$var-var-variable",
+					detail: "Variable declared in _variables.scss",
+					insertText: '".$var-var-variable"',
+					filterText: '"ns.$var-var-variable"',
+				},
+				{
+					label: "fun-fun-function",
+					detail: "Function declared in _functions.scss",
+					insertText: '{"_tabstop":1,"value":".fun-fun-function()"}',
+				},
+			];
+
+			await testCompletion(docUri, position(line, 23), expectedCompletions);
+		}
+	});
 });
 
 describe("SassDoc Completion Test", () => {

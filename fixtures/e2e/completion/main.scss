@@ -23,4 +23,17 @@ $fonts: -apple-system;
   color: ns.
   @include ns.
   --runtime-var: var(--other-var, #{ns.})
+  font-size: -#{ns.}
+}
+
+@function _multiply($value) {
+  @return $value * ns.;
+}
+
+@function _add($value) {
+  @return $value + ns.;
+}
+
+@function _subtract($value) {
+  @return $value - ns.;
 }

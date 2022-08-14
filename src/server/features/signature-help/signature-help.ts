@@ -246,7 +246,12 @@ export async function doSignatureHelp(
 		);
 
 		const sassdoc = applySassDoc(symbol, {
-			displayOptions: { description: true, deprecated: true, return: true },
+			displayOptions: {
+				description: true,
+				deprecated: true,
+				return: true,
+				parameter: true,
+			},
 		});
 
 		signatureInfo.documentation = {
@@ -347,7 +352,8 @@ function traverseTree(
 		if (
 			!child.link.target ||
 			(child as ScssImport).dynamic ||
-			(child as ScssImport).css
+			(child as ScssImport).css ||
+			child.link.target === scssDocument.uri
 		) {
 			continue;
 		}

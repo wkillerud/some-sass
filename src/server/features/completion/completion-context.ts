@@ -17,11 +17,12 @@ export interface CompletionContext {
 	originalExtension: SupportedExtensions;
 }
 
+const reReturn = /^.*@return/;
 const rePropertyValue = /.*:\s*/;
 const reEmptyPropertyValue = /.*:\s*$/;
 const reQuotedValueInString = /["'](?:[^"'\\]|\\.)*["']/g;
 const reMixinReference = /.*@include\s+(.*)/;
-const reComment = /^.*(\/(\/|\*)|\*)/;
+const reComment = /^(.*\/\/|.*\/\*|\s*\*)/;
 const reSassDoc = /^[\\s]*\/{3}.*$/;
 const reQuotes = /["']/;
 const rePartialModuleAtRule = /@(?:use|forward|import) ["']/;
@@ -35,9 +36,10 @@ function checkVariableContext(
 	isPropertyValue: boolean,
 	isEmptyValue: boolean,
 	isQuotes: boolean,
+	isReturn: boolean,
 	isNamespace: boolean,
 ): boolean {
-	if (isPropertyValue && !isEmptyValue && !isQuotes) {
+	if ((isReturn || isPropertyValue) && !isEmptyValue && !isQuotes) {
 		if (isNamespace && word.endsWith(".")) {
 			return true;
 		}
@@ -71,10 +73,11 @@ function checkFunctionContext(
 	isPropertyValue: boolean,
 	isEmptyValue: boolean,
 	isQuotes: boolean,
+	isReturn: boolean,
 	isNamespace: boolean,
 	settings: ISettings,
 ): boolean {
-	if (isPropertyValue && !isEmptyValue && !isQuotes) {
+	if ((isReturn || isPropertyValue) && !isEmptyValue && !isQuotes) {
 		if (isNamespace) {
 			return true;
 		}
@@ -114,7 +117,7 @@ function checkNamespaceContext(
 
 	// Skip #{ if this is interpolation
 	return currentWord.substring(
-		isInterpolation ? 2 : 0,
+		isInterpolation ? currentWord.indexOf("{") + 1 : 0,
 		currentWord.indexOf("."),
 	);
 }
@@ -134,6 +137,7 @@ export function createCompletionContext(
 	const isInterpolation = isInterpolationContext(currentWord);
 
 	// Information about current position
+	const isReturn = reReturn.test(textBeforeWord);
 	const isPropertyValue = rePropertyValue.test(textBeforeWord);
 	const isEmptyValue = reEmptyPropertyValue.test(textBeforeWord);
 	const isQuotes = reQuotes.test(
@@ -161,6 +165,7 @@ export function createCompletionContext(
 			isPropertyValue,
 			isEmptyValue,
 			isQuotes,
+			isReturn,
 			Boolean(namespace),
 		),
 		function: checkFunctionContext(
@@ -169,6 +174,7 @@ export function createCompletionContext(
 			isPropertyValue,
 			isEmptyValue,
 			isQuotes,
+			isReturn,
 			Boolean(namespace),
 			settings,
 		),

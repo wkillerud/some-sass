@@ -136,7 +136,7 @@ describe("Services/Parser", () => {
 				uri: "middle/middle.scss",
 			});
 			await helpers.makeDocument(storage, ["$tr: 2px;"], fs, {
-				uri: "moddle/lower/lower.scss",
+				uri: "middle/lower/lower.scss",
 			});
 
 			const document = await helpers.makeDocument(
@@ -150,6 +150,23 @@ describe("Services/Parser", () => {
 			const uses = [...symbols.uses.values()];
 
 			strictEqual(uses.length, 3, "expected to find three uses");
+		});
+
+		it("should not crash on link to the same document", async () => {
+			const document = await helpers.makeDocument(
+				storage,
+				['@use "./self";', "$var: 1px;"],
+				fs,
+				{
+					uri: "self.scss",
+				},
+			);
+			const symbols = await parseDocument(document, URI.parse(""), fs);
+			const uses = [...symbols.uses.values()];
+			const variables = [...symbols.variables.values()];
+
+			strictEqual(variables.length, 1, "expected to find one variable");
+			strictEqual(uses.length, 0, "expected to find no use link to self");
 		});
 	});
 

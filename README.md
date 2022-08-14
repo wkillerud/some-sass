@@ -16,7 +16,9 @@ Visit the [release section on GitHub](https://github.com/wkillerud/vscode-scss/r
 
 Search for Some Sass (`SomewhatStationery.some-sass`) from the extension installer within VS Code or install from [the Marketplace](https://marketplace.visualstudio.com/items?itemName=SomewhatStationery.some-sass).
 
-If you have SCSS IntelliSense (`mrmlnc.vscode-scss`) installed you should disable or uninstall it. Otherwise the two extensions will both provide hover information and code suggestions.
+See [Recommended settings](#recommended-settings-for-visual-studio-code) for some tips on how to tweak code suggestions to your liking.
+
+Note that if you have SCSS IntelliSense (`mrmlnc.vscode-scss`) installed you should disable or uninstall it. Otherwise the two extensions will both provide hover information and code suggestions.
 
 ## Usage
 
@@ -166,7 +168,6 @@ Depending on your project size, you may want to tweak this setting to control ho
 - JSON key: `somesass.scannerDepth`.
 - Default: `30`.
 
-
 #### Stop scanner from following links
 
 `@deprecated`
@@ -177,7 +178,6 @@ after `@import` becomes CSS-only.
 
 - JSON key: `somesass.scanImportedFiles`.
 - Default: `true`.
-
 
 ## What this extension does _not_ do
 

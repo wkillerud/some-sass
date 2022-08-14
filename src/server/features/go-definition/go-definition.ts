@@ -211,7 +211,8 @@ function traverseTree(
 		if (
 			!child.link.target ||
 			(child as ScssImport).dynamic ||
-			(child as ScssImport).css
+			(child as ScssImport).css ||
+			child.link.target === scssDocument.uri
 		) {
 			continue;
 		}

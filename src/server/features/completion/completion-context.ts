@@ -114,7 +114,7 @@ function checkNamespaceContext(
 
 	// Skip #{ if this is interpolation
 	return currentWord.substring(
-		isInterpolation ? 2 : 0,
+		isInterpolation ? currentWord.indexOf("{") + 1 : 0,
 		currentWord.indexOf("."),
 	);
 }

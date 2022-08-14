@@ -246,7 +246,12 @@ export async function doSignatureHelp(
 		);
 
 		const sassdoc = applySassDoc(symbol, {
-			displayOptions: { description: true, deprecated: true, return: true },
+			displayOptions: {
+				description: true,
+				deprecated: true,
+				return: true,
+				parameter: true,
+			},
 		});
 
 		signatureInfo.documentation = {

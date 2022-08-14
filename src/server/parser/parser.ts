@@ -85,10 +85,27 @@ async function findDocumentSymbols(
 				const partialExists = await fs.exists(partialUri);
 				if (!partialExists) {
 					// We tried to resolve the file as a partial, but it doesn't exist.
-					continue;
+					// The target string may be a folder with an index file
+					// so try looking for it by that name.
+					const index = ensureIndex(link.target);
+					const indexUri = URI.parse(index);
+					const indexExists = await fs.exists(indexUri);
+					if (!indexExists) {
+						const partialIndex = ensurePartial(ensureIndex(link.target));
+						const partialIndexUri = URI.parse(partialIndex);
+						const partialIndexExists = await fs.exists(partialIndexUri);
+						if (!partialIndexExists) {
+							// We tried, this file doesn't exist
+							continue;
+						} else {
+							link.target = partialIndex;
+						}
+					} else {
+						link.target = index;
+					}
+				} else {
+					link.target = partial;
 				}
-
-				link.target = partial;
 			}
 
 			const matchUse = reUse.exec(line);
@@ -268,6 +285,20 @@ function ensurePartial(target: string): string {
 	const path = target.slice(0, Math.max(0, lastSlash + 1));
 	const extension = target.slice(Math.max(0, lastDot));
 	return `${path}_${fileName}${extension}`;
+}
+
+function ensureIndex(target: string): string {
+	const lastSlash = target.lastIndexOf("/");
+	const lastDot = target.lastIndexOf(".");
+	const fileName = target.substring(lastSlash + 1, lastDot);
+
+	if (fileName.includes("index")) {
+		return target;
+	}
+
+	const path = target.slice(0, Math.max(0, lastSlash + 1));
+	const extension = target.slice(Math.max(0, lastDot));
+	return `${path}/${fileName}/index${extension}`;
 }
 
 function urlMatches(url: string, linkTarget: string): boolean {

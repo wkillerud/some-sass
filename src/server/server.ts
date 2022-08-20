@@ -1,5 +1,4 @@
-import { FileStat, FileType } from "vscode-css-languageservice";
-import { Connection, RequestType } from "vscode-languageserver";
+import { Connection } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
 	TextDocuments,
@@ -10,11 +9,6 @@ import type {
 	InitializeResult,
 } from "vscode-languageserver/node";
 import { URI } from "vscode-uri";
-import {
-	REQUEST_FS_FIND_FILES,
-	REQUEST_FS_READ_FILE,
-	REQUEST_FS_STAT,
-} from "../shared/constants";
 import type { FileSystemProvider } from "../shared/file-system";
 import { doCompletion } from "./features/completion";
 import { doDiagnostics } from "./features/diagnostics/diagnostics";
@@ -23,6 +17,7 @@ import { doHover } from "./features/hover/hover";
 import { provideReferences } from "./features/references";
 import { doSignatureHelp } from "./features/signature-help/signature-help";
 import { searchWorkspaceSymbol } from "./features/workspace-symbols/workspace-symbol";
+import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";
 import ScannerService from "./scanner";
 import type { ISettings } from "./settings";
@@ -255,107 +250,4 @@ export class SomeSassServer {
 
 		this.connection.listen();
 	}
-}
-
-export namespace FsFindFilesRequest {
-	export const type: RequestType<
-		{ pattern: string; exclude: string[] },
-		string[],
-		any
-	> = new RequestType(REQUEST_FS_FIND_FILES);
-}
-
-export namespace FsReadFileRequest {
-	export const type: RequestType<
-		{ uri: string; encoding?: string },
-		string,
-		any
-	> = new RequestType(REQUEST_FS_READ_FILE);
-}
-
-export namespace FsStatRequest {
-	export const type: RequestType<string, FileStat, any> = new RequestType(
-		REQUEST_FS_STAT,
-	);
-}
-
-export function getFileSystemProvider(
-	connection: Connection,
-	runtime: RuntimeEnvironment,
-): FileSystemProvider {
-	return {
-		async stat(uri: URI) {
-			const handler = runtime.file;
-			if (handler) {
-				return handler.stat(uri);
-			}
-			try {
-				const res = await connection.sendRequest(
-					FsStatRequest.type,
-					uri.toString(),
-				);
-				return res as FileStat;
-			} catch (e) {
-				return {
-					type: FileType.Unknown,
-					mtime: -1,
-					ctime: -1,
-					size: -1,
-				};
-			}
-		},
-		async readFile(uri: URI, encoding = "utf-8") {
-			const handler = runtime.file;
-			if (handler) {
-				return await handler.readFile(uri);
-			}
-			const res = await connection.sendRequest(FsReadFileRequest.type, {
-				uri: uri.toString(),
-				encoding,
-			});
-			return res;
-		},
-		async findFiles(pattern, exclude) {
-			const handler = runtime.file;
-			if (handler) {
-				return handler.findFiles(pattern, exclude);
-			}
-
-			try {
-				const res = await connection.sendRequest(FsFindFilesRequest.type, {
-					pattern,
-					exclude,
-				});
-				return res.map((stringUri) => URI.parse(stringUri));
-			} catch (e) {
-				console.error((e as Error).message);
-				return [];
-			}
-		},
-		async exists(uri: URI) {
-			const handler = runtime.file;
-			if (handler) {
-				return handler.exists(uri);
-			}
-
-			try {
-				const res = await connection.sendRequest(
-					FsStatRequest.type,
-					uri.toString(),
-				);
-				const exists = res.type !== FileType.Unknown;
-				return exists;
-			} catch {
-				return false;
-			}
-		},
-		realPath(uri) {
-			const handler = runtime.file;
-			if (handler) {
-				return handler.realPath(uri);
-			}
-
-			return Promise.resolve(uri.toString());
-		},
-	};
 }

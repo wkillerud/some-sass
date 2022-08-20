@@ -14,7 +14,6 @@ export function getSCSSRegions(content: string) {
 	const startRe =
 		/<style[\w\t\n "'=]+(lang|type)=["'](text\/)?scss["'][\w\t\n "'=]*>/g;
 	const endRe = /<\/style>/g;
-	/* Tslint:disable:no-conditional-assignment */
 	let start: RegExpExecArray | null;
 	let end: RegExpExecArray | null;
 	while (

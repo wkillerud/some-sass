@@ -113,7 +113,7 @@ export function applySassDoc(
 		}
 	}
 
-	// For fixins that take @content
+	// For mixins that take @content
 	if (displayOptions.content && doc.content) {
 		description += `\n\n@content ${doc.content}`;
 	}

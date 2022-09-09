@@ -86,6 +86,10 @@ export enum NodeType {
 	ForwardVisibility,
 	Module,
 	UnicodeRange,
+	Layer,
+	LayerNameList,
+	LayerName,
+	PropertyAtRule,
 }
 
 export interface INode {

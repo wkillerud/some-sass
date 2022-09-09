@@ -181,11 +181,11 @@ async function findDocumentSymbols(
 		console.error(error);
 	}
 
-	const symbols = ls.findDocumentSymbols(document, ast);
+	const symbols = ls.findDocumentSymbols2(document, ast);
 
 	for (const symbol of symbols) {
-		const position = symbol.location.range.start;
-		const offset = document.offsetAt(symbol.location.range.start);
+		const position = symbol.range.start;
+		const offset = document.offsetAt(symbol.range.start);
 		switch (symbol.kind) {
 			case SymbolKind.Variable: {
 				const dollarlessName = symbol.name.replace("$", "");

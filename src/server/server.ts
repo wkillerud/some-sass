@@ -1,4 +1,4 @@
-import { Connection } from "vscode-languageserver";
+import { Connection, FileChangeType } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
 	TextDocuments,
@@ -145,9 +145,25 @@ export class SomeSassServer {
 			settings = params.settings.somesass;
 		});
 
-		this.connection.onDidChangeWatchedFiles((event) => {
-			const files = event.changes.map((file) => URI.parse(file.uri));
-			return scannerService.scan(files, workspaceRoot);
+		this.connection.onDidChangeWatchedFiles(async (event) => {
+			const newFiles: URI[] = [];
+			for (const change of event.changes) {
+				const uri = URI.parse(change.uri);
+				if (change.type === FileChangeType.Deleted) {
+					storageService.delete(uri);
+				} else if (change.type === FileChangeType.Changed) {
+					const document = storageService.get(uri);
+					if (document) {
+						await scannerService.update(document, workspaceRoot);
+					} else {
+						// New to us anyway
+						newFiles.push(uri);
+					}
+				} else {
+					newFiles.push(uri);
+				}
+			}
+			return scannerService.scan(newFiles, workspaceRoot);
 		});
 
 		this.connection.onCompletion((textDocumentPosition) => {

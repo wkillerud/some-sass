@@ -98,14 +98,16 @@ async function findDocumentSymbols(
 							// We tried, this file doesn't exist
 							continue;
 						} else {
-							link.target = partialIndex;
+							link.target = partialIndexUri.toString();
 						}
 					} else {
-						link.target = index;
+						link.target = indexUri.toString();
 					}
 				} else {
-					link.target = partial;
+					link.target = partialUri.toString();
 				}
+			} else {
+				link.target = targetUri.toString();
 			}
 
 			const matchUse = reUse.exec(line);

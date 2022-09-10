@@ -31,6 +31,8 @@ dist/test/
 src/
 types/
 patches/
+.nvmrc
+.nycrc.json
 CONTRIBUTING.md
 CHANGELOG.md
 

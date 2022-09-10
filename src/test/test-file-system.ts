@@ -35,6 +35,6 @@ export class TestFileSystem implements FileSystemProvider {
 	}
 
 	realPath(uri: URI) {
-		return Promise.resolve(uri.fsPath);
+		return Promise.resolve(uri);
 	}
 }

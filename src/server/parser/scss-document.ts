@@ -62,7 +62,7 @@ export class ScssDocument implements IScssDocument {
 
 		try {
 			const path = await this.fs.realPath(URI.parse(this.uri));
-			this.realPath = path;
+			this.realPath = path.fsPath;
 		} catch {
 			// Do nothing
 		}

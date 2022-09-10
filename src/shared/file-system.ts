@@ -15,5 +15,5 @@ export interface FileSystemProvider {
 	): Promise<URI[]>;
 	readFile(uri: URI, encoding?: BufferEncoding): Promise<string>;
 	stat(uri: URI): Promise<FileStat>;
-	realPath(uri: URI): Promise<string>;
+	realPath(uri: URI): Promise<URI>;
 }

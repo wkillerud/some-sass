@@ -40,8 +40,9 @@ export class NodeFileSystem implements FileSystemProvider {
 		return promises.readFile(uri.fsPath, encoding);
 	}
 
-	realPath(uri: URI): Promise<string> {
-		return promises.realpath(uri.fsPath);
+	async realPath(uri: URI): Promise<URI> {
+		const fsPath = await promises.realpath(uri.fsPath);
+		return URI.file(fsPath);
 	}
 
 	async stat(uri: URI): Promise<FileStat> {

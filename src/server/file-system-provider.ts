@@ -107,7 +107,7 @@ export function getFileSystemProvider(
 				return handler.realPath(uri);
 			}
 
-			return Promise.resolve(uri.toString());
+			return Promise.resolve(uri);
 		},
 	};
 }

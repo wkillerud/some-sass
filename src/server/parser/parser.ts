@@ -115,6 +115,7 @@ async function findDocumentSymbols(
 				const url = matchUse.groups?.["url"];
 				if (urlMatches(url as string, link.target)) {
 					const namespace = matchUse.groups?.["namespace"];
+					link.target = await toRealPath(link.target, fs);
 					result.uses.set(link.target, {
 						link,
 						namespace: namespace || getNamespaceFromLink(link),
@@ -129,6 +130,7 @@ async function findDocumentSymbols(
 			if (matchForward) {
 				const url = matchForward.groups?.["url"];
 				if (urlMatches(url as string, link.target)) {
+					link.target = await toRealPath(link.target, fs);
 					result.forwards.set(link.target, {
 						link,
 						prefix: matchForward.groups?.["prefix"],
@@ -145,6 +147,7 @@ async function findDocumentSymbols(
 			if (matchImport) {
 				const url = matchImport.groups?.["url"];
 				if (urlMatches(url as string, link.target)) {
+					link.target = await toRealPath(link.target, fs);
 					result.imports.set(link.target, {
 						link,
 						dynamic: reDynamicPath.test(link.target),
@@ -319,6 +322,15 @@ function urlMatches(url: string, linkTarget: string): boolean {
 	}
 
 	return match;
+}
+
+async function toRealPath(
+	target: string,
+	fs: FileSystemProvider,
+): Promise<string> {
+	const linkUri = URI.parse(target);
+	const realPathUri = await fs.realPath(linkUri);
+	return realPathUri.toString();
 }
 
 function getVariableValue(ast: INode, offset: number): string | null {

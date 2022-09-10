@@ -1,4 +1,5 @@
-import { strictEqual } from "assert";
+import { ok, strictEqual } from "assert";
+import { isMatch } from "micromatch";
 import ScannerService from "../../server/scanner";
 import { defaultSettings } from "../../server/settings";
 import StorageService from "../../server/storage";
@@ -7,7 +8,7 @@ import { getUri } from "./scanner-helper";
 
 const fs = new NodeFileSystem();
 
-describe("Services/Parser", () => {
+describe("Services/Scanner", () => {
 	it("should follow links", async () => {
 		const workspaceUri = getUri("scanner/follow-links/");
 		const docUri = getUri("scanner/follow-links/styles.scss");
@@ -39,6 +40,16 @@ describe("Services/Parser", () => {
 			documents.length,
 			1,
 			"expected to find a document in fixtures/unit/scanner/self-reference/",
+		);
+	});
+
+	it("exclude matcher works as expected", () => {
+		ok(isMatch("/home/user/project/.git/index", "**/.git/**"));
+		ok(
+			isMatch(
+				"/home/user/project/node_modules/package/some.scss",
+				"**/node_modules/**",
+			),
 		);
 	});
 });

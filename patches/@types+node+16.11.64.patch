@@ -1,12 +1,11 @@
-diff --git a/node_modules/@types/node/globals.d.ts b/node_modules/@types/node/globals.d.ts
-index 3d230a5..5f579c6 100755
---- a/node_modules/@types/node/globals.d.ts
-+++ b/node_modules/@types/node/globals.d.ts
-@@ -41,40 +41,40 @@ declare var exports: any;
-  */
+diff --git a/node_modules/@types/node/ts4.8/globals.d.ts b/node_modules/@types/node/ts4.8/globals.d.ts
+index 3d230a5..1b8465c 100755
+--- a/node_modules/@types/node/ts4.8/globals.d.ts
++++ b/node_modules/@types/node/ts4.8/globals.d.ts
+@@ -42,38 +42,38 @@ declare var exports: any;
  declare var gc: undefined | (() => void);
  
--//#region borrowed
+ //#region borrowed
 -// from https://github.com/microsoft/TypeScript/blob/38da7c600c83e7b31193a62495239a0fe478cb67/lib/lib.webworker.d.ts#L633 until moved to separate lib
 -/** A controller object that allows you to abort one or more DOM requests as and when desired. */
 -interface AbortController {
@@ -39,8 +38,6 @@ index 3d230a5..5f579c6 100755
 -    new(): AbortSignal;
 -    // TODO: Add abort() static
 -};
--//#endregion borrowed
-+// //#region borrowed
 +// // from https://github.com/microsoft/TypeScript/blob/38da7c600c83e7b31193a62495239a0fe478cb67/lib/lib.webworker.d.ts#L633 until moved to separate lib
 +// /** A controller object that allows you to abort one or more DOM requests as and when desired. */
 +// interface AbortController {
@@ -73,7 +70,6 @@ index 3d230a5..5f579c6 100755
 +//     new(): AbortSignal;
 +//     // TODO: Add abort() static
 +// };
-+// //#endregion borrowed
+ //#endregion borrowed
  
  //#region ArrayLike.at()
- interface RelativeIndexable<T> {

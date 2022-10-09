@@ -8,7 +8,7 @@ Some Sass provides code suggestions, documentation and code navigation for SCSS.
 
 Supports standalone SCSS, as well as style blocks inside Vue, Svelte and Astro components.
 
-Based on SCSS Intellisense by [Denis Malinochkin and contributors](https://github.com/mrmlnc/vscode-scss). Uses the built-in VS Code language server for SCSS.
+Based on SCSS Intellisense by [Denis Malinochkin and contributors](https://github.com/mrmlnc/vscode-scss). Extends the built-in VS Code language server for SCSS.
 
 Visit the [release section on GitHub](https://github.com/wkillerud/vscode-scss/releases) to see what has changed between versions.
 

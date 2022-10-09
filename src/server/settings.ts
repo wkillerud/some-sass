@@ -16,6 +16,11 @@ export interface ISettings {
 	readonly suggestFunctionsInStringContextAfterSymbols: string;
 }
 
+export interface IEditorSettings {
+	insertSpaces: boolean;
+	tabSize: number;
+}
+
 export const defaultSettings: ISettings = Object.freeze({
 	scannerDepth: 30,
 	scannerExclude: [

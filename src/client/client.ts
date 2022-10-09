@@ -1,4 +1,14 @@
-import { TextEditor, Uri, window, workspace, WorkspaceFolder } from "vscode";
+import {
+	commands,
+	Position,
+	Selection,
+	TextEdit,
+	TextEditor,
+	Uri,
+	window,
+	workspace,
+	WorkspaceFolder,
+} from "vscode";
 import { FileStat } from "vscode-css-languageservice";
 import {
 	BaseLanguageClient,
@@ -7,6 +17,7 @@ import {
 	RevealOutputChannelOn,
 } from "vscode-languageclient";
 import { defaultSettings, ISettings } from "../server/settings";
+import { getEOL } from "../server/utils/string";
 import {
 	EXTENSION_ID,
 	EXTENSION_NAME,
@@ -176,4 +187,70 @@ export function serveFileSystemRequests(
 			return result.map((uri) => uri.toString());
 		},
 	);
+}
+
+export function registerCodeActionCommand(client: BaseLanguageClient) {
+	commands.registerCommand(
+		"_somesass.applyExtractCodeAction",
+		applyExtractCodeAction,
+	);
+
+	function applyExtractCodeAction(
+		uri: string,
+		documentVersion: number,
+		textEdit: TextEdit,
+	) {
+		const textEditor = window.activeTextEditor;
+		if (!textEditor || textEditor.document.uri.toString() !== uri) {
+			return;
+		}
+
+		if (textEditor.document.version !== documentVersion) {
+			window.showInformationMessage(
+				"The document has changed since the extract edit was made. Please save and retry.",
+			);
+			return;
+		}
+
+		textEditor
+			.edit((editor) => {
+				editor.replace(
+					client.protocol2CodeConverter.asRange(textEdit.range),
+					textEdit.newText,
+				);
+			})
+			.then((success) => {
+				if (!success) {
+					window.showErrorMessage(
+						"Failed to extract. Consider opening an issue with steps to reproduce.",
+					);
+					return;
+				}
+
+				// Position where the newly extracted symbol is being used.
+				const lines = textEdit.newText.split(getEOL(textEdit.newText));
+				const lineOfUsage = lines[lines.length - 1];
+
+				const _variable = lineOfUsage.indexOf("_variable");
+				const _function = lineOfUsage.indexOf("_function");
+				const _mixin = lineOfUsage.indexOf("_mixin");
+
+				const newCursorPosition = new Position(
+					textEdit.range.start.line + lines.length - 1,
+					Math.max(_variable, _function, _mixin) + 1,
+				);
+
+				// Clear selection
+				textEditor.selection = new Selection(
+					newCursorPosition,
+					newCursorPosition,
+				);
+
+				// Trigger rename of extracted symbol
+				commands.executeCommand("editor.action.rename", [
+					textEditor.document.uri,
+					newCursorPosition,
+				]);
+			});
+	}
 }

@@ -79,6 +79,14 @@ mixin or function.
 To use this feature, right-click a variable, mixin or function and choose
 `Find All References`.
 
+### Code actions
+
+#### Extract
+
+Available when you have an active selection. Pick between extracting to a variable, function or mixin.
+
+See the [Refactoring](https://code.visualstudio.com/docs/editor/refactoring) chapter of the VS Code documentation to see how to use this feature.
+
 ## Recommended settings for Visual Studio Code
 
 **Improved code suggestions for variables under namespaces**

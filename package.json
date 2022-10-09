@@ -28,7 +28,8 @@
 		"onLanguage:scss",
 		"onLanguage:vue",
 		"onLanguage:svelte",
-		"onLanguage:astro"
+		"onLanguage:astro",
+		"onCommand:_somesass.applyExtractCodeAction"
 	],
 	"capabilities": {
 		"virtualWorkspaces": true

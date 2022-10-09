@@ -15,6 +15,7 @@ import { EXTENSION_ID, EXTENSION_NAME } from "../shared/constants";
 import {
 	createLanguageClientOptions,
 	getCurrentWorkspace,
+	registerCodeActionCommand,
 	serveFileSystemRequests,
 } from "./client";
 
@@ -77,6 +78,7 @@ async function initializeClient(
 				serveFileSystemRequests(client, {
 					TextDecoder,
 				});
+				registerCodeActionCommand(client);
 			} catch (error: unknown) {
 				await window.showErrorMessage(
 					`Client initialization failed. ${

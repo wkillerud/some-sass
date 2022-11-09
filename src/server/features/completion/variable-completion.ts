@@ -92,10 +92,13 @@ export function createVariableCompletionItems(
 			kind: completionKind,
 			detail,
 			tags: variable.sassdoc?.deprecated ? [CompletionItemTag.Deprecated] : [],
-			documentation: {
-				kind: MarkupKind.Markdown,
-				value: documentation,
-			},
+			documentation:
+				completionKind === CompletionItemKind.Color
+					? documentation
+					: {
+							kind: MarkupKind.Markdown,
+							value: documentation,
+					  },
 		});
 	}
 

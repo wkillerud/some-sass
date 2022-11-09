@@ -7,6 +7,7 @@
 		"moduleResolution": "node",
 		"rootDir": "src",
 		"outDir": "out",
-		"strict": true
+		"strict": true,
+		"resolveJsonModule": true
 	}
 }

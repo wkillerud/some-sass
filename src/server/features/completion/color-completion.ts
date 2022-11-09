@@ -7,16 +7,10 @@ const colorHex = /.?(#([\da-f]{6}([\da-f]{2})?|[\da-f]{3}([\da-f])?))\b/gi;
 const colorFunctions =
 	/((rgb|hsl)a?\((?:\d{1,3}%?,\s*){2}\d{1,3}%?(,\s*\d?\.?\d+)?\))/gi;
 
-const preparedRePart = Object.keys(webColors)
-	.map((color) => `\\b${color}\\b`)
-	.join("|");
-
-const colorWeb = new RegExp(`.?(${preparedRePart})(?!-)`, "g");
-
-export function getVariableColor(value: string): string[] | null {
-	const hex = findHex(value);
-	const fn = findFn(value);
-	const words = findWords(value);
+export function getVariableColor(value: string): string | string[] | null {
+	const hex: string[] | null = findHex(value);
+	const fn: string[] | null = findFn(value);
+	const word: string | null = findWord(value);
 
 	if (hex.length > 0) {
 		return hex;
@@ -26,8 +20,8 @@ export function getVariableColor(value: string): string[] | null {
 		return fn;
 	}
 
-	if (words.length > 0) {
-		return words;
+	if (word) {
+		return word;
 	}
 
 	return null;
@@ -44,9 +38,9 @@ function findHex(text: string): string[] {
 		const matchedColor = match[1];
 
 		try {
-			const color = Color(matchedColor).hex();
-
-			result.push(color);
+			Color(matchedColor).hex();
+			// Push the original value if the above does not error
+			result.push(text);
 		} catch (error) {
 			console.error(error);
 		}
@@ -80,29 +74,13 @@ function findFn(text: string): string[] {
 /**
  * Find color from words
  */
-function findWords(text: string): string[] {
-	let match = colorWeb.exec(text);
-	const result = [];
+function findWord(text: string): string | null {
+	const namedCssColor = text as keyof typeof webColors;
+	const color = webColors[namedCssColor];
 
-	while (match !== null) {
-		const firstChar = match[0]?.[0];
-		const matchedColor = match[1];
-
-		if (firstChar && firstChar.length > 0 && /[#$@\\-]/.test(firstChar)) {
-			match = colorWeb.exec(text);
-			continue;
-		}
-
-		try {
-			const color = Color(matchedColor).rgb().string();
-
-			result.push(color);
-		} catch (error) {
-			console.error(error);
-		}
-
-		match = colorWeb.exec(text);
+	if (color) {
+		return color;
 	}
 
-	return result;
+	return null;
 }

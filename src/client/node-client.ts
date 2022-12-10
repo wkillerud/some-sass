@@ -16,6 +16,7 @@ import { NodeFileSystem } from "../shared/node-file-system";
 import {
 	createLanguageClientOptions,
 	getCurrentWorkspace,
+	registerCodeActionCommand,
 	serveFileSystemRequests,
 } from "./client";
 
@@ -93,6 +94,7 @@ async function initializeClient(
 					fs: new NodeFileSystem(),
 					TextDecoder,
 				});
+				registerCodeActionCommand(client);
 			} catch (error: unknown) {
 				await window.showErrorMessage(
 					`Client initialization failed. ${

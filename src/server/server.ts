@@ -1,4 +1,11 @@
-import { Connection, FileChangeType } from "vscode-languageserver";
+import {
+	CodeAction,
+	CodeActionKind,
+	Command,
+	Connection,
+	FileChangeType,
+	TextDocumentEdit,
+} from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
 	TextDocuments,
@@ -10,6 +17,7 @@ import type {
 } from "vscode-languageserver/node";
 import { URI } from "vscode-uri";
 import type { FileSystemProvider } from "../shared/file-system";
+import { ExtractProvider } from "./features/code-actions";
 import { doCompletion } from "./features/completion";
 import { doDiagnostics } from "./features/diagnostics/diagnostics";
 import { goDefinition } from "./features/go-definition/go-definition";
@@ -20,7 +28,7 @@ import { searchWorkspaceSymbol } from "./features/workspace-symbols/workspace-sy
 import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";
 import ScannerService from "./scanner";
-import type { ISettings } from "./settings";
+import type { IEditorSettings, ISettings } from "./settings";
 import StorageService from "./storage";
 import { getSCSSRegionsDocument } from "./utils/embedded";
 
@@ -41,6 +49,7 @@ export class SomeSassServer {
 	public listen(): void {
 		let workspaceRoot: URI;
 		let settings: ISettings;
+		let editorSettings: IEditorSettings;
 		let storageService: StorageService;
 		let scannerService: ScannerService;
 		let fileSystemProvider: FileSystemProvider;
@@ -65,7 +74,6 @@ export class SomeSassServer {
 				);
 
 				workspaceRoot = URI.parse(options.workspace);
-				settings = options.settings;
 
 				return {
 					capabilities: {
@@ -90,12 +98,25 @@ export class SomeSassServer {
 						hoverProvider: true,
 						definitionProvider: true,
 						workspaceSymbolProvider: true,
+						codeActionProvider: {
+							codeActionKinds: [
+								CodeActionKind.RefactorExtract,
+								CodeActionKind.RefactorExtract + ".function",
+								CodeActionKind.RefactorExtract + ".constant",
+							],
+							resolveProvider: false,
+						},
 					},
 				};
 			},
 		);
 
 		this.connection.onInitialized(async () => {
+			settings = await this.connection.workspace.getConfiguration("somesass");
+			editorSettings = await this.connection.workspace.getConfiguration(
+				"editor",
+			);
+
 			storageService = new StorageService();
 			scannerService = new ScannerService(
 				storageService,
@@ -258,6 +279,45 @@ export class SomeSassServer {
 				storageService,
 				workspaceRoot.toString(),
 			);
+		});
+
+		this.connection.onCodeAction(async (params) => {
+			const codeActionProviders = [new ExtractProvider(editorSettings)];
+
+			const document = documents.get(params.textDocument.uri);
+			if (document === undefined) {
+				return undefined;
+			}
+
+			const allActions: (Command | CodeAction)[] = [];
+
+			for (const provider of codeActionProviders) {
+				const actions = await provider.provideCodeActions(
+					document,
+					params.range,
+				);
+
+				if (provider instanceof ExtractProvider) {
+					for (const action of actions) {
+						const edit: TextDocumentEdit | undefined = action.edit
+							?.documentChanges?.[0] as TextDocumentEdit;
+
+						const command = Command.create(
+							action.title,
+							"_somesass.applyExtractCodeAction",
+							document.uri,
+							document.version,
+							edit && edit.edits[0],
+						);
+
+						allActions.push(
+							CodeAction.create(action.title, command, action.kind),
+						);
+					}
+				}
+			}
+
+			return allActions;
 		});
 
 		this.connection.onShutdown(() => {

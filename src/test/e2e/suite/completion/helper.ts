@@ -77,10 +77,9 @@ export async function testCompletion(
 				assert.strictEqual(match.detail, ei.detail);
 			}
 			if (ei.insertText) {
-				assert.strictEqual(
-					JSON.stringify(match.insertText),
-					ei.insertText,
-					`Expected insertText to match ${
+				assert.ok(
+					JSON.stringify(match.insertText).includes(ei.insertText),
+					`Expected insertText to include ${
 						ei.insertText
 					}. Actual: ${JSON.stringify(match.insertText)}`,
 				);

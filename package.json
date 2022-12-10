@@ -123,13 +123,13 @@
 		"mocha": "^10.0.0",
 		"nyc": "^15.1.0",
 		"patch-package": "^6.5.0",
-		"prettier": "2.7.1",
+		"prettier": "^2.8.1",
 		"rimraf": "^3.0.2",
-		"sinon": "^14.0.0",
+		"sinon": "15.0.0",
 		"ts-loader": "^9.3.1",
 		"typescript": "^4.7.4",
 		"webpack": "^5.73.0",
-		"webpack-cli": "^4.10.0"
+		"webpack-cli": "4.10.0"
 	},
 	"dependencies": {
 		"color": "^4.2.3",

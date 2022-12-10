@@ -61,7 +61,7 @@ describe("SCSS Completion Test", function () {
 			{
 				label: "fun-fun-function",
 				detail: "Function declared in _functions.scss",
-				insertText: '{"_tabstop":1,"value":".fun-fun-function()"}',
+				insertText: '".fun-fun-function()"',
 			},
 		];
 
@@ -79,7 +79,7 @@ describe("SCSS Completion Test", function () {
 			{
 				label: "fun-fun-function",
 				detail: "Function declared in _functions.scss",
-				insertText: '{"_tabstop":1,"value":"fun-fun-function()"}',
+				insertText: '"fun-fun-function()"',
 			},
 		];
 
@@ -91,7 +91,7 @@ describe("SCSS Completion Test", function () {
 			{
 				label: "mix-mix-mixin",
 				detail: "Mixin declared in _mixins.scss",
-				insertText: '{"_tabstop":1,"value":".mix-mix-mixin"}',
+				insertText: '".mix-mix-mixin"',
 			},
 		];
 
@@ -102,7 +102,7 @@ describe("SCSS Completion Test", function () {
 			{
 				label: "mix-mix-mixin",
 				detail: "Mixin declared in _mixins.scss",
-				insertText: '{"_tabstop":1,"value":"mix-mix-mixin"}',
+				insertText: '"mix-mix-mixin"',
 			},
 		];
 
@@ -183,7 +183,7 @@ describe("SCSS Completion Test", function () {
 			{
 				label: "fun-fun-function",
 				detail: "Function declared in _functions.scss",
-				insertText: '{"_tabstop":1,"value":".fun-fun-function()"}',
+				insertText: '".fun-fun-function()"',
 			},
 		];
 
@@ -201,7 +201,7 @@ describe("SCSS Completion Test", function () {
 			{
 				label: "fun-fun-function",
 				detail: "Function declared in _functions.scss",
-				insertText: '{"_tabstop":1,"value":"fun-fun-function()"}',
+				insertText: '"fun-fun-function()"',
 			},
 		];
 
@@ -221,7 +221,7 @@ describe("SCSS Completion Test", function () {
 			{
 				label: "fun-fun-function",
 				detail: "Function declared in _functions.scss",
-				insertText: '{"_tabstop":1,"value":".fun-fun-function()"}',
+				insertText: '".fun-fun-function()"',
 			},
 		];
 
@@ -239,7 +239,7 @@ describe("SCSS Completion Test", function () {
 			{
 				label: "fun-fun-function",
 				detail: "Function declared in _functions.scss",
-				insertText: '{"_tabstop":1,"value":".fun-fun-function()"}',
+				insertText: '".fun-fun-function()"',
 			},
 		];
 
@@ -258,7 +258,7 @@ describe("SassDoc Completion Test", () => {
 		const expectedCompletions = [
 			{
 				label: "SassDoc block",
-				insertText: '{"_tabstop":1,"value":" ${0}\\n/// @output ${2}"}',
+				insertText: '" ${0}\\n/// @output ${2}"',
 			},
 		];
 
@@ -269,8 +269,7 @@ describe("SassDoc Completion Test", () => {
 		const expectedCompletions = [
 			{
 				label: "SassDoc block",
-				insertText:
-					'{"_tabstop":1,"value":" ${0}\\n/// @content ${1}\\n/// @output ${2}"}',
+				insertText: '" ${0}\\n/// @content ${1}\\n/// @output ${2}"',
 			},
 		];
 
@@ -282,7 +281,7 @@ describe("SassDoc Completion Test", () => {
 			{
 				label: "SassDoc block",
 				insertText:
-					'{"_tabstop":1,"value":" ${0}\\n/// @param {${1:Number}} \\\\$a [1px] ${2:-}\\n/// @param {${3:Number}} \\\\$b [2px] ${4:-}\\n/// @output ${6:-}"}',
+					'" ${0}\\n/// @param {${1:Number}} \\\\$a [1px] ${2:-}\\n/// @param {${3:Number}} \\\\$b [2px] ${4:-}\\n/// @output ${6:-}"',
 			},
 		];
 
@@ -294,7 +293,7 @@ describe("SassDoc Completion Test", () => {
 			{
 				label: "SassDoc block",
 				insertText:
-					'{"_tabstop":1,"value":" ${0}\\n/// @param {${1:type}} \\\\$a ${2:-}\\n/// @param {${3:type}} \\\\$b ${4:-}\\n/// @output ${6:-}"}',
+					'" ${0}\\n/// @param {${1:type}} \\\\$a ${2:-}\\n/// @param {${3:type}} \\\\$b ${4:-}\\n/// @output ${6:-}"',
 			},
 		];
 
@@ -306,7 +305,7 @@ describe("SassDoc Completion Test", () => {
 			{
 				label: "SassDoc block",
 				insertText:
-					'{"_tabstop":1,"value":" ${0}\\n/// @param {${1:type}} \\\\ ${2:-}\\n/// @return {${3:type}} ${4:-}"}',
+					'" ${0}\\n/// @param {${1:type}} \\\\ ${2:-}\\n/// @return {${3:type}} ${4:-}"',
 			},
 		];
 
@@ -318,7 +317,7 @@ describe("SassDoc Completion Test", () => {
 			{
 				label: "SassDoc block",
 				insertText:
-					'{"_tabstop":1,"value":" ${0}\\n/// @param {${1:Number}} \\\\$a [1px] ${2:-}\\n/// @param {${3:Number}} \\\\$b [2px] ${4:-}\\n/// @return {${5:type}} ${6:-}"}',
+					'" ${0}\\n/// @param {${1:Number}} \\\\$a [1px] ${2:-}\\n/// @param {${3:Number}} \\\\$b [2px] ${4:-}\\n/// @return {${5:type}} ${6:-}"',
 			},
 		];
 

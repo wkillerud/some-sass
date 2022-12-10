@@ -18,6 +18,8 @@ export interface ISettings {
 
 export interface IEditorSettings {
 	insertSpaces: boolean;
+	/** Introduced in 1.74 */
+	indentSize: number | undefined;
 	tabSize: number;
 }
 

@@ -63,8 +63,12 @@ const tab = "	";
 
 export function indentText(text: string, settings: IEditorSettings): string {
 	if (settings.insertSpaces) {
-		const numberOfSpaces =
-			typeof settings.tabSize === "number" ? settings.tabSize : 2;
+		const numberOfSpaces: number =
+			typeof settings.indentSize === "number"
+				? settings.indentSize
+				: typeof settings.tabSize === "number"
+				? settings.tabSize
+				: 2;
 		return `${space.repeat(numberOfSpaces)}${text}`;
 	}
 

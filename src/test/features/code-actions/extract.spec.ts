@@ -9,6 +9,7 @@ describe("Providers/Extract", () => {
 		const provider = new ExtractProvider({
 			tabSize: 2,
 			insertSpaces: true,
+			indentSize: 2,
 		});
 
 		const document = TextDocument.create(
@@ -56,6 +57,7 @@ describe("Providers/Extract", () => {
 		const provider = new ExtractProvider({
 			tabSize: 2,
 			insertSpaces: false,
+			indentSize: 2,
 		});
 
 		const document = TextDocument.create(
@@ -107,6 +109,7 @@ box-shadow: $_variable;`,
 		const provider = new ExtractProvider({
 			tabSize: 2,
 			insertSpaces: false,
+			indentSize: 2,
 		});
 
 		const document = TextDocument.create(
@@ -170,8 +173,9 @@ a.cta {
 
 	it("supports extracting a mixin with space indents", async () => {
 		const provider = new ExtractProvider({
-			tabSize: 4,
+			tabSize: 2,
 			insertSpaces: true,
+			indentSize: 4,
 		});
 
 		const document = TextDocument.create(
@@ -237,6 +241,7 @@ a.cta {
 		const provider = new ExtractProvider({
 			tabSize: 2,
 			insertSpaces: false,
+			indentSize: 2,
 		});
 
 		const document = TextDocument.create(
@@ -290,6 +295,7 @@ box-shadow: _function();`,
 		const provider = new ExtractProvider({
 			tabSize: 2,
 			insertSpaces: true,
+			indentSize: 2,
 		});
 
 		const document = TextDocument.create(

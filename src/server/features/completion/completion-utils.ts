@@ -17,7 +17,7 @@ export function makeMixinDocumentation(symbol: ScssMixin): string {
  * Use the SnippetString syntax to provide smart completions of parameter names.
  */
 export function mapParameterSnippet(p: ScssParameter, index: number): string {
-	if (p.sassdoc?.type.length) {
+	if (p.sassdoc?.type?.length) {
 		const choices = parseStringLiteralChoices(p.sassdoc.type);
 		if (choices.length > 0) {
 			return `\${${index + 1}|${choices.join(",")}|}`;

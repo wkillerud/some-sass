@@ -3,18 +3,19 @@
 Some Sass provides code suggestions, documentation and code navigation for SCSS.
 
 - Full support for `@use` and `@forward`, including aliases, prefixes and hiding.
+- Workspace-wide code navigation and refactoring, such as Rename Symbol.
 - Rich documentation through [SassDoc](http://sassdoc.com).
 - Suggestions and hover info for built-in Sass modules, when used with `@use`.
 
 Supports standalone SCSS, as well as style blocks inside Vue, Svelte and Astro components.
 
-Based on SCSS Intellisense by [Denis Malinochkin and contributors](https://github.com/mrmlnc/vscode-scss). Extends the built-in VS Code language server for SCSS.
+## Recommended settings
+
+See [Recommended settings](#recommended-settings-for-visual-studio-code) for some tips on how to tweak code suggestions to your liking.
 
 ## Setup
 
 Search for Some Sass (`SomewhatStationery.some-sass`) from the extension installer within VS Code or install from [the Marketplace](https://marketplace.visualstudio.com/items?itemName=SomewhatStationery.some-sass).
-
-See [Recommended settings](#recommended-settings-for-visual-studio-code) for some tips on how to tweak code suggestions to your liking.
 
 Note that if you have SCSS IntelliSense (`mrmlnc.vscode-scss`) installed you should disable or uninstall it. Otherwise the two extensions will both provide hover information and code suggestions.
 
@@ -195,6 +196,8 @@ after `@import` becomes CSS-only.
 Visit the [release section on GitHub](https://github.com/wkillerud/vscode-scss/releases) to see what has changed.
 
 ## License
+
+Based on SCSS Intellisense by [Denis Malinochkin and contributors](https://github.com/mrmlnc/vscode-scss). Extends the built-in VS Code language server for SCSS.
 
 This software is released under the terms of the MIT license.
 

@@ -1,7 +1,7 @@
 {
 	"name": "some-sass",
-	"displayName": "Some Sass",
-	"description": "Provides code suggestions, documentation and code navigation for modern SCSS",
+	"displayName": "Some Sass: extended support for SCSS and SassDoc",
+	"description": "Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
 	"version": "2.7.1",
 	"publisher": "SomewhatStationery",
 	"license": "MIT",

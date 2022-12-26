@@ -31,11 +31,11 @@ Completions work with and without `@use` namespaces (including from built-in Sas
 If you document your mixin using the `@content` [annotation from SassDoc](http://sassdoc.com/annotations/#content)
 the extension will use that information to autosuggest brackets and move focus inside the mixin contents.
 
-![](images/suggestions-mixins.gif)
+<video src="https://user-images.githubusercontent.com/1223410/209579415-759d66b5-c504-49aa-b06a-1dd5091a79b9.mp4" data-canonical-src="https://user-images.githubusercontent.com/1223410/209579415-759d66b5-c504-49aa-b06a-1dd5091a79b9.mp4" controls="controls" muted="muted" class="d-block rounded-bottom-2 border-top width-fit" style="max-height:640px;"></video>
 
 Try documenting your mixins and functions with SassDoc comment blocks.
 
-![](images/suggestions-sassdoc.gif)
+<video src="https://user-images.githubusercontent.com/1223410/209579456-885e965c-2d1f-490a-9d81-77fb145fcc3c.mp4" data-canonical-src="https://user-images.githubusercontent.com/1223410/209579456-885e965c-2d1f-490a-9d81-77fb145fcc3c.mp4" controls="controls" muted="muted" class="d-block rounded-bottom-2 border-top width-fit" style="max-height:640px;"></video>
 
 ### Information on hover
 
@@ -43,7 +43,7 @@ Hover over any Sass variables, mixins or functions to see more details about the
 
 Documentation written with SassDoc will be included in the hover information. Additionally, the extension will provide (~~strikethrough~~) hints when using something marked as `@deprecated` [with SassDoc](http://sassdoc.com/annotations/#deprecated).
 
-![](images/sassdoc-hover.gif)
+<video src="https://user-images.githubusercontent.com/1223410/209579427-12a2dc10-506a-4689-aecf-19645e4dbe49.mp4" data-canonical-src="https://user-images.githubusercontent.com/1223410/209579427-12a2dc10-506a-4689-aecf-19645e4dbe49.mp4" controls="controls" muted="muted" class="d-block rounded-bottom-2 border-top width-fit" style="max-height:640px;"></video>
 
 ### Code navigation
 
@@ -58,8 +58,6 @@ To use this feature, either:
 #### Go to Symbol
 
 To use this feature – in the `Go` menu – choose [Go to Symbol](https://code.visualstudio.com/Docs/editor/editingevolved#_go-to-symbol) either for Workspace (`Cmd + T`) or for Editor (`Cmd + Shift + O`).
-
-![](images/workspace-symbols.gif)
 
 #### Go to References
 

@@ -78,6 +78,12 @@ To use this feature, right-click a variable, mixin or function and choose
 
 ### Code actions
 
+#### Rename Symbol
+
+Rename a variable, function or mixin across the entire workspace. Rright click a symbol and choose Rename Symbol, or hit `F2` to start renaming.
+
+If you use prefixes with `@forward` the prefix _will not_ be changed – only the base variable name.
+
 #### Extract
 
 Available when you have an active selection. Pick between extracting to a variable, function or mixin.

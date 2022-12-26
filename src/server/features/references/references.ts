@@ -43,7 +43,12 @@ export async function provideReferences(
 		return null;
 	}
 
-	const referenceIdentifier = getIdentifier(document, referenceNode, context);
+	const referenceIdentifier = getIdentifier(
+		document,
+		referenceNode,
+		storage,
+		context,
+	);
 	if (!referenceIdentifier) {
 		return null;
 	}
@@ -226,6 +231,7 @@ function createReference(
 function getIdentifier(
 	document: TextDocument,
 	hoverNode: INode,
+	storage: StorageService,
 	context: ReferenceContext,
 ): Identifier | null {
 	let identifier: Identifier | null = null;
@@ -238,12 +244,48 @@ function getIdentifier(
 			}
 		}
 
-		identifier = {
+		return {
 			name: hoverNode.getName(),
 			position: document.positionAt(hoverNode.offset),
 			kind: SymbolKind.Variable,
 		};
 	} else if (hoverNode.type === NodeType.Identifier) {
+		if (hoverNode.getParent()?.type === NodeType.ForwardVisibility) {
+			// At this point the identifier can be both a function and a mixin.
+			// To figure it out we need to look for the original definition as
+			// both a function and a mixin.
+
+			const candidateIdentifier: Identifier = {
+				name: hoverNode.getText(),
+				position: document.positionAt(hoverNode.offset),
+				kind: SymbolKind.Method,
+			};
+
+			const [asMixin] = getDefinitionSymbol(
+				document,
+				storage,
+				candidateIdentifier,
+			);
+
+			if (asMixin) {
+				return candidateIdentifier;
+			}
+
+			candidateIdentifier.kind = SymbolKind.Function;
+
+			const [asFunction] = getDefinitionSymbol(
+				document,
+				storage,
+				candidateIdentifier,
+			);
+
+			if (asFunction) {
+				return candidateIdentifier;
+			}
+
+			return null;
+		}
+
 		let i = 0;
 		let node = hoverNode;
 		let isMixin = false;
@@ -299,6 +341,7 @@ function getDefinition(
 	const definitionIdentifier = getIdentifier(
 		scssDocument,
 		definitionNode,
+		storage,
 		context,
 	);
 	if (!definitionIdentifier) {

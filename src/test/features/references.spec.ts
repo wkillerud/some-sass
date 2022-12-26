@@ -177,6 +177,61 @@ describe("Providers/References", () => {
 		});
 	});
 
+	it("provideReferences - @forward visibility for variable", async () => {
+		await helpers.makeDocument(storage, ["$secret: 1;"], fs, {
+			uri: "var.scss",
+		});
+
+		const forward = await helpers.makeDocument(
+			storage,
+			'@forward "var" as var-* hide $secret;',
+			fs,
+			{
+				uri: "dev.scss",
+			},
+		);
+
+		const actual = await provideReferences(forward, 33, storage, {
+			includeDeclaration: true,
+		});
+
+		ok(
+			actual,
+			"provideReferences returned null for a variable referenced in an @forward hide",
+		);
+		strictEqual(
+			actual?.references.length,
+			2,
+			"Expected two references to `secret`: one declaration and one as part of a @forward statement (in hide).",
+		);
+
+		const [variable, dev] = actual.references;
+
+		ok(variable?.location.uri.endsWith("var.scss"));
+		deepStrictEqual(variable?.location.range, {
+			start: {
+				line: 0,
+				character: 0,
+			},
+			end: {
+				line: 0,
+				character: 7,
+			},
+		});
+
+		ok(dev?.location.uri.endsWith("dev.scss"));
+		deepStrictEqual(dev?.location.range, {
+			start: {
+				line: 0,
+				character: 29,
+			},
+			end: {
+				line: 0,
+				character: 36,
+			},
+		});
+	});
+
 	it("provideReferences - Functions", async () => {
 		await helpers.makeDocument(
 			storage,
@@ -351,6 +406,66 @@ describe("Providers/References", () => {
 		});
 	});
 
+	it("provideReferences - @forward visibility with function", async () => {
+		await helpers.makeDocument(
+			storage,
+			"@function secret() { @return 1; }",
+			fs,
+			{
+				uri: "func.scss",
+			},
+		);
+
+		const forward = await helpers.makeDocument(
+			storage,
+			'@forward "func" as fun-* hide secret;',
+			fs,
+			{
+				uri: "dev.scss",
+			},
+		);
+
+		const actual = await provideReferences(forward, 33, storage, {
+			includeDeclaration: true,
+		});
+
+		ok(
+			actual,
+			"provideReferences returned null for a function referenced in an @forward hide",
+		);
+		strictEqual(
+			actual?.references.length,
+			2,
+			"Expected two references to `secret`: one declaration and one as part of a @forward statement (in hide).",
+		);
+
+		const [func, dev] = actual.references;
+
+		ok(func?.location.uri.endsWith("func.scss"));
+		deepStrictEqual(func?.location.range, {
+			start: {
+				line: 0,
+				character: 10,
+			},
+			end: {
+				line: 0,
+				character: 16,
+			},
+		});
+
+		ok(dev?.location.uri.endsWith("dev.scss"));
+		deepStrictEqual(dev?.location.range, {
+			start: {
+				line: 0,
+				character: 30,
+			},
+			end: {
+				line: 0,
+				character: 36,
+			},
+		});
+	});
+
 	it("provideReferences - Mixins", async () => {
 		await helpers.makeDocument(
 			storage,
@@ -521,6 +636,66 @@ describe("Providers/References", () => {
 			end: {
 				line: 4,
 				character: 19,
+			},
+		});
+	});
+
+	it("provideReferences - @forward visibility for mixin", async () => {
+		await helpers.makeDocument(
+			storage,
+			["@mixin secret() {", "	line-height: 1;", "}"],
+			fs,
+			{
+				uri: "mix.scss",
+			},
+		);
+
+		const forward = await helpers.makeDocument(
+			storage,
+			'@forward "mix" as mix-* hide secret;',
+			fs,
+			{
+				uri: "dev.scss",
+			},
+		);
+
+		const actual = await provideReferences(forward, 33, storage, {
+			includeDeclaration: true,
+		});
+
+		ok(
+			actual,
+			"provideReferences returned null for a mixin referenced in an @forward hide",
+		);
+		strictEqual(
+			actual?.references.length,
+			2,
+			"Expected two references to `secret`: one declaration and one as part of a @forward statement (in hide).",
+		);
+
+		const [mix, dev] = actual.references;
+
+		ok(mix?.location.uri.endsWith("mix.scss"));
+		deepStrictEqual(mix?.location.range, {
+			start: {
+				line: 0,
+				character: 7,
+			},
+			end: {
+				line: 0,
+				character: 13,
+			},
+		});
+
+		ok(dev?.location.uri.endsWith("dev.scss"));
+		deepStrictEqual(dev?.location.range, {
+			start: {
+				line: 0,
+				character: 29,
+			},
+			end: {
+				line: 0,
+				character: 35,
 			},
 		});
 	});

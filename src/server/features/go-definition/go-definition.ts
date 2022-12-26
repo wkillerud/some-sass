@@ -43,7 +43,11 @@ export function goDefinition(
 		return null;
 	}
 
-	const identifier: Identifier | null = getIdentifier(document, hoverNode);
+	const identifier: Identifier | null = getIdentifier(
+		document,
+		hoverNode,
+		storage,
+	);
 	if (!identifier) {
 		return null;
 	}
@@ -72,9 +76,8 @@ export function goDefinition(
 function getIdentifier(
 	document: TextDocument,
 	hoverNode: INode,
+	storage: StorageService,
 ): Identifier | null {
-	let identifier: Identifier | null = null;
-
 	if (hoverNode.type === NodeType.VariableName) {
 		const parent = hoverNode.getParent();
 
@@ -82,13 +85,49 @@ function getIdentifier(
 		const isDeclaration = parent.type === NodeType.VariableDeclaration;
 
 		if (!isFunctionParameter && !isDeclaration) {
-			identifier = {
+			return {
 				name: hoverNode.getName(),
 				position: document.positionAt(hoverNode.offset),
 				kind: SymbolKind.Variable,
 			};
 		}
 	} else if (hoverNode.type === NodeType.Identifier) {
+		if (hoverNode.getParent()?.type === NodeType.ForwardVisibility) {
+			// At this point the identifier can be both a function and a mixin.
+			// To figure it out we need to look for the original definition as
+			// both a function and a mixin.
+
+			const candidateIdentifier: Identifier = {
+				name: hoverNode.getText(),
+				position: document.positionAt(hoverNode.offset),
+				kind: SymbolKind.Method,
+			};
+
+			const [asMixin] = getDefinitionSymbol(
+				document,
+				storage,
+				candidateIdentifier,
+			);
+
+			if (asMixin) {
+				return candidateIdentifier;
+			}
+
+			candidateIdentifier.kind = SymbolKind.Function;
+
+			const [asFunction] = getDefinitionSymbol(
+				document,
+				storage,
+				candidateIdentifier,
+			);
+
+			if (asFunction) {
+				return candidateIdentifier;
+			}
+
+			return null;
+		}
+
 		let i = 0;
 		let node = hoverNode;
 		let isMixin = false;
@@ -110,7 +149,7 @@ function getIdentifier(
 				kind = SymbolKind.Function;
 			}
 
-			identifier = {
+			return {
 				name: node.getName(),
 				position: document.positionAt(node.offset),
 				kind,
@@ -118,11 +157,7 @@ function getIdentifier(
 		}
 	}
 
-	if (!identifier) {
-		return null;
-	}
-
-	return identifier;
+	return null;
 }
 
 export function getDefinitionSymbol(

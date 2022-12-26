@@ -109,31 +109,31 @@ export async function provideReferences(
 				continue;
 			}
 
-			// Tokens from maps include their trailing comma.
-			// Tokens of function parameters include the function parentheses.
-			// Strip them before comparing.
-			const trailingCommalessText = stripTrailingComma(text);
-			const parentheseslessText = stripParentheses(text);
 			const dollarlessDefinition = stripTrailingComma(
 				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				asDollarlessVariable(builtin ? builtin[1] : definitionSymbol!.name),
 			);
 
-			const isWordMatch =
-				tokenType === "word" &&
-				trailingCommalessText.endsWith(dollarlessDefinition);
-			const isParameterMatch =
-				tokenType === "brackets" && text.includes(dollarlessDefinition);
-			if (isWordMatch || isParameterMatch) {
+			const isMatch = text.includes(dollarlessDefinition);
+			if (isMatch) {
 				// For type 'word' offset should always be defined, but default to 0 just in case
 				let adjustedOffset = offset || 0;
-				let adjustedText = isParameterMatch
-					? parentheseslessText
-					: trailingCommalessText;
+
+				// Tokens from maps include their trailing comma.
+				// Function parameters include their parentheses. Strip them both.
+				let word = stripParentheses(stripTrailingComma(text));
+
+				if (tokenType === "brackets") {
+					// Only include the parameter we're interested in
+					[word] = word
+						.split(",")
+						.filter((w) => w.includes(dollarlessDefinition));
+				}
+				let adjustedText = word;
 
 				// The tokenizer treats the namespace and variable name as a single word.
 				// We need the offset for the actual variable, so find its position in the word.
-				if (trailingCommalessText !== referenceIdentifier.name) {
+				if (adjustedText !== referenceIdentifier.name) {
 					adjustedText = adjustedText.split(".")[1] || adjustedText;
 					adjustedOffset += text.indexOf(adjustedText);
 				}

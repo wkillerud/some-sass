@@ -722,10 +722,10 @@ describe("Providers/References", () => {
 			storage,
 			[
 				'@use "dev";',
-				"",
+				"$_b: 1;",
 				".a {",
 				"	// Here it comes!",
-				" content: dev.fun-hello(dev.$fun-name);",
+				" content: dev.fun-hello(dev.$fun-name, $_b);",
 				"}",
 			],
 			fs,
@@ -734,7 +734,7 @@ describe("Providers/References", () => {
 			},
 		);
 
-		const name = await provideReferences(usage, 66, storage, {
+		const name = await provideReferences(usage, 73, storage, {
 			includeDeclaration: true,
 		});
 		ok(

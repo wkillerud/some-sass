@@ -12,12 +12,27 @@ import {
 import { getDefinitionSymbol } from "../go-definition/go-definition";
 import { sassBuiltInModules } from "../sass-built-in-modules";
 
+type References = {
+	definition: {
+		symbol: ScssSymbol;
+		document: IScssDocument;
+	} | null;
+	references: Reference[];
+};
+
+type Reference = {
+	isBuiltIn: boolean;
+	name: string;
+	location: Location;
+	kind: SymbolKind | null;
+};
+
 export async function provideReferences(
 	document: TextDocument,
 	offset: number,
 	storage: StorageService,
 	context: ReferenceContext,
-): Promise<Location[] | null> {
+): Promise<References | null> {
 	const scssDocument = storage.get(document.uri);
 	if (!scssDocument) {
 		return null;
@@ -28,7 +43,12 @@ export async function provideReferences(
 		return null;
 	}
 
-	const referenceIdentifier = getIdentifier(document, referenceNode, context);
+	const referenceIdentifier = getIdentifier(
+		document,
+		referenceNode,
+		storage,
+		context,
+	);
 	if (!referenceIdentifier) {
 		return null;
 	}
@@ -79,7 +99,7 @@ export async function provideReferences(
 		return null;
 	}
 
-	const references: Location[] = [];
+	const references: Reference[] = [];
 	for (const scssDocument of storage.values()) {
 		const text = scssDocument.getText();
 		const tokens = tokenizer(text);
@@ -89,31 +109,31 @@ export async function provideReferences(
 				continue;
 			}
 
-			// Tokens from maps include their trailing comma.
-			// Tokens of function parameters include the function parentheses.
-			// Strip them before comparing.
-			const trailingCommalessText = stripTrailingComma(text);
-			const parentheseslessText = stripParentheses(text);
 			const dollarlessDefinition = stripTrailingComma(
 				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				asDollarlessVariable(builtin ? builtin[1] : definitionSymbol!.name),
 			);
 
-			const isWordMatch =
-				tokenType === "word" &&
-				trailingCommalessText.endsWith(dollarlessDefinition);
-			const isParameterMatch =
-				tokenType === "brackets" && text.includes(dollarlessDefinition);
-			if (isWordMatch || isParameterMatch) {
+			const isMatch = text.includes(dollarlessDefinition);
+			if (isMatch) {
 				// For type 'word' offset should always be defined, but default to 0 just in case
 				let adjustedOffset = offset || 0;
-				let adjustedText = isParameterMatch
-					? parentheseslessText
-					: trailingCommalessText;
+
+				// Tokens from maps include their trailing comma.
+				// Function parameters include their parentheses. Strip them both.
+				let word = stripParentheses(stripTrailingComma(text));
+
+				if (tokenType === "brackets") {
+					// Only include the parameter we're interested in
+					[word] = word
+						.split(",")
+						.filter((w) => w.includes(dollarlessDefinition));
+				}
+				let adjustedText = word;
 
 				// The tokenizer treats the namespace and variable name as a single word.
 				// We need the offset for the actual variable, so find its position in the word.
-				if (trailingCommalessText !== referenceIdentifier.name) {
+				if (adjustedText !== referenceIdentifier.name) {
 					adjustedText = adjustedText.split(".")[1] || adjustedText;
 					adjustedOffset += text.indexOf(adjustedText);
 				}
@@ -139,7 +159,12 @@ export async function provideReferences(
 								adjustedOffset,
 								adjustedText,
 							);
-							references.push(reference);
+							references.push({
+								isBuiltIn: true,
+								name: adjustedText,
+								location: reference,
+								kind: null,
+							});
 						}
 					}
 
@@ -162,13 +187,27 @@ export async function provideReferences(
 						adjustedOffset,
 						adjustedText,
 					);
-					references.push(reference);
+					references.push({
+						isBuiltIn: false,
+						location: reference,
+						name: adjustedText,
+						kind: definitionSymbol.kind,
+					});
 				}
 			}
 		}
 	}
 
-	return references;
+	return {
+		references,
+		definition:
+			definitionSymbol && definitionDocument
+				? {
+						symbol: definitionSymbol,
+						document: definitionDocument,
+				  }
+				: null,
+	};
 }
 
 interface Identifier {
@@ -192,6 +231,7 @@ function createReference(
 function getIdentifier(
 	document: TextDocument,
 	hoverNode: INode,
+	storage: StorageService,
 	context: ReferenceContext,
 ): Identifier | null {
 	let identifier: Identifier | null = null;
@@ -204,12 +244,48 @@ function getIdentifier(
 			}
 		}
 
-		identifier = {
+		return {
 			name: hoverNode.getName(),
 			position: document.positionAt(hoverNode.offset),
 			kind: SymbolKind.Variable,
 		};
 	} else if (hoverNode.type === NodeType.Identifier) {
+		if (hoverNode.getParent()?.type === NodeType.ForwardVisibility) {
+			// At this point the identifier can be both a function and a mixin.
+			// To figure it out we need to look for the original definition as
+			// both a function and a mixin.
+
+			const candidateIdentifier: Identifier = {
+				name: hoverNode.getText(),
+				position: document.positionAt(hoverNode.offset),
+				kind: SymbolKind.Method,
+			};
+
+			const [asMixin] = getDefinitionSymbol(
+				document,
+				storage,
+				candidateIdentifier,
+			);
+
+			if (asMixin) {
+				return candidateIdentifier;
+			}
+
+			candidateIdentifier.kind = SymbolKind.Function;
+
+			const [asFunction] = getDefinitionSymbol(
+				document,
+				storage,
+				candidateIdentifier,
+			);
+
+			if (asFunction) {
+				return candidateIdentifier;
+			}
+
+			return null;
+		}
+
 		let i = 0;
 		let node = hoverNode;
 		let isMixin = false;
@@ -265,6 +341,7 @@ function getDefinition(
 	const definitionIdentifier = getIdentifier(
 		scssDocument,
 		definitionNode,
+		storage,
 		context,
 	);
 	if (!definitionIdentifier) {

@@ -35,7 +35,6 @@ patches/
 .nvmrc
 .nycrc.json
 CONTRIBUTING.md
-CHANGELOG.md
 
 # Build artifacts
 out/

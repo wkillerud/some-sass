@@ -10,8 +10,6 @@ Supports standalone SCSS, as well as style blocks inside Vue, Svelte and Astro c
 
 Based on SCSS Intellisense by [Denis Malinochkin and contributors](https://github.com/mrmlnc/vscode-scss). Extends the built-in VS Code language server for SCSS.
 
-Visit the [release section on GitHub](https://github.com/wkillerud/vscode-scss/releases) to see what has changed between versions.
-
 ## Setup
 
 Search for Some Sass (`SomewhatStationery.some-sass`) from the extension installer within VS Code or install from [the Marketplace](https://marketplace.visualstudio.com/items?itemName=SomewhatStationery.some-sass).

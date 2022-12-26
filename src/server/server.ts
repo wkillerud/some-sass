@@ -4,6 +4,7 @@ import {
 	Command,
 	Connection,
 	FileChangeType,
+	Range,
 	TextDocumentEdit,
 } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
@@ -23,6 +24,7 @@ import { doDiagnostics } from "./features/diagnostics/diagnostics";
 import { goDefinition } from "./features/go-definition/go-definition";
 import { doHover } from "./features/hover/hover";
 import { provideReferences } from "./features/references";
+import { doRename, prepareRename } from "./features/rename";
 import { doSignatureHelp } from "./features/signature-help/signature-help";
 import { searchWorkspaceSymbol } from "./features/workspace-symbols/workspace-symbol";
 import { getFileSystemProvider } from "./file-system-provider";
@@ -106,6 +108,7 @@ export class SomeSassServer {
 							],
 							resolveProvider: false,
 						},
+						renameProvider: { prepareProvider: true },
 					},
 				};
 			},
@@ -255,7 +258,7 @@ export class SomeSassServer {
 			return goDefinition(document, offset, storageService);
 		});
 
-		this.connection.onReferences((referenceParams) => {
+		this.connection.onReferences(async (referenceParams) => {
 			const uri = documents.get(referenceParams.textDocument.uri);
 			if (uri === undefined) {
 				return undefined;
@@ -270,7 +273,18 @@ export class SomeSassServer {
 			}
 
 			const options = referenceParams.context;
-			return provideReferences(document, offset, storageService, options);
+			const references = await provideReferences(
+				document,
+				offset,
+				storageService,
+				options,
+			);
+
+			if (!references) {
+				return null;
+			}
+
+			return references.references.map((r) => r.location);
 		});
 
 		this.connection.onWorkspaceSymbol((workspaceSymbolParams) => {
@@ -318,6 +332,49 @@ export class SomeSassServer {
 			}
 
 			return allActions;
+		});
+
+		this.connection.onPrepareRename(async (params) => {
+			const uri = documents.get(params.textDocument.uri);
+			if (uri === undefined) {
+				return null;
+			}
+
+			const { document, offset } = getSCSSRegionsDocument(uri, params.position);
+			if (!document) {
+				return null;
+			}
+
+			const preparations = await prepareRename(
+				document,
+				offset,
+				storageService,
+				settings,
+			);
+			return preparations as unknown as {
+				range: Range;
+				placeholder: string;
+			};
+		});
+
+		this.connection.onRenameRequest(async (params) => {
+			const uri = documents.get(params.textDocument.uri);
+			if (uri === undefined) {
+				return null;
+			}
+
+			const { document, offset } = getSCSSRegionsDocument(uri, params.position);
+			if (!document) {
+				return null;
+			}
+
+			const edits = await doRename(
+				document,
+				offset,
+				storageService,
+				params.newName,
+			);
+			return edits;
 		});
 
 		this.connection.onShutdown(() => {

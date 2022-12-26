@@ -12,12 +12,27 @@ import {
 import { getDefinitionSymbol } from "../go-definition/go-definition";
 import { sassBuiltInModules } from "../sass-built-in-modules";
 
+type References = {
+	definition: {
+		symbol: ScssSymbol;
+		document: IScssDocument;
+	} | null;
+	references: Reference[];
+};
+
+type Reference = {
+	isBuiltIn: boolean;
+	name: string;
+	location: Location;
+	kind: SymbolKind | null;
+};
+
 export async function provideReferences(
 	document: TextDocument,
 	offset: number,
 	storage: StorageService,
 	context: ReferenceContext,
-): Promise<Location[] | null> {
+): Promise<References | null> {
 	const scssDocument = storage.get(document.uri);
 	if (!scssDocument) {
 		return null;
@@ -79,7 +94,7 @@ export async function provideReferences(
 		return null;
 	}
 
-	const references: Location[] = [];
+	const references: Reference[] = [];
 	for (const scssDocument of storage.values()) {
 		const text = scssDocument.getText();
 		const tokens = tokenizer(text);
@@ -139,7 +154,12 @@ export async function provideReferences(
 								adjustedOffset,
 								adjustedText,
 							);
-							references.push(reference);
+							references.push({
+								isBuiltIn: true,
+								name: adjustedText,
+								location: reference,
+								kind: null,
+							});
 						}
 					}
 
@@ -162,13 +182,27 @@ export async function provideReferences(
 						adjustedOffset,
 						adjustedText,
 					);
-					references.push(reference);
+					references.push({
+						isBuiltIn: false,
+						location: reference,
+						name: adjustedText,
+						kind: definitionSymbol.kind,
+					});
 				}
 			}
 		}
 	}
 
-	return references;
+	return {
+		references,
+		definition:
+			definitionSymbol && definitionDocument
+				? {
+						symbol: definitionSymbol,
+						document: definitionDocument,
+				  }
+				: null,
+	};
 }
 
 interface Identifier {

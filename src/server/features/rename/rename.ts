@@ -97,9 +97,11 @@ export async function doRename(
 	};
 
 	for (const { location, kind, name } of references.references) {
+		/* eslint-disable @typescript-eslint/no-non-null-assertion */
 		if (!edits.changes![location.uri]) {
 			edits.changes![location.uri] = [];
 		}
+		/* eslint-enable @typescript-eslint/no-non-null-assertion */
 
 		const range = location.range;
 
@@ -117,6 +119,7 @@ export async function doRename(
 			}
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		edits.changes![location.uri].push(TextEdit.replace(range, newName));
 	}
 

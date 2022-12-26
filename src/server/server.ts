@@ -142,6 +142,10 @@ export class SomeSassServer {
 		});
 
 		documents.onDidChangeContent(async (change) => {
+			if (!scannerService) {
+				return null;
+			}
+
 			try {
 				await scannerService.update(change.document, workspaceRoot);
 			} catch (error) {
@@ -170,6 +174,10 @@ export class SomeSassServer {
 		});
 
 		this.connection.onDidChangeWatchedFiles(async (event) => {
+			if (!scannerService) {
+				return null;
+			}
+
 			const newFiles: URI[] = [];
 			for (const change of event.changes) {
 				const uri = URI.parse(change.uri);

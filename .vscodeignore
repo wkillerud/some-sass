@@ -27,6 +27,7 @@ node_modules/
 .nyc_output/
 coverage/
 fixtures/
+images/
 dist/test/
 src/
 types/

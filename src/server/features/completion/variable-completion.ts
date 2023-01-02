@@ -8,7 +8,7 @@ import type { CompletionItem } from "vscode-languageserver-types";
 import type { IScssDocument } from "../../parser";
 import { applySassDoc } from "../../utils/sassdoc";
 import { asDollarlessVariable, getLimitedString } from "../../utils/string";
-import { getVariableColor } from "./color-completion";
+import { isColor } from "./color-completion";
 import type { CompletionContext } from "./completion-context";
 import { rePrivate } from "./completion-utils";
 
@@ -22,14 +22,12 @@ export function createVariableCompletionItems(
 	const completions: CompletionItem[] = [];
 
 	for (const variable of scssDocument.variables.values()) {
-		const color = variable.value ? getVariableColor(variable.value) : null;
+		const color = variable.value ? isColor(variable.value) : null;
 		const completionKind = color
 			? CompletionItemKind.Color
 			: CompletionItemKind.Variable;
 
-		let documentation = getLimitedString(
-			color ? color.toString() : variable.value || "",
-		);
+		let documentation = getLimitedString(color || variable.value || "");
 		let detail = `Variable declared in ${scssDocument.fileName}`;
 
 		let label = variable.name;

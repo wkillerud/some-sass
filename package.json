@@ -132,8 +132,7 @@
 		"webpack-cli": "4.10.0"
 	},
 	"dependencies": {
-		"color": "^4.2.3",
-		"css-color-names": "^1.0.1",
+		"colorjs.io": "0.4.2",
 		"fast-glob": "^3.2.11",
 		"path-browserify": "1.0.1",
 		"process": "0.11.10",

@@ -17,18 +17,15 @@
 		{
 			"type": "extensionHost",
 			"request": "launch",
-			"name": "Launch Client",
+			"name": "Launch extension",
 			"runtimeExecutable": "${execPath}",
 			"args": ["--extensionDevelopmentPath=${workspaceRoot}"],
-			"outFiles": ["${workspaceRoot}/dist/**/*.js"]
-		},
-		{
-			"type": "node",
-			"request": "attach",
-			"name": "Attach to Server",
-			"port": 6006,
-			"restart": true,
-			"outFiles": ["${workspaceRoot}/dist/**/*.js"]
+			"outFiles": ["${workspaceRoot}/dist/**/*.js"],
+			"autoAttachChildProcesses": true,
+			"preLaunchTask": {
+				"type": "npm",
+				"script": "dev"
+			}
 		},
 		{
 			"name": "Launch Web Extension in VS Code",
@@ -40,7 +37,11 @@
 				"--extensionDevelopmentKind=web"
 			],
 			"outFiles": ["${workspaceFolder}/dist/browser-*.js"],
-			"preLaunchTask": "npm: dev"
+			"autoAttachChildProcesses": true,
+			"preLaunchTask": {
+				"type": "npm",
+				"script": "dev"
+			}
 		},
 		{
 			"name": "Web Integration Tests in VS Code",
@@ -53,13 +54,11 @@
 				"--extensionTestsPath=${workspaceFolder}/dist/test/web/suite/index"
 			],
 			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
-			"preLaunchTask": "npm: dev"
-		}
-	],
-	"compounds": [
-		{
-			"name": "Client + Server",
-			"configurations": ["Launch Client", "Attach to Server"]
+			"autoAttachChildProcesses": true,
+			"preLaunchTask": {
+				"type": "npm",
+				"script": "dev"
+			}
 		}
 	]
 }

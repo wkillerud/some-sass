@@ -1,86 +1,12 @@
-// Copied/mutated from https://github.com/sergiirocks/vscode-ext-color-highlight/tree/master/src/strategies
+import ColorDotJS from "colorjs.io";
 
-import * as Color from "color";
-import * as webColors from "css-color-names";
-
-const colorHex = /.?(#([\da-f]{6}([\da-f]{2})?|[\da-f]{3}([\da-f])?))\b/gi;
-const colorFunctions =
-	/((rgb|hsl)a?\((?:\d{1,3}%?,\s*){2}\d{1,3}%?(,\s*\d?\.?\d+)?\))/gi;
-
-export function getVariableColor(value: string): string | string[] | null {
-	const hex: string[] | null = findHex(value);
-	const fn: string[] | null = findFn(value);
-	const word: string | null = findWord(value);
-
-	if (hex.length > 0) {
-		return hex;
+export function isColor(value: string): string | null {
+	try {
+		ColorDotJS.parse(value);
+		// Yup, it's color.
+		return value;
+	} catch (e) {
+		return null;
 	}
-
-	if (fn.length > 0) {
-		return fn;
-	}
-
-	if (word) {
-		return word;
-	}
-
-	return null;
-}
-
-/*
- * Find color from hexcode
- */
-function findHex(text: string): string[] {
-	let match = colorHex.exec(text);
-	const result = [];
-
-	while (match !== null) {
-		const matchedColor = match[1];
-
-		try {
-			Color(matchedColor).hex();
-			// Push the original value if the above does not error
-			result.push(text);
-		} catch (error) {
-			console.error(error);
-		}
-
-		match = colorHex.exec(text);
-	}
-
-	return result;
-}
-
-/**
- * Find color from rgb/hsl
- */
-function findFn(text: string): string[] {
-	let match = colorFunctions.exec(text);
-	const result: string[] = [];
-
-	while (match !== null) {
-		const color = match[0];
-
-		if (color !== undefined) {
-			result.push(color);
-		}
-
-		match = colorFunctions.exec(text);
-	}
-
-	return result;
-}
-
-/**
- * Find color from words
- */
-function findWord(text: string): string | null {
-	const namedCssColor = text as keyof typeof webColors;
-	const color = webColors[namedCssColor];
-
-	if (color) {
-		return color;
-	}
-
 	return null;
 }

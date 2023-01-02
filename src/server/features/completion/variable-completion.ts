@@ -5,8 +5,10 @@ import {
 	MarkupKind,
 } from "vscode-languageserver-types";
 import type { CompletionItem } from "vscode-languageserver-types";
-import type { IScssDocument } from "../../parser";
+import { IScssDocument } from "../../parser";
+import StorageService from "../../storage";
 import { applySassDoc } from "../../utils/sassdoc";
+import { getBaseValueFrom, isReferencingVariable } from "../../utils/scss";
 import { asDollarlessVariable, getLimitedString } from "../../utils/string";
 import { isColor } from "./color-completion";
 import type { CompletionContext } from "./completion-context";
@@ -14,6 +16,7 @@ import { rePrivate } from "./completion-utils";
 
 export function createVariableCompletionItems(
 	scssDocument: IScssDocument,
+	storage: StorageService,
 	currentDocument: TextDocument,
 	context: CompletionContext,
 	hiddenSymbols: string[] = [],
@@ -22,12 +25,17 @@ export function createVariableCompletionItems(
 	const completions: CompletionItem[] = [];
 
 	for (const variable of scssDocument.variables.values()) {
-		const color = variable.value ? isColor(variable.value) : null;
+		let value = variable.value;
+		if (isReferencingVariable(variable)) {
+			value = getBaseValueFrom(variable, scssDocument, storage).value;
+		}
+
+		const color = value ? isColor(value) : null;
 		const completionKind = color
 			? CompletionItemKind.Color
 			: CompletionItemKind.Variable;
 
-		let documentation = getLimitedString(color || variable.value || "");
+		let documentation = getLimitedString(color || value || "");
 		let detail = `Variable declared in ${scssDocument.fileName}`;
 
 		let label = variable.name;

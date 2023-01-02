@@ -15,6 +15,7 @@ import {
 } from "../../parser";
 import type StorageService from "../../storage";
 import { applySassDoc } from "../../utils/sassdoc";
+import { getBaseValueFrom, isReferencingVariable } from "../../utils/scss";
 import { asDollarlessVariable, getLimitedString } from "../../utils/string";
 import { sassBuiltInModules } from "../sass-built-in-modules";
 import { sassDocAnnotations } from "../sassdoc-annotations";
@@ -27,12 +28,24 @@ interface Identifier {
 function formatVariableMarkupContent(
 	variable: ScssVariable,
 	sourceDocument: IScssDocument,
+	storage: StorageService,
 ): MarkupContent {
-	const value = getLimitedString(variable.value || "");
+	let value = variable.value;
+	if (isReferencingVariable(variable)) {
+		value = getBaseValueFrom(variable, sourceDocument, storage).value;
+	}
+
+	value = getLimitedString(value || "");
 
 	const result = {
 		kind: MarkupKind.Markdown,
-		value: ["```scss", `${variable.name}: ${value};`, "```"].join("\n"),
+		value: [
+			"```scss",
+			`${variable.name}: ${value};${
+				value !== variable.value ? ` // via ${variable.value}` : ""
+			}`,
+			"```",
+		].join("\n"),
 	};
 
 	const sassdoc = applySassDoc(variable);
@@ -244,6 +257,7 @@ export function doHover(
 				contents = formatVariableMarkupContent(
 					symbol as ScssVariable,
 					sourceDocument,
+					storage,
 				);
 
 				break;

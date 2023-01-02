@@ -33,6 +33,32 @@ export function goDefinition(
 	offset: number,
 	storage: StorageService,
 ): Location | null {
+	const result = getDefinition(document, offset, storage);
+	if (!result) {
+		return null;
+	}
+
+	const [definition, sourceDocument] = result;
+	if (!definition || !sourceDocument) {
+		return null;
+	}
+
+	const symbol = Location.create(sourceDocument.uri, {
+		start: definition.position,
+		end: {
+			line: definition.position.line,
+			character: definition.position.character + definition.name.length,
+		},
+	});
+
+	return symbol;
+}
+
+export function getDefinition(
+	document: TextDocument,
+	offset: number,
+	storage: StorageService,
+): [ScssSymbol, IScssDocument] | null {
 	const currentScssDocument = storage.get(document.uri);
 	if (!currentScssDocument) {
 		return null;
@@ -62,15 +88,7 @@ export function goDefinition(
 		return null;
 	}
 
-	const symbol = Location.create(sourceDocument.uri, {
-		start: definition.position,
-		end: {
-			line: definition.position.line,
-			character: definition.position.character + definition.name.length,
-		},
-	});
-
-	return symbol;
+	return [definition, sourceDocument];
 }
 
 function getIdentifier(

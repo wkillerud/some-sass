@@ -115,6 +115,7 @@ export function doCompletion(
 		if (settings.suggestVariables && context.variable) {
 			const variables = createVariableCompletionItems(
 				scssDocument,
+				storage,
 				document,
 				context,
 			);
@@ -276,6 +277,7 @@ function traverseTree(
 		if (settings.suggestVariables && context.variable) {
 			const variables = createVariableCompletionItems(
 				scssDocument,
+				storage,
 				document,
 				context,
 				hiddenSymbols,

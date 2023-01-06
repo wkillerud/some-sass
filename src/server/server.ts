@@ -135,9 +135,7 @@ export class SomeSassServer {
 			try {
 				await scannerService.scan(files, workspaceRoot);
 			} catch (error) {
-				if (settings.showErrors) {
-					this.connection.window.showErrorMessage(String(error));
-				}
+				console.log(String(error));
 			}
 		});
 

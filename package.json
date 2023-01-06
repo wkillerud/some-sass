@@ -76,21 +76,6 @@
 					"default": false,
 					"description": "If your project uses the new module system with @use and @forward, you may want to only include suggestions from your used modules."
 				},
-				"somesass.suggestVariables": {
-					"type": "boolean",
-					"default": true,
-					"description": "Allows prompt Variables."
-				},
-				"somesass.suggestMixins": {
-					"type": "boolean",
-					"default": true,
-					"description": "Allows prompt Mixins."
-				},
-				"somesass.suggestFunctions": {
-					"type": "boolean",
-					"default": true,
-					"description": "Allows prompt Functions."
-				},
 				"somesass.suggestFunctionsInStringContextAfterSymbols": {
 					"type": "string",
 					"default": " (+-*%",

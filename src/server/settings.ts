@@ -10,9 +10,6 @@ export interface ISettings {
 	// Suggestions
 	readonly suggestAllFromOpenDocument: boolean;
 	readonly suggestFromUseOnly: boolean;
-	readonly suggestVariables: boolean;
-	readonly suggestMixins: boolean;
-	readonly suggestFunctions: boolean;
 	readonly suggestFunctionsInStringContextAfterSymbols: string;
 }
 
@@ -34,8 +31,5 @@ export const defaultSettings: ISettings = Object.freeze({
 	showErrors: false,
 	suggestAllFromOpenDocument: true,
 	suggestFromUseOnly: true,
-	suggestVariables: true,
-	suggestMixins: true,
-	suggestFunctions: true,
 	suggestFunctionsInStringContextAfterSymbols: " (+-*%",
 });

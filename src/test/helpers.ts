@@ -68,9 +68,6 @@ export function makeSettings(options?: Partial<ISettings>): ISettings {
 		showErrors: false,
 		suggestAllFromOpenDocument: false,
 		suggestFromUseOnly: false,
-		suggestVariables: true,
-		suggestMixins: true,
-		suggestFunctions: true,
 		suggestFunctionsInStringContextAfterSymbols: " (+-*%",
 		...options,
 	};

@@ -88,15 +88,6 @@ export function createLanguageClientOptions(
 		suggestFromUseOnly:
 			configuration.get<boolean>("suggestFromUseOnly") ||
 			defaultSettings.suggestFromUseOnly,
-		suggestVariables:
-			configuration.get<boolean>("suggestVariables") ||
-			defaultSettings.suggestVariables,
-		suggestMixins:
-			configuration.get<boolean>("suggestMixins") ||
-			defaultSettings.suggestMixins,
-		suggestFunctions:
-			configuration.get<boolean>("suggestFunctions") ||
-			defaultSettings.suggestFunctions,
 		suggestFunctionsInStringContextAfterSymbols:
 			configuration.get<string>(
 				"suggestFunctionsInStringContextAfterSymbols",

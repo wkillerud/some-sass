@@ -112,7 +112,7 @@ export function doCompletion(
 			continue;
 		}
 
-		if (settings.suggestVariables && context.variable) {
+		if (context.variable) {
 			const variables = createVariableCompletionItems(
 				scssDocument,
 				storage,
@@ -122,7 +122,7 @@ export function doCompletion(
 			completions.items = completions.items.concat(variables);
 		}
 
-		if (settings.suggestMixins && context.mixin) {
+		if (context.mixin) {
 			const mixins = createMixinCompletionItems(
 				scssDocument,
 				document,
@@ -131,7 +131,7 @@ export function doCompletion(
 			completions.items = completions.items.concat(mixins);
 		}
 
-		if (settings.suggestFunctions && context.function) {
+		if (context.function) {
 			const functions = createFunctionCompletionItems(
 				scssDocument,
 				document,
@@ -274,7 +274,7 @@ function traverseTree(
 		settings.suggestAllFromOpenDocument ||
 		scssDocument.uri !== document.uri
 	) {
-		if (settings.suggestVariables && context.variable) {
+		if (context.variable) {
 			const variables = createVariableCompletionItems(
 				scssDocument,
 				storage,
@@ -286,7 +286,7 @@ function traverseTree(
 			completionItems = completionItems.concat(variables);
 		}
 
-		if (settings.suggestMixins && context.mixin) {
+		if (context.mixin) {
 			const mixins = createMixinCompletionItems(
 				scssDocument,
 				document,
@@ -297,7 +297,7 @@ function traverseTree(
 			completionItems = completionItems.concat(mixins);
 		}
 
-		if (settings.suggestFunctions && context.function) {
+		if (context.function) {
 			const functions = createFunctionCompletionItems(
 				scssDocument,
 				document,

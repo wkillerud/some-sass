@@ -146,14 +146,6 @@ There will unfortunately be duplicates.
 - JSON key: `somesass.suggestAllFromOpenDocument`
 - Default value: `false`.
 
-#### Control what types of symbols are suggested
-
-There are three settings that let you pick what types of symbols (variables, functions, mixins) should be suggested if you are only interested in some of them.
-By default, all of them are turned on.
-
-- JSON keys: `somesass.suggestFunctions`, `somesass.suggestMixins` and `somesass.suggestVariables`.
-- Default value: `true`.
-
 #### Decide when function suggestions should kick in
 
 Suggest functions after the specified symbols when in a string context.

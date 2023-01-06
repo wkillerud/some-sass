@@ -59,12 +59,8 @@
 				"somesass.scanImportedFiles": {
 					"type": "boolean",
 					"default": true,
-					"description": "Allows scan imported files."
-				},
-				"somesass.showErrors": {
-					"type": "boolean",
-					"default": false,
-					"description": "Allows to display errors."
+					"deprecationMessage": "Will be removed at some point after `@import` becomes CSS-only.",
+					"description": "Allows scan imported files. Turning this off will severely limit functionality, and is not recommended."
 				},
 				"somesass.suggestAllFromOpenDocument": {
 					"type": "boolean",
@@ -75,21 +71,6 @@
 					"type": "boolean",
 					"default": false,
 					"description": "If your project uses the new module system with @use and @forward, you may want to only include suggestions from your used modules."
-				},
-				"somesass.suggestVariables": {
-					"type": "boolean",
-					"default": true,
-					"description": "Allows prompt Variables."
-				},
-				"somesass.suggestMixins": {
-					"type": "boolean",
-					"default": true,
-					"description": "Allows prompt Mixins."
-				},
-				"somesass.suggestFunctions": {
-					"type": "boolean",
-					"default": true,
-					"description": "Allows prompt Functions."
 				},
 				"somesass.suggestFunctionsInStringContextAfterSymbols": {
 					"type": "string",

@@ -1,13 +1,7 @@
 export interface ISettings {
-	// Scanner
 	readonly scannerDepth: number;
 	readonly scannerExclude: string[];
 	readonly scanImportedFiles: boolean;
-
-	// Display
-	readonly showErrors: boolean;
-
-	// Suggestions
 	readonly suggestAllFromOpenDocument: boolean;
 	readonly suggestFromUseOnly: boolean;
 	readonly suggestFunctionsInStringContextAfterSymbols: string;
@@ -28,7 +22,6 @@ export const defaultSettings: ISettings = Object.freeze({
 		"**/bower_components/**",
 	],
 	scanImportedFiles: true,
-	showErrors: false,
 	suggestAllFromOpenDocument: true,
 	suggestFromUseOnly: true,
 	suggestFunctionsInStringContextAfterSymbols: " (+-*%",

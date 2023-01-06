@@ -65,7 +65,6 @@ export function makeSettings(options?: Partial<ISettings>): ISettings {
 		scannerDepth: 30,
 		scannerExclude: ["**/.git", "**/node_modules", "**/bower_components"],
 		scanImportedFiles: true,
-		showErrors: false,
 		suggestAllFromOpenDocument: false,
 		suggestFromUseOnly: false,
 		suggestFunctionsInStringContextAfterSymbols: " (+-*%",

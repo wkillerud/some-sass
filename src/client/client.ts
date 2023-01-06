@@ -80,8 +80,6 @@ export function createLanguageClientOptions(
 		scanImportedFiles:
 			configuration.get<boolean>("scanImportedFiles") ||
 			defaultSettings.scanImportedFiles,
-		showErrors:
-			configuration.get<boolean>("showErrors") || defaultSettings.showErrors,
 		suggestAllFromOpenDocument:
 			configuration.get<boolean>("suggestAllFromOpenDocument") ||
 			defaultSettings.suggestAllFromOpenDocument,

@@ -1,0 +1,46 @@
+{
+	"name": "some-sass-language-server",
+	"description": "LSP server. Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
+	"publisher": "SomewhatStationery",
+	"license": "MIT",
+	"engines": {
+		"vscode": "^1.66.0"
+	},
+	"version": "1.0.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/wkillerud/vscode-scss"
+	},
+	"dependencies": {
+		"colorjs.io": "^0.4.2",
+		"fast-glob": "^3.2.11",
+		"scss-sassdoc-parser": "^1.0.2",
+		"scss-symbols-parser": "^2.0.1",
+		"vscode-css-languageservice": "^6.0.1",
+		"vscode-languageserver": "^8.0.1",
+		"vscode-languageserver-textdocument": "^1.0.5",
+		"vscode-languageserver-types": "^3.17.1",
+		"vscode-uri": "^3.0.3"
+	},
+	"devDependencies": {
+		"@nodelib/fs.macchiato": "^1.0.4",
+		"@types/micromatch": "^4.0.0",
+		"@types/mocha": "^9.1.1",
+		"@types/node": "^16.11.43",
+		"@types/sinon": "^10.0.12",
+		"assert": "^2.0.0",
+		"micromatch": "^4.0.5",
+		"mocha": "^10.0.0",
+		"nyc": "^15.1.0",
+		"rimraf": "^3.0.2",
+		"sinon": "^15.0.1"
+	},
+	"scripts": {
+		"clean": "rimraf out",
+		"test": "npm run test:clean && npm run test:compile && npm run test:unit",
+		"test:clean": "rimraf out",
+		"test:compile": "tsc -p ./",
+		"test:unit": "mocha \"out/**/*.spec.js\"",
+		"test:coverage": "nyc npm run test:unit"
+	}
+}

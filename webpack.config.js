@@ -12,12 +12,53 @@ const path = require("path");
 const webpack = require("webpack");
 
 /** @type WebpackConfig */
-const nodeConfig = {
+const nodeClientConfig = {
 	target: "node", // VScode extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
 
 	entry: {
-		"node-client": "./src/client/node-client.ts",
-		"node-server": "./src/server/node-server.ts",
+		"node-client": "./client/src/node-client.ts",
+	},
+	output: {
+		path: path.resolve(__dirname, "dist"),
+		filename: "[name].js",
+		libraryTarget: "commonjs2",
+		devtoolModuleFilenameTemplate: "../[resource-path]",
+	},
+	devtool: "source-map",
+	externals: {
+		fsevents: 'require("fsevents")',
+		vscode: "commonjs vscode", // The vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
+	},
+	resolve: {
+		extensions: [".ts", ".js"],
+	},
+	module: {
+		rules: [
+			{
+				test: /\.ts$/,
+				exclude: /node_modules/,
+				use: [
+					{
+						loader: "ts-loader",
+						options: {
+							compilerOptions: {
+								module: "es6", // Override `tsconfig.json` so that TypeScript emits native JavaScript modules.
+							},
+						},
+					},
+				],
+			},
+		],
+	},
+	plugins: [new webpack.IgnorePlugin({ resourceRegExp: /vertx/ })],
+};
+
+/** @type WebpackConfig */
+const nodeServerConfig = {
+	target: "node", // VScode extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
+
+	entry: {
+		"node-server": "./server/src/node-server.ts",
 	},
 	output: {
 		path: path.resolve(__dirname, "dist"),
@@ -60,8 +101,7 @@ const browserClientConfig = {
 	mode: "none",
 	target: "webworker", // web extensions run in a webworker context
 	entry: {
-		"browser-client": "./src/client/browser-client.ts",
-		"test/web/suite/index": "./src/test/web/suite/index.ts", // source of the web extension test runner
+		"browser-client": "./client/src/browser-client.ts",
 	},
 	output: {
 		filename: "[name].js",
@@ -112,7 +152,7 @@ const browserServerConfig = {
 	mode: "none",
 	target: "webworker", // web extensions run in a webworker context
 	entry: {
-		"browser-server": "./src/server/browser-server.ts",
+		"browser-server": "./server/src/browser-server.ts",
 	},
 	output: {
 		filename: "[name].js",
@@ -157,4 +197,9 @@ const browserServerConfig = {
 	devtool: "source-map",
 };
 
-module.exports = [nodeConfig, browserClientConfig, browserServerConfig];
+module.exports = [
+	nodeClientConfig,
+	nodeServerConfig,
+	browserClientConfig,
+	browserServerConfig,
+];

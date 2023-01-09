@@ -40,4 +40,3 @@ jobs:
           timeout_minutes: 5
           max_attempts: 3
           command: npm run test:e2e
-

@@ -81,54 +81,30 @@
 		}
 	},
 	"devDependencies": {
-		"@nodelib/fs.macchiato": "^1.0.4",
-		"@types/color": "^3.0.3",
-		"@types/color-name": "^1.1.1",
-		"@types/micromatch": "^4.0.0",
-		"@types/mocha": "^9.1.1",
 		"@types/node": "^16.11.43",
-		"@types/sinon": "^10.0.12",
-		"@types/vscode": "^1.66.0",
 		"@types/webpack-env": "1.17.0",
 		"@typescript-eslint/eslint-plugin": "^5.31.0",
 		"@typescript-eslint/parser": "^5.31.0",
-		"@vscode/test-electron": "^2.1.5",
-		"@vscode/test-web": "^0.0.32",
-		"assert": "^2.0.0",
 		"eslint": "^8.19.0",
 		"eslint-config-prettier": "^8.6.0",
 		"eslint-plugin-import": "^2.26.0",
 		"eslint-plugin-prettier": "^4.2.1",
 		"husky": "^8.0.2",
 		"lint-staged": "^13.1.0",
-		"mocha": "^10.0.0",
-		"nyc": "^15.1.0",
-		"patch-package": "^6.5.0",
 		"prettier": "^2.8.1",
 		"rimraf": "^3.0.2",
-		"sinon": "^15.0.1",
 		"ts-loader": "^9.3.1",
 		"typescript": "^4.7.4",
 		"webpack": "^5.73.0",
 		"webpack-cli": "^5.0.1"
 	},
 	"dependencies": {
-		"colorjs.io": "^0.4.2",
-		"fast-glob": "^3.2.11",
 		"path-browserify": "^1.0.1",
 		"process": "^0.11.10",
-		"scss-sassdoc-parser": "^1.0.2",
-		"scss-symbols-parser": "^2.0.1",
-		"util": "^0.12.5",
-		"vscode-css-languageservice": "^6.0.1",
-		"vscode-languageclient": "^8.0.1",
-		"vscode-languageserver": "^8.0.1",
-		"vscode-languageserver-textdocument": "^1.0.5",
-		"vscode-languageserver-types": "^3.17.1",
-		"vscode-uri": "^3.0.3"
+		"util": "^0.12.5"
 	},
 	"lint-staged": {
-		"src/**/*.ts": [
+		"**/*.ts": [
 			"prettier --write",
 			"eslint --fix"
 		]
@@ -139,18 +115,11 @@
 		"vscode:prepublish": "npm run build",
 		"clean": "rimraf dist",
 		"build": "npm run clean && webpack --mode production --devtool hidden-source-map",
-		"predev": "npm run clean",
 		"dev": "webpack --mode development --watch",
-		"lint": "eslint \"src/**/*.ts\" --cache",
-		"test": "npm run test:clean && npm run test:compile && npm run test:unit",
-		"test:clean": "rimraf out",
-		"test:compile": "tsc -p ./",
-		"test:unit": "mocha \"out/**/*.spec.js\"",
-		"test:coverage": "nyc npm run test:unit",
-		"test:e2e": "npm run build && node ./out/test/e2e/runTest.js",
-		"test:chrome": "npm run build && vscode-test-web --browserType=chromium --extensionDevelopmentPath=. --extensionTestsPath=dist/test/web/suite/index.js ./fixtures/e2e",
-		"open:chrome": "npm run build && vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ./fixtures/e2e",
-		"postinstall": "patch-package"
+		"lint": "eslint \"**/*.ts\" --cache",
+		"test": "cd server && npm test",
+		"test:e2e": "npm run build && cd e2e && npm test",
+		"postinstall": "cd client && npm install && cd ../e2e && npm install && cd ../server && npm install"
 	},
 	"__metadata": {
 		"id": "6d35099c-3671-464c-ac0b-34a0c3823927",

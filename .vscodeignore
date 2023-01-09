@@ -12,14 +12,15 @@ npm-debug.log*
 .husky/
 .editorconfig
 .eslintrc.json
+**/.eslintrc.json
 .gitattributes
 .gitignore
 .npmrc
-tsconfig.json
+**/tsconfig.json
 webpack.config.js
 
 # Dependencies
-node_modules/
+**/node_modules/**
 
 # Source and test files
 .vscode-test/
@@ -29,7 +30,8 @@ coverage/
 fixtures/
 images/
 dist/test/
-src/
+**/*.ts
+**/*.map
 types/
 patches/
 .nvmrc
@@ -37,5 +39,5 @@ patches/
 CONTRIBUTING.md
 
 # Build artifacts
-out/
+**/out/**
 *.vsix

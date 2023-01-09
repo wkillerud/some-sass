@@ -90,7 +90,7 @@ Open `dist/browser-server.js`, search for a function name close to where you wan
 
 Unit tests can be useful tools to debug more efficiently. If you want to debug using a unit test, the same rule applies – you have to set breakpoints on the compiled output.
 
-Tests are compiled to `out/test/`. Find your test, or the code you want to debug in the `out/` folder, and set breakpoints.
+Tests are compiled to `server/out/test/`. Find your test, or the code you want to debug in the `server/out/` folder, and set breakpoints.
 
 The extension Mocha Test Explorer (`hbenl.vscode-mocha-test-adapter`) is useful to launch individual tests in debug mode. Install the extension, open your unit test, and press the Debug button that should appear over your test. Hopefully you should see the code pause on your breakpoint. If not, try to place breakpoints elsewhere. Something unexpected may stop you from reaching your code.
 
@@ -104,9 +104,9 @@ If you still want to debug the integration tests there are a few things to keep 
 
 - You will need to install Vetur (`octref.vetur`), Astro (`astro-build.astro-vscode`) and Svelte for VS Code (`svelte.svelte-vscode`).
 - You **must** use default settings for Some Sass. Tip: use the included Workspace Settings.
-- To compile changes in test code, run `npm run test:compile`
+- To compile changes in test code, run `npm run compile` in the `e2e` directory.
 
-Again, breakpoints must be set in the compiled output. Integration tests are compiled to `out/test/e2e/suite/`. Breakpoints can _only be set in test code_, meaning any code in the `out/test/e2e/` folder.
+Again, breakpoints must be set in the compiled output. Integration tests are compiled to `e2e/out/suite/`. Breakpoints can _only be set in test code_, meaning any code in the `e2e/out/` folder.
 
 Now you are ready to start debugging!
 

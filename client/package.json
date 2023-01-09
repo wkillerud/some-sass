@@ -1,0 +1,27 @@
+{
+	"name": "some-sass-vscode-client",
+	"description": "VSCode client for Some Sass.",
+	"publisher": "SomewhatStationery",
+	"license": "MIT",
+	"version": "1.0.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/wkillerud/vscode-scss"
+	},
+	"engines": {
+		"vscode": "^1.66.0"
+	},
+	"dependencies": {
+		"fast-glob": "^3.2.12",
+		"vscode-css-languageservice": "^6.0.1",
+		"vscode-languageclient": "^8.0.1",
+		"vscode-uri": "^3.0.7"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.66.0",
+		"rimraf": "^3.0.2"
+	},
+	"scripts": {
+		"clean": "rimraf out"
+	}
+}

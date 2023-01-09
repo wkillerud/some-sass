@@ -9,10 +9,10 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/out/test/e2e/suite",
+				"--extensionTestsPath=${workspaceFolder}/e2e/out/suite",
 				"${workspaceFolder}/fixtures/e2e/"
 			],
-			"outFiles": ["${workspaceFolder}/out/test/e2e/**/*.js"]
+			"outFiles": ["${workspaceFolder}/e2e/out/**/*.js"]
 		},
 		{
 			"type": "extensionHost",
@@ -37,23 +37,6 @@
 				"--extensionDevelopmentKind=web"
 			],
 			"outFiles": ["${workspaceFolder}/dist/browser-*.js"],
-			"autoAttachChildProcesses": true,
-			"preLaunchTask": {
-				"type": "npm",
-				"script": "dev"
-			}
-		},
-		{
-			"name": "Web Integration Tests in VS Code",
-			"type": "extensionHost",
-			"debugWebWorkerHost": true,
-			"request": "launch",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionDevelopmentKind=web",
-				"--extensionTestsPath=${workspaceFolder}/dist/test/web/suite/index"
-			],
-			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
 			"autoAttachChildProcesses": true,
 			"preLaunchTask": {
 				"type": "npm",

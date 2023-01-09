@@ -1,0 +1,30 @@
+{
+	"name": "some-sass-e2e",
+	"description": "End-to-end tests for vscode-scss.",
+	"publisher": "SomewhatStationery",
+	"license": "MIT",
+	"version": "1.0.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/wkillerud/vscode-scss"
+	},
+	"engines": {
+		"vscode": "^1.66.0"
+	},
+	"devDependencies": {
+		"@types/mocha": "^9.1.1",
+		"@types/sinon": "^10.0.12",
+		"@types/vscode": "^1.66.0",
+		"@vscode/test-electron": "^2.1.5",
+		"assert": "^2.0.0",
+		"fast-glob": "^3.2.11",
+		"mocha": "^10.0.0",
+		"rimraf": "^3.0.2",
+		"vscode-languageclient": "^8.0.1"
+	},
+	"scripts": {
+		"test": "npm run clean && npm run compile && node ./out/runTest.js",
+		"clean": "rimraf out",
+		"compile": "tsc -p ./"
+	}
+}

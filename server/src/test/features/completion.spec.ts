@@ -1,10 +1,15 @@
 import { strictEqual, ok } from "assert";
-import { CompletionItemKind, SymbolKind } from "vscode-languageserver";
+import {
+	CompletionItem,
+	CompletionItemKind,
+	SymbolKind,
+} from "vscode-languageserver";
 import type { CompletionList } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { doCompletion } from "../../features/completion";
 import { parseStringLiteralChoices } from "../../features/completion/completion-utils";
 import { sassBuiltInModules } from "../../features/sass-built-in-modules";
+import { sassDocAnnotations } from "../../features/sassdoc-annotations";
 import { ScssDocument } from "../../parser";
 import type { ISettings } from "../../settings";
 import StorageService from "../../storage";
@@ -235,5 +240,20 @@ describe("Providers/Completion - Utils", () => {
 
 		result = parseStringLiteralChoices('"String" | "Number"');
 		strictEqual(result.join(", "), '"String", "Number"');
+	});
+});
+
+describe("Providers/Completion - SassDoc", () => {
+	it("Offers completions for SassDoc annotations on variable", async () => {
+		const expectedCompletions = sassDocAnnotations.map((a) => a.annotation);
+
+		const actual = await getCompletionList(["///|", "$doc-variable: 1px;"]);
+
+		ok(
+			expectedCompletions.every((annotation) =>
+				actual.items.find((item: CompletionItem) => item.label === annotation),
+			),
+			"One or more expected SassDoc annotations were not present.",
+		);
 	});
 });

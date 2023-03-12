@@ -2,22 +2,19 @@ import { strictEqual, deepStrictEqual, ok } from "assert";
 import { DiagnosticSeverity, DiagnosticTag } from "vscode-languageserver-types";
 import { EXTENSION_NAME } from "../../constants";
 import { doDiagnostics } from "../../features/diagnostics/diagnostics";
-import StorageService from "../../storage";
 import * as helpers from "../helpers";
-import { TestFileSystem } from "../test-file-system";
-
-const storage = new StorageService();
-const fs = new TestFileSystem(storage);
 
 describe("Providers/Diagnostics", () => {
-	it("doDiagnostics - Variables", async () => {
-		const document = await helpers.makeDocument(
-			storage,
-			["/// @deprecated Use something else", "$a: 1;", ".a { content: $a; }"],
-			fs,
-		);
+	beforeEach(() => helpers.createTestContext());
 
-		const actual = await doDiagnostics(document, storage);
+	it("doDiagnostics - Variables", async () => {
+		const document = await helpers.makeDocument([
+			"/// @deprecated Use something else",
+			"$a: 1;",
+			".a { content: $a; }",
+		]);
+
+		const actual = await doDiagnostics(document);
 
 		deepStrictEqual(actual, [
 			{
@@ -34,19 +31,15 @@ describe("Providers/Diagnostics", () => {
 	});
 
 	it("doDiagnostics - Functions", async () => {
-		const document = await helpers.makeDocument(
-			storage,
-			[
-				"/// @deprecated Use something else",
-				"@function old-function() {",
-				"  @return 1;",
-				"}",
-				".a { content: old-function(); }",
-			],
-			fs,
-		);
+		const document = await helpers.makeDocument([
+			"/// @deprecated Use something else",
+			"@function old-function() {",
+			"  @return 1;",
+			"}",
+			".a { content: old-function(); }",
+		]);
 
-		const actual = await doDiagnostics(document, storage);
+		const actual = await doDiagnostics(document);
 
 		deepStrictEqual(actual, [
 			{
@@ -63,19 +56,15 @@ describe("Providers/Diagnostics", () => {
 	});
 
 	it("doDiagnostics - Mixins", async () => {
-		const document = await helpers.makeDocument(
-			storage,
-			[
-				"/// @deprecated Use something else",
-				"@mixin old-mixin {",
-				"  content: 'mixin';",
-				"}",
-				".a { @include old-mixin(); }",
-			],
-			fs,
-		);
+		const document = await helpers.makeDocument([
+			"/// @deprecated Use something else",
+			"@mixin old-mixin {",
+			"  content: 'mixin';",
+			"}",
+			".a { @include old-mixin(); }",
+		]);
 
-		const actual = await doDiagnostics(document, storage);
+		const actual = await doDiagnostics(document);
 
 		deepStrictEqual(actual, [
 			{
@@ -92,29 +81,25 @@ describe("Providers/Diagnostics", () => {
 	});
 
 	it("doDiagnostics - all of the above", async () => {
-		const document = await helpers.makeDocument(
-			storage,
-			[
-				"/// @deprecated Use something else",
-				"$a: 1;",
-				".a { content: $a; }",
-				"",
-				"/// @deprecated Use something else",
-				"@function old-function() {",
-				"  @return 1;",
-				"}",
-				".a { content: old-function(); }",
-				"",
-				"/// @deprecated Use something else",
-				"@mixin old-mixin {",
-				"  content: 'mixin';",
-				"}",
-				".a { @include old-mixin(); }",
-			],
-			fs,
-		);
+		const document = await helpers.makeDocument([
+			"/// @deprecated Use something else",
+			"$a: 1;",
+			".a { content: $a; }",
+			"",
+			"/// @deprecated Use something else",
+			"@function old-function() {",
+			"  @return 1;",
+			"}",
+			".a { content: old-function(); }",
+			"",
+			"/// @deprecated Use something else",
+			"@mixin old-mixin {",
+			"  content: 'mixin';",
+			"}",
+			".a { @include old-mixin(); }",
+		]);
 
-		const actual = await doDiagnostics(document, storage);
+		const actual = await doDiagnostics(document);
 
 		strictEqual(actual.length, 3);
 
@@ -125,29 +110,25 @@ describe("Providers/Diagnostics", () => {
 	});
 
 	it("doDiagnostics - support annotation without description", async () => {
-		const document = await helpers.makeDocument(
-			storage,
-			[
-				"/// @deprecated",
-				"$a: 1;",
-				".a { content: $a; }",
-				"",
-				"/// @deprecated",
-				"@function old-function() {",
-				"  @return 1;",
-				"}",
-				".a { content: old-function(); }",
-				"",
-				"/// @deprecated",
-				"@mixin old-mixin {",
-				"  content: 'mixin';",
-				"}",
-				".a { @include old-mixin(); }",
-			],
-			fs,
-		);
+		const document = await helpers.makeDocument([
+			"/// @deprecated",
+			"$a: 1;",
+			".a { content: $a; }",
+			"",
+			"/// @deprecated",
+			"@function old-function() {",
+			"  @return 1;",
+			"}",
+			".a { content: old-function(); }",
+			"",
+			"/// @deprecated",
+			"@mixin old-mixin {",
+			"  content: 'mixin';",
+			"}",
+			".a { @include old-mixin(); }",
+		]);
 
-		const actual = await doDiagnostics(document, storage);
+		const actual = await doDiagnostics(document);
 
 		strictEqual(actual.length, 3);
 
@@ -159,46 +140,39 @@ describe("Providers/Diagnostics", () => {
 	});
 
 	it("doDiagnostics - support namespaces with prefix", async () => {
-		await helpers.makeDocument(storage, ["/// @deprecated", "$old-a: 1;"], fs, {
+		await helpers.makeDocument(["/// @deprecated", "$old-a: 1;"], {
 			uri: "variables.scss",
 		});
 		await helpers.makeDocument(
-			storage,
 			["/// @deprecated", "@function old-function() {", "  @return 1;", "}"],
-			fs,
+
 			{ uri: "functions.scss" },
 		);
 		await helpers.makeDocument(
-			storage,
 			["/// @deprecated", "@mixin old-mixin {", "  content: 'mixin';", "}"],
-			fs,
+
 			{ uri: "mixins.scss" },
 		);
 		await helpers.makeDocument(
-			storage,
 			[
 				"@forward './functions' as fun-*;",
 				"@forward './mixins' as mix-* hide secret, other-secret;",
 				"@forward './variables' hide $secret;",
 			],
-			fs,
+
 			{ uri: "namespace.scss" },
 		);
 
-		const document = await helpers.makeDocument(
-			storage,
-			[
-				"@use 'namespace' as ns;",
-				".foo {",
-				"  color: ns.$old-a;",
-				"  line-height: ns.fun-old-function();",
-				"  @include ns.mix-old-mixin;",
-				"}",
-			],
-			fs,
-		);
+		const document = await helpers.makeDocument([
+			"@use 'namespace' as ns;",
+			".foo {",
+			"  color: ns.$old-a;",
+			"  line-height: ns.fun-old-function();",
+			"  @include ns.mix-old-mixin;",
+			"}",
+		]);
 
-		const actual = await doDiagnostics(document, storage);
+		const actual = await doDiagnostics(document);
 
 		// For some reason we get duplicate diagnostics for mixins.
 		// Haven't been able to track down why getVariableFunctionMixinReferences produces two of the same node.

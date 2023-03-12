@@ -1,21 +1,14 @@
 import { resolve, join } from "path";
-import {
-	getSCSSLanguageService,
-	Position,
-	Range,
-} from "vscode-css-languageservice";
+import { Position, Range } from "vscode-css-languageservice";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
+import { createContext, useContext } from "../context-provider";
+import { FileSystemProvider } from "../file-system";
 import { parseDocument, type INode } from "../parser";
+import { getLanguageService } from "../parser/language-service";
 import type { ISettings } from "../settings";
-import type StorageService from "../storage";
-import type { TestFileSystem } from "./test-file-system";
-
-const ls = getSCSSLanguageService();
-
-ls.configure({
-	validate: false,
-});
+import StorageService from "../storage";
+import { TestFileSystem } from "./test-file-system";
 
 export interface MakeDocumentOptions {
 	uri?: string;
@@ -24,9 +17,7 @@ export interface MakeDocumentOptions {
 }
 
 export async function makeDocument(
-	storage: StorageService,
 	lines: string[] | string,
-	fs: TestFileSystem,
 	options: MakeDocumentOptions = {},
 ): Promise<TextDocument> {
 	const text = Array.isArray(lines) ? lines.join("\n") : lines;
@@ -40,18 +31,15 @@ export async function makeDocument(
 		text,
 	);
 
-	const scssDocument = await parseDocument(document, workspaceRootUri, fs, {});
-
+	const scssDocument = await parseDocument(document, workspaceRootUri);
+	const { storage } = useContext();
 	storage.set(uri, scssDocument);
 	return document;
 }
 
-export async function makeAst(
-	storage: StorageService,
-	lines: string[],
-	fs: TestFileSystem,
-): Promise<INode> {
-	const document = await makeDocument(storage, lines, fs);
+export async function makeAst(lines: string[]): Promise<INode> {
+	const document = await makeDocument(lines);
+	const ls = getLanguageService();
 	return ls.parseStylesheet(document) as INode;
 }
 
@@ -70,3 +58,30 @@ export function makeSettings(options?: Partial<ISettings>): ISettings {
 		...options,
 	};
 }
+
+export const createTestContext = (fsProvider?: FileSystemProvider): void => {
+	const storage = new StorageService();
+	const fs = fsProvider || new TestFileSystem(storage);
+
+	createContext({
+		storage,
+		fs,
+		settings: makeSettings(),
+		editorSettings: {
+			insertSpaces: false,
+			indentSize: 2,
+			tabSize: 2,
+		},
+		workspaceRoot: URI.parse(process.cwd()),
+		clientCapabilities: {
+			textDocument: {
+				completion: {
+					completionItem: { documentationFormat: ["markdown", "plaintext"] },
+				},
+				hover: {
+					contentFormat: ["markdown", "plaintext"],
+				},
+			},
+		},
+	});
+};

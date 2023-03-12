@@ -2,13 +2,9 @@ import { strictEqual, deepStrictEqual, ok } from "assert";
 import { stub, SinonStub } from "sinon";
 import { FileType } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
+import { useContext } from "../../context-provider";
 import { parseDocument, reForward, reModuleAtRule, reUse } from "../../parser";
-import StorageService from "../../storage";
 import * as helpers from "../helpers";
-import { TestFileSystem } from "../test-file-system";
-
-const storage = new StorageService();
-const fs = new TestFileSystem(storage);
 
 describe("Services/Parser", () => {
 	describe(".parseDocument", () => {
@@ -16,6 +12,8 @@ describe("Services/Parser", () => {
 		let fileExistsStub: SinonStub;
 
 		beforeEach(() => {
+			helpers.createTestContext();
+			const { fs } = useContext();
 			fileExistsStub = stub(fs, "exists");
 			statStub = stub(fs, "stat").yields(null, {
 				type: FileType.Unknown,
@@ -31,17 +29,13 @@ describe("Services/Parser", () => {
 		});
 
 		it("should return symbols", async () => {
-			const document = await helpers.makeDocument(
-				storage,
-				[
-					'$name: "value";',
-					"@mixin mixin($a: 1, $b) {}",
-					"@function function($a: 1, $b) {}",
-				],
-				fs,
-			);
+			const document = await helpers.makeDocument([
+				'$name: "value";',
+				"@mixin mixin($a: 1, $b) {}",
+				"@function function($a: 1, $b) {}",
+			]);
 
-			const symbols = await parseDocument(document, URI.parse(""), fs, {});
+			const symbols = await parseDocument(document, URI.parse(""));
 
 			// Variables
 			const variables = [...symbols.variables.values()];
@@ -80,27 +74,23 @@ describe("Services/Parser", () => {
 		it("should return links", async () => {
 			fileExistsStub.resolves(true);
 
-			await helpers.makeDocument(storage, ["$var: 1px;"], fs, {
+			await helpers.makeDocument(["$var: 1px;"], {
 				uri: "variables.scss",
 			});
-			await helpers.makeDocument(storage, ["$tr: 2px;"], fs, {
+			await helpers.makeDocument(["$tr: 2px;"], {
 				uri: "corners.scss",
 			});
-			await helpers.makeDocument(storage, ["$b: #000;"], fs, {
+			await helpers.makeDocument(["$b: #000;"], {
 				uri: "color.scss",
 			});
 
-			const document = await helpers.makeDocument(
-				storage,
-				[
-					'@use "variables" as vars;',
-					'@use "corners" as *;',
-					'@forward "colors" as color-* hide $varslingsfarger, varslingsfarge;',
-				],
-				fs,
-			);
+			const document = await helpers.makeDocument([
+				'@use "variables" as vars;',
+				'@use "corners" as *;',
+				'@forward "colors" as color-* hide $varslingsfarger, varslingsfarge;',
+			]);
 
-			const symbols = await parseDocument(document, URI.parse(""), fs, {});
+			const symbols = await parseDocument(document, URI.parse(""));
 
 			// Uses
 			const uses = [...symbols.uses.values()];
@@ -124,24 +114,23 @@ describe("Services/Parser", () => {
 		it("should return relative links", async () => {
 			fileExistsStub.resolves(true);
 
-			await helpers.makeDocument(storage, ["$var: 1px;"], fs, {
+			await helpers.makeDocument(["$var: 1px;"], {
 				uri: "upper.scss",
 			});
-			await helpers.makeDocument(storage, ["$b: #000;"], fs, {
+			await helpers.makeDocument(["$b: #000;"], {
 				uri: "middle/middle.scss",
 			});
-			await helpers.makeDocument(storage, ["$tr: 2px;"], fs, {
+			await helpers.makeDocument(["$tr: 2px;"], {
 				uri: "middle/lower/lower.scss",
 			});
 
 			const document = await helpers.makeDocument(
-				storage,
 				['@use "../upper";', '@use "./middle";', '@use "./lower/lower";'],
-				fs,
+
 				{ uri: "middle/main.scss" },
 			);
 
-			const symbols = await parseDocument(document, URI.parse(""), fs, {});
+			const symbols = await parseDocument(document, URI.parse(""));
 			const uses = [...symbols.uses.values()];
 
 			strictEqual(uses.length, 3, "expected to find three uses");
@@ -149,14 +138,13 @@ describe("Services/Parser", () => {
 
 		it("should not crash on link to the same document", async () => {
 			const document = await helpers.makeDocument(
-				storage,
 				['@use "./self";', "$var: 1px;"],
-				fs,
+
 				{
 					uri: "self.scss",
 				},
 			);
-			const symbols = await parseDocument(document, URI.parse(""), fs, {});
+			const symbols = await parseDocument(document, URI.parse(""));
 			const uses = [...symbols.uses.values()];
 			const variables = [...symbols.variables.values()];
 

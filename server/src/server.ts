@@ -17,6 +17,11 @@ import type {
 } from "vscode-languageserver/node";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
+import {
+	changeConfiguration,
+	createContext,
+	useContext,
+} from "./context-provider";
 import { ExtractProvider } from "./features/code-actions";
 import { doCompletion } from "./features/completion";
 import { doDiagnostics } from "./features/diagnostics/diagnostics";
@@ -30,7 +35,7 @@ import type { FileSystemProvider } from "./file-system";
 import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";
 import ScannerService from "./scanner";
-import type { IEditorSettings, ISettings } from "./settings";
+import type { ISettings } from "./settings";
 import StorageService from "./storage";
 import { getSCSSRegionsDocument } from "./utils/embedded";
 
@@ -50,9 +55,6 @@ export class SomeSassServer {
 
 	public listen(): void {
 		let workspaceRoot: URI;
-		let settings: ISettings;
-		let editorSettings: IEditorSettings;
-		let storageService: StorageService;
 		let scannerService: ScannerService;
 		let fileSystemProvider: FileSystemProvider;
 		let clientCapabilities: ClientCapabilities;
@@ -118,18 +120,24 @@ export class SomeSassServer {
 		);
 
 		this.connection.onInitialized(async () => {
-			settings = await this.connection.workspace.getConfiguration("somesass");
-			editorSettings = await this.connection.workspace.getConfiguration(
+			const settings = await this.connection.workspace.getConfiguration(
+				"somesass",
+			);
+			const editorSettings = await this.connection.workspace.getConfiguration(
 				"editor",
 			);
+			const storageService = new StorageService();
 
-			storageService = new StorageService();
-			scannerService = new ScannerService(
-				storageService,
-				fileSystemProvider,
-				settings,
+			createContext({
 				clientCapabilities,
-			);
+				fs: fileSystemProvider,
+				settings,
+				editorSettings,
+				workspaceRoot,
+				storage: storageService,
+			});
+
+			scannerService = new ScannerService();
 
 			const files = await fileSystemProvider.findFiles(
 				"**/*.{scss,svelte,astro,vue}",
@@ -156,7 +164,7 @@ export class SomeSassServer {
 				return;
 			}
 
-			const diagnostics = await doDiagnostics(change.document, storageService);
+			const diagnostics = await doDiagnostics(change.document);
 
 			// Check that no new version has been made while we waited
 			const latestTextDocument = documents.get(change.document.uri);
@@ -172,7 +180,8 @@ export class SomeSassServer {
 		});
 
 		this.connection.onDidChangeConfiguration((params) => {
-			settings = params.settings.somesass;
+			const settings: ISettings = params.settings.somesass;
+			changeConfiguration(settings);
 		});
 
 		this.connection.onDidChangeWatchedFiles(async (event) => {
@@ -180,13 +189,14 @@ export class SomeSassServer {
 				return null;
 			}
 
+			const { storage } = useContext();
 			const newFiles: URI[] = [];
 			for (const change of event.changes) {
 				const uri = URI.parse(change.uri);
 				if (change.type === FileChangeType.Deleted) {
-					storageService.delete(uri);
+					storage.delete(uri);
 				} else if (change.type === FileChangeType.Changed) {
-					const document = storageService.get(uri);
+					const document = storage.get(uri);
 					if (document) {
 						await scannerService.update(document, workspaceRoot);
 					} else {
@@ -214,14 +224,7 @@ export class SomeSassServer {
 				return null;
 			}
 
-			const completions = await doCompletion(
-				document,
-				offset,
-				settings,
-				storageService,
-				workspaceRoot,
-				fileSystemProvider,
-			);
+			const completions = await doCompletion(document, offset);
 
 			return completions;
 		});
@@ -240,7 +243,7 @@ export class SomeSassServer {
 				return null;
 			}
 
-			return doHover(document, offset, storageService);
+			return doHover(document, offset);
 		});
 
 		this.connection.onSignatureHelp((textDocumentPosition) => {
@@ -257,7 +260,7 @@ export class SomeSassServer {
 				return null;
 			}
 
-			return doSignatureHelp(document, offset, storageService);
+			return doSignatureHelp(document, offset);
 		});
 
 		this.connection.onDefinition((textDocumentPosition) => {
@@ -274,7 +277,7 @@ export class SomeSassServer {
 				return null;
 			}
 
-			return goDefinition(document, offset, storageService);
+			return goDefinition(document, offset);
 		});
 
 		this.connection.onReferences(async (referenceParams) => {
@@ -292,12 +295,7 @@ export class SomeSassServer {
 			}
 
 			const options = referenceParams.context;
-			const references = await provideReferences(
-				document,
-				offset,
-				storageService,
-				options,
-			);
+			const references = await provideReferences(document, offset, options);
 
 			if (!references) {
 				return null;
@@ -309,12 +307,12 @@ export class SomeSassServer {
 		this.connection.onWorkspaceSymbol((workspaceSymbolParams) => {
 			return searchWorkspaceSymbol(
 				workspaceSymbolParams.query,
-				storageService,
 				workspaceRoot.toString(),
 			);
 		});
 
 		this.connection.onCodeAction(async (params) => {
+			const { editorSettings } = useContext();
 			const codeActionProviders = [new ExtractProvider(editorSettings)];
 
 			const document = documents.get(params.textDocument.uri);
@@ -364,12 +362,7 @@ export class SomeSassServer {
 				return null;
 			}
 
-			const preparations = await prepareRename(
-				document,
-				offset,
-				storageService,
-				settings,
-			);
+			const preparations = await prepareRename(document, offset);
 			return preparations;
 		});
 
@@ -384,17 +377,13 @@ export class SomeSassServer {
 				return null;
 			}
 
-			const edits = await doRename(
-				document,
-				offset,
-				storageService,
-				params.newName,
-			);
+			const edits = await doRename(document, offset, params.newName);
 			return edits;
 		});
 
 		this.connection.onShutdown(() => {
-			storageService.clear();
+			const { storage } = useContext();
+			storage.clear();
 		});
 
 		this.connection.listen();

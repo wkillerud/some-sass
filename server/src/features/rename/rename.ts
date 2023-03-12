@@ -5,8 +5,7 @@ import {
 	TextEdit,
 	WorkspaceEdit,
 } from "vscode-languageserver-types";
-import { ISettings } from "../../settings";
-import StorageService from "../../storage";
+import { useContext } from "../../context-provider";
 import { createCompletionContext } from "../completion/completion-context";
 import { provideReferences } from "../references";
 
@@ -15,12 +14,11 @@ const defaultBehavior = { defaultBehavior: true };
 export async function prepareRename(
 	document: TextDocument,
 	offset: number,
-	storageService: StorageService,
-	settings: ISettings,
 ): Promise<
 	null | { defaultBehavior: boolean } | { range: Range; placeholder: string }
 > {
-	const scssDocument = storageService.get(document.uri);
+	const { settings, storage } = useContext();
+	const scssDocument = storage.get(document.uri);
 	if (!scssDocument) {
 		return defaultBehavior;
 	}
@@ -39,7 +37,7 @@ export async function prepareRename(
 
 	const range = scssDocument.getNodeRange(referenceNode);
 
-	const references = await provideReferences(document, offset, storageService, {
+	const references = await provideReferences(document, offset, {
 		includeDeclaration: true,
 	});
 
@@ -82,10 +80,9 @@ export async function prepareRename(
 export async function doRename(
 	document: TextDocument,
 	offset: number,
-	storageService: StorageService,
 	newName: string,
 ): Promise<null | WorkspaceEdit> {
-	const references = await provideReferences(document, offset, storageService, {
+	const references = await provideReferences(document, offset, {
 		includeDeclaration: true,
 	});
 	if (!references) {

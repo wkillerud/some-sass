@@ -6,7 +6,6 @@ import {
 } from "vscode-languageserver-types";
 import type { CompletionItem } from "vscode-languageserver-types";
 import { IScssDocument } from "../../parser";
-import StorageService from "../../storage";
 import { applySassDoc } from "../../utils/sassdoc";
 import { getBaseValueFrom, isReferencingVariable } from "../../utils/scss";
 import { asDollarlessVariable, getLimitedString } from "../../utils/string";
@@ -16,7 +15,6 @@ import { rePrivate } from "./completion-utils";
 
 export function createVariableCompletionItems(
 	scssDocument: IScssDocument,
-	storage: StorageService,
 	currentDocument: TextDocument,
 	context: CompletionContext,
 	hiddenSymbols: string[] = [],
@@ -27,7 +25,7 @@ export function createVariableCompletionItems(
 	for (const variable of scssDocument.variables.values()) {
 		let value = variable.value;
 		if (isReferencingVariable(variable)) {
-			value = getBaseValueFrom(variable, scssDocument, storage).value;
+			value = getBaseValueFrom(variable, scssDocument).value;
 		}
 
 		const color = value ? isColor(value) : null;

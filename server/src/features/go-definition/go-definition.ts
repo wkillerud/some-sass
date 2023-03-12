@@ -3,6 +3,7 @@ import type {
 	TextDocument,
 	Position,
 } from "vscode-languageserver-textdocument";
+import { useContext } from "../../context-provider";
 import { NodeType } from "../../parser";
 import type {
 	INode,
@@ -31,9 +32,8 @@ function samePosition(a: Position | undefined, b: Position): boolean {
 export function goDefinition(
 	document: TextDocument,
 	offset: number,
-	storage: StorageService,
 ): Location | null {
-	const result = getDefinition(document, offset, storage);
+	const result = getDefinition(document, offset);
 	if (!result) {
 		return null;
 	}
@@ -57,8 +57,8 @@ export function goDefinition(
 export function getDefinition(
 	document: TextDocument,
 	offset: number,
-	storage: StorageService,
 ): [ScssSymbol, IScssDocument] | null {
+	const { storage } = useContext();
 	const currentScssDocument = storage.get(document.uri);
 	if (!currentScssDocument) {
 		return null;
@@ -69,18 +69,13 @@ export function getDefinition(
 		return null;
 	}
 
-	const identifier: Identifier | null = getIdentifier(
-		document,
-		hoverNode,
-		storage,
-	);
+	const identifier: Identifier | null = getIdentifier(document, hoverNode);
 	if (!identifier) {
 		return null;
 	}
 
 	const [definition, sourceDocument] = getDefinitionSymbol(
 		document,
-		storage,
 		identifier,
 	);
 
@@ -94,7 +89,6 @@ export function getDefinition(
 function getIdentifier(
 	document: TextDocument,
 	hoverNode: INode,
-	storage: StorageService,
 ): Identifier | null {
 	if (hoverNode.type === NodeType.VariableName) {
 		const parent = hoverNode.getParent();
@@ -121,11 +115,7 @@ function getIdentifier(
 				kind: SymbolKind.Method,
 			};
 
-			const [asMixin] = getDefinitionSymbol(
-				document,
-				storage,
-				candidateIdentifier,
-			);
+			const [asMixin] = getDefinitionSymbol(document, candidateIdentifier);
 
 			if (asMixin) {
 				return candidateIdentifier;
@@ -133,11 +123,7 @@ function getIdentifier(
 
 			candidateIdentifier.kind = SymbolKind.Function;
 
-			const [asFunction] = getDefinitionSymbol(
-				document,
-				storage,
-				candidateIdentifier,
-			);
+			const [asFunction] = getDefinitionSymbol(document, candidateIdentifier);
 
 			if (asFunction) {
 				return candidateIdentifier;
@@ -180,9 +166,9 @@ function getIdentifier(
 
 export function getDefinitionSymbol(
 	document: TextDocument,
-	storage: StorageService,
 	identifier: Identifier,
 ): [null, null] | [ScssSymbol, IScssDocument] {
+	const { storage } = useContext();
 	const scssDocument = storage.get(document.uri);
 	if (!scssDocument) {
 		return [null, null];

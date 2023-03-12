@@ -7,9 +7,9 @@ import {
 	DocumentLink,
 	LanguageService,
 } from "vscode-css-languageservice";
-import { ClientCapabilities } from "vscode-languageserver";
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
+import { useContext } from "../context-provider";
 import { sassBuiltInModuleNames } from "../features/sass-built-in-modules";
 import type { FileSystemProvider } from "../file-system";
 import { asDollarlessVariable, getLinesFromText } from "../utils/string";
@@ -31,10 +31,9 @@ const reDynamicPath = /[#*{}]/;
 export async function parseDocument(
 	document: TextDocument,
 	workspaceRoot: URI,
-	fs: FileSystemProvider,
-	clientCapabilities: ClientCapabilities,
 ): Promise<ScssDocument> {
-	const ls = getLanguageService(fs, clientCapabilities);
+	const { fs } = useContext();
+	const ls = getLanguageService();
 	const ast = ls.parseStylesheet(document) as INode;
 	const symbols = await findDocumentSymbols(
 		document,
@@ -43,7 +42,6 @@ export async function parseDocument(
 		fs,
 		ls,
 	);
-
 	return new ScssDocument(fs, document, symbols, ast);
 }
 

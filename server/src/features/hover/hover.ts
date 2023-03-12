@@ -1,6 +1,7 @@
 import { MarkupKind, SymbolKind } from "vscode-languageserver";
 import type { Hover, MarkupContent } from "vscode-languageserver";
 import type { TextDocument } from "vscode-languageserver-textdocument";
+import { useContext } from "../../context-provider";
 import {
 	NodeType,
 	IScssDocument,
@@ -13,7 +14,6 @@ import {
 	tokenizer,
 	Token,
 } from "../../parser";
-import type StorageService from "../../storage";
 import { applySassDoc } from "../../utils/sassdoc";
 import { getBaseValueFrom, isReferencingVariable } from "../../utils/scss";
 import { asDollarlessVariable, getLimitedString } from "../../utils/string";
@@ -28,11 +28,10 @@ interface Identifier {
 function formatVariableMarkupContent(
 	variable: ScssVariable,
 	sourceDocument: IScssDocument,
-	storage: StorageService,
 ): MarkupContent {
 	let value = variable.value;
 	if (isReferencingVariable(variable)) {
-		value = getBaseValueFrom(variable, sourceDocument, storage).value;
+		value = getBaseValueFrom(variable, sourceDocument).value;
 	}
 
 	value = getLimitedString(value || "");
@@ -104,11 +103,8 @@ function formatFunctionMarkupContent(
 	return result;
 }
 
-export function doHover(
-	document: TextDocument,
-	offset: number,
-	storage: StorageService,
-): Hover | null {
+export function doHover(document: TextDocument, offset: number): Hover | null {
+	const { storage } = useContext();
 	const scssDocument = storage.get(document.uri);
 	if (!scssDocument) {
 		return null;
@@ -243,11 +239,7 @@ export function doHover(
 		return null;
 	}
 
-	const [symbol, sourceDocument] = doSymbolHunting(
-		document,
-		storage,
-		identifier,
-	);
+	const [symbol, sourceDocument] = doSymbolHunting(document, identifier);
 
 	// Content for Hover popup
 	let contents: MarkupContent | undefined;
@@ -257,7 +249,6 @@ export function doHover(
 				contents = formatVariableMarkupContent(
 					symbol as ScssVariable,
 					sourceDocument,
-					storage,
 				);
 
 				break;
@@ -319,9 +310,9 @@ export function doHover(
 
 function doSymbolHunting(
 	document: TextDocument,
-	storage: StorageService,
 	identifier: Identifier,
 ): [null, null] | [ScssSymbol, IScssDocument] {
+	const { storage } = useContext();
 	const scssDocument = storage.get(document.uri);
 	if (!scssDocument) {
 		return [null, null];
@@ -334,11 +325,7 @@ function doSymbolHunting(
 			continue;
 		}
 
-		const [symbol, sourceDocument] = traverseTree(
-			scssDocument,
-			identifier,
-			storage,
-		);
+		const [symbol, sourceDocument] = traverseTree(scssDocument, identifier);
 		if (symbol) {
 			return [symbol, sourceDocument];
 		}
@@ -383,9 +370,9 @@ function doSymbolHunting(
 function traverseTree(
 	document: IScssDocument,
 	identifier: Identifier,
-	storage: StorageService,
 	accumulatedPrefix = "",
 ): [null, null] | [ScssSymbol, IScssDocument] {
+	const { storage } = useContext();
 	const scssDocument = storage.get(document.uri);
 	if (!scssDocument) {
 		return [null, null];
@@ -422,12 +409,7 @@ function traverseTree(
 			prefix += (child as ScssForward).prefix;
 		}
 
-		const [symbol, document] = traverseTree(
-			childDocument,
-			identifier,
-			storage,
-			prefix,
-		);
+		const [symbol, document] = traverseTree(childDocument, identifier, prefix);
 		if (symbol) {
 			return [symbol, document];
 		}

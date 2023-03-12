@@ -7,7 +7,7 @@ import {
 } from "vscode-languageserver";
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import { URI, Utils } from "vscode-uri";
-import { FileSystemProvider } from "../../file-system";
+import { useContext } from "../../context-provider";
 import { sassBuiltInModules } from "../sass-built-in-modules";
 import type { CompletionContext } from "./completion-context";
 
@@ -16,8 +16,6 @@ export const rePartialUse = /@use ["'|](?<url>.*)["'|]?/;
 export async function doImportCompletion(
 	document: TextDocument,
 	context: CompletionContext,
-	workspaceRoot: URI,
-	fileSystemProvider: FileSystemProvider,
 ): Promise<CompletionList> {
 	const completions = CompletionList.create([], false);
 
@@ -40,6 +38,7 @@ export async function doImportCompletion(
 		createSassBuiltInCompletionItems(completions.items);
 	}
 
+	const { workspaceRoot, fs } = useContext();
 	// Need file system access for import completions
 	if (document.uri.startsWith("file://")) {
 		const moduleName = getModuleNameFromPath(url);
@@ -52,7 +51,6 @@ export async function doImportCompletion(
 				moduleName,
 				documentFolderUri,
 				rootFolderUri,
-				fileSystemProvider,
 			);
 			if (modulePath) {
 				const pathWithinModule = url.substring(moduleName.length + 1);
@@ -60,7 +58,7 @@ export async function doImportCompletion(
 					URI.parse(modulePath),
 					pathWithinModule,
 				);
-				const filesInModulePath = await fileSystemProvider.readDirectory(
+				const filesInModulePath = await fs.readDirectory(
 					pathInsideModule.fsPath,
 				);
 				for (const [file, fileType] of filesInModulePath) {
@@ -141,7 +139,6 @@ async function resolvePathToModule(
 	_moduleName: string,
 	documentFolderUri: string,
 	rootFolderUri: string | undefined,
-	fileSystemProvider: FileSystemProvider,
 ): Promise<string | undefined> {
 	// resolve the module relative to the document. We can't use `require` here as the code is webpacked.
 
@@ -151,7 +148,7 @@ async function resolvePathToModule(
 		_moduleName,
 		"package.json",
 	);
-	if (await fileExists(fileSystemProvider, packPath.fsPath)) {
+	if (await fileExists(packPath.fsPath)) {
 		return Utils.dirname(packPath).toString(true);
 	} else if (
 		rootFolderUri &&
@@ -162,21 +159,15 @@ async function resolvePathToModule(
 			_moduleName,
 			Utils.dirname(URI.parse(documentFolderUri)).toString(true),
 			rootFolderUri,
-			fileSystemProvider,
 		);
 	}
 	return undefined;
 }
 
-async function fileExists(
-	fileSystemProvider: FileSystemProvider,
-	uri: string,
-): Promise<boolean> {
-	if (!fileSystemProvider) {
-		return false;
-	}
+async function fileExists(uri: string): Promise<boolean> {
+	const { fs } = useContext();
 	try {
-		const stat = await fileSystemProvider.stat(URI.parse(uri));
+		const stat = await fs.stat(URI.parse(uri));
 		if (stat.type === FileType.Unknown && stat.size === -1) {
 			return false;
 		}

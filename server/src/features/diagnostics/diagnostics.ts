@@ -8,6 +8,7 @@ import type {
 	VersionedTextDocumentIdentifier,
 } from "vscode-languageserver-types";
 import { EXTENSION_NAME } from "../../constants";
+import { useContext } from "../../context-provider";
 import { NodeType } from "../../parser";
 import type {
 	INode,
@@ -16,15 +17,13 @@ import type {
 	ScssImport,
 	ScssSymbol,
 } from "../../parser";
-import type StorageService from "../../storage";
 import { asDollarlessVariable } from "../../utils/string";
 
 export async function doDiagnostics(
 	document: VersionedTextDocumentIdentifier,
-	storage: StorageService,
 ): Promise<Diagnostic[]> {
 	const diagnostics: Diagnostic[] = [];
-
+	const { storage } = useContext();
 	const openDocument = storage.get(document.uri);
 	if (!openDocument) {
 		console.error(
@@ -42,7 +41,7 @@ export async function doDiagnostics(
 
 	// Do traversal once, and then do diagnostics on the symbols for each reference
 	const symbols: ScssSymbol[] = [];
-	doSymbolHunting(openDocument, storage, symbols);
+	doSymbolHunting(openDocument, symbols);
 
 	for (const node of references) {
 		for (const symbol of symbols) {
@@ -101,20 +100,19 @@ function getVariableFunctionMixinReferences(fromNode: INode): INode[] {
 
 function doSymbolHunting(
 	openDocument: IScssDocument,
-	storage: StorageService,
 	result: ScssSymbol[],
 ): ScssSymbol[] {
-	traverseTree(openDocument, openDocument, storage, result);
+	traverseTree(openDocument, openDocument, result);
 	return result;
 }
 
 function traverseTree(
 	openDocument: IScssDocument,
 	childDocument: IScssDocument,
-	storage: StorageService,
 	result: ScssSymbol[],
 	accumulatedPrefix = "",
 ): ScssSymbol[] {
+	const { storage } = useContext();
 	const scssDocument = storage.get(childDocument.uri);
 	if (!scssDocument) {
 		return result;
@@ -155,7 +153,7 @@ function traverseTree(
 			prefix += (child as ScssForward).prefix;
 		}
 
-		traverseTree(openDocument, childDocument, storage, result, prefix);
+		traverseTree(openDocument, childDocument, result, prefix);
 	}
 
 	return result;

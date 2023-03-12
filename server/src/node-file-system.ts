@@ -1,7 +1,7 @@
 import { promises, constants, existsSync } from "fs";
 import * as fg from "fast-glob";
 import { type FileStat, FileType } from "vscode-css-languageservice";
-import { URI } from "vscode-uri";
+import { URI, Utils } from "vscode-uri";
 import type { FileSystemProvider } from "./file-system";
 
 export class NodeFileSystem implements FileSystemProvider {
@@ -38,6 +38,20 @@ export class NodeFileSystem implements FileSystemProvider {
 
 	readFile(uri: URI, encoding: BufferEncoding = "utf-8"): Promise<string> {
 		return promises.readFile(uri.fsPath, encoding);
+	}
+
+	async readDirectory(uri: string): Promise<[string, FileType][]> {
+		const dir = await promises.readdir(uri);
+		const result: [string, FileType][] = [];
+		for (const file of dir) {
+			try {
+				const stats = await this.stat(Utils.joinPath(URI.parse(uri), file));
+				result.push([file, stats.type]);
+			} catch (e) {
+				result.push([file, FileType.Unknown]);
+			}
+		}
+		return result;
 	}
 
 	async realPath(uri: URI): Promise<URI> {

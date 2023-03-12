@@ -6,12 +6,14 @@ import {
 } from "vscode-languageserver";
 import type { CompletionList } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
+import { URI } from "vscode-uri";
 import { doCompletion } from "../../features/completion";
 import { parseStringLiteralChoices } from "../../features/completion/completion-utils";
 import { rePartialUse } from "../../features/completion/import-completion";
 import { sassBuiltInModules } from "../../features/sass-built-in-modules";
 import { sassDocAnnotations } from "../../features/sassdoc-annotations";
-import { ScssDocument } from "../../parser";
+import { INode, ScssDocument } from "../../parser";
+import { getLanguageService } from "../../parser/language-service";
 import type { ISettings } from "../../settings";
 import StorageService from "../../storage";
 import * as helpers from "../helpers";
@@ -20,89 +22,98 @@ import { TestFileSystem } from "../test-file-system";
 const storage = new StorageService();
 const fs = new TestFileSystem(storage);
 
+const document = TextDocument.create("./one.scss", "scss", 1, "");
+const ls = getLanguageService(fs, {});
+const ast = ls.parseStylesheet(document) as INode;
+
 storage.set(
 	"one.scss",
-	new ScssDocument(fs, TextDocument.create("./one.scss", "scss", 1, ""), {
-		variables: new Map([
-			[
-				"$one",
-				{
-					name: "$one",
-					kind: SymbolKind.Variable,
-					value: "1",
-					offset: 0,
-					position: { line: 1, character: 1 },
-				},
-			],
-			[
-				"$two",
-				{
-					name: "$two",
-					kind: SymbolKind.Variable,
-					value: null,
-					offset: 0,
-					position: { line: 1, character: 1 },
-				},
-			],
-			[
-				"$hex",
-				{
-					name: "$hex",
-					kind: SymbolKind.Variable,
-					value: "#fff",
-					offset: 0,
-					position: { line: 1, character: 1 },
-				},
-			],
-			[
-				"$rgb",
-				{
-					name: "$rgb",
-					kind: SymbolKind.Variable,
-					value: "rgb(0,0,0)",
-					offset: 0,
-					position: { line: 1, character: 1 },
-				},
-			],
-			[
-				"$word",
-				{
-					name: "$word",
-					kind: SymbolKind.Variable,
-					value: "red",
-					offset: 0,
-					position: { line: 1, character: 1 },
-				},
-			],
-		]),
-		mixins: new Map([
-			[
-				"test",
-				{
-					name: "test",
-					kind: SymbolKind.Method,
-					parameters: [],
-					offset: 0,
-					position: { line: 1, character: 1 },
-				},
-			],
-		]),
-		functions: new Map([
-			[
-				"make",
-				{
-					name: "make",
-					kind: SymbolKind.Function,
-					parameters: [],
-					offset: 0,
-					position: { line: 1, character: 1 },
-				},
-			],
-		]),
-		imports: new Map(),
-		uses: new Map(),
-		forwards: new Map(),
-	}),
+	new ScssDocument(
+		fs,
+		document,
+		{
+			variables: new Map([
+				[
+					"$one",
+					{
+						name: "$one",
+						kind: SymbolKind.Variable,
+						value: "1",
+						offset: 0,
+						position: { line: 1, character: 1 },
+					},
+				],
+				[
+					"$two",
+					{
+						name: "$two",
+						kind: SymbolKind.Variable,
+						value: null,
+						offset: 0,
+						position: { line: 1, character: 1 },
+					},
+				],
+				[
+					"$hex",
+					{
+						name: "$hex",
+						kind: SymbolKind.Variable,
+						value: "#fff",
+						offset: 0,
+						position: { line: 1, character: 1 },
+					},
+				],
+				[
+					"$rgb",
+					{
+						name: "$rgb",
+						kind: SymbolKind.Variable,
+						value: "rgb(0,0,0)",
+						offset: 0,
+						position: { line: 1, character: 1 },
+					},
+				],
+				[
+					"$word",
+					{
+						name: "$word",
+						kind: SymbolKind.Variable,
+						value: "red",
+						offset: 0,
+						position: { line: 1, character: 1 },
+					},
+				],
+			]),
+			mixins: new Map([
+				[
+					"test",
+					{
+						name: "test",
+						kind: SymbolKind.Method,
+						parameters: [],
+						offset: 0,
+						position: { line: 1, character: 1 },
+					},
+				],
+			]),
+			functions: new Map([
+				[
+					"make",
+					{
+						name: "make",
+						kind: SymbolKind.Function,
+						parameters: [],
+						offset: 0,
+						position: { line: 1, character: 1 },
+					},
+				],
+			]),
+			imports: new Map(),
+			uses: new Map(),
+			forwards: new Map(),
+		},
+		ast,
+	),
 );
 
 async function getCompletionList(
@@ -115,7 +126,14 @@ async function getCompletionList(
 	const document = await helpers.makeDocument(storage, text, fs);
 	const offset = text.indexOf("|");
 
-	return doCompletion(document, offset, settings, storage);
+	return doCompletion(
+		document,
+		offset,
+		settings,
+		storage,
+		URI.parse(__dirname),
+		fs,
+	);
 }
 
 describe("Providers/Completion - Basic", () => {

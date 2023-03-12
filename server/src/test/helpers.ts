@@ -40,7 +40,7 @@ export async function makeDocument(
 		text,
 	);
 
-	const scssDocument = await parseDocument(document, workspaceRootUri, fs);
+	const scssDocument = await parseDocument(document, workspaceRootUri, fs, {});
 
 	storage.set(uri, scssDocument);
 	return document;

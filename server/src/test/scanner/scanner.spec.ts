@@ -13,7 +13,7 @@ describe("Services/Scanner", () => {
 		const workspaceUri = getUri("scanner/follow-links/");
 		const docUri = getUri("scanner/follow-links/styles.scss");
 		const storage = new StorageService();
-		const scanner = new ScannerService(storage, fs, defaultSettings);
+		const scanner = new ScannerService(storage, fs, defaultSettings, {});
 		await scanner.scan([docUri], workspaceUri);
 
 		const documents = [...storage.values()];
@@ -31,7 +31,7 @@ describe("Services/Scanner", () => {
 		const workspaceUri = getUri("scanner/self-reference/");
 		const docUri = getUri("scanner/self-reference/styles.scss");
 		const storage = new StorageService();
-		const scanner = new ScannerService(storage, fs, defaultSettings);
+		const scanner = new ScannerService(storage, fs, defaultSettings, {});
 		await scanner.scan([docUri], workspaceUri);
 
 		const documents = [...storage.values()];

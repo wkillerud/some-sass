@@ -41,7 +41,7 @@ describe("Services/Parser", () => {
 				fs,
 			);
 
-			const symbols = await parseDocument(document, URI.parse(""), fs);
+			const symbols = await parseDocument(document, URI.parse(""), fs, {});
 
 			// Variables
 			const variables = [...symbols.variables.values()];
@@ -100,7 +100,7 @@ describe("Services/Parser", () => {
 				fs,
 			);
 
-			const symbols = await parseDocument(document, URI.parse(""), fs);
+			const symbols = await parseDocument(document, URI.parse(""), fs, {});
 
 			// Uses
 			const uses = [...symbols.uses.values()];
@@ -141,7 +141,7 @@ describe("Services/Parser", () => {
 				{ uri: "middle/main.scss" },
 			);
 
-			const symbols = await parseDocument(document, URI.parse(""), fs);
+			const symbols = await parseDocument(document, URI.parse(""), fs, {});
 			const uses = [...symbols.uses.values()];
 
 			strictEqual(uses.length, 3, "expected to find three uses");
@@ -156,7 +156,7 @@ describe("Services/Parser", () => {
 					uri: "self.scss",
 				},
 			);
-			const symbols = await parseDocument(document, URI.parse(""), fs);
+			const symbols = await parseDocument(document, URI.parse(""), fs, {});
 			const uses = [...symbols.uses.values()];
 			const variables = [...symbols.variables.values()];
 

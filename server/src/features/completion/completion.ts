@@ -5,6 +5,8 @@ import {
 } from "vscode-languageserver";
 import type { CompletionItem } from "vscode-languageserver";
 import type { TextDocument } from "vscode-languageserver-textdocument";
+import { URI } from "vscode-uri";
+import { FileSystemProvider } from "../../file-system";
 import type {
 	IScssDocument,
 	ScssForward,
@@ -24,12 +26,14 @@ import { createMixinCompletionItems } from "./mixin-completion";
 import { doSassDocCompletion } from "./sassdoc-completion";
 import { createVariableCompletionItems } from "./variable-completion";
 
-export function doCompletion(
+export async function doCompletion(
 	document: TextDocument,
 	offset: number,
 	settings: ISettings,
 	storage: StorageService,
-): CompletionList {
+	workspaceRoot: URI,
+	fileSystemProvider: FileSystemProvider,
+): Promise<CompletionList> {
 	let completions = CompletionList.create([], false);
 
 	const text = document.getText();
@@ -45,7 +49,12 @@ export function doCompletion(
 	}
 
 	if (context.import) {
-		return doImportCompletion(document, context, storage);
+		return await doImportCompletion(
+			document,
+			context,
+			workspaceRoot,
+			fileSystemProvider,
+		);
 	}
 
 	if (context.namespace) {

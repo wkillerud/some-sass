@@ -1,3 +1,4 @@
+import { ClientCapabilities } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
 import type { FileSystemProvider } from "./file-system";
@@ -15,12 +16,15 @@ export default class ScannerService {
 	private readonly storage: StorageService;
 	private readonly fs: FileSystemProvider;
 	private readonly settings: ISettings;
+	private readonly clientCapabilities: ClientCapabilities;
 
 	constructor(
 		storage: StorageService,
 		fs: FileSystemProvider,
 		settings: ISettings,
+		clientCapabilities: ClientCapabilities,
 	) {
+		this.clientCapabilities = clientCapabilities;
 		this.storage = storage;
 		this.fs = fs;
 		this.settings = settings;
@@ -58,6 +62,7 @@ export default class ScannerService {
 			scssRegions,
 			workspaceRoot,
 			this.fs,
+			this.clientCapabilities,
 		);
 		this.storage.set(scssDocument.uri, scssDocument);
 	}
@@ -93,6 +98,7 @@ export default class ScannerService {
 				scssRegions,
 				workspaceRoot,
 				this.fs,
+				this.clientCapabilities,
 			);
 			// TODO: be inspired by the way the LSP sample handles document storage and cache invalidation? Documents can be renamed, deleted.
 			this.storage.set(scssDocument.uri, scssDocument);

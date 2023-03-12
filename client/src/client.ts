@@ -9,7 +9,7 @@ import {
 	workspace,
 	WorkspaceFolder,
 } from "vscode";
-import type { FileStat } from "vscode-css-languageservice";
+import type { FileStat, FileType } from "vscode-css-languageservice";
 import {
 	BaseLanguageClient,
 	LanguageClientOptions,
@@ -20,6 +20,7 @@ import {
 	EXTENSION_ID,
 	EXTENSION_NAME,
 	REQUEST_FS_FIND_FILES,
+	REQUEST_FS_READ_DIRECTORY,
 	REQUEST_FS_READ_FILE,
 	REQUEST_FS_STAT,
 } from "./constants";
@@ -131,6 +132,11 @@ export namespace FsReadFileRequest {
 	> = new RequestType(REQUEST_FS_READ_FILE);
 }
 
+export namespace FsReadDirectoryRequest {
+	export const type: RequestType<string, [string, FileType][], any> =
+		new RequestType(REQUEST_FS_READ_DIRECTORY);
+}
+
 export namespace FsStatRequest {
 	export const type: RequestType<string, FileStat, any> = new RequestType(
 		REQUEST_FS_STAT,
@@ -141,41 +147,43 @@ export function serveFileSystemRequests(
 	client: BaseLanguageClient,
 	runtime: Runtime,
 ) {
-	client.onRequest(FsStatRequest.type, (uriString: string) => {
+	client.onRequest(FsStatRequest.type, (uriString) => {
 		const uri = Uri.parse(uriString);
 		if (uri.scheme === "file" && runtime.fs) {
 			return runtime.fs.stat(uri);
 		}
 		return workspace.fs.stat(uri);
 	});
-	client.onRequest(
-		FsReadFileRequest.type,
-		async (param: { uri: string; encoding?: string }) => {
-			const uri = Uri.parse(param.uri);
-			if (uri.scheme === "file" && runtime.fs) {
-				return runtime.fs.readFile(uri);
-			}
-			const buffer = await workspace.fs.readFile(uri);
-			return new runtime.TextDecoder(param.encoding).decode(buffer);
-		},
-	);
-	client.onRequest(
-		FsFindFilesRequest.type,
-		async (param: { pattern: string; exclude: string[] }, token) => {
-			if (runtime.fs) {
-				const result = await runtime.fs.findFiles(param.pattern, param.exclude);
-				return result.map((uri) => uri.toString());
-			}
-
-			const result = await workspace.findFiles(
-				param.pattern,
-				"**/node_modules/**",
-				undefined,
-				token,
-			);
+	client.onRequest(FsReadFileRequest.type, async (param) => {
+		const uri = Uri.parse(param.uri);
+		if (uri.scheme === "file" && runtime.fs) {
+			return runtime.fs.readFile(uri);
+		}
+		const buffer = await workspace.fs.readFile(uri);
+		return new runtime.TextDecoder(param.encoding).decode(buffer);
+	});
+	client.onRequest(FsReadDirectoryRequest.type, async (param) => {
+		const uri = Uri.parse(param);
+		if (uri.scheme === "file" && runtime.fs) {
+			return runtime.fs.readDirectory(param);
+		}
+		const dir = await workspace.fs.readDirectory(uri);
+		return dir;
+	});
+	client.onRequest(FsFindFilesRequest.type, async (param, token) => {
+		if (runtime.fs) {
+			const result = await runtime.fs.findFiles(param.pattern, param.exclude);
 			return result.map((uri) => uri.toString());
-		},
-	);
+		}
+
+		const result = await workspace.findFiles(
+			param.pattern,
+			"**/node_modules/**",
+			undefined,
+			token,
+		);
+		return result.map((uri) => uri.toString());
+	});
 }
 
 export function registerCodeActionCommand(client: BaseLanguageClient) {

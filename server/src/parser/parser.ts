@@ -5,7 +5,9 @@ import {
 	Range,
 	SymbolKind,
 	DocumentLink,
+	LanguageService,
 } from "vscode-css-languageservice";
+import { ClientCapabilities } from "vscode-languageserver";
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
 import { sassBuiltInModuleNames } from "../features/sass-built-in-modules";
@@ -30,10 +32,17 @@ export async function parseDocument(
 	document: TextDocument,
 	workspaceRoot: URI,
 	fs: FileSystemProvider,
+	clientCapabilities: ClientCapabilities,
 ): Promise<ScssDocument> {
-	const ls = getLanguageService(fs);
+	const ls = getLanguageService(fs, clientCapabilities);
 	const ast = ls.parseStylesheet(document) as INode;
-	const symbols = await findDocumentSymbols(document, ast, workspaceRoot, fs);
+	const symbols = await findDocumentSymbols(
+		document,
+		ast,
+		workspaceRoot,
+		fs,
+		ls,
+	);
 
 	return new ScssDocument(fs, document, symbols, ast);
 }
@@ -43,6 +52,7 @@ async function findDocumentSymbols(
 	ast: INode,
 	workspaceRoot: URI,
 	fs: FileSystemProvider,
+	ls: LanguageService,
 ): Promise<IScssSymbols> {
 	const result: IScssSymbols = {
 		functions: new Map(),
@@ -53,7 +63,6 @@ async function findDocumentSymbols(
 		forwards: new Map(),
 	};
 
-	const ls = getLanguageService(fs);
 	const links = await ls.findDocumentLinks2(
 		document,
 		ast,

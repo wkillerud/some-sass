@@ -1,4 +1,5 @@
 import {
+	ClientCapabilities,
 	CodeAction,
 	CodeActionKind,
 	Command,
@@ -54,6 +55,7 @@ export class SomeSassServer {
 		let storageService: StorageService;
 		let scannerService: ScannerService;
 		let fileSystemProvider: FileSystemProvider;
+		let clientCapabilities: ClientCapabilities;
 
 		// Create a simple text document manager. The text document manager
 		// _supports full document sync only
@@ -68,6 +70,8 @@ export class SomeSassServer {
 		this.connection.onInitialize(
 			async (params: InitializeParams): Promise<InitializeResult> => {
 				const options = params.initializationOptions as InitializationOption;
+
+				clientCapabilities = params.capabilities;
 
 				fileSystemProvider = getFileSystemProvider(
 					this.connection,
@@ -124,6 +128,7 @@ export class SomeSassServer {
 				storageService,
 				fileSystemProvider,
 				settings,
+				clientCapabilities,
 			);
 
 			const files = await fileSystemProvider.findFiles(
@@ -195,7 +200,7 @@ export class SomeSassServer {
 			return scannerService.scan(newFiles, workspaceRoot);
 		});
 
-		this.connection.onCompletion((textDocumentPosition) => {
+		this.connection.onCompletion(async (textDocumentPosition) => {
 			const uri = documents.get(textDocumentPosition.textDocument.uri);
 			if (uri === undefined) {
 				return;
@@ -209,7 +214,16 @@ export class SomeSassServer {
 				return null;
 			}
 
-			return doCompletion(document, offset, settings, storageService);
+			const completions = await doCompletion(
+				document,
+				offset,
+				settings,
+				storageService,
+				workspaceRoot,
+				fileSystemProvider,
+			);
+
+			return completions;
 		});
 
 		this.connection.onHover((textDocumentPosition) => {

@@ -4,7 +4,8 @@ import type { SignatureHelp } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { hasInFacts } from "../../features/signature-help/facts";
 import { doSignatureHelp } from "../../features/signature-help/signature-help";
-import { ScssDocument } from "../../parser";
+import { INode, ScssDocument } from "../../parser";
+import { getLanguageService } from "../../parser/language-service";
 import StorageService from "../../storage";
 import * as helpers from "../helpers";
 import { TestFileSystem } from "../test-file-system";
@@ -12,78 +13,87 @@ import { TestFileSystem } from "../test-file-system";
 const storage = new StorageService();
 const fs = new TestFileSystem(storage);
 
+const document = TextDocument.create("./one.scss", "scss", 1, "");
+const ls = getLanguageService(fs, {});
+const ast = ls.parseStylesheet(document) as INode;
+
 storage.set(
 	"one.scss",
-	new ScssDocument(fs, TextDocument.create("./one.scss", "scss", 1, ""), {
-		variables: new Map(),
-		mixins: new Map([
-			[
-				"one",
-				{
-					name: "one",
-					kind: SymbolKind.Method,
-					parameters: [],
-					offset: 0,
-					position: { line: 1, character: 1 },
-				},
-			],
-			[
-				"two",
-				{
-					name: "two",
-					kind: SymbolKind.Method,
-					parameters: [
-						{ name: "$a", value: null, offset: 0 },
-						{ name: "$b", value: null, offset: 0 },
-					],
-					offset: 0,
-					position: { line: 1, character: 1 },
-				},
-			],
-		]),
-		functions: new Map([
-			[
-				"make",
-				{
-					name: "make",
-					kind: SymbolKind.Function,
-					parameters: [],
-					offset: 0,
-					position: { line: 1, character: 1 },
-				},
-			],
-			[
-				"one",
-				{
-					name: "one",
-					kind: SymbolKind.Function,
-					parameters: [
-						{ name: "$a", value: null, offset: 0 },
-						{ name: "$b", value: null, offset: 0 },
-						{ name: "$c", value: null, offset: 0 },
-					],
-					offset: 0,
-					position: { line: 1, character: 1 },
-				},
-			],
-			[
-				"two",
-				{
-					name: "two",
-					kind: SymbolKind.Function,
-					parameters: [
-						{ name: "$a", value: null, offset: 0 },
-						{ name: "$b", value: null, offset: 0 },
-					],
-					offset: 0,
-					position: { line: 1, character: 1 },
-				},
-			],
-		]),
-		imports: new Map(),
-		uses: new Map(),
-		forwards: new Map(),
-	}),
+	new ScssDocument(
+		fs,
+		TextDocument.create("./one.scss", "scss", 1, ""),
+		{
+			variables: new Map(),
+			mixins: new Map([
+				[
+					"one",
+					{
+						name: "one",
+						kind: SymbolKind.Method,
+						parameters: [],
+						offset: 0,
+						position: { line: 1, character: 1 },
+					},
+				],
+				[
+					"two",
+					{
+						name: "two",
+						kind: SymbolKind.Method,
+						parameters: [
+							{ name: "$a", value: null, offset: 0 },
+							{ name: "$b", value: null, offset: 0 },
+						],
+						offset: 0,
+						position: { line: 1, character: 1 },
+					},
+				],
+			]),
+			functions: new Map([
+				[
+					"make",
+					{
+						name: "make",
+						kind: SymbolKind.Function,
+						parameters: [],
+						offset: 0,
+						position: { line: 1, character: 1 },
+					},
+				],
+				[
+					"one",
+					{
+						name: "one",
+						kind: SymbolKind.Function,
+						parameters: [
+							{ name: "$a", value: null, offset: 0 },
+							{ name: "$b", value: null, offset: 0 },
+							{ name: "$c", value: null, offset: 0 },
+						],
+						offset: 0,
+						position: { line: 1, character: 1 },
+					},
+				],
+				[
+					"two",
+					{
+						name: "two",
+						kind: SymbolKind.Function,
+						parameters: [
+							{ name: "$a", value: null, offset: 0 },
+							{ name: "$b", value: null, offset: 0 },
+						],
+						offset: 0,
+						position: { line: 1, character: 1 },
+					},
+				],
+			]),
+			imports: new Map(),
+			uses: new Map(),
+			forwards: new Map(),
+		},
+		ast,
+	),
 );
 
 async function getSignatureHelp(lines: string[]): Promise<SignatureHelp> {

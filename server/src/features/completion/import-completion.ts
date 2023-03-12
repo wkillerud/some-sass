@@ -1,14 +1,20 @@
 import {
-	CompletionItem,
+	type CompletionItem,
 	CompletionList,
 	MarkupKind,
 } from "vscode-languageserver";
+import type { TextDocument } from "vscode-languageserver-textdocument";
+import StorageService from "../../storage";
 import { sassBuiltInModules } from "../sass-built-in-modules";
 import type { CompletionContext } from "./completion-context";
 
-const rePartialUse = /^@use ["']/;
+export const rePartialUse = /@use ["'|](?<url>.*)["'|]?/;
 
-export function doImportCompletion(context: CompletionContext): CompletionList {
+export function doImportCompletion(
+	document: TextDocument,
+	context: CompletionContext,
+	storage: StorageService,
+): CompletionList {
 	const completions = CompletionList.create([], false);
 
 	if (rePartialUse.test(context.textBeforeWord)) {

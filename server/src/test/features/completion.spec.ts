@@ -8,6 +8,7 @@ import type { CompletionList } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { doCompletion } from "../../features/completion";
 import { parseStringLiteralChoices } from "../../features/completion/completion-utils";
+import { rePartialUse } from "../../features/completion/import-completion";
 import { sassBuiltInModules } from "../../features/sass-built-in-modules";
 import { sassDocAnnotations } from "../../features/sassdoc-annotations";
 import { ScssDocument } from "../../parser";
@@ -210,6 +211,44 @@ describe("Providers/Completion - Import", () => {
 			}),
 			"Expected to find all Sass built-in modules, but some or all are missing",
 		);
+	});
+
+	it("rePartialUse matches expected things", () => {
+		ok(
+			!rePartialUse.test("@use "),
+			"should not match unless there's an opening quote",
+		);
+		ok(
+			rePartialUse.test('@use "'),
+			"should match an empty opening @use with double quote",
+		);
+		ok(
+			rePartialUse.test("@use '"),
+			"should match an empty opening @use with single quote",
+		);
+		ok(rePartialUse.test("@use '~foo"), "should match with tilde");
+		ok(
+			rePartialUse.test("@use './foo"),
+			"should match with relative import in same directory",
+		);
+		ok(
+			rePartialUse.test("@use '../foo"),
+			"should match with relative import in parent",
+		);
+		ok(
+			rePartialUse.test("@use '../../foo"),
+			"should match with relative import in grandparent",
+		);
+		ok(
+			rePartialUse.test("@use 'foo"),
+			"should match without special character prefix",
+		);
+		ok(rePartialUse.test("@use 'foo'"), "should match with closing quote");
+		ok(rePartialUse.test("@use 'foo';"), "should match with closing semicolon");
+
+		const actual = rePartialUse.exec("@use '../../foo");
+		ok(actual, "expected match to return a result");
+		strictEqual(actual?.[1], "../../foo", "expected match to include the url");
 	});
 });
 

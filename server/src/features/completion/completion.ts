@@ -45,7 +45,7 @@ export function doCompletion(
 	}
 
 	if (context.import) {
-		return doImportCompletion(context);
+		return doImportCompletion(document, context, storage);
 	}
 
 	if (context.namespace) {

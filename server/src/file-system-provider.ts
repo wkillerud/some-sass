@@ -3,6 +3,7 @@ import { Connection, RequestType } from "vscode-languageserver";
 import { URI } from "vscode-uri";
 import {
 	REQUEST_FS_FIND_FILES,
+	REQUEST_FS_READ_DIRECTORY,
 	REQUEST_FS_READ_FILE,
 	REQUEST_FS_STAT,
 } from "./constants";
@@ -23,6 +24,11 @@ export namespace FsReadFileRequest {
 		string,
 		any
 	> = new RequestType(REQUEST_FS_READ_FILE);
+}
+
+export namespace FsReadDirectoryRequest {
+	export const type: RequestType<string, [string, FileType][], any> =
+		new RequestType(REQUEST_FS_READ_DIRECTORY);
 }
 
 export namespace FsStatRequest {
@@ -65,6 +71,17 @@ export function getFileSystemProvider(
 				uri: uri.toString(),
 				encoding,
 			});
+			return res;
+		},
+		async readDirectory(uri: string) {
+			const handler = runtime.file;
+			if (handler) {
+				return await handler.readDirectory(uri);
+			}
+			const res = await connection.sendRequest(
+				FsReadDirectoryRequest.type,
+				uri.toString(),
+			);
 			return res;
 		},
 		async findFiles(pattern, exclude) {

@@ -2,6 +2,7 @@ import { tokenizer } from "scss-symbols-parser";
 import { MarkupKind, SignatureInformation } from "vscode-languageserver";
 import type { SignatureHelp } from "vscode-languageserver";
 import type { TextDocument } from "vscode-languageserver-textdocument";
+import { useContext } from "../../context-provider";
 import type {
 	IScssDocument,
 	ScssForward,
@@ -9,7 +10,6 @@ import type {
 	ScssImport,
 	ScssMixin,
 } from "../../parser";
-import type StorageService from "../../storage";
 import { applySassDoc } from "../../utils/sassdoc";
 import {
 	asDollarlessVariable,
@@ -160,7 +160,6 @@ function parseArgumentsAtLine(text: string): IMixinEntry {
 export async function doSignatureHelp(
 	document: TextDocument,
 	offset: number,
-	storage: StorageService,
 ): Promise<SignatureHelp> {
 	const ret: SignatureHelp = {
 		activeSignature: 0,
@@ -185,7 +184,6 @@ export async function doSignatureHelp(
 
 	const suggestions: Array<ScssFunction | ScssMixin> = doSymbolHunting(
 		document,
-		storage,
 		entry,
 		symbolType,
 	);
@@ -274,12 +272,11 @@ export async function doSignatureHelp(
 
 function doSymbolHunting(
 	document: TextDocument,
-	storage: StorageService,
 	entry: IMixinEntry,
 	entryType: "function" | "mixin",
 ): Array<ScssFunction | ScssMixin> {
 	const result: Array<ScssFunction | ScssMixin> = [];
-
+	const { storage } = useContext();
 	const scssDocument = storage.get(document.uri);
 	if (!scssDocument) {
 		return result;
@@ -292,7 +289,7 @@ function doSymbolHunting(
 			continue;
 		}
 
-		traverseTree(scssDocument, storage, result, entry, entryType);
+		traverseTree(scssDocument, result, entry, entryType);
 	}
 
 	if (result.length === 0) {
@@ -318,12 +315,12 @@ function doSymbolHunting(
 
 function traverseTree(
 	document: IScssDocument,
-	storage: StorageService,
 	result: Array<ScssFunction | ScssMixin>,
 	entry: IMixinEntry,
 	entryType: "function" | "mixin",
 	accumulatedPrefix = "",
 ): Array<ScssFunction | ScssMixin> {
+	const { storage } = useContext();
 	const scssDocument = storage.get(document.uri);
 	if (!scssDocument) {
 		return result;
@@ -368,7 +365,7 @@ function traverseTree(
 			prefix += (child as ScssForward).prefix;
 		}
 
-		traverseTree(childDocument, storage, result, entry, entryType, prefix);
+		traverseTree(childDocument, result, entry, entryType, prefix);
 	}
 
 	return result;

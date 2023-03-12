@@ -1,21 +1,23 @@
 import { ok, strictEqual } from "assert";
 import { isMatch } from "micromatch";
+import { useContext } from "../../context-provider";
 import { NodeFileSystem } from "../../node-file-system";
 import ScannerService from "../../scanner";
-import { defaultSettings } from "../../settings";
-import StorageService from "../../storage";
+import * as helpers from "../helpers";
 import { getUri } from "./scanner-helper";
 
-const fs = new NodeFileSystem();
-
 describe("Services/Scanner", () => {
+	beforeEach(() => {
+		helpers.createTestContext(new NodeFileSystem());
+	});
+
 	it("should follow links", async () => {
 		const workspaceUri = getUri("scanner/follow-links/");
 		const docUri = getUri("scanner/follow-links/styles.scss");
-		const storage = new StorageService();
-		const scanner = new ScannerService(storage, fs, defaultSettings);
+		const scanner = new ScannerService();
 		await scanner.scan([docUri], workspaceUri);
 
+		const { storage } = useContext();
 		const documents = [...storage.values()];
 
 		strictEqual(
@@ -30,10 +32,10 @@ describe("Services/Scanner", () => {
 
 		const workspaceUri = getUri("scanner/self-reference/");
 		const docUri = getUri("scanner/self-reference/styles.scss");
-		const storage = new StorageService();
-		const scanner = new ScannerService(storage, fs, defaultSettings);
+		const scanner = new ScannerService();
 		await scanner.scan([docUri], workspaceUri);
 
+		const { storage } = useContext();
 		const documents = [...storage.values()];
 
 		strictEqual(

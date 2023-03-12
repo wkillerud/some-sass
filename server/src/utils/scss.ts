@@ -1,7 +1,6 @@
 import { getDefinition } from "../features/go-definition";
 import { IScssDocument, NodeType, ScssVariable } from "../parser";
 import { getParentNodeByType } from "../parser/ast";
-import StorageService from "../storage";
 
 export function isReferencingVariable(variable: ScssVariable): boolean {
 	if (!variable.value) {
@@ -13,7 +12,6 @@ export function isReferencingVariable(variable: ScssVariable): boolean {
 export function getBaseValueFrom(
 	variable: ScssVariable,
 	scssDocument: IScssDocument,
-	storage: StorageService,
 	depth = 0,
 ): ScssVariable {
 	if (depth > 10) {
@@ -44,11 +42,7 @@ export function getBaseValueFrom(
 		return variable;
 	}
 
-	const result = getDefinition(
-		scssDocument.textDocument,
-		referenceOffset,
-		storage,
-	);
+	const result = getDefinition(scssDocument.textDocument, referenceOffset);
 	if (!result) {
 		return variable;
 	}
@@ -58,7 +52,6 @@ export function getBaseValueFrom(
 		return getBaseValueFrom(
 			definition as ScssVariable,
 			definitionDocument,
-			storage,
 			(depth += 1),
 		);
 	}

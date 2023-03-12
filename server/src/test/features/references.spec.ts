@@ -1,34 +1,25 @@
 import { strictEqual, deepStrictEqual, ok } from "assert";
 import { provideReferences } from "../../features/references";
-import StorageService from "../../storage";
 import * as helpers from "../helpers";
-import { TestFileSystem } from "../test-file-system";
 
 describe("Providers/References", () => {
-	let storage: StorageService;
-	let fs: TestFileSystem;
-
 	beforeEach(() => {
-		storage = new StorageService();
-		fs = new TestFileSystem(storage);
+		helpers.createTestContext();
 	});
 
 	it("provideReferences - Variables", async () => {
-		await helpers.makeDocument(storage, '$day: "monday";', fs, {
+		await helpers.makeDocument('$day: "monday";', {
 			uri: "ki.scss",
 		});
 
 		const firstUsage = await helpers.makeDocument(
-			storage,
 			['@use "ki";', "", ".a::after {", " content: ki.$day;", "}"],
-			fs,
 			{
 				uri: "helen.scss",
 			},
 		);
 
 		await helpers.makeDocument(
-			storage,
 			[
 				'@use "ki";',
 				"",
@@ -37,13 +28,13 @@ describe("Providers/References", () => {
 				" content: ki.$day;",
 				"}",
 			],
-			fs,
+
 			{
 				uri: "gato.scss",
 			},
 		);
 
-		const actual = await provideReferences(firstUsage, 38, storage, {
+		const actual = await provideReferences(firstUsage, 38, {
 			includeDeclaration: true,
 		});
 
@@ -94,25 +85,23 @@ describe("Providers/References", () => {
 	});
 
 	it("provideReferences - @forward variable with prefix", async () => {
-		await helpers.makeDocument(storage, '$day: "monday";', fs, {
+		await helpers.makeDocument('$day: "monday";', {
 			uri: "ki.scss",
 		});
 
-		await helpers.makeDocument(storage, '@forward "ki" as ki-*;', fs, {
+		await helpers.makeDocument('@forward "ki" as ki-*;', {
 			uri: "dev.scss",
 		});
 
 		const firstUsage = await helpers.makeDocument(
-			storage,
 			['@use "dev";', "", ".a::after {", " content: dev.$ki-day;", "}"],
-			fs,
+
 			{
 				uri: "coast.scss",
 			},
 		);
 
 		await helpers.makeDocument(
-			storage,
 			[
 				'@use "ki";',
 				"",
@@ -121,13 +110,13 @@ describe("Providers/References", () => {
 				" content: ki.$day;",
 				"}",
 			],
-			fs,
+
 			{
 				uri: "winter.scss",
 			},
 		);
 
-		const actual = await provideReferences(firstUsage, 42, storage, {
+		const actual = await provideReferences(firstUsage, 42, {
 			includeDeclaration: true,
 		});
 
@@ -178,20 +167,19 @@ describe("Providers/References", () => {
 	});
 
 	it("provideReferences - @forward visibility for variable", async () => {
-		await helpers.makeDocument(storage, ["$secret: 1;"], fs, {
+		await helpers.makeDocument(["$secret: 1;"], {
 			uri: "var.scss",
 		});
 
 		const forward = await helpers.makeDocument(
-			storage,
 			'@forward "var" as var-* hide $secret;',
-			fs,
+
 			{
 				uri: "dev.scss",
 			},
 		);
 
-		const actual = await provideReferences(forward, 33, storage, {
+		const actual = await provideReferences(forward, 33, {
 			includeDeclaration: true,
 		});
 
@@ -234,25 +222,22 @@ describe("Providers/References", () => {
 
 	it("provideReferences - Functions", async () => {
 		await helpers.makeDocument(
-			storage,
 			"@function hello() { @return 1; }",
-			fs,
+
 			{
 				uri: "func.scss",
 			},
 		);
 
 		const firstUsage = await helpers.makeDocument(
-			storage,
 			['@use "func";', "", ".a {", " line-height: func.hello();", "}"],
-			fs,
+
 			{
 				uri: "one.scss",
 			},
 		);
 
 		await helpers.makeDocument(
-			storage,
 			[
 				'@use "func";',
 				"",
@@ -261,13 +246,13 @@ describe("Providers/References", () => {
 				" line-height: func.hello();",
 				"}",
 			],
-			fs,
+
 			{
 				uri: "two.scss",
 			},
 		);
 
-		const actual = await provideReferences(firstUsage, 42, storage, {
+		const actual = await provideReferences(firstUsage, 42, {
 			includeDeclaration: true,
 		});
 
@@ -319,29 +304,26 @@ describe("Providers/References", () => {
 
 	it("provideReferences - @forward function with prefix", async () => {
 		await helpers.makeDocument(
-			storage,
 			"@function hello() { @return 1; }",
-			fs,
+
 			{
 				uri: "func.scss",
 			},
 		);
 
-		await helpers.makeDocument(storage, '@forward "func" as fun-*;', fs, {
+		await helpers.makeDocument('@forward "func" as fun-*;', {
 			uri: "dev.scss",
 		});
 
 		const firstUsage = await helpers.makeDocument(
-			storage,
 			['@use "dev";', "", ".a {", " line-height: dev.fun-hello();", "}"],
-			fs,
+
 			{
 				uri: "one.scss",
 			},
 		);
 
 		await helpers.makeDocument(
-			storage,
 			[
 				'@use "func";',
 				"",
@@ -350,13 +332,13 @@ describe("Providers/References", () => {
 				" line-height: func.hello();",
 				"}",
 			],
-			fs,
+
 			{
 				uri: "two.scss",
 			},
 		);
 
-		const actual = await provideReferences(firstUsage, 40, storage, {
+		const actual = await provideReferences(firstUsage, 40, {
 			includeDeclaration: true,
 		});
 
@@ -408,24 +390,22 @@ describe("Providers/References", () => {
 
 	it("provideReferences - @forward visibility with function", async () => {
 		await helpers.makeDocument(
-			storage,
 			"@function secret() { @return 1; }",
-			fs,
+
 			{
 				uri: "func.scss",
 			},
 		);
 
 		const forward = await helpers.makeDocument(
-			storage,
 			'@forward "func" as fun-* hide secret;',
-			fs,
+
 			{
 				uri: "dev.scss",
 			},
 		);
 
-		const actual = await provideReferences(forward, 33, storage, {
+		const actual = await provideReferences(forward, 33, {
 			includeDeclaration: true,
 		});
 
@@ -468,25 +448,22 @@ describe("Providers/References", () => {
 
 	it("provideReferences - Mixins", async () => {
 		await helpers.makeDocument(
-			storage,
 			["@mixin hello() {", "	line-height: 1;", "}"],
-			fs,
+
 			{
 				uri: "mix.scss",
 			},
 		);
 
 		const firstUsage = await helpers.makeDocument(
-			storage,
 			['@use "mix";', "", ".a {", " @include mix.hello();", "}"],
-			fs,
+
 			{
 				uri: "one.scss",
 			},
 		);
 
 		await helpers.makeDocument(
-			storage,
 			[
 				'@use "mix";',
 				"",
@@ -495,13 +472,13 @@ describe("Providers/References", () => {
 				" @include mix.hello;",
 				"}",
 			],
-			fs,
+
 			{
 				uri: "two.scss",
 			},
 		);
 
-		const actual = await provideReferences(firstUsage, 33, storage, {
+		const actual = await provideReferences(firstUsage, 33, {
 			includeDeclaration: true,
 		});
 
@@ -553,29 +530,26 @@ describe("Providers/References", () => {
 
 	it("provideReferences - @forward mixin with prefix", async () => {
 		await helpers.makeDocument(
-			storage,
 			["@mixin hello() {", "	line-height: 1;", "}"],
-			fs,
+
 			{
 				uri: "mix.scss",
 			},
 		);
 
-		await helpers.makeDocument(storage, '@forward "mix" as mix-*;', fs, {
+		await helpers.makeDocument('@forward "mix" as mix-*;', {
 			uri: "dev.scss",
 		});
 
 		const firstUsage = await helpers.makeDocument(
-			storage,
 			['@use "dev";', "", ".a {", " @include dev.mix-hello();", "}"],
-			fs,
+
 			{
 				uri: "one.scss",
 			},
 		);
 
 		await helpers.makeDocument(
-			storage,
 			[
 				'@use "mix";',
 				"",
@@ -584,13 +558,13 @@ describe("Providers/References", () => {
 				" @include mix.hello();",
 				"}",
 			],
-			fs,
+
 			{
 				uri: "two.scss",
 			},
 		);
 
-		const actual = await provideReferences(firstUsage, 33, storage, {
+		const actual = await provideReferences(firstUsage, 33, {
 			includeDeclaration: true,
 		});
 
@@ -642,24 +616,22 @@ describe("Providers/References", () => {
 
 	it("provideReferences - @forward visibility for mixin", async () => {
 		await helpers.makeDocument(
-			storage,
 			["@mixin secret() {", "	line-height: 1;", "}"],
-			fs,
+
 			{
 				uri: "mix.scss",
 			},
 		);
 
 		const forward = await helpers.makeDocument(
-			storage,
 			'@forward "mix" as mix-* hide secret;',
-			fs,
+
 			{
 				uri: "dev.scss",
 			},
 		);
 
-		const actual = await provideReferences(forward, 33, storage, {
+		const actual = await provideReferences(forward, 33, {
 			includeDeclaration: true,
 		});
 
@@ -702,24 +674,22 @@ describe("Providers/References", () => {
 
 	it("providesReference - @forward function parameter with prefix", async () => {
 		await helpers.makeDocument(
-			storage,
 			[
 				"@function hello($var) { @return $var; }",
 				'$name: "there";',
 				'$reply: "general";',
 			],
-			fs,
+
 			{
 				uri: "fun.scss",
 			},
 		);
 
-		await helpers.makeDocument(storage, '@forward "fun" as fun-*;', fs, {
+		await helpers.makeDocument('@forward "fun" as fun-*;', {
 			uri: "dev.scss",
 		});
 
 		const usage = await helpers.makeDocument(
-			storage,
 			[
 				'@use "dev";',
 				"$_b: 1;",
@@ -728,13 +698,13 @@ describe("Providers/References", () => {
 				" content: dev.fun-hello(dev.$fun-name, $_b);",
 				"}",
 			],
-			fs,
+
 			{
 				uri: "one.scss",
 			},
 		);
 
-		const name = await provideReferences(usage, 73, storage, {
+		const name = await provideReferences(usage, 73, {
 			includeDeclaration: true,
 		});
 		ok(
@@ -764,20 +734,18 @@ describe("Providers/References", () => {
 
 	it("providesReference - @forward in map with prefix", async () => {
 		await helpers.makeDocument(
-			storage,
 			["@function hello() { @return 1; }", '$day: "monday";'],
-			fs,
+
 			{
 				uri: "fun.scss",
 			},
 		);
 
-		await helpers.makeDocument(storage, '@forward "fun" as fun-*;', fs, {
+		await helpers.makeDocument('@forward "fun" as fun-*;', {
 			uri: "dev.scss",
 		});
 
 		const usage = await helpers.makeDocument(
-			storage,
 			[
 				'@use "dev";',
 				"",
@@ -786,13 +754,13 @@ describe("Providers/References", () => {
 				' "goodbye": dev.fun-hello(),',
 				");",
 			],
-			fs,
+
 			{
 				uri: "one.scss",
 			},
 		);
 
-		const funDay = await provideReferences(usage, 36, storage, {
+		const funDay = await provideReferences(usage, 36, {
 			includeDeclaration: true,
 		});
 
@@ -820,7 +788,7 @@ describe("Providers/References", () => {
 			},
 		});
 
-		const hello = await provideReferences(usage, 64, storage, {
+		const hello = await provideReferences(usage, 64, {
 			includeDeclaration: true,
 		});
 		ok(
@@ -836,20 +804,18 @@ describe("Providers/References", () => {
 
 	it("provideReferences - excludes declaration if context says so", async () => {
 		await helpers.makeDocument(
-			storage,
 			["@function hello() { @return 1; }", '$day: "monday";'],
-			fs,
+
 			{
 				uri: "fun.scss",
 			},
 		);
 
-		await helpers.makeDocument(storage, '@forward "fun" as fun-*;', fs, {
+		await helpers.makeDocument('@forward "fun" as fun-*;', {
 			uri: "dev.scss",
 		});
 
 		const usage = await helpers.makeDocument(
-			storage,
 			[
 				'@use "dev";',
 				"",
@@ -858,13 +824,13 @@ describe("Providers/References", () => {
 				' "goodbye": dev.fun-hello(),',
 				");",
 			],
-			fs,
+
 			{
 				uri: "one.scss",
 			},
 		);
 
-		const funDay = await provideReferences(usage, 36, storage, {
+		const funDay = await provideReferences(usage, 36, {
 			includeDeclaration: false,
 		});
 
@@ -874,7 +840,7 @@ describe("Providers/References", () => {
 		);
 		strictEqual(funDay?.references.length, 1, "Expected one reference to $day");
 
-		const hello = await provideReferences(usage, 64, storage, {
+		const hello = await provideReferences(usage, 64, {
 			includeDeclaration: false,
 		});
 		ok(
@@ -886,7 +852,6 @@ describe("Providers/References", () => {
 
 	it("provideReferences - Sass built-in", async () => {
 		const usage = await helpers.makeDocument(
-			storage,
 			[
 				'@use "sass:color";',
 				'$_color: color.scale($color: "#1b1917", $alpha: -75%);',
@@ -895,25 +860,24 @@ describe("Providers/References", () => {
 				"	transform: scale(1.1);",
 				"}",
 			],
-			fs,
+
 			{
 				uri: "one.scss",
 			},
 		);
 
 		await helpers.makeDocument(
-			storage,
 			[
 				'@use "sass:color";',
 				'$_other-color: color.scale($color: "#1b1917", $alpha: -75%);',
 			],
-			fs,
+
 			{
 				uri: "two.scss",
 			},
 		);
 
-		const references = await provideReferences(usage, 34, storage, {
+		const references = await provideReferences(usage, 34, {
 			includeDeclaration: true,
 		});
 		ok(references, "provideReferences returned null for Sass built-in");

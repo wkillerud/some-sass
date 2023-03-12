@@ -5,14 +5,13 @@ import {
 } from "vscode-languageserver";
 import type { CompletionItem } from "vscode-languageserver";
 import type { TextDocument } from "vscode-languageserver-textdocument";
+import { useContext } from "../../context-provider";
 import type {
 	IScssDocument,
 	ScssForward,
 	ScssImport,
 	ScssUse,
 } from "../../parser";
-import type { ISettings } from "../../settings";
-import type StorageService from "../../storage";
 import { asDollarlessVariable } from "../../utils/string";
 import { sassBuiltInModules } from "../sass-built-in-modules";
 import type { SassBuiltInModule } from "../sass-built-in-modules";
@@ -24,15 +23,14 @@ import { createMixinCompletionItems } from "./mixin-completion";
 import { doSassDocCompletion } from "./sassdoc-completion";
 import { createVariableCompletionItems } from "./variable-completion";
 
-export function doCompletion(
+export async function doCompletion(
 	document: TextDocument,
 	offset: number,
-	settings: ISettings,
-	storage: StorageService,
-): CompletionList {
+): Promise<CompletionList> {
 	let completions = CompletionList.create([], false);
 
 	const text = document.getText();
+	const { storage, settings } = useContext();
 	const context = createCompletionContext(document, text, offset, settings);
 
 	if (context.sassDoc) {
@@ -45,11 +43,11 @@ export function doCompletion(
 	}
 
 	if (context.import) {
-		return doImportCompletion(context);
+		return await doImportCompletion(document, context);
 	}
 
 	if (context.namespace) {
-		completions = doNamespacedCompletion(document, settings, context, storage);
+		completions = doNamespacedCompletion(document, context);
 	}
 
 	const scssDocument = storage.get(document.uri);
@@ -84,9 +82,7 @@ export function doCompletion(
 			};
 			traverseTree(
 				document,
-				settings,
 				wildcardContext,
-				storage,
 				accumulator,
 				namespaceRootDocument,
 			);
@@ -115,7 +111,6 @@ export function doCompletion(
 		if (context.variable) {
 			const variables = createVariableCompletionItems(
 				scssDocument,
-				storage,
 				document,
 				context,
 			);
@@ -146,11 +141,10 @@ export function doCompletion(
 
 function doNamespacedCompletion(
 	document: TextDocument,
-	settings: ISettings,
 	context: CompletionContext,
-	storage: StorageService,
 ): CompletionList {
 	const completions = CompletionList.create([], false);
+	const { storage } = useContext();
 	const scssDocument = storage.get(document.uri);
 	if (!scssDocument) {
 		return completions;
@@ -188,14 +182,7 @@ function doNamespacedCompletion(
 	}
 
 	const accumulator: Map<string, CompletionItem[]> = new Map();
-	traverseTree(
-		document,
-		settings,
-		context,
-		storage,
-		accumulator,
-		namespaceRootDocument,
-	);
+	traverseTree(document, context, accumulator, namespaceRootDocument);
 
 	completions.items = [...accumulator.values()].flat();
 
@@ -251,9 +238,7 @@ function doBuiltInCompletion(
 
 function traverseTree(
 	document: TextDocument,
-	settings: ISettings,
 	context: CompletionContext,
-	storage: StorageService,
 	accumulator: Map<string, CompletionItem[]>,
 	leaf: IScssDocument,
 	hiddenSymbols: string[] = [],
@@ -262,7 +247,7 @@ function traverseTree(
 	if (accumulator.has(leaf.uri)) {
 		return;
 	}
-
+	const { storage, settings } = useContext();
 	const scssDocument = storage.get(leaf.uri);
 	if (!scssDocument) {
 		return;
@@ -277,7 +262,6 @@ function traverseTree(
 		if (context.variable) {
 			const variables = createVariableCompletionItems(
 				scssDocument,
-				storage,
 				document,
 				context,
 				hiddenSymbols,
@@ -337,15 +321,6 @@ function traverseTree(
 			prefix += (child as ScssForward).prefix;
 		}
 
-		traverseTree(
-			document,
-			settings,
-			context,
-			storage,
-			accumulator,
-			childDocument,
-			hidden,
-			prefix,
-		);
+		traverseTree(document, context, accumulator, childDocument, hidden, prefix);
 	}
 }

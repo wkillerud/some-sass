@@ -4,7 +4,6 @@ import { URI } from "vscode-uri";
 import type { FileSystemProvider } from "../file-system";
 import { getLinesFromText } from "../utils/string";
 import { getNodeAtOffset } from "./ast";
-import { getLanguageService } from "./language-service";
 import type { INode } from "./node";
 import type {
 	IScssDocument,
@@ -39,10 +38,9 @@ export class ScssDocument implements IScssDocument {
 		fs: FileSystemProvider,
 		document: TextDocument,
 		symbols: IScssSymbols,
-		ast?: INode,
+		ast: INode,
 	) {
-		const ls = getLanguageService(fs);
-		this.ast = ast ?? (ls.parseStylesheet(document) as INode);
+		this.ast = ast;
 		this.fs = fs;
 		this.textDocument = document;
 		this.uri = document.uri;

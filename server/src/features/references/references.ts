@@ -1,6 +1,7 @@
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import type { Position, ReferenceContext } from "vscode-languageserver-types";
 import { Location, Range, SymbolKind } from "vscode-languageserver-types";
+import { useContext } from "../../context-provider";
 import type { INode, IScssDocument, ScssSymbol } from "../../parser";
 import { NodeType, tokenizer } from "../../parser";
 import type StorageService from "../../storage";
@@ -30,9 +31,9 @@ type Reference = {
 export async function provideReferences(
 	document: TextDocument,
 	offset: number,
-	storage: StorageService,
 	context: ReferenceContext,
 ): Promise<References | null> {
+	const { storage } = useContext();
 	const scssDocument = storage.get(document.uri);
 	if (!scssDocument) {
 		return null;
@@ -43,12 +44,7 @@ export async function provideReferences(
 		return null;
 	}
 
-	const referenceIdentifier = getIdentifier(
-		document,
-		referenceNode,
-		storage,
-		context,
-	);
+	const referenceIdentifier = getIdentifier(document, referenceNode, context);
 	if (!referenceIdentifier) {
 		return null;
 	}
@@ -72,7 +68,6 @@ export async function provideReferences(
 	if (!definitionSymbol || !definitionDocument) {
 		[definitionSymbol, definitionDocument] = getDefinitionSymbol(
 			document,
-			storage,
 			referenceIdentifier,
 		);
 	}
@@ -231,7 +226,6 @@ function createReference(
 function getIdentifier(
 	document: TextDocument,
 	hoverNode: INode,
-	storage: StorageService,
 	context: ReferenceContext,
 ): Identifier | null {
 	let identifier: Identifier | null = null;
@@ -261,11 +255,7 @@ function getIdentifier(
 				kind: SymbolKind.Method,
 			};
 
-			const [asMixin] = getDefinitionSymbol(
-				document,
-				storage,
-				candidateIdentifier,
-			);
+			const [asMixin] = getDefinitionSymbol(document, candidateIdentifier);
 
 			if (asMixin) {
 				return candidateIdentifier;
@@ -273,11 +263,7 @@ function getIdentifier(
 
 			candidateIdentifier.kind = SymbolKind.Function;
 
-			const [asFunction] = getDefinitionSymbol(
-				document,
-				storage,
-				candidateIdentifier,
-			);
+			const [asFunction] = getDefinitionSymbol(document, candidateIdentifier);
 
 			if (asFunction) {
 				return candidateIdentifier;
@@ -341,7 +327,6 @@ function getDefinition(
 	const definitionIdentifier = getIdentifier(
 		scssDocument,
 		definitionNode,
-		storage,
 		context,
 	);
 	if (!definitionIdentifier) {
@@ -350,7 +335,6 @@ function getDefinition(
 
 	const [definitionSymbol, definitionDocument] = getDefinitionSymbol(
 		scssDocument,
-		storage,
 		definitionIdentifier,
 	);
 	if (!definitionSymbol || !definitionDocument) {

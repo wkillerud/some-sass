@@ -1,16 +1,13 @@
 import { strictEqual } from "assert";
 import { NodeType } from "../../parser";
 import { getNodeAtOffset, getParentNodeByType } from "../../parser/ast";
-import StorageService from "../../storage";
 import * as helpers from "../helpers";
-import { TestFileSystem } from "../test-file-system";
-
-const storage = new StorageService();
-const fs = new TestFileSystem(storage);
 
 describe("Utils/Ast", () => {
+	beforeEach(() => helpers.createTestContext());
+
 	it("getNodeAtOffset", async () => {
-		const ast = await helpers.makeAst(storage, [".a {}"], fs);
+		const ast = await helpers.makeAst([".a {}"]);
 
 		const node = getNodeAtOffset(ast, 4);
 
@@ -19,7 +16,7 @@ describe("Utils/Ast", () => {
 	});
 
 	it("getParentNodeByType", async () => {
-		const ast = await helpers.makeAst(storage, [".a {}"], fs);
+		const ast = await helpers.makeAst([".a {}"]);
 
 		const node = getNodeAtOffset(ast, 4);
 		const parentNode = getParentNodeByType(node, NodeType.Ruleset);

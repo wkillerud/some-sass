@@ -4,16 +4,21 @@ import type {
 	FileSystemProvider as CSSFileSystemProvider,
 } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
-import type { FileSystemProvider } from "../file-system";
+import { useContext } from "../context-provider";
 
-let ls: LanguageService | null = null;
+let ls: LanguageService;
 
-export function getLanguageService(fs: FileSystemProvider): LanguageService {
+export function getLanguageService(): LanguageService {
 	if (ls) {
 		return ls;
 	}
 
+	const { fs, clientCapabilities } = useContext();
+
 	const fileSystemProvider: CSSFileSystemProvider = {
+		readDirectory(uri) {
+			return fs.readDirectory(uri);
+		},
 		async stat(uri: string) {
 			try {
 				return await fs.stat(URI.parse(uri));
@@ -31,10 +36,11 @@ export function getLanguageService(fs: FileSystemProvider): LanguageService {
 		},
 	};
 
-	ls = getSCSSLanguageService({ fileSystemProvider });
+	ls = getSCSSLanguageService({ fileSystemProvider, clientCapabilities });
 
 	ls.configure({
 		validate: false,
 	});
+
 	return ls;
 }

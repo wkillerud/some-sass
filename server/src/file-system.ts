@@ -1,4 +1,4 @@
-import { FileStat } from "vscode-css-languageservice";
+import { FileStat, FileType } from "vscode-css-languageservice";
 import type { CancellationToken } from "vscode-languageserver";
 import type { URI } from "vscode-uri";
 
@@ -14,6 +14,7 @@ export interface FileSystemProvider {
 		token?: CancellationToken,
 	): Promise<URI[]>;
 	readFile(uri: URI, encoding?: BufferEncoding): Promise<string>;
+	readDirectory(uri: string): Promise<[string, FileType][]>;
 	stat(uri: URI): Promise<FileStat>;
 	realPath(uri: URI): Promise<URI>;
 }

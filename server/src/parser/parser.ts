@@ -5,9 +5,11 @@ import {
 	Range,
 	SymbolKind,
 	DocumentLink,
+	LanguageService,
 } from "vscode-css-languageservice";
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
+import { useContext } from "../context-provider";
 import { sassBuiltInModuleNames } from "../features/sass-built-in-modules";
 import type { FileSystemProvider } from "../file-system";
 import { asDollarlessVariable, getLinesFromText } from "../utils/string";
@@ -29,12 +31,17 @@ const reDynamicPath = /[#*{}]/;
 export async function parseDocument(
 	document: TextDocument,
 	workspaceRoot: URI,
-	fs: FileSystemProvider,
 ): Promise<ScssDocument> {
-	const ls = getLanguageService(fs);
+	const { fs } = useContext();
+	const ls = getLanguageService();
 	const ast = ls.parseStylesheet(document) as INode;
-	const symbols = await findDocumentSymbols(document, ast, workspaceRoot, fs);
-
+	const symbols = await findDocumentSymbols(
+		document,
+		ast,
+		workspaceRoot,
+		fs,
+		ls,
+	);
 	return new ScssDocument(fs, document, symbols, ast);
 }
 
@@ -43,6 +50,7 @@ async function findDocumentSymbols(
 	ast: INode,
 	workspaceRoot: URI,
 	fs: FileSystemProvider,
+	ls: LanguageService,
 ): Promise<IScssSymbols> {
 	const result: IScssSymbols = {
 		functions: new Map(),
@@ -53,7 +61,6 @@ async function findDocumentSymbols(
 		forwards: new Map(),
 	};
 
-	const ls = getLanguageService(fs);
 	const links = await ls.findDocumentLinks2(
 		document,
 		ast,

@@ -1,13 +1,12 @@
 import type { SymbolInformation } from "vscode-languageserver";
-import type StorageService from "../../storage";
+import { useContext } from "../../context-provider";
 
 export async function searchWorkspaceSymbol(
 	query: string,
-	storage: StorageService,
 	root: string,
 ): Promise<SymbolInformation[]> {
 	const workspaceSymbols: SymbolInformation[] = [];
-
+	const { storage } = useContext();
 	for (const scssDocument of storage.values()) {
 		if (!scssDocument.uri.includes(root)) {
 			continue;

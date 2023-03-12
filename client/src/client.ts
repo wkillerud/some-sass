@@ -9,7 +9,7 @@ import {
 	workspace,
 	WorkspaceFolder,
 } from "vscode";
-import { FileStat } from "vscode-css-languageservice";
+import type { FileStat } from "vscode-css-languageservice";
 import {
 	BaseLanguageClient,
 	LanguageClientOptions,

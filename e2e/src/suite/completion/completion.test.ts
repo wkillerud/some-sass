@@ -3,6 +3,7 @@ import { testCompletion } from "./helper";
 
 describe("SCSS Completion Test", function () {
 	const docUri = getDocUri("completion/main.scss");
+	const modulesDocUri = getDocUri("completion/modules.scss");
 	const vueDocUri = getDocUri("completion/AppButton.vue");
 	const svelteDocUri = getDocUri("completion/AppButton.svelte");
 	const astroDocUri = getDocUri("completion/AppButton.astro");
@@ -13,6 +14,47 @@ describe("SCSS Completion Test", function () {
 		await showFile(svelteDocUri);
 		await showFile(astroDocUri);
 		await sleepCI();
+	});
+
+	it("Offers completions when using node_modules", async () => {
+		await testCompletion(modulesDocUri, position(1, 17), [
+			{
+				label: "scss/",
+				insertText: "scss/",
+			},
+		]);
+		await testCompletion(modulesDocUri, position(2, 22), [
+			{
+				label: "bootstrap.scss",
+				insertText: "bootstrap",
+			},
+		]);
+		await testCompletion(modulesDocUri, position(3, 11), [
+			{
+				label: "bar.scss",
+				insertText: "bar",
+			},
+		]);
+
+		// Deprecated tilde imports
+		await testCompletion(modulesDocUri, position(4, 18), [
+			{
+				label: "scss/",
+				insertText: "scss/",
+			},
+		]);
+		await testCompletion(modulesDocUri, position(5, 23), [
+			{
+				label: "bootstrap.scss",
+				insertText: "bootstrap",
+			},
+		]);
+		await testCompletion(modulesDocUri, position(6, 12), [
+			{
+				label: "bar.scss",
+				insertText: "bar",
+			},
+		]);
 	});
 
 	it("Offers completions from tilde imports", async () => {

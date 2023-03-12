@@ -1,4 +1,8 @@
-import { CompletionList, MarkupKind } from "vscode-languageserver";
+import {
+	CompletionItem,
+	CompletionList,
+	MarkupKind,
+} from "vscode-languageserver";
 import { sassBuiltInModules } from "../sass-built-in-modules";
 import type { CompletionContext } from "./completion-context";
 
@@ -8,16 +12,22 @@ export function doImportCompletion(context: CompletionContext): CompletionList {
 	const completions = CompletionList.create([], false);
 
 	if (rePartialUse.test(context.textBeforeWord)) {
-		completions.items = Object.entries(sassBuiltInModules).map(
-			([moduleName, { summary, reference }]) => ({
-				label: moduleName,
-				documentation: {
-					kind: MarkupKind.Markdown,
-					value: [summary, "", `[Sass reference](${reference})`].join("\n"),
-				},
-			}),
-		);
+		createSassBuiltInCompletionItems(completions.items);
 	}
 
 	return completions;
+}
+
+function createSassBuiltInCompletionItems(completions: CompletionItem[]): void {
+	for (const [moduleName, { summary, reference }] of Object.entries(
+		sassBuiltInModules,
+	)) {
+		completions.push({
+			label: moduleName,
+			documentation: {
+				kind: MarkupKind.Markdown,
+				value: [summary, "", `[Sass reference](${reference})`].join("\n"),
+			},
+		});
+	}
 }

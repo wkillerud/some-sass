@@ -4,10 +4,8 @@ import {
 	Command,
 	Connection,
 	FileChangeType,
-	Range,
 	TextDocumentEdit,
 } from "vscode-languageserver";
-import { TextDocument } from "vscode-languageserver-textdocument";
 import {
 	TextDocuments,
 	TextDocumentSyncKind,
@@ -16,6 +14,7 @@ import type {
 	InitializeParams,
 	InitializeResult,
 } from "vscode-languageserver/node";
+import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
 import { ExtractProvider } from "./features/code-actions";
 import { doCompletion } from "./features/completion";
@@ -357,10 +356,7 @@ export class SomeSassServer {
 				storageService,
 				settings,
 			);
-			return preparations as unknown as {
-				range: Range;
-				placeholder: string;
-			};
+			return preparations;
 		});
 
 		this.connection.onRenameRequest(async (params) => {

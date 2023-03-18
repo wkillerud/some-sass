@@ -115,6 +115,7 @@ const browserClientConfig = {
 			// provides alternate implementation for node module and source files
 		},
 		fallback: {
+			events: require.resolve("events/"),
 			assert: require.resolve("assert"),
 			path: require.resolve("path-browserify"),
 		},
@@ -165,6 +166,7 @@ const browserServerConfig = {
 		extensions: [".ts", ".js"],
 		alias: {},
 		fallback: {
+			events: require.resolve("events/"),
 			path: require.resolve("path-browserify"),
 			util: require.resolve("util/"),
 			"fs/promises": false,

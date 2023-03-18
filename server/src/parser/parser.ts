@@ -1,4 +1,3 @@
-import { parseString } from "scss-sassdoc-parser";
 import type { ParseResult } from "scss-sassdoc-parser";
 import {
 	Position,
@@ -188,7 +187,14 @@ async function findDocumentSymbols(
 
 	let sassdoc: ParseResult[] = [];
 	try {
-		sassdoc = await parseString(text);
+		// Avoid transpiling the dynamic import to require()
+		// https://github.com/TypeStrong/ts-node/discussions/1290
+		const dynamicImport = new Function(
+			"modulePath",
+			"return import(modulePath);",
+		);
+		const sassdocParser = await dynamicImport("scss-sassdoc-parser");
+		sassdoc = await sassdocParser.parse(text);
 	} catch (error) {
 		console.error(error);
 	}

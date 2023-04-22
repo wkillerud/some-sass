@@ -32,9 +32,7 @@ export async function doDiagnostics(
 		return diagnostics;
 	}
 
-	const references: INode[] = getVariableFunctionMixinReferences(
-		openDocument.ast,
-	);
+	const references: INode[] = getReferences(openDocument.ast);
 	if (references.length === 0) {
 		return diagnostics;
 	}
@@ -45,14 +43,30 @@ export async function doDiagnostics(
 
 	for (const node of references) {
 		for (const symbol of symbols) {
-			const nodeKind: SymbolKind =
-				node.type === NodeType.Function
-					? SymbolKind.Function
-					: node.type === NodeType.MixinReference
-					? SymbolKind.Method
-					: SymbolKind.Variable;
+			let nodeKind: SymbolKind | null = null;
 
-			if (symbol.kind === nodeKind && node.getName() === symbol.name) {
+			switch (node.type) {
+				case NodeType.Function:
+					nodeKind = SymbolKind.Function;
+					break;
+				case NodeType.MixinReference:
+					nodeKind = SymbolKind.Method;
+					break;
+				case NodeType.VariableName:
+					nodeKind = SymbolKind.Variable;
+					break;
+				case NodeType.SimpleSelector:
+					nodeKind = SymbolKind.Class;
+					break;
+			}
+
+			if (nodeKind === null) {
+				continue;
+			}
+
+			const name =
+				nodeKind === SymbolKind.Class ? node.getText() : node.getName();
+			if (symbol.kind === nodeKind && name === symbol.name) {
 				const diagnostic = createDiagnostic(openDocument, node, symbol);
 				if (diagnostic) {
 					diagnostics.push(diagnostic);
@@ -64,7 +78,7 @@ export async function doDiagnostics(
 	return diagnostics;
 }
 
-function getVariableFunctionMixinReferences(fromNode: INode): INode[] {
+function getReferences(fromNode: INode): INode[] {
 	return fromNode.getChildren().flatMap((child) => {
 		if (child.type === NodeType.VariableName) {
 			const parent = child.getParent();
@@ -92,9 +106,19 @@ function getVariableFunctionMixinReferences(fromNode: INode): INode[] {
 			) {
 				return [node];
 			}
+		} else if (child.type === NodeType.SimpleSelector) {
+			let node = child;
+			let i = 0;
+			while (node.type !== NodeType.ExtendsReference && i !== 2) {
+				node = node.getParent();
+				i++;
+			}
+			if (node.type === NodeType.ExtendsReference) {
+				return [child];
+			}
 		}
 
-		return getVariableFunctionMixinReferences(child);
+		return getReferences(child);
 	});
 }
 
@@ -119,6 +143,15 @@ function traverseTree(
 	}
 
 	for (const symbol of scssDocument.getSymbols()) {
+		// Placeholders are not namespaced the same way other symbols are
+		if (symbol.kind === SymbolKind.Class) {
+			result.push({
+				...symbol,
+				name: symbol.name,
+			});
+			continue;
+		}
+
 		// The symbol may have a prefix in the open document, so we need to add it here
 		// so we can compare apples to apples later on.
 		let symbolName = `${accumulatedPrefix}${asDollarlessVariable(symbol.name)}`;

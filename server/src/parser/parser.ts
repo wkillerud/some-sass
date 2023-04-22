@@ -260,9 +260,10 @@ async function findDocumentSymbols(
 
 			case SymbolKind.Class: {
 				if (symbol.name.startsWith("%")) {
+					const sansPercent = symbol.name.substring(1);
 					const docs = sassdoc.find(
 						(v) =>
-							v.context.name === symbol.name &&
+							v.context.name === sansPercent &&
 							v.context.type === "placeholder",
 					);
 					result.placeholders.set(symbol.name, {

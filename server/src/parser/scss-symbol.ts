@@ -32,6 +32,8 @@ export interface ScssMixin extends ScssSymbol {
 
 export type ScssFunction = ScssMixin;
 
+export type ScssPlaceholder = ScssSymbol;
+
 export interface ScssLink {
 	link: DocumentLink;
 }
@@ -59,6 +61,7 @@ export interface IScssSymbols {
 	variables: Map<string, ScssVariable>;
 	mixins: Map<string, ScssMixin>;
 	functions: Map<string, ScssFunction>;
+	placeholders: Map<string, ScssPlaceholder>;
 }
 
 export interface IScssDocument extends TextDocument, IScssSymbols {

@@ -20,6 +20,7 @@ import type { CompletionContext } from "./completion-context";
 import { createFunctionCompletionItems } from "./function-completion";
 import { doImportCompletion } from "./import-completion";
 import { createMixinCompletionItems } from "./mixin-completion";
+import { createPlaceholderCompletionItems } from "./placeholder-completion";
 import { doSassDocCompletion } from "./sassdoc-completion";
 import { createVariableCompletionItems } from "./variable-completion";
 
@@ -96,7 +97,9 @@ export async function doCompletion(
 	// If at this point we're not in a namespace context,
 	// but the user only wants suggestions from namespaces
 	// (we consider `*` a namespace), we should return an empty list.
-	if (settings.suggestFromUseOnly) {
+	// An exception is if the user is typing a placeholder.
+	// These are not prefixed with their namespace, even with @use.
+	if (settings.suggestFromUseOnly && !context.placeholder) {
 		return completions;
 	}
 
@@ -106,6 +109,11 @@ export async function doCompletion(
 			scssDocument.uri === document.uri
 		) {
 			continue;
+		}
+
+		if (context.placeholder) {
+			const variables = createPlaceholderCompletionItems(scssDocument);
+			completions.items = completions.items.concat(variables);
 		}
 
 		if (context.variable) {
@@ -291,36 +299,54 @@ function traverseTree(
 			);
 			completionItems = completionItems.concat(functions);
 		}
-	}
 
-	accumulator.set(leaf.uri, completionItems);
-
-	// Check to see if we have to go deeper
-	for (const child of leaf.getLinks()) {
-		if (
-			!child.link.target ||
-			(child as ScssImport).dynamic ||
-			(child as ScssImport).css ||
-			child.link.target === scssDocument.uri
-		) {
-			continue;
+		if (context.placeholder) {
+			const placeholders = createPlaceholderCompletionItems(
+				scssDocument,
+				hiddenSymbols,
+			);
+			completionItems = completionItems.concat(placeholders);
 		}
 
-		const childDocument = storage.get(child.link.target);
-		if (!childDocument) {
-			continue;
-		}
+		accumulator.set(leaf.uri, completionItems);
 
-		let hidden = hiddenSymbols;
-		if ((child as ScssForward).hide && (child as ScssForward).hide.length > 0) {
-			hidden = hiddenSymbols.concat((child as ScssForward).hide);
-		}
+		// Check to see if we have to go deeper
+		for (const child of leaf.getLinks()) {
+			if (
+				!child.link.target ||
+				(child as ScssImport).dynamic ||
+				(child as ScssImport).css ||
+				child.link.target === scssDocument.uri
+			) {
+				continue;
+			}
 
-		let prefix = accumulatedPrefix;
-		if ((child as ScssForward).prefix) {
-			prefix += (child as ScssForward).prefix;
-		}
+			const childDocument = storage.get(child.link.target);
+			if (!childDocument) {
+				continue;
+			}
 
-		traverseTree(document, context, accumulator, childDocument, hidden, prefix);
+			let hidden = hiddenSymbols;
+			if (
+				(child as ScssForward).hide &&
+				(child as ScssForward).hide.length > 0
+			) {
+				hidden = hiddenSymbols.concat((child as ScssForward).hide);
+			}
+
+			let prefix = accumulatedPrefix;
+			if ((child as ScssForward).prefix) {
+				prefix += (child as ScssForward).prefix;
+			}
+
+			traverseTree(
+				document,
+				context,
+				accumulator,
+				childDocument,
+				hidden,
+				prefix,
+			);
+		}
 	}
 }

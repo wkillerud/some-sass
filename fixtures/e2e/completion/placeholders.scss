@@ -1,0 +1,15 @@
+@use "placeholders/placeholders-module" as pl;
+
+%mediumAlert {
+  color: orange;
+}
+
+.alert {
+  &--medium {
+    @extend %m;
+  }
+
+  &--strong {
+    @extend %s;
+  }
+}

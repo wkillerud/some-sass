@@ -62,6 +62,7 @@ describe("Providers/WorkspaceSymbol", () => {
 					imports: new Map(),
 					uses: new Map(),
 					forwards: new Map(),
+					placeholders: new Map(),
 				},
 				ast,
 			),

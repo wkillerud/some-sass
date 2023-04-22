@@ -56,8 +56,12 @@ export async function prepareRename(
 		return defaultBehavior;
 	}
 
-	// Exclude the $ of the variable, since it's required.
-	if (references.references[0].kind === SymbolKind.Variable) {
+	// Exclude the $ of the variable and % of the placeholder,
+	// since they're required.
+	if (
+		references.references[0].kind === SymbolKind.Variable ||
+		references.references[0].kind === SymbolKind.Class
+	) {
 		range.start.character += 1;
 	}
 
@@ -102,8 +106,9 @@ export async function doRename(
 
 		const range = location.range;
 
-		// Exclude the $ of the variable, since it's required.
-		if (kind === SymbolKind.Variable) {
+		// Exclude the $ of the variable and % of the placeholder,
+		// since they're required.
+		if (kind === SymbolKind.Variable || kind === SymbolKind.Class) {
 			range.start.character = range.start.character + 1;
 		}
 

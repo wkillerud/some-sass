@@ -26,7 +26,7 @@ const reMixinReference = /.*@include\s+(.*)/;
 const reComment = /^(.*\/\/|.*\/\*|\s*\*)/;
 const reSassDoc = /^[\\s]*\/{3}.*$/;
 const reQuotes = /["']/;
-const rePlaceholder = /^\s+@extend\s+%/;
+const rePlaceholder = /@extend\s+%/;
 const rePartialModuleAtRule = /@(?:use|forward|import) ["']/;
 
 /**

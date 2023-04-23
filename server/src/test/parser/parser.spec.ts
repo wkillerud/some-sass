@@ -88,6 +88,7 @@ describe("Services/Parser", () => {
 				'@use "variables" as vars;',
 				'@use "corners" as *;',
 				'@forward "colors" as color-* hide $varslingsfarger, varslingsfarge;',
+				"%alert { color: blue; }",
 			]);
 
 			const symbols = await parseDocument(document, URI.parse(""));
@@ -109,6 +110,11 @@ describe("Services/Parser", () => {
 				"$varslingsfarger",
 				"varslingsfarge",
 			]);
+
+			// Placeholder
+			const placeholders = [...symbols.placeholders.values()];
+			strictEqual(placeholders.length, 1, "expected to find one placeholder");
+			strictEqual(placeholders[0]?.name, "%alert");
 		});
 
 		it("should return relative links", async () => {

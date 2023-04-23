@@ -914,4 +914,86 @@ describe("Providers/References", () => {
 			},
 		});
 	});
+
+	it("provideReferences - placeholders", async () => {
+		await helpers.makeDocument(
+			["%alert {", "	color: blue;", "}"],
+
+			{
+				uri: "place.scss",
+			},
+		);
+
+		const firstUsage = await helpers.makeDocument(
+			['@use "place";', "", ".a {", " @extend %alert;", "}"],
+
+			{
+				uri: "one.scss",
+			},
+		);
+
+		await helpers.makeDocument(
+			[
+				'@use "place";',
+				"",
+				".a {",
+				"	// Here it comes!",
+				" @extend %alert;",
+				"}",
+			],
+
+			{
+				uri: "two.scss",
+			},
+		);
+
+		const actual = await provideReferences(firstUsage, 33, {
+			includeDeclaration: true,
+		});
+
+		ok(actual, "provideReferences returned null for a placeholder");
+		strictEqual(
+			actual?.references.length,
+			3,
+			"Expected three references to alert: two usages and one declaration",
+		);
+
+		const [place, one, two] = actual.references;
+
+		ok(place?.location.uri.endsWith("place.scss"));
+		deepStrictEqual(place?.location.range, {
+			start: {
+				line: 0,
+				character: 0,
+			},
+			end: {
+				line: 0,
+				character: 6,
+			},
+		});
+
+		ok(one?.location.uri.endsWith("one.scss"));
+		deepStrictEqual(one?.location.range, {
+			start: {
+				line: 3,
+				character: 9,
+			},
+			end: {
+				line: 3,
+				character: 15,
+			},
+		});
+
+		ok(two?.location.uri.endsWith("two.scss"));
+		deepStrictEqual(two?.location.range, {
+			start: {
+				line: 4,
+				character: 9,
+			},
+			end: {
+				line: 4,
+				character: 15,
+			},
+		});
+	});
 });

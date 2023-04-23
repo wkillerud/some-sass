@@ -602,6 +602,12 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 					signature: "($string, $start-at, $end-at: -1)",
 					returns: "string",
 				},
+				split: {
+					description:
+						"Returns a bracketed, comma-separated list of substrings of `$string` that are separated by `$separator`. The `$separator`s aren't included in these substrings.\n\nIf `$limit` is a number 1 or higher, this splits on at most that many `$separator`s (and so returns at most `$limit` + 1 strings). The last substring contains the rest of the string, including any remaining `$separator`s.",
+					signature: "($string, $separator, $limit: null)",
+					returns: "list",
+				},
 				"to-upper-case": {
 					description:
 						"Returns a copy of `$string` with the ASCII letters converted to upper case.",

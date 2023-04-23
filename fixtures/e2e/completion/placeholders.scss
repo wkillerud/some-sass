@@ -6,7 +6,7 @@
 
 .alert {
   &--medium {
-    @extend %m;
+    @extend %;
   }
 
   &--strong {

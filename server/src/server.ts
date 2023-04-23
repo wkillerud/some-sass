@@ -97,6 +97,9 @@ export class SomeSassServer {
 								// For @use completion
 								'"',
 								"'",
+
+								// For placeholder completion
+								"%",
 							],
 						},
 						signatureHelpProvider: {

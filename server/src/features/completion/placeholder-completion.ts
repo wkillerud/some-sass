@@ -20,7 +20,6 @@ export function createPlaceholderCompletionItems(
 
 		const label = placeholder.name;
 		const filterText = placeholder.name.substring(1);
-		const insertText = filterText;
 
 		let documentation = placeholder.name;
 		const sassdoc = applySassDoc(placeholder, {

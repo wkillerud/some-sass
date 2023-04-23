@@ -18,10 +18,10 @@ async function main() {
 
 		const workspaceDir = path.resolve(__dirname, "../../fixtures/e2e");
 
+		const version = "insiders";
+
 		// Download VS Code, unzip it and run the integration test
-		const vscodeExecutablePath = await downloadAndUnzipVSCode(
-			process.env.CI ? "stable" : "insiders",
-		);
+		const vscodeExecutablePath = await downloadAndUnzipVSCode(version);
 
 		const [cli, ...args] =
 			resolveCliArgsFromVSCodeExecutablePath(vscodeExecutablePath);
@@ -57,13 +57,17 @@ async function main() {
 
 		await runTests({
 			vscodeExecutablePath,
-			version: "insiders",
+			version,
 			extensionDevelopmentPath,
 			extensionTestsPath,
 			launchArgs: [workspaceDir],
 		});
-	} catch {
+	} catch (e) {
 		console.error("Failed to run tests");
+		const error = e as Error;
+		console.error(error.name);
+		console.error(error.message);
+		console.error(error.stack);
 		process.exit(1);
 	}
 }

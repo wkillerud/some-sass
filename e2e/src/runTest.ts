@@ -19,7 +19,9 @@ async function main() {
 		const workspaceDir = path.resolve(__dirname, "../../fixtures/e2e");
 
 		// Download VS Code, unzip it and run the integration test
-		const vscodeExecutablePath = await downloadAndUnzipVSCode("insiders");
+		const vscodeExecutablePath = await downloadAndUnzipVSCode(
+			process.env.CI ? "stable" : "insiders",
+		);
 
 		const [cli, ...args] =
 			resolveCliArgsFromVSCodeExecutablePath(vscodeExecutablePath);

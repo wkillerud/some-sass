@@ -365,3 +365,38 @@ describe("SassDoc Completion Test", () => {
 		await testCompletion(docUri, position(30, 4), expectedCompletions);
 	});
 });
+
+describe("Placeholders", () => {
+	const docUri = getDocUri("completion/placeholders.scss");
+
+	before(async () => {
+		await showFile(docUri);
+		await sleepCI();
+	});
+
+	it("Offers completions for placeholders", async () => {
+		const expectedCompletions = [
+			{
+				label: "%mediumAlert",
+				insertText: "mediumAlert",
+			},
+			{
+				label: "%strongAlert",
+				insertText: "strongAlert",
+			},
+		];
+
+		await testCompletion(docUri, position(9, 14), expectedCompletions);
+	});
+
+	it("Completions filter as expected", async () => {
+		const expectedCompletions = [
+			{
+				label: "%strongAlert",
+				insertText: "strongAlert",
+			},
+		];
+
+		await testCompletion(docUri, position(13, 15), expectedCompletions);
+	});
+});

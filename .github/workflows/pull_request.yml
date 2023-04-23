@@ -35,7 +35,7 @@ jobs:
 
       - name: Run e2e tests
         if: runner.os != 'Linux'
-        uses: nick-fields/retry@e88a9994b039653512d697de1bce46b00bfe11b5
+        uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
         with:
           timeout_minutes: 5
           max_attempts: 3

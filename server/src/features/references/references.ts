@@ -304,6 +304,12 @@ function getIdentifier(
 				kind,
 			};
 		}
+	} else if (hoverNode.type === NodeType.SelectorPlaceholder) {
+		identifier = {
+			name: hoverNode.getText(),
+			position: document.positionAt(hoverNode.offset),
+			kind: SymbolKind.Class,
+		};
 	}
 
 	if (!identifier) {

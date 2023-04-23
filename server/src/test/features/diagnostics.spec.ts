@@ -185,4 +185,29 @@ describe("Providers/Diagnostics", () => {
 			"Every diagnostic must have a message",
 		);
 	});
+
+	it("doDiagnostics - Placeholders", async () => {
+		const document = await helpers.makeDocument([
+			"/// @deprecated Use something else",
+			"%oldPlaceholder {",
+			"  content: 'placeholder';",
+			"}",
+			".a { @extend %oldPlaceholder; }",
+		]);
+
+		const actual = await doDiagnostics(document);
+
+		deepStrictEqual(actual, [
+			{
+				message: "Use something else",
+				range: {
+					start: { line: 4, character: 13 },
+					end: { line: 4, character: 28 },
+				},
+				source: EXTENSION_NAME,
+				tags: [DiagnosticTag.Deprecated],
+				severity: DiagnosticSeverity.Hint,
+			},
+		]);
+	});
 });

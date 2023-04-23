@@ -13,6 +13,7 @@ import {
 	ScssForward,
 	tokenizer,
 	Token,
+	ScssPlaceholder,
 } from "../../parser";
 import { applySassDoc } from "../../utils/sassdoc";
 import { getBaseValueFrom, isReferencingVariable } from "../../utils/scss";
@@ -103,6 +104,25 @@ function formatFunctionMarkupContent(
 	return result;
 }
 
+function formatPlaceholderMarkupContent(
+	placeholder: ScssPlaceholder,
+	sourceDocument: IScssDocument,
+): MarkupContent {
+	const result = {
+		kind: MarkupKind.Markdown,
+		value: ["```scss", placeholder.name, "```"].join("\n"),
+	};
+
+	const sassdoc = applySassDoc(placeholder);
+	if (sassdoc) {
+		result.value += `\n____\n${sassdoc}`;
+	}
+
+	result.value += `\n____\nPlaceholder declared in ${sourceDocument.fileName}`;
+
+	return result;
+}
+
 export function doHover(document: TextDocument, offset: number): Hover | null {
 	const { storage } = useContext();
 	const scssDocument = storage.get(document.uri);
@@ -166,6 +186,14 @@ export function doHover(document: TextDocument, offset: number): Hover | null {
 				kind: SymbolKind.Method,
 			};
 
+			break;
+		}
+
+		case NodeType.SelectorPlaceholder: {
+			identifier = {
+				name: hoverNode.getText(),
+				kind: SymbolKind.Class,
+			};
 			break;
 		}
 
@@ -271,6 +299,14 @@ export function doHover(document: TextDocument, offset: number): Hover | null {
 
 				break;
 			}
+
+			case SymbolKind.Class: {
+				contents = formatPlaceholderMarkupContent(
+					symbol as ScssPlaceholder,
+					sourceDocument,
+				);
+				break;
+			}
 			// No default
 		}
 	}
@@ -360,6 +396,14 @@ function doSymbolHunting(
 
 				break;
 			}
+
+			case SymbolKind.Class: {
+				const placeholder = document.placeholders.get(identifier.name);
+				if (placeholder) {
+					return [placeholder, document];
+				}
+			}
+
 			// No default
 		}
 	}
@@ -379,6 +423,14 @@ function traverseTree(
 	}
 
 	for (const symbol of scssDocument.getSymbols()) {
+		if (symbol.kind === SymbolKind.Class) {
+			// Placeholders are not namespaced the same way other symbols are
+			if (symbol.name === identifier.name && symbol.kind === identifier.kind) {
+				return [symbol, scssDocument];
+			}
+			continue;
+		}
+
 		const symbolName = `${accumulatedPrefix}${asDollarlessVariable(
 			symbol.name,
 		)}`;

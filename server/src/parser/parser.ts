@@ -24,6 +24,7 @@ export const reUse = /@use ["'|](?<url>.+)["'|](?: as (?<namespace>\*|\w+))?;/;
 export const reForward =
 	/@forward ["'|](?<url>.+)["'|](?: as (?<prefix>\w+-)\*)?(?: hide (?<hide>.+))?;/;
 export const reImport = /@import ["'|](?<url>.+)["'|]/;
+export const rePlaceholder = /^\s*%(?<name>\w+)/;
 
 const reDynamicPath = /[#*{}]/;
 
@@ -58,6 +59,7 @@ async function findDocumentSymbols(
 		imports: new Map(),
 		uses: new Map(),
 		forwards: new Map(),
+		placeholders: new Map(),
 	};
 
 	const links = await ls.findDocumentLinks2(
@@ -196,7 +198,7 @@ async function findDocumentSymbols(
 		const sassdocParser = await dynamicImport("scss-sassdoc-parser");
 		sassdoc = await sassdocParser.parse(text);
 	} catch (error) {
-		console.error(error);
+		console.error((error as Error).message);
 	}
 
 	const symbols = ls.findDocumentSymbols2(document, ast);
@@ -253,6 +255,25 @@ async function findDocumentSymbols(
 					sassdoc: docs,
 				});
 
+				break;
+			}
+
+			case SymbolKind.Class: {
+				if (symbol.name.startsWith("%")) {
+					const sansPercent = symbol.name.substring(1);
+					const docs = sassdoc.find(
+						(v) =>
+							v.context.name === sansPercent &&
+							v.context.type === "placeholder",
+					);
+					result.placeholders.set(symbol.name, {
+						name: symbol.name,
+						kind: SymbolKind.Class,
+						offset,
+						position,
+						sassdoc: docs,
+					});
+				}
 				break;
 			}
 			// No default

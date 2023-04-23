@@ -159,6 +159,12 @@ function getIdentifier(
 				kind,
 			};
 		}
+	} else if (hoverNode.type === NodeType.SelectorPlaceholder) {
+		return {
+			name: hoverNode.getText(),
+			position: document.positionAt(hoverNode.offset),
+			kind: SymbolKind.Class,
+		};
 	}
 
 	return null;
@@ -205,6 +211,8 @@ export function getDefinitionSymbol(
 
 		if (identifier.kind === SymbolKind.Variable) {
 			symbols = scssDocument.variables.values();
+		} else if (identifier.kind === SymbolKind.Class) {
+			symbols = scssDocument.placeholders.values();
 		} else if (identifier.kind === SymbolKind.Function) {
 			symbols = scssDocument.functions.values();
 		} else {
@@ -236,6 +244,14 @@ function traverseTree(
 	}
 
 	for (const symbol of scssDocument.getSymbols()) {
+		if (symbol.kind === SymbolKind.Class) {
+			// Placeholders are not namespaced the same way other symbols are
+			if (symbol.name === identifier.name && symbol.kind === identifier.kind) {
+				return [symbol, scssDocument];
+			}
+			continue;
+		}
+
 		const symbolName = `${accumulatedPrefix}${asDollarlessVariable(
 			symbol.name,
 		)}`;

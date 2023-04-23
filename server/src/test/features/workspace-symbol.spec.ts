@@ -62,6 +62,18 @@ describe("Providers/WorkspaceSymbol", () => {
 					imports: new Map(),
 					uses: new Map(),
 					forwards: new Map(),
+					placeholders: new Map([
+						[
+							"%alert",
+							{
+								name: "%alert",
+								kind: SymbolKind.Class,
+								parameters: [],
+								offset: 0,
+								position: { line: 1, character: 1 },
+							},
+						],
+					]),
 				},
 				ast,
 			),
@@ -71,11 +83,29 @@ describe("Providers/WorkspaceSymbol", () => {
 	it("searchWorkspaceSymbol - Empty query", async () => {
 		const actual = await searchWorkspaceSymbol("", "");
 
-		strictEqual(actual.length, 3);
+		strictEqual(actual.length, 4);
 	});
 
-	it("searchWorkspaceSymbol - Non-empty query", async () => {
+	it("searchWorkspaceSymbol - query for variable", async () => {
 		const actual = await searchWorkspaceSymbol("$", "");
+
+		strictEqual(actual.length, 1);
+	});
+
+	it("searchWorkspaceSymbol - query for function", async () => {
+		const actual = await searchWorkspaceSymbol("ma", "");
+
+		strictEqual(actual.length, 1);
+	});
+
+	it("searchWorkspaceSymbol - query for mixin", async () => {
+		const actual = await searchWorkspaceSymbol("mi", "");
+
+		strictEqual(actual.length, 1);
+	});
+
+	it("searchWorkspaceSymbol - query for placeholder", async () => {
+		const actual = await searchWorkspaceSymbol("%", "");
 
 		strictEqual(actual.length, 1);
 	});

@@ -82,6 +82,10 @@ export class SomeSassServer {
 
 				workspaceRoot = URI.parse(options.workspace);
 
+				this.connection.console.log(
+					`[Server(${process.pid}) ${workspaceRoot}] Started and initialize received`,
+				);
+
 				return {
 					capabilities: {
 						textDocumentSync: TextDocumentSyncKind.Incremental,

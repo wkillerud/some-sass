@@ -3,7 +3,6 @@ import {
 	Position,
 	Selection,
 	TextEdit,
-	TextEditor,
 	Uri,
 	window,
 	workspace,
@@ -12,6 +11,7 @@ import {
 import type { FileStat, FileType } from "vscode-css-languageservice";
 import {
 	BaseLanguageClient,
+	DocumentSelector,
 	LanguageClientOptions,
 	RequestType,
 	RevealOutputChannelOn,
@@ -34,36 +34,34 @@ export function log(message: string): void {
 	output.appendLine(message);
 }
 
-export function getCurrentWorkspace(
-	editor: TextEditor | undefined,
-): WorkspaceFolder | undefined {
-	if (!editor) {
-		return;
-	}
-
-	const uri = editor.document.uri;
-	return workspace.getWorkspaceFolder(uri);
-}
-
 export function createLanguageClientOptions(
-	currentWorkspace: WorkspaceFolder,
-): LanguageClientOptions | undefined {
-	/**
-	 * The workspace path is used to separate clients in multi-workspace environment.
-	 * Otherwise, each client will participate in each workspace.
-	 */
-	const pattern = `${currentWorkspace.uri.fsPath.replace(/\\/g, "/")}/**`;
-
-	const documentSelector = [
-		{ scheme: "file", language: "scss", pattern },
-		{ scheme: "file", language: "vue", pattern },
-		{ scheme: "file", language: "svelte", pattern },
-		{ scheme: "file", language: "astro", pattern },
-		{ scheme: "vscode-vfs", language: "scss", pattern },
-		{ scheme: "vscode-vfs", language: "vue", pattern },
-		{ scheme: "vscode-vfs", language: "svelte", pattern },
-		{ scheme: "vscode-vfs", language: "astro", pattern },
+	currentWorkspace?: WorkspaceFolder,
+): LanguageClientOptions {
+	let documentSelector: DocumentSelector = [
+		{ scheme: "untitled", language: "scss" },
+		{ scheme: "untitled", language: "vue" },
+		{ scheme: "untitled", language: "svelte" },
+		{ scheme: "untitled", language: "astro" },
 	];
+
+	if (currentWorkspace) {
+		/**
+		 * The workspace path is used to separate clients in multi-workspace environment.
+		 * Otherwise, each client will participate in each workspace.
+		 */
+		const pattern = `${currentWorkspace.uri.fsPath.replace(/\\/g, "/")}/**`;
+
+		documentSelector = [
+			{ scheme: "file", language: "scss", pattern },
+			{ scheme: "file", language: "vue", pattern },
+			{ scheme: "file", language: "svelte", pattern },
+			{ scheme: "file", language: "astro", pattern },
+			{ scheme: "vscode-vfs", language: "scss", pattern },
+			{ scheme: "vscode-vfs", language: "vue", pattern },
+			{ scheme: "vscode-vfs", language: "svelte", pattern },
+			{ scheme: "vscode-vfs", language: "astro", pattern },
+		];
+	}
 
 	const configuration = workspace.getConfiguration(
 		"somesass",
@@ -97,14 +95,16 @@ export function createLanguageClientOptions(
 		documentSelector,
 		synchronize: {
 			configurationSection: ["somesass"],
-			fileEvents: workspace.createFileSystemWatcher({
-				baseUri: currentWorkspace.uri,
-				base: currentWorkspace.uri.fsPath,
-				pattern: "**/*.{scss,vue,svelte,astro}",
-			}),
+			fileEvents: currentWorkspace
+				? workspace.createFileSystemWatcher({
+						baseUri: currentWorkspace.uri,
+						base: currentWorkspace.uri.fsPath,
+						pattern: "**/*.{scss,vue,svelte,astro}",
+				  })
+				: undefined,
 		},
 		initializationOptions: {
-			workspace: currentWorkspace.uri.toString(),
+			workspace: currentWorkspace?.uri.toString(),
 			settings,
 		},
 		diagnosticCollectionName: EXTENSION_ID,
@@ -186,11 +186,14 @@ export function serveFileSystemRequests(
 	});
 }
 
-export function registerCodeActionCommand(client: BaseLanguageClient) {
-	commands.registerCommand(
-		"_somesass.applyExtractCodeAction",
-		applyExtractCodeAction,
-	);
+export async function registerCodeActionCommand(client: BaseLanguageClient) {
+	const existingCommands = await commands.getCommands(true);
+	if (!existingCommands.includes("_somesass.applyExtractCodeAction")) {
+		commands.registerCommand(
+			"_somesass.applyExtractCodeAction",
+			applyExtractCodeAction,
+		);
+	}
 
 	function applyExtractCodeAction(
 		uri: string,

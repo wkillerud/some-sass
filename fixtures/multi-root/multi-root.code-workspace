@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"name": "root",
+			"path": "./"
+		},
+		{
+			"name": "Folder A",
+			"path": "./foldera"
+		},
+		{
+			"name": "Folder B",
+			"path": "./folderb"
+		},
+		{
+			"path": "../e2e"
+		}
+	]
+}

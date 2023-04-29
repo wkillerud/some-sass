@@ -1,6 +1,7 @@
 import {
 	ExtensionContext,
 	ProgressLocation,
+	TextDocument,
 	Uri,
 	window,
 	workspace,
@@ -13,81 +14,124 @@ import {
 } from "vscode-languageclient/browser";
 import {
 	createLanguageClientOptions,
-	getCurrentWorkspace,
 	registerCodeActionCommand,
 	serveFileSystemRequests,
 } from "./client";
 import { EXTENSION_ID, EXTENSION_NAME } from "./constants";
 
+let defaultClient: LanguageClient;
 const clients: Map<string, BaseLanguageClient> = new Map<
 	string,
 	BaseLanguageClient
 >();
 
-export async function activate(context: ExtensionContext): Promise<void> {
-	context.subscriptions.push(
-		window.onDidChangeActiveTextEditor(async (editor) => {
-			const workspace = getCurrentWorkspace(editor);
-			if (workspace === undefined || clients.has(workspace.uri.toString())) {
-				return;
-			}
-			await initializeClient(context, workspace);
-		}),
-		workspace.onDidChangeWorkspaceFolders((event) =>
-			Promise.all(
-				event.removed.map((folder) => clients.get(folder.uri.fsPath)?.stop()),
-			),
-		),
-	);
-
-	const currentWorkspace = getCurrentWorkspace(window.activeTextEditor);
-	if (
-		currentWorkspace === undefined ||
-		clients.has(currentWorkspace.uri.toString())
-	) {
-		return;
+let _sortedWorkspaceFolders: string[] | undefined;
+function sortedWorkspaceFolders(): string[] {
+	if (_sortedWorkspaceFolders === void 0) {
+		_sortedWorkspaceFolders = workspace.workspaceFolders
+			? workspace.workspaceFolders
+					.map((folder) => {
+						let result = folder.uri.toString();
+						if (result.charAt(result.length - 1) !== "/") {
+							result = result + "/";
+						}
+						return result;
+					})
+					.sort((a, b) => {
+						return a.length - b.length;
+					})
+			: [];
 	}
-	await initializeClient(context, currentWorkspace);
+	return _sortedWorkspaceFolders;
+}
+workspace.onDidChangeWorkspaceFolders(
+	() => (_sortedWorkspaceFolders = undefined),
+);
+
+function getOuterMostWorkspaceFolder(folder: WorkspaceFolder): WorkspaceFolder {
+	const sorted = sortedWorkspaceFolders();
+	for (const element of sorted) {
+		let uri = folder.uri.toString();
+		if (uri.charAt(uri.length - 1) !== "/") {
+			uri = uri + "/";
+		}
+		if (uri.startsWith(element)) {
+			const folder = workspace.getWorkspaceFolder(Uri.parse(element));
+			if (folder) {
+				return folder;
+			}
+		}
+	}
+	return folder;
 }
 
-async function initializeClient(
-	context: ExtensionContext,
-	currentWorkspace: WorkspaceFolder,
-): Promise<void> {
-	const clientOptions = createLanguageClientOptions(currentWorkspace);
-	if (!clientOptions) {
-		return;
+export async function activate(context: ExtensionContext): Promise<void> {
+	async function didOpenTextDocument(document: TextDocument): Promise<void> {
+		if (
+			document.languageId !== "scss" ||
+			(document.uri.scheme !== "file" && document.uri.scheme !== "untitled")
+		) {
+			return;
+		}
+
+		const uri = document.uri;
+		// Untitled files go to a default client.
+		if (uri.scheme === "untitled" && !defaultClient) {
+			const defaultOptions = createLanguageClientOptions();
+			defaultClient = createWorkerLanguageClient(context, defaultOptions);
+			defaultClient.start();
+			return;
+		}
+
+		let folder = workspace.getWorkspaceFolder(uri);
+		// Require a workspace folder
+		if (!folder) {
+			return;
+		}
+		// If we have nested workspace folders we only start a server on the outer most workspace folder.
+		folder = getOuterMostWorkspaceFolder(folder);
+		if (!clients.has(folder.uri.toString())) {
+			const clientOptions = createLanguageClientOptions(folder);
+			const client = createWorkerLanguageClient(context, clientOptions);
+
+			await window.withProgress(
+				{
+					title: `[${folder.name}] Starting Some Sass server`,
+					location: ProgressLocation.Window,
+				},
+				async () => {
+					try {
+						client.registerProposedFeatures();
+						await client.start();
+						serveFileSystemRequests(client, {
+							TextDecoder,
+						});
+						registerCodeActionCommand(client);
+					} catch (error: unknown) {
+						await window.showErrorMessage(
+							`Client initialization failed. ${
+								(error as Error).stack ?? "<empty_stack>"
+							}`,
+						);
+					}
+				},
+			);
+			client.start();
+			clients.set(folder.uri.toString(), client);
+		}
 	}
 
-	const client: BaseLanguageClient = createWorkerLanguageClient(
-		context,
-		clientOptions,
-	);
-
-	clients.set(currentWorkspace.uri.toString(), client);
-
-	return await window.withProgress(
-		{
-			title: `[${currentWorkspace.name}] Starting Some Sass server`,
-			location: ProgressLocation.Window,
-		},
-		async () => {
-			try {
-				client.registerProposedFeatures();
-				await client.start();
-				serveFileSystemRequests(client, {
-					TextDecoder,
-				});
-				registerCodeActionCommand(client);
-			} catch (error: unknown) {
-				await window.showErrorMessage(
-					`Client initialization failed. ${
-						(error as Error).stack ?? "<empty_stack>"
-					}`,
-				);
+	workspace.onDidOpenTextDocument(didOpenTextDocument);
+	workspace.textDocuments.forEach(didOpenTextDocument);
+	workspace.onDidChangeWorkspaceFolders((event) => {
+		for (const folder of event.removed) {
+			const client = clients.get(folder.uri.toString());
+			if (client) {
+				clients.delete(folder.uri.toString());
+				client.stop();
 			}
-		},
-	);
+		}
+	});
 }
 
 function createWorkerLanguageClient(
@@ -109,5 +153,12 @@ function createWorkerLanguageClient(
 }
 
 export async function deactivate(): Promise<void> {
-	await Promise.all([...clients.values()].map((client) => client.stop()));
+	const promises: Thenable<void>[] = [];
+	if (defaultClient) {
+		promises.push(defaultClient.stop());
+	}
+	for (const client of clients.values()) {
+		promises.push(client.stop());
+	}
+	return Promise.all(promises).then(() => undefined);
 }

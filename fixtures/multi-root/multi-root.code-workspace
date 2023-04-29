@@ -11,6 +11,9 @@
 		{
 			"name": "Folder B",
 			"path": "./folderb"
+		},
+		{
+			"path": "../e2e"
 		}
 	]
 }

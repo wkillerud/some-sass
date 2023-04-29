@@ -129,6 +129,7 @@ describe("Providers/Completion", () => {
 					uses: new Map(),
 					forwards: new Map(),
 					placeholders: new Map(),
+					placeholderUsages: new Map(),
 				},
 				ast,
 			),

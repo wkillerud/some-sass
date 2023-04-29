@@ -60,6 +60,7 @@ async function findDocumentSymbols(
 		uses: new Map(),
 		forwards: new Map(),
 		placeholders: new Map(),
+		placeholderUsages: new Map(),
 	};
 
 	const links = await ls.findDocumentLinks2(

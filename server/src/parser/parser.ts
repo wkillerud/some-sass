@@ -25,6 +25,7 @@ export const reForward =
 	/@forward ["'|](?<url>.+)["'|](?: as (?<prefix>\w+-)\*)?(?: hide (?<hide>.+))?;/;
 export const reImport = /@import ["'|](?<url>.+)["'|]/;
 export const rePlaceholder = /^\s*%(?<name>\w+)/;
+export const rePlaceholderUsage = /\s*@extend\s+(?<name>%[\w\d-_]+)/;
 
 const reDynamicPath = /[#*{}]/;
 

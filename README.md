@@ -39,6 +39,8 @@ Try documenting your mixins and functions with SassDoc comment blocks.
 
 If you use `%placeholder-selectors`, you will get suggestions for them both when using them and when writing them. All features work with placeholders, including code navigation, SassDoc on hover, and more.
 
+<video src="https://user-images.githubusercontent.com/1223410/235316476-635b727c-a838-45ff-b282-76f821e8fb1d.mp4" data-canonical-src="https://user-images.githubusercontent.com/1223410/235316476-635b727c-a838-45ff-b282-76f821e8fb1d.mp4" controls="controls" muted="muted" class="d-block rounded-bottom-2 border-top width-fit" style="max-height:640px;"></video>
+
 ### Information on hover
 
 Hover over any Sass variables, mixins or functions to see more details about them.

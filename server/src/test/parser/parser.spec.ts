@@ -39,6 +39,7 @@ describe("Services/Parser", () => {
 				'$name: "value";',
 				"@mixin mixin($a: 1, $b) {}",
 				"@function function($a: 1, $b) {}",
+				"%placeholder { color: blue; }",
 			]);
 
 			const symbols = await parseDocument(document, URI.parse(""));
@@ -75,6 +76,26 @@ describe("Services/Parser", () => {
 
 			strictEqual(functions[0]?.parameters[1]?.name, "$b");
 			strictEqual(functions[0]?.parameters[1]?.value, null);
+
+			// Placeholders
+			const placeholders = [...symbols.placeholders.values()];
+			strictEqual(placeholders.length, 1);
+
+			strictEqual(placeholders[0]?.name, "%placeholder");
+		});
+
+		it("should return placeholder usages", async () => {
+			const document = await helpers.makeDocument([
+				".app-asdfqwer1234 {",
+				"	@extend %app !optional;",
+				"}",
+			]);
+
+			const symbols = await parseDocument(document, URI.parse(""));
+			const usages = [...symbols.placeholderUsages.values()];
+			strictEqual(usages.length, 1);
+
+			strictEqual(usages[0]?.name, "%app");
 		});
 
 		it("should return links", async () => {

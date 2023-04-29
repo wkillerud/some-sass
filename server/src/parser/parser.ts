@@ -73,7 +73,12 @@ async function findDocumentSymbols(
 	const text = document.getText();
 	const lines = getLinesFromText(text);
 
-	for (const line of lines) {
+	for (let lineNumber = 0; lineNumber < lines.length; lineNumber++) {
+		const line = lines.at(lineNumber);
+		if (typeof line === "undefined") {
+			continue;
+		}
+
 		for (const link of links) {
 			if (
 				!link.target ||
@@ -186,6 +191,22 @@ async function findDocumentSymbols(
 			}
 
 			continue;
+		}
+
+		if (rePlaceholderUsage.test(line)) {
+			const match = rePlaceholderUsage.exec(line);
+			if (match) {
+				const name = match.groups?.["name"];
+				if (name) {
+					const position = Position.create(lineNumber, line.indexOf(name));
+					result.placeholderUsages.set(name, {
+						name,
+						position,
+						offset: document.offsetAt(position),
+						kind: SymbolKind.Class,
+					});
+				}
+			}
 		}
 	}
 

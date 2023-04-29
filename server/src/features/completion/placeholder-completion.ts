@@ -53,7 +53,10 @@ export function createPlaceholderCompletionItems(
 }
 
 export function createPlaceholderDeclarationCompletionItems(): CompletionItem[] {
-	const uniquePlaceholders = new Map<string, CompletionItem>();
+	const uniquePlaceholders = new Map<
+		string,
+		[CompletionItem, CompletionItem]
+	>();
 
 	const { storage } = useContext();
 	for (const document of storage.values()) {
@@ -64,15 +67,25 @@ export function createPlaceholderDeclarationCompletionItems(): CompletionItem[] 
 			}
 
 			const filterText = usage.name.substring(1);
-			uniquePlaceholders.set(label, {
-				label,
-				kind: CompletionItemKind.Class,
-				filterText,
-				insertText: filterText,
-				insertTextFormat: InsertTextFormat.Snippet,
-			});
+			uniquePlaceholders.set(label, [
+				{
+					label,
+					kind: CompletionItemKind.Class,
+					filterText,
+					insertText: filterText,
+					insertTextFormat: InsertTextFormat.Snippet,
+				},
+				{
+					label,
+					labelDetails: { detail: " { }" },
+					kind: CompletionItemKind.Class,
+					filterText,
+					insertText: filterText + " {\n\t$0\n}",
+					insertTextFormat: InsertTextFormat.Snippet,
+				},
+			]);
 		}
 	}
 
-	return [...uniquePlaceholders.values()];
+	return [...uniquePlaceholders.values()].flat();
 }

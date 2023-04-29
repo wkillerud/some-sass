@@ -416,8 +416,16 @@ describe("Reverse placeholders", () => {
 				insertText: "app",
 			},
 			{
+				label: "%app",
+				labelDetails: { detail: " { }" },
+			},
+			{
 				label: "%chat",
 				insertText: "chat",
+			},
+			{
+				label: "%chat",
+				labelDetails: { detail: " { }" },
 			},
 		];
 

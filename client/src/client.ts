@@ -186,11 +186,14 @@ export function serveFileSystemRequests(
 	});
 }
 
-export function registerCodeActionCommand(client: BaseLanguageClient) {
-	commands.registerCommand(
-		"_somesass.applyExtractCodeAction",
-		applyExtractCodeAction,
-	);
+export async function registerCodeActionCommand(client: BaseLanguageClient) {
+	const existingCommands = await commands.getCommands(true);
+	if (!existingCommands.includes("_somesass.applyExtractCodeAction")) {
+		commands.registerCommand(
+			"_somesass.applyExtractCodeAction",
+			applyExtractCodeAction,
+		);
+	}
 
 	function applyExtractCodeAction(
 		uri: string,

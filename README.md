@@ -5,6 +5,7 @@ Some Sass provides code suggestions, documentation and code navigation for SCSS.
 - Full support for `@use` and `@forward`, including aliases, prefixes and hiding.
 - Workspace-wide code navigation and refactoring, such as Rename Symbol.
 - Rich documentation through [SassDoc](http://sassdoc.com).
+- Language features for `%placeholder-selectors`, both when using them and writing them.
 - Suggestions and hover info for built-in Sass modules, when used with `@use`.
 
 Supports standalone SCSS, as well as style blocks inside Vue, Svelte and Astro components.
@@ -35,6 +36,8 @@ the extension will use that information to autosuggest brackets and move focus i
 Try documenting your mixins and functions with SassDoc comment blocks.
 
 <video src="https://user-images.githubusercontent.com/1223410/209579456-885e965c-2d1f-490a-9d81-77fb145fcc3c.mp4" data-canonical-src="https://user-images.githubusercontent.com/1223410/209579456-885e965c-2d1f-490a-9d81-77fb145fcc3c.mp4" controls="controls" muted="muted" class="d-block rounded-bottom-2 border-top width-fit" style="max-height:640px;"></video>
+
+If you use `%placeholder-selectors`, you will get suggestions for them both when using them and when writing them. All features work with placeholders, including code navigation, SassDoc on hover, and more.
 
 ### Information on hover
 

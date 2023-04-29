@@ -16,6 +16,7 @@ export interface CompletionContext {
 	mixin: boolean;
 	originalExtension: SupportedExtensions;
 	placeholder: boolean;
+	placeholderDeclaration: boolean;
 }
 
 const reReturn = /^.*@return/;
@@ -27,6 +28,7 @@ const reComment = /^(.*\/\/|.*\/\*|\s*\*)/;
 const reSassDoc = /^[\\s]*\/{3}.*$/;
 const reQuotes = /["']/;
 const rePlaceholder = /@extend\s+%/;
+const rePlaceholderDeclaration = /\s*%/;
 const rePartialModuleAtRule = /@(?:use|forward|import) ["']/;
 
 /**
@@ -148,6 +150,8 @@ export function createCompletionContext(
 
 	// Is placeholder, e.g. `@extend %placeholder`
 	const isPlaceholder = rePlaceholder.test(textBeforeWord);
+	const isPlaceholderDeclaration =
+		!isPlaceholder && rePlaceholderDeclaration.test(textBeforeWord);
 
 	// Is namespace, e.g. `namespace.$var` or `@include namespace.mixin` or `namespace.func()`
 	const namespace = checkNamespaceContext(currentWord, isInterpolation);
@@ -186,5 +190,6 @@ export function createCompletionContext(
 		mixin: checkMixinContext(textBeforeWord, isPropertyValue),
 		originalExtension,
 		placeholder: isPlaceholder,
+		placeholderDeclaration: isPlaceholderDeclaration,
 	};
 }

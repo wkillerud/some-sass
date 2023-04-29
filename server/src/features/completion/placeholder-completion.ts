@@ -4,6 +4,7 @@ import {
 	CompletionItemTag,
 	InsertTextFormat,
 } from "vscode-languageserver";
+import { useContext } from "../../context-provider";
 import { type IScssDocument } from "../../parser";
 import { applySassDoc } from "../../utils/sassdoc";
 
@@ -49,4 +50,29 @@ export function createPlaceholderCompletionItems(
 	}
 
 	return completions;
+}
+
+export function createPlaceholderDeclarationCompletionItems(): CompletionItem[] {
+	const uniquePlaceholders = new Map<string, CompletionItem>();
+
+	const { storage } = useContext();
+	for (const document of storage.values()) {
+		for (const usage of document.placeholderUsages.values()) {
+			const label = usage.name;
+			if (uniquePlaceholders.has(label)) {
+				continue;
+			}
+
+			const filterText = usage.name.substring(1);
+			uniquePlaceholders.set(label, {
+				label,
+				kind: CompletionItemKind.Class,
+				filterText,
+				insertText: filterText,
+				insertTextFormat: InsertTextFormat.Snippet,
+			});
+		}
+	}
+
+	return [...uniquePlaceholders.values()];
 }

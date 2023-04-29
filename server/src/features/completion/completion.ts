@@ -20,7 +20,10 @@ import type { CompletionContext } from "./completion-context";
 import { createFunctionCompletionItems } from "./function-completion";
 import { doImportCompletion } from "./import-completion";
 import { createMixinCompletionItems } from "./mixin-completion";
-import { createPlaceholderCompletionItems } from "./placeholder-completion";
+import {
+	createPlaceholderCompletionItems,
+	createPlaceholderDeclarationCompletionItems,
+} from "./placeholder-completion";
 import { doSassDocCompletion } from "./sassdoc-completion";
 import { createVariableCompletionItems } from "./variable-completion";
 
@@ -99,7 +102,17 @@ export async function doCompletion(
 	// (we consider `*` a namespace), we should return an empty list.
 	// An exception is if the user is typing a placeholder.
 	// These are not prefixed with their namespace, even with @use.
-	if (settings.suggestFromUseOnly && !context.placeholder) {
+	if (
+		settings.suggestFromUseOnly &&
+		!context.placeholder &&
+		!context.placeholderDeclaration
+	) {
+		return completions;
+	}
+
+	if (context.placeholderDeclaration) {
+		const usages = createPlaceholderDeclarationCompletionItems();
+		completions.items = completions.items.concat(usages);
 		return completions;
 	}
 
@@ -112,8 +125,8 @@ export async function doCompletion(
 		}
 
 		if (context.placeholder) {
-			const variables = createPlaceholderCompletionItems(scssDocument);
-			completions.items = completions.items.concat(variables);
+			const placeholders = createPlaceholderCompletionItems(scssDocument);
+			completions.items = completions.items.concat(placeholders);
 		}
 
 		if (context.variable) {

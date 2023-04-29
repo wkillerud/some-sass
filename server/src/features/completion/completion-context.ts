@@ -28,7 +28,7 @@ const reComment = /^(.*\/\/|.*\/\*|\s*\*)/;
 const reSassDoc = /^[\\s]*\/{3}.*$/;
 const reQuotes = /["']/;
 const rePlaceholder = /@extend\s+%/;
-const rePlaceholderDeclaration = /\s*%/;
+const rePlaceholderDeclaration = /\s*%$/;
 const rePartialModuleAtRule = /@(?:use|forward|import) ["']/;
 
 /**

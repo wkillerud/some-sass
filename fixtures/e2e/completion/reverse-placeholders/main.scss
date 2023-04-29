@@ -1,0 +1,5 @@
+@use "./theme";
+
+.app-asdfqwer1234 {
+  @extend %app !optional;
+}

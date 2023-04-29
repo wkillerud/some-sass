@@ -400,3 +400,35 @@ describe("Placeholders", () => {
 		await testCompletion(docUri, position(13, 15), expectedCompletions);
 	});
 });
+
+describe("Reverse placeholders", () => {
+	const docUri = getDocUri("completion/reverse-placeholders/_theme.scss");
+
+	before(async () => {
+		await showFile(docUri);
+		await sleepCI();
+	});
+
+	it("Offers completions for placeholder usages when implementing a placeholder selector", async () => {
+		const expectedCompletions = [
+			{
+				label: "%app",
+				insertText: "app",
+			},
+			{
+				label: "%app",
+				labelDetails: { detail: " { }" },
+			},
+			{
+				label: "%chat",
+				insertText: "chat",
+			},
+			{
+				label: "%chat",
+				labelDetails: { detail: " { }" },
+			},
+		];
+
+		await testCompletion(docUri, position(1, 2), expectedCompletions);
+	});
+});

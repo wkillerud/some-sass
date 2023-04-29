@@ -74,6 +74,7 @@ describe("Providers/Hover", () => {
 					uses: new Map(),
 					forwards: new Map(),
 					placeholders: new Map(),
+					placeholderUsages: new Map(),
 				},
 				ast,
 			),

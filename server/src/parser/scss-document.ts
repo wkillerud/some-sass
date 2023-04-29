@@ -14,6 +14,7 @@ import type {
 	ScssLink,
 	ScssMixin,
 	ScssPlaceholder,
+	ScssPlaceholderUsage,
 	ScssSymbol,
 	ScssUse,
 	ScssVariable,
@@ -32,6 +33,7 @@ export class ScssDocument implements IScssDocument {
 	public mixins: Map<string, ScssMixin> = new Map();
 	public functions: Map<string, ScssFunction> = new Map();
 	public placeholders: Map<string, ScssPlaceholder> = new Map();
+	public placeholderUsages: Map<string, ScssPlaceholderUsage> = new Map();
 
 	private fs: FileSystemProvider;
 	private realPath: string | null = null;
@@ -53,6 +55,7 @@ export class ScssDocument implements IScssDocument {
 		this.mixins = symbols.mixins;
 		this.functions = symbols.functions;
 		this.placeholders = symbols.placeholders;
+		this.placeholderUsages = symbols.placeholderUsages;
 		this.fileName = this.getFileName();
 	}
 

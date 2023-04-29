@@ -1,0 +1,9 @@
+@use "./theme";
+
+.app-asdfqwer1234 {
+  @extend %app !optional;
+}
+
+.chat-qwerasdf1234 {
+  @extend %chat !optional;
+}

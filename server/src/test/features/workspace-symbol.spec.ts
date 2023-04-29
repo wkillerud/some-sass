@@ -74,6 +74,7 @@ describe("Providers/WorkspaceSymbol", () => {
 							},
 						],
 					]),
+					placeholderUsages: new Map(),
 				},
 				ast,
 			),

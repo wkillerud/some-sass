@@ -3,7 +3,13 @@ import { stub, SinonStub } from "sinon";
 import { FileType } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
 import { useContext } from "../../context-provider";
-import { parseDocument, reForward, reModuleAtRule, reUse } from "../../parser";
+import {
+	parseDocument,
+	reForward,
+	reModuleAtRule,
+	rePlaceholderUsage,
+	reUse,
+} from "../../parser";
 import * as helpers from "../helpers";
 
 describe("Services/Parser", () => {
@@ -33,6 +39,7 @@ describe("Services/Parser", () => {
 				'$name: "value";',
 				"@mixin mixin($a: 1, $b) {}",
 				"@function function($a: 1, $b) {}",
+				"%placeholder { color: blue; }",
 			]);
 
 			const symbols = await parseDocument(document, URI.parse(""));
@@ -69,6 +76,26 @@ describe("Services/Parser", () => {
 
 			strictEqual(functions[0]?.parameters[1]?.name, "$b");
 			strictEqual(functions[0]?.parameters[1]?.value, null);
+
+			// Placeholders
+			const placeholders = [...symbols.placeholders.values()];
+			strictEqual(placeholders.length, 1);
+
+			strictEqual(placeholders[0]?.name, "%placeholder");
+		});
+
+		it("should return placeholder usages", async () => {
+			const document = await helpers.makeDocument([
+				".app-asdfqwer1234 {",
+				"	@extend %app !optional;",
+				"}",
+			]);
+
+			const symbols = await parseDocument(document, URI.parse(""));
+			const usages = [...symbols.placeholderUsages.values()];
+			strictEqual(usages.length, 1);
+
+			strictEqual(usages[0]?.name, "%app");
 		});
 
 		it("should return links", async () => {
@@ -348,6 +375,47 @@ describe("Services/Parser", () => {
 			strictEqual(
 				match!.groups!["hide"] as string,
 				"$varslingsfarger, varslingsfarge",
+			);
+		});
+
+		it("for placeholder usages", () => {
+			strictEqual(
+				rePlaceholderUsage.exec("@extend %app;")!.groups!["name"],
+				"%app",
+				"should match a basic usage with space",
+			);
+
+			strictEqual(
+				rePlaceholderUsage.exec("@extend	%app-name;")!.groups!["name"],
+				"%app-name",
+				"should match a basic usage with tab",
+			);
+
+			strictEqual(
+				rePlaceholderUsage.exec("@extend %spacing-2;")!.groups!["name"],
+				"%spacing-2",
+				"should match a basic usage with non-breaking space",
+			);
+
+			strictEqual(
+				rePlaceholderUsage.exec("@extend %placeholder !optional;")!.groups![
+					"name"
+				],
+				"%placeholder",
+				"should match optional",
+			);
+
+			strictEqual(
+				rePlaceholderUsage.exec("			@extend %down_low;")!.groups!["name"],
+				"%down_low",
+				"should match with indent",
+			);
+
+			strictEqual(
+				rePlaceholderUsage.exec(".app-asdfqwer1234 { @extend %placeholder;")!
+					.groups!["name"],
+				"%placeholder",
+				"should match on same line as class",
 			);
 		});
 	});

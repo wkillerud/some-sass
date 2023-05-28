@@ -51,6 +51,7 @@ export function makeSettings(options?: Partial<ISettings>): ISettings {
 	return {
 		scannerDepth: 30,
 		scannerExclude: ["**/.git", "**/node_modules", "**/bower_components"],
+		suggestionStyle: "all",
 		scanImportedFiles: true,
 		suggestAllFromOpenDocument: false,
 		suggestFromUseOnly: false,

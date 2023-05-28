@@ -9,6 +9,7 @@ import type {
 	CompletionItemLabelDetails,
 } from "vscode-languageserver";
 import type { TextDocument } from "vscode-languageserver-textdocument";
+import { useContext } from "../../context-provider";
 import type { IScssDocument, ScssMixin } from "../../parser";
 import { applySassDoc } from "../../utils/sassdoc";
 import type { CompletionContext } from "./completion-context";
@@ -149,26 +150,33 @@ function makeMixinCompletion(
 	mixin: ScssMixin,
 	documentation: string,
 ): void {
-	completions.push({
-		label,
-		labelDetails,
-		filterText,
-		sortText,
-		kind: CompletionItemKind.Snippet,
-		detail,
-		insertTextFormat: InsertTextFormat.Snippet,
-		insertText,
-		tags: mixin.sassdoc?.deprecated ? [CompletionItemTag.Deprecated] : [],
-		documentation: {
-			kind: MarkupKind.Markdown,
-			value: documentation,
-		},
-	});
+	const context = useContext();
+
+	if (context?.settings?.suggestionStyle !== "bracket") {
+		completions.push({
+			label,
+			labelDetails,
+			filterText,
+			sortText,
+			kind: CompletionItemKind.Snippet,
+			detail,
+			insertTextFormat: InsertTextFormat.Snippet,
+			insertText,
+			tags: mixin.sassdoc?.deprecated ? [CompletionItemTag.Deprecated] : [],
+			documentation: {
+				kind: MarkupKind.Markdown,
+				value: documentation,
+			},
+		});
+	}
 
 	// Not all mixins have @content, but when they do, be smart about adding brackets
 	// and move the cursor to be ready to add said contents.
 	// Include as separate suggestion since content may not always be needed or wanted.
-	if (mixin.sassdoc?.content) {
+	if (
+		mixin.sassdoc?.content &&
+		context?.settings?.suggestionStyle !== "nobracket"
+	) {
 		const details = { ...labelDetails };
 		details.detail = details.detail ? `${details.detail} { }` : " { }";
 		completions.push({

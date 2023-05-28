@@ -151,6 +151,19 @@ There will unfortunately be duplicates.
 - JSON key: `somesass.suggestAllFromOpenDocument`
 - Default value: `false`.
 
+#### Suggestion style
+
+Mixins with `@content` SassDoc annotations and `%placeholders` get two suggestions by default:
+
+- One without `{ }`.
+- One _with_ `{ }`. This one creates a new block, and moves the cursor inside the block.
+
+If you find this noisy, you can control which suggestions you would like to see:
+
+- All suggestions (default).
+- No brackets.
+- Only brackets. This still includes other suggestions, where there are no brackets to begin with.
+
 #### Decide when function suggestions should kick in
 
 Suggest functions after the specified symbols when in a string context.

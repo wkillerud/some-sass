@@ -2,7 +2,7 @@
 	"name": "some-sass",
 	"displayName": "Some Sass: extended support for SCSS and SassDoc",
 	"description": "Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
-	"version": "2.12.0",
+	"version": "2.13.0",
 	"publisher": "SomewhatStationery",
 	"license": "MIT",
 	"engines": {
@@ -61,6 +61,26 @@
 					"default": true,
 					"deprecationMessage": "Will be removed at some point after `@import` becomes CSS-only.",
 					"description": "Allows scan imported files. Turning this off will severely limit functionality, and is not recommended."
+				},
+				"somesass.suggestionStyle": {
+					"type": "string",
+					"default": "all",
+					"description": "Controls the style of suggestions for mixins and placeholders.",
+					"enum": [
+						"all",
+						"nobracket",
+						"bracket"
+					],
+					"enumItemLabels": [
+						"All",
+						"No brackets",
+						"Only brackets"
+					],
+					"enumDescriptions": [
+						"Show all suggestions",
+						"Only show suggestions without brackets",
+						"Where brackets are suggested, omit duplicates without brackets"
+					]
 				},
 				"somesass.suggestAllFromOpenDocument": {
 					"type": "boolean",

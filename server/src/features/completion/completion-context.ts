@@ -151,7 +151,7 @@ export function createCompletionContext(
 	const isPlaceholder = rePlaceholder.test(textBeforeWord);
 	const isPlaceholderDeclaration =
 		!isPlaceholder &&
-		(/\s+%$/.test(textBeforeWord) || /^%$/.test(textBeforeWord));
+		(/\s+%/.test(textBeforeWord) || /^%/.test(textBeforeWord));
 
 	// Is namespace, e.g. `namespace.$var` or `@include namespace.mixin` or `namespace.func()`
 	const namespace = checkNamespaceContext(currentWord, isInterpolation);

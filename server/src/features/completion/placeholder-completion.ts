@@ -55,10 +55,10 @@ export function createPlaceholderCompletionItems(
 export function createPlaceholderDeclarationCompletionItems(): CompletionItem[] {
 	const uniquePlaceholders = new Map<
 		string,
-		[CompletionItem, CompletionItem]
+		[CompletionItem | undefined, CompletionItem | undefined]
 	>();
 
-	const { storage } = useContext();
+	const { storage, settings } = useContext();
 	for (const document of storage.values()) {
 		for (const usage of document.placeholderUsages.values()) {
 			const label = usage.name;
@@ -68,24 +68,30 @@ export function createPlaceholderDeclarationCompletionItems(): CompletionItem[] 
 
 			const filterText = usage.name.substring(1);
 			uniquePlaceholders.set(label, [
-				{
-					label,
-					kind: CompletionItemKind.Class,
-					filterText,
-					insertText: filterText,
-					insertTextFormat: InsertTextFormat.Snippet,
-				},
-				{
-					label,
-					labelDetails: { detail: " { }" },
-					kind: CompletionItemKind.Class,
-					filterText,
-					insertText: filterText + " {\n\t$0\n}",
-					insertTextFormat: InsertTextFormat.Snippet,
-				},
+				settings.suggestionStyle !== "bracket"
+					? {
+							label,
+							kind: CompletionItemKind.Class,
+							filterText,
+							insertText: filterText,
+							insertTextFormat: InsertTextFormat.Snippet,
+					  }
+					: undefined,
+				settings.suggestionStyle !== "nobracket"
+					? {
+							label,
+							labelDetails: { detail: " { }" },
+							kind: CompletionItemKind.Class,
+							filterText,
+							insertText: filterText + " {\n\t$0\n}",
+							insertTextFormat: InsertTextFormat.Snippet,
+					  }
+					: undefined,
 			]);
 		}
 	}
 
-	return [...uniquePlaceholders.values()].flat();
+	return [...uniquePlaceholders.values()]
+		.flat()
+		.filter((p) => typeof p !== "undefined") as CompletionItem[];
 }

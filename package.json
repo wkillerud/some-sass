@@ -62,6 +62,26 @@
 					"deprecationMessage": "Will be removed at some point after `@import` becomes CSS-only.",
 					"description": "Allows scan imported files. Turning this off will severely limit functionality, and is not recommended."
 				},
+				"somesass.suggestionStyle": {
+					"type": "string",
+					"default": "all",
+					"description": "Controls the style of suggestions for mixins and placeholders.",
+					"enum": [
+						"all",
+						"nobracket",
+						"bracket"
+					],
+					"enumItemLabels": [
+						"All",
+						"No brackets",
+						"Only brackets"
+					],
+					"enumDescriptions": [
+						"Show all suggestions",
+						"Only show suggestions without brackets",
+						"Where brackets are suggested, omit duplicates without brackets"
+					]
+				},
 				"somesass.suggestAllFromOpenDocument": {
 					"type": "boolean",
 					"default": false,

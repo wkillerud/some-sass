@@ -79,6 +79,9 @@ export function createLanguageClientOptions(
 		scanImportedFiles:
 			configuration.get<boolean>("scanImportedFiles") ||
 			defaultSettings.scanImportedFiles,
+		suggestionStyle:
+			configuration.get<"all" | "bracket" | "nobracket">("suggestionStyle") ||
+			defaultSettings.suggestionStyle,
 		suggestAllFromOpenDocument:
 			configuration.get<boolean>("suggestAllFromOpenDocument") ||
 			defaultSettings.suggestAllFromOpenDocument,

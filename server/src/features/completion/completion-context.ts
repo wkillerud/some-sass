@@ -131,13 +131,43 @@ export function createCompletionContext(
 	offset: number,
 	settings: ISettings,
 ): CompletionContext {
-	const currentWord = getCurrentWord(text, offset);
+	const word = getCurrentWord(text, offset);
 	const textBeforeWord = getTextBeforePosition(text, offset);
+	const lastDot = document.uri.lastIndexOf(".");
+	const originalExtension = document.uri.slice(
+		Math.max(0, lastDot + 1),
+	) as SupportedExtensions;
 
-	const isImport = rePartialModuleAtRule.test(textBeforeWord);
+	const result: CompletionContext = {
+		word,
+		textBeforeWord,
+		originalExtension,
+		comment: false,
+		sassDoc: false,
+		namespace: null,
+		import: false,
+		variable: false,
+		function: false,
+		mixin: false,
+		placeholder: false,
+		placeholderDeclaration: false,
+	};
+
+	result.import = rePartialModuleAtRule.test(textBeforeWord);
+	if (result.import) {
+		return result;
+	}
+
+	result.comment = isCommentContext(textBeforeWord);
+	result.sassDoc = isSassDocContext(textBeforeWord);
+	if (result.comment || result.sassDoc) {
+		return result;
+	}
 
 	// Is "#{INTERPOLATION}"
-	const isInterpolation = isInterpolationContext(currentWord);
+	const isInterpolation = isInterpolationContext(word);
+	// Is namespace, e.g. `namespace.$var` or `@include namespace.mixin` or `namespace.func()`
+	result.namespace = checkNamespaceContext(word, isInterpolation);
 
 	// Information about current position
 	const isReturn = reReturn.test(textBeforeWord);
@@ -147,49 +177,44 @@ export function createCompletionContext(
 		textBeforeWord.replace(reQuotedValueInString, ""),
 	);
 
+	result.variable = checkVariableContext(
+		word,
+		isInterpolation,
+		isPropertyValue,
+		isEmptyValue,
+		isQuotes,
+		isReturn,
+		Boolean(result.namespace),
+	);
+	result.function = checkFunctionContext(
+		textBeforeWord,
+		isInterpolation,
+		isPropertyValue,
+		isEmptyValue,
+		isQuotes,
+		isReturn,
+		Boolean(result.namespace),
+		settings,
+	);
+	result.mixin = checkMixinContext(textBeforeWord, isPropertyValue);
+
+	if (result.variable || result.function || result.mixin) {
+		return result;
+	}
+
 	// Is placeholder, e.g. `@extend %placeholder`
-	const isPlaceholder = rePlaceholder.test(textBeforeWord);
-	const isPlaceholderDeclaration =
-		!isPlaceholder &&
+	result.placeholder = rePlaceholder.test(textBeforeWord);
+	if (result.placeholder) {
+		return result;
+	}
+
+	result.placeholderDeclaration =
+		!result.placeholder &&
 		(/\s+%/.test(textBeforeWord) || /^%/.test(textBeforeWord));
 
-	// Is namespace, e.g. `namespace.$var` or `@include namespace.mixin` or `namespace.func()`
-	const namespace = checkNamespaceContext(currentWord, isInterpolation);
+	if (result.placeholderDeclaration) {
+		return result;
+	}
 
-	const lastDot = document.uri.lastIndexOf(".");
-	const originalExtension = document.uri.slice(
-		Math.max(0, lastDot + 1),
-	) as SupportedExtensions;
-
-	return {
-		word: currentWord,
-		textBeforeWord,
-		comment: isCommentContext(textBeforeWord),
-		sassDoc: isSassDocContext(textBeforeWord),
-		namespace,
-		import: isImport,
-		variable: checkVariableContext(
-			currentWord,
-			isInterpolation,
-			isPropertyValue,
-			isEmptyValue,
-			isQuotes,
-			isReturn,
-			Boolean(namespace),
-		),
-		function: checkFunctionContext(
-			textBeforeWord,
-			isInterpolation,
-			isPropertyValue,
-			isEmptyValue,
-			isQuotes,
-			isReturn,
-			Boolean(namespace),
-			settings,
-		),
-		mixin: checkMixinContext(textBeforeWord, isPropertyValue),
-		originalExtension,
-		placeholder: isPlaceholder,
-		placeholderDeclaration: isPlaceholderDeclaration,
-	};
+	return result;
 }

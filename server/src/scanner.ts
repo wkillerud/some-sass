@@ -54,7 +54,7 @@ export default class ScannerService {
 			return;
 		}
 
-		const alreadyParsed = storage.get(uri);
+		const alreadyParsed = storage.has(uri);
 		if (alreadyParsed) {
 			// The same file may be referenced by multiple other files,
 			// so skip doing the parsing work if it's already been done.

@@ -636,4 +636,6 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 		},
 	});
 
-export const sassBuiltInModuleNames: string[] = Object.keys(sassBuiltInModules);
+export const sassBuiltInModuleNames: Set<string> = new Set(
+	Object.keys(sassBuiltInModules),
+);

@@ -4,9 +4,10 @@ import type { Position } from "vscode-languageserver-textdocument";
 type Region = [number, number];
 
 export function isFileWhereScssCanBeEmbedded(path: string) {
-	return (
-		path.endsWith(".vue") || path.endsWith(".svelte") || path.endsWith(".astro")
-	);
+	if (path.endsWith(".scss")) {
+		return false;
+	}
+	return true;
 }
 
 export function getSCSSRegions(content: string) {

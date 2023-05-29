@@ -15,11 +15,6 @@ describe("Utils/VueSvelte", () => {
 			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.scss.vue"),
 			true,
 		);
-		strictEqual(
-			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.vue.ts"),
-			false,
-		);
-		strictEqual(isFileWhereScssCanBeEmbedded("sdasdsa/sdadsf.ts"), false);
 		strictEqual(isFileWhereScssCanBeEmbedded("sda.vue/AppButton.scss"), false);
 		strictEqual(
 			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.vue.scss"),
@@ -30,10 +25,6 @@ describe("Utils/VueSvelte", () => {
 		strictEqual(
 			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.scss.svelte"),
 			true,
-		);
-		strictEqual(
-			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.svelte.ts"),
-			false,
 		);
 		strictEqual(
 			isFileWhereScssCanBeEmbedded("sda.svelte/AppButton.scss"),
@@ -48,10 +39,6 @@ describe("Utils/VueSvelte", () => {
 		strictEqual(
 			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.scss.astro"),
 			true,
-		);
-		strictEqual(
-			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.astro.ts"),
-			false,
 		);
 		strictEqual(
 			isFileWhereScssCanBeEmbedded("sda.astro/AppButton.scss"),

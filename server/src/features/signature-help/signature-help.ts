@@ -210,11 +210,7 @@ export async function doSignatureHelp(
 
 					signatureInfo.documentation = {
 						kind: MarkupKind.Markdown,
-						value: [
-							description,
-							"",
-							`[Sass reference](${reference}#${name})`,
-						].join("\n"),
+						value: `${description}\n\n[Sass reference](${reference}#${name})`,
 					};
 
 					if (signature) {

@@ -99,7 +99,7 @@ function createSassBuiltInCompletionItems(completions: CompletionItem[]): void {
 			label: moduleName,
 			documentation: {
 				kind: MarkupKind.Markdown,
-				value: [summary, "", `[Sass reference](${reference})`].join("\n"),
+				value: `${summary}\n\n[Sass reference](${reference})`,
 			},
 		});
 	}

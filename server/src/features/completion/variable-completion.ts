@@ -33,8 +33,17 @@ export function createVariableCompletionItems(
 			? CompletionItemKind.Color
 			: CompletionItemKind.Variable;
 
-		let documentation = color || value || "";
-		let detail = `Variable declared in ${scssDocument.fileName}`;
+		let documentation =
+			color ||
+			[
+				"```scss",
+				`${variable.name}: ${value};${
+					value !== variable.value ? ` // via ${variable.value}` : ""
+				}`,
+				"```",
+			].join("\n") ||
+			"";
+		let detail = undefined;
 
 		let label = variable.name;
 		let sortText;
@@ -43,7 +52,7 @@ export function createVariableCompletionItems(
 
 		if (variable.mixin) {
 			// Add 'argument from MIXIN_NAME' suffix if Variable is Mixin argument
-			detail = `Argument from ${variable.mixin}, ${detail.toLowerCase()}`;
+			detail = `Argument from ${variable.mixin}`;
 		} else {
 			const isPrivate = variable.name.match(rePrivate);
 			const isFromCurrentDocument = scssDocument.uri === currentDocument.uri;
@@ -62,9 +71,11 @@ export function createVariableCompletionItems(
 
 			const sassdoc = applySassDoc(variable);
 			if (sassdoc) {
-				documentation += `\n\n${sassdoc}`;
+				documentation += `\n____\n${sassdoc}`;
 			}
 		}
+
+		documentation += `\n____\nVariable declared in ${scssDocument.fileName}`;
 
 		const isEmbedded = context.originalExtension !== "scss";
 		if (context.namespace) {

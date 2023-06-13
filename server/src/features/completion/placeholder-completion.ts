@@ -23,9 +23,7 @@ export function createPlaceholderCompletionItems(
 		const filterText = placeholder.name.substring(1);
 
 		let documentation = placeholder.name;
-		const sassdoc = applySassDoc(placeholder, {
-			displayOptions: { description: true, deprecated: true },
-		});
+		const sassdoc = applySassDoc(placeholder);
 		if (sassdoc) {
 			documentation += `\n____\n${sassdoc}`;
 		}

@@ -1,16 +1,59 @@
-import type { ScssMixin, ScssParameter } from "../../parser";
+import { MarkupContent, MarkupKind } from "vscode-languageserver";
+import type {
+	IScssDocument,
+	ScssFunction,
+	ScssMixin,
+	ScssParameter,
+} from "../../parser";
+import { applySassDoc } from "../../utils/sassdoc";
 import { asDollarlessVariable } from "../../utils/string";
 
 export const rePrivate = /^\$?[_-].*$/;
 
-/**
- * Return Mixin as string.
- */
-export function makeMixinDocumentation(symbol: ScssMixin): string {
-	const args = symbol.parameters
+export function makeMixinDocumentation(
+	mixin: ScssMixin,
+	sourceDocument: IScssDocument,
+): MarkupContent {
+	const args = mixin.parameters
 		.map((item) => `${item.name}: ${item.value}`)
 		.join(", ");
-	return `${symbol.name}(${args})`;
+
+	const result = {
+		kind: MarkupKind.Markdown,
+		value: ["```scss", `@mixin ${mixin.name}(${args})`, "```"].join("\n"),
+	};
+
+	const sassdoc = applySassDoc(mixin);
+	if (sassdoc) {
+		result.value += `\n____\n${sassdoc}`;
+	}
+
+	result.value += `\n____\nMixin declared in ${sourceDocument.fileName}`;
+
+	return result;
+}
+
+export function makeFunctionDocumentation(
+	func: ScssFunction,
+	sourceDocument: IScssDocument,
+): MarkupContent {
+	const args = func.parameters
+		.map((item) => `${item.name}: ${item.value}`)
+		.join(", ");
+
+	const result = {
+		kind: MarkupKind.Markdown,
+		value: ["```scss", `@function ${func.name}(${args})`, "```"].join("\n"),
+	};
+
+	const sassdoc = applySassDoc(func);
+	if (sassdoc) {
+		result.value += `\n____\n${sassdoc}`;
+	}
+
+	result.value += `\n____\nFunction declared in ${sourceDocument.fileName}`;
+
+	return result;
 }
 
 /**

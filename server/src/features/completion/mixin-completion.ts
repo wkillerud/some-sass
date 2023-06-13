@@ -2,7 +2,7 @@ import {
 	CompletionItemKind,
 	CompletionItemTag,
 	InsertTextFormat,
-	MarkupKind,
+	MarkupContent,
 } from "vscode-languageserver";
 import type {
 	CompletionItem,
@@ -11,7 +11,6 @@ import type {
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import { useContext } from "../../context-provider";
 import type { IScssDocument, ScssMixin } from "../../parser";
-import { applySassDoc } from "../../utils/sassdoc";
 import type { CompletionContext } from "./completion-context";
 import {
 	makeMixinDocumentation,
@@ -41,18 +40,7 @@ export function createMixinCompletionItems(
 			continue;
 		}
 
-		let documentation = makeMixinDocumentation(mixin);
-		const sassdoc = applySassDoc(mixin, {
-			displayOptions: {
-				content: true,
-				description: true,
-				deprecated: true,
-				output: true,
-			},
-		});
-		if (sassdoc) {
-			documentation += `\n____\n${sassdoc}`;
-		}
+		const documentation = makeMixinDocumentation(mixin, scssDocument);
 
 		// Client needs the namespace as part of the text that is matched,
 		// and inserted text needs to include the `.` which will otherwise
@@ -71,7 +59,6 @@ export function createMixinCompletionItems(
 				: `${prefix}${mixin.name}`
 			: mixin.name;
 		const sortText = isPrivate ? label.replace(/^$[_-]/, "") : undefined;
-		const detail = `Mixin declared in ${scssDocument.fileName}`;
 
 		// Use the SnippetString syntax to provide smart completions of parameter names
 		const labelDetails: CompletionItemLabelDetails | undefined = undefined;
@@ -84,7 +71,6 @@ export function createMixinCompletionItems(
 				labelDetails,
 				filterText,
 				sortText,
-				detail,
 				insertText,
 				mixin,
 				documentation,
@@ -106,7 +92,6 @@ export function createMixinCompletionItems(
 				},
 				filterText,
 				sortText,
-				detail,
 				`${insertText}(${parametersSnippet})`,
 				mixin,
 				documentation,
@@ -128,7 +113,6 @@ export function createMixinCompletionItems(
 				},
 				filterText,
 				sortText,
-				detail,
 				`${insertText}(${parametersSnippet})`,
 				mixin,
 				documentation,
@@ -145,10 +129,9 @@ function makeMixinCompletion(
 	labelDetails: CompletionItemLabelDetails | undefined,
 	filterText: string,
 	sortText: string | undefined,
-	detail: string,
 	insertText: string,
 	mixin: ScssMixin,
-	documentation: string,
+	documentation: MarkupContent,
 ): void {
 	const context = useContext();
 
@@ -159,14 +142,10 @@ function makeMixinCompletion(
 			filterText,
 			sortText,
 			kind: CompletionItemKind.Snippet,
-			detail,
 			insertTextFormat: InsertTextFormat.Snippet,
 			insertText,
 			tags: mixin.sassdoc?.deprecated ? [CompletionItemTag.Deprecated] : [],
-			documentation: {
-				kind: MarkupKind.Markdown,
-				value: documentation,
-			},
+			documentation,
 		});
 	}
 
@@ -185,14 +164,10 @@ function makeMixinCompletion(
 			filterText,
 			sortText,
 			kind: CompletionItemKind.Snippet,
-			detail,
 			insertTextFormat: InsertTextFormat.Snippet,
 			insertText: (insertText += " {\n\t$0\n}"),
 			tags: mixin.sassdoc.deprecated ? [CompletionItemTag.Deprecated] : [],
-			documentation: {
-				kind: MarkupKind.Markdown,
-				value: documentation,
-			},
+			documentation,
 		});
 	}
 }

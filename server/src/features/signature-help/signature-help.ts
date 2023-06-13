@@ -210,11 +210,7 @@ export async function doSignatureHelp(
 
 					signatureInfo.documentation = {
 						kind: MarkupKind.Markdown,
-						value: [
-							description,
-							"",
-							`[Sass reference](${reference}#${name})`,
-						].join("\n"),
+						value: `${description}\n\n[Sass reference](${reference}#${name})`,
 					};
 
 					if (signature) {
@@ -243,14 +239,7 @@ export async function doSignatureHelp(
 			`${symbol.name} (${paramsString})`,
 		);
 
-		const sassdoc = applySassDoc(symbol, {
-			displayOptions: {
-				description: true,
-				deprecated: true,
-				return: true,
-				parameter: true,
-			},
-		});
+		const sassdoc = applySassDoc(symbol);
 
 		signatureInfo.documentation = {
 			kind: MarkupKind.Markdown,

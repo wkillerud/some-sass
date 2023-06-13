@@ -14,6 +14,10 @@ export default class StorageService {
 		return this.storage.get(this.toKey(key));
 	}
 
+	public has(key: StorageItemKey | URI): boolean {
+		return this.storage.has(this.toKey(key));
+	}
+
 	public set(key: StorageItemKey | URI, value: StorageItemValue): void {
 		this.storage.set(this.toKey(key), value);
 	}

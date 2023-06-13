@@ -3,10 +3,7 @@ import { URI } from "vscode-uri";
 import { useContext } from "./context-provider";
 import type { ScssImport } from "./parser";
 import { parseDocument } from "./parser";
-import {
-	getSCSSRegionsDocument,
-	isFileWhereScssCanBeEmbedded,
-} from "./utils/embedded";
+import { getSCSSRegionsDocument } from "./utils/embedded";
 
 export default class ScannerService {
 	public async scan(files: URI[], workspaceRoot: URI): Promise<void> {
@@ -32,12 +29,15 @@ export default class ScannerService {
 		document: TextDocument,
 		workspaceRoot: URI,
 	): Promise<void> {
-		const scssRegions = this.getScssRegionsOfDocument(document);
-		if (!scssRegions) {
+		const scssRegions = getSCSSRegionsDocument(document);
+		if (!scssRegions.document) {
 			return;
 		}
 
-		const scssDocument = await parseDocument(scssRegions, workspaceRoot);
+		const scssDocument = await parseDocument(
+			scssRegions.document,
+			workspaceRoot,
+		);
 		const { storage } = useContext();
 		storage.set(scssDocument.uri, scssDocument);
 	}
@@ -54,7 +54,7 @@ export default class ScannerService {
 			return;
 		}
 
-		const alreadyParsed = storage.get(uri);
+		const alreadyParsed = storage.has(uri);
 		if (alreadyParsed) {
 			// The same file may be referenced by multiple other files,
 			// so skip doing the parsing work if it's already been done.
@@ -65,12 +65,15 @@ export default class ScannerService {
 		try {
 			const content = await fs.readFile(uri);
 			const document = TextDocument.create(uri.toString(), "scss", 1, content);
-			const scssRegions = this.getScssRegionsOfDocument(document);
-			if (!scssRegions) {
+			const scssRegions = getSCSSRegionsDocument(document);
+			if (!scssRegions.document) {
 				return;
 			}
 
-			const scssDocument = await parseDocument(scssRegions, workspaceRoot);
+			const scssDocument = await parseDocument(
+				scssRegions.document,
+				workspaceRoot,
+			);
 			storage.set(scssDocument.uri, scssDocument);
 
 			const maxDepth = settings.scannerDepth ?? 30;
@@ -101,20 +104,5 @@ export default class ScannerService {
 			console.error((error as Error).message);
 			// Something went wrong parsing this file. Try to parse the others.
 		}
-	}
-
-	protected getScssRegionsOfDocument(
-		document: TextDocument,
-	): TextDocument | null {
-		if (isFileWhereScssCanBeEmbedded(document.uri)) {
-			const regions = getSCSSRegionsDocument(document);
-			if (regions.document) {
-				return regions.document;
-			}
-
-			return null;
-		}
-
-		return document;
 	}
 }

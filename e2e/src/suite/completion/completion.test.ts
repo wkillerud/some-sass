@@ -61,7 +61,6 @@ describe("SCSS Completion Test", function () {
 		let expectedCompletions = [
 			{
 				label: "$tilde",
-				detail: "Variable declared in bar.scss",
 				insertText: '"$tilde"',
 			},
 		];
@@ -71,7 +70,6 @@ describe("SCSS Completion Test", function () {
 		expectedCompletions = [
 			{
 				label: "$tilde",
-				detail: "Variable declared in bar.scss",
 				insertText: '"tilde"',
 			},
 		];
@@ -81,9 +79,7 @@ describe("SCSS Completion Test", function () {
 	});
 
 	it("Offers completions from partial file", async () => {
-		const expectedCompletions = [
-			{ label: "$partial", detail: "Variable declared in _partial.scss" },
-		];
+		const expectedCompletions = [{ label: "$partial" }];
 
 		await testCompletion(docUri, position(17, 11), expectedCompletions);
 		await testCompletion(vueDocUri, position(28, 11), expectedCompletions);
@@ -95,13 +91,11 @@ describe("SCSS Completion Test", function () {
 		let expectedCompletions = [
 			{
 				label: "$var-var-variable",
-				detail: "Variable declared in _variables.scss",
 				insertText: '".$var-var-variable"',
 				filterText: '"ns.$var-var-variable"',
 			},
 			{
 				label: "fun-fun-function",
-				detail: "Function declared in _functions.scss",
 				insertText: '".fun-fun-function()"',
 			},
 		];
@@ -113,13 +107,11 @@ describe("SCSS Completion Test", function () {
 		expectedCompletions = [
 			{
 				label: "$var-var-variable",
-				detail: "Variable declared in _variables.scss",
 				insertText: '"$var-var-variable"',
 				filterText: '"ns.$var-var-variable"',
 			},
 			{
 				label: "fun-fun-function",
-				detail: "Function declared in _functions.scss",
 				insertText: '"fun-fun-function()"',
 			},
 		];
@@ -131,7 +123,6 @@ describe("SCSS Completion Test", function () {
 		expectedCompletions = [
 			{
 				label: "mix-mix-mixin",
-				detail: "Mixin declared in _mixins.scss",
 				insertText: '".mix-mix-mixin"',
 			},
 		];
@@ -142,7 +133,6 @@ describe("SCSS Completion Test", function () {
 		expectedCompletions = [
 			{
 				label: "mix-mix-mixin",
-				detail: "Mixin declared in _mixins.scss",
 				insertText: '"mix-mix-mixin"',
 			},
 		];
@@ -217,13 +207,11 @@ describe("SCSS Completion Test", function () {
 		let expectedCompletions = [
 			{
 				label: "$var-var-variable",
-				detail: "Variable declared in _variables.scss",
 				insertText: '".$var-var-variable"',
 				filterText: '"ns.$var-var-variable"',
 			},
 			{
 				label: "fun-fun-function",
-				detail: "Function declared in _functions.scss",
 				insertText: '".fun-fun-function()"',
 			},
 		];
@@ -235,13 +223,11 @@ describe("SCSS Completion Test", function () {
 		expectedCompletions = [
 			{
 				label: "$var-var-variable",
-				detail: "Variable declared in _variables.scss",
 				insertText: '"$var-var-variable"',
 				filterText: '"ns.$var-var-variable"',
 			},
 			{
 				label: "fun-fun-function",
-				detail: "Function declared in _functions.scss",
 				insertText: '"fun-fun-function()"',
 			},
 		];
@@ -255,13 +241,11 @@ describe("SCSS Completion Test", function () {
 		const expectedCompletions = [
 			{
 				label: "$var-var-variable",
-				detail: "Variable declared in _variables.scss",
 				insertText: '".$var-var-variable"',
 				filterText: '"ns.$var-var-variable"',
 			},
 			{
 				label: "fun-fun-function",
-				detail: "Function declared in _functions.scss",
 				insertText: '".fun-fun-function()"',
 			},
 		];
@@ -273,13 +257,11 @@ describe("SCSS Completion Test", function () {
 		const expectedCompletions = [
 			{
 				label: "$var-var-variable",
-				detail: "Variable declared in _variables.scss",
 				insertText: '".$var-var-variable"',
 				filterText: '"ns.$var-var-variable"',
 			},
 			{
 				label: "fun-fun-function",
-				detail: "Function declared in _functions.scss",
 				insertText: '".fun-fun-function()"',
 			},
 		];

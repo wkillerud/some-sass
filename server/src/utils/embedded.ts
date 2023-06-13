@@ -4,9 +4,10 @@ import type { Position } from "vscode-languageserver-textdocument";
 type Region = [number, number];
 
 export function isFileWhereScssCanBeEmbedded(path: string) {
-	return (
-		path.endsWith(".vue") || path.endsWith(".svelte") || path.endsWith(".astro")
-	);
+	if (path.endsWith(".scss")) {
+		return false;
+	}
+	return true;
 }
 
 export function getSCSSRegions(content: string) {
@@ -49,34 +50,35 @@ export function getSCSSContent(
 	return newContent;
 }
 
-function convertTextDocument(document: TextDocument, regions: Region[]) {
-	return TextDocument.create(
-		document.uri,
-		"scss",
-		document.version,
-		getSCSSContent(document.getText(), regions),
-	);
-}
-
 export function getSCSSRegionsDocument(
 	document: TextDocument,
 	position?: Position,
 ) {
 	const offset = position ? document.offsetAt(position) : 0;
+
 	if (!isFileWhereScssCanBeEmbedded(document.uri)) {
 		return { document, offset };
 	}
 
-	const scssRegions = getSCSSRegions(document.getText());
-
-	if (typeof position === "undefined") {
-		return { document: convertTextDocument(document, scssRegions), offset };
-	}
+	const text = document.getText();
+	const scssRegions = getSCSSRegions(text);
 
 	if (
+		typeof position === "undefined" ||
 		scssRegions.some((region) => region[0] <= offset && region[1] >= offset)
 	) {
-		return { document: convertTextDocument(document, scssRegions), offset };
+		const uri = document.uri;
+		const version = document.version;
+
+		return {
+			document: TextDocument.create(
+				uri,
+				"scss",
+				version,
+				getSCSSContent(text, scssRegions),
+			),
+			offset,
+		};
 	}
 
 	return { document: null, offset };

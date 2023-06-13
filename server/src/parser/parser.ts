@@ -176,16 +176,19 @@ async function findDocumentSymbols(
 		const matchUse = reUse.exec(line);
 		if (matchUse) {
 			const url = matchUse.groups?.["url"];
-			const builtIn = sassBuiltInModuleNames.find((module) => module === url);
-			if (builtIn) {
+			if (!url) {
+				continue;
+			}
+			const isBuiltIn = sassBuiltInModuleNames.has(url);
+			if (isBuiltIn) {
 				const namespace = matchUse.groups?.["namespace"];
-				result.uses.set(builtIn, {
+				result.uses.set(url, {
 					// Fake link with builtin as target
 					link: DocumentLink.create(
 						Range.create(Position.create(1, 1), Position.create(1, 1)),
-						builtIn,
+						url,
 					),
-					namespace: namespace || builtIn.split(":")[1],
+					namespace: namespace || url.split(":")[1],
 					isAliased: Boolean(namespace),
 				});
 			}

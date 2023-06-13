@@ -8,7 +8,7 @@ import type { CompletionItem } from "vscode-languageserver-types";
 import { IScssDocument } from "../../parser";
 import { applySassDoc } from "../../utils/sassdoc";
 import { getBaseValueFrom, isReferencingVariable } from "../../utils/scss";
-import { asDollarlessVariable, getLimitedString } from "../../utils/string";
+import { asDollarlessVariable } from "../../utils/string";
 import { isColor } from "./color-completion";
 import type { CompletionContext } from "./completion-context";
 import { rePrivate } from "./completion-utils";
@@ -33,8 +33,17 @@ export function createVariableCompletionItems(
 			? CompletionItemKind.Color
 			: CompletionItemKind.Variable;
 
-		let documentation = getLimitedString(color || value || "");
-		let detail = `Variable declared in ${scssDocument.fileName}`;
+		let documentation =
+			color ||
+			[
+				"```scss",
+				`${variable.name}: ${value};${
+					value !== variable.value ? ` // via ${variable.value}` : ""
+				}`,
+				"```",
+			].join("\n") ||
+			"";
+		let detail = undefined;
 
 		let label = variable.name;
 		let sortText;
@@ -43,7 +52,7 @@ export function createVariableCompletionItems(
 
 		if (variable.mixin) {
 			// Add 'argument from MIXIN_NAME' suffix if Variable is Mixin argument
-			detail = `Argument from ${variable.mixin}, ${detail.toLowerCase()}`;
+			detail = `Argument from ${variable.mixin}`;
 		} else {
 			const isPrivate = variable.name.match(rePrivate);
 			const isFromCurrentDocument = scssDocument.uri === currentDocument.uri;
@@ -60,13 +69,13 @@ export function createVariableCompletionItems(
 				sortText = label.replace(/^$[_-]/, "");
 			}
 
-			const sassdoc = applySassDoc(variable, {
-				displayOptions: { description: true, deprecated: true, type: true },
-			});
+			const sassdoc = applySassDoc(variable);
 			if (sassdoc) {
-				documentation += `\n\n${sassdoc}`;
+				documentation += `\n____\n${sassdoc}`;
 			}
 		}
+
+		documentation += `\n____\nVariable declared in ${scssDocument.fileName}`;
 
 		const isEmbedded = context.originalExtension !== "scss";
 		if (context.namespace) {

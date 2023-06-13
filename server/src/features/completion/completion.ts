@@ -12,7 +12,6 @@ import type {
 	ScssImport,
 	ScssUse,
 } from "../../parser";
-import { asDollarlessVariable } from "../../utils/string";
 import { sassBuiltInModules } from "../sass-built-in-modules";
 import type { SassBuiltInModule } from "../sass-built-in-modules";
 import { createCompletionContext } from "./completion-context";
@@ -194,7 +193,8 @@ function doNamespacedCompletion(
 		// Look for matches in built-in namespaces, which do not appear in storage
 		for (const [builtIn, module] of Object.entries(sassBuiltInModules)) {
 			if (builtIn === use.link.target) {
-				return doBuiltInCompletion(context, module);
+				doBuiltInCompletion(completions, context, module);
+				return completions;
 			}
 		}
 
@@ -211,31 +211,19 @@ function doNamespacedCompletion(
 }
 
 function doBuiltInCompletion(
+	completions: CompletionList,
 	context: CompletionContext,
 	module: SassBuiltInModule,
-): CompletionList {
-	const completions = CompletionList.create([], false);
+): void {
 	completions.items = Object.entries(module.exports).map(
-		([name, { description, signature, returns }]) => {
-			const parametersSnippet = signature
-				? signature
-						.replace(/:.+[$)]/g, "") // Remove default values
-						.replace(/[().]/g, "") // Remove parentheses and ... list indicator
-						.split(",")
-						.map(
-							(p, index) =>
-								`\${${index + 1}:${asDollarlessVariable(p.trim())}}`,
-						)
-						.join(", ")
-				: "";
-
+		([name, { description, signature, parameterSnippet, returns }]) => {
 			return {
 				label: name,
 				filterText: `${context.namespace}.${name}`,
 				insertText: context.word.endsWith(".")
-					? `.${name}${signature ? `(${parametersSnippet})` : ""}`
+					? `.${name}${signature ? `(${parameterSnippet})` : ""}`
 					: name,
-				insertTextFormat: parametersSnippet
+				insertTextFormat: parameterSnippet
 					? InsertTextFormat.Snippet
 					: InsertTextFormat.PlainText,
 				labelDetails: {
@@ -244,17 +232,11 @@ function doBuiltInCompletion(
 				},
 				documentation: {
 					kind: MarkupKind.Markdown,
-					value: [
-						description,
-						"",
-						`[Sass reference](${module.reference}#${name})`,
-					].join("\n"),
+					value: `${description}\n\n[Sass reference](${module.reference}#${name})`,
 				},
 			};
 		},
 	);
-
-	return completions;
 }
 
 function traverseTree(

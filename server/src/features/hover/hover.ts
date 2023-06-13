@@ -17,7 +17,11 @@ import {
 } from "../../parser";
 import { applySassDoc } from "../../utils/sassdoc";
 import { getBaseValueFrom, isReferencingVariable } from "../../utils/scss";
-import { asDollarlessVariable, getLimitedString } from "../../utils/string";
+import { asDollarlessVariable } from "../../utils/string";
+import {
+	makeFunctionDocumentation,
+	makeMixinDocumentation,
+} from "../completion/completion-utils";
 import { sassBuiltInModules } from "../sass-built-in-modules";
 import { sassDocAnnotations } from "../sassdoc-annotations";
 
@@ -35,7 +39,7 @@ function formatVariableMarkupContent(
 		value = getBaseValueFrom(variable, sourceDocument).value;
 	}
 
-	value = getLimitedString(value || "");
+	value = value || "";
 
 	const result = {
 		kind: MarkupKind.Markdown,
@@ -54,52 +58,6 @@ function formatVariableMarkupContent(
 	}
 
 	result.value += `\n____\nVariable declared in ${sourceDocument.fileName}`;
-
-	return result;
-}
-
-function formatMixinMarkupContent(
-	mixin: ScssMixin,
-	sourceDocument: IScssDocument,
-): MarkupContent {
-	const args = mixin.parameters
-		.map((item) => `${item.name}: ${item.value}`)
-		.join(", ");
-
-	const result = {
-		kind: MarkupKind.Markdown,
-		value: ["```scss", `@mixin ${mixin.name}(${args})`, "```"].join("\n"),
-	};
-
-	const sassdoc = applySassDoc(mixin);
-	if (sassdoc) {
-		result.value += `\n____\n${sassdoc}`;
-	}
-
-	result.value += `\n____\nMixin declared in ${sourceDocument.fileName}`;
-
-	return result;
-}
-
-function formatFunctionMarkupContent(
-	func: ScssFunction,
-	sourceDocument: IScssDocument,
-): MarkupContent {
-	const args = func.parameters
-		.map((item) => `${item.name}: ${item.value}`)
-		.join(", ");
-
-	const result = {
-		kind: MarkupKind.Markdown,
-		value: ["```scss", `@function ${func.name}(${args})`, "```"].join("\n"),
-	};
-
-	const sassdoc = applySassDoc(func);
-	if (sassdoc) {
-		result.value += `\n____\n${sassdoc}`;
-	}
-
-	result.value += `\n____\nFunction declared in ${sourceDocument.fileName}`;
 
 	return result;
 }
@@ -278,25 +236,19 @@ export function doHover(document: TextDocument, offset: number): Hover | null {
 					symbol as ScssVariable,
 					sourceDocument,
 				);
-
 				break;
 			}
 
 			case SymbolKind.Method: {
-				contents = formatMixinMarkupContent(
-					symbol as ScssMixin,
-					sourceDocument,
-				);
-
+				contents = makeMixinDocumentation(symbol as ScssMixin, sourceDocument);
 				break;
 			}
 
 			case SymbolKind.Function: {
-				contents = formatFunctionMarkupContent(
+				contents = makeFunctionDocumentation(
 					symbol as ScssFunction,
 					sourceDocument,
 				);
-
 				break;
 			}
 

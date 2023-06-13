@@ -36,22 +36,6 @@ export function getTextAfterPosition(text: string, offset: number) {
 	return text.substring(i + 1, offset);
 }
 
-/**
- * Limit of string length.
- */
-export function getLimitedString(str: string, ellipsis = true): string {
-	if (!str) {
-		return "null";
-	}
-
-	// Twitter <3
-	if (str.length < 140) {
-		return str;
-	}
-
-	return str.slice(0, 140) + (ellipsis ? "\u2026" : "");
-}
-
 export const reNewline = /\r\n|\r|\n/;
 
 export function getLinesFromText(text: string): string[] {

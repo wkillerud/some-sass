@@ -1,8 +1,8 @@
 import {
 	CompletionItemKind,
-	MarkupKind,
 	InsertTextFormat,
 	CompletionItemTag,
+	MarkupContent,
 } from "vscode-languageserver";
 import type {
 	CompletionItem,
@@ -10,10 +10,9 @@ import type {
 } from "vscode-languageserver";
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import type { IScssDocument, ScssFunction } from "../../parser";
-import { applySassDoc } from "../../utils/sassdoc";
 import type { CompletionContext } from "./completion-context";
 import {
-	makeMixinDocumentation,
+	makeFunctionDocumentation,
 	mapParameterSignature,
 	mapParameterSnippet,
 	rePrivate,
@@ -57,15 +56,7 @@ export function createFunctionCompletionItems(
 			: func.name;
 		const sortText = isPrivate ? label.replace(/^$[_-]/, "") : undefined;
 
-		let documentation = makeMixinDocumentation(func);
-		const sassdoc = applySassDoc(func, {
-			displayOptions: { description: true, deprecated: true, return: true },
-		});
-		if (sassdoc) {
-			documentation += `\n____\n${sassdoc}`;
-		}
-
-		const detail = `Function declared in ${scssDocument.fileName}`;
+		const documentation = makeFunctionDocumentation(func, scssDocument);
 
 		const requiredParameters = func.parameters.filter((p) => !p.value);
 		const parametersSnippet = requiredParameters
@@ -82,7 +73,6 @@ export function createFunctionCompletionItems(
 				},
 				filterText,
 				sortText,
-				detail,
 				`${insertText}(${parametersSnippet})`,
 				func,
 				documentation,
@@ -104,7 +94,6 @@ export function createFunctionCompletionItems(
 					},
 					filterText,
 					sortText,
-					detail,
 					`${insertText}(${parametersSnippet})`,
 					func,
 					documentation,
@@ -121,10 +110,9 @@ function makeFunctionCompletion(
 	labelDetails: CompletionItemLabelDetails | undefined,
 	filterText: string,
 	sortText: string | undefined,
-	detail: string,
 	insertText: string,
 	func: ScssFunction,
-	documentation: string,
+	documentation: MarkupContent,
 ): CompletionItem {
 	return {
 		label,
@@ -132,13 +120,9 @@ function makeFunctionCompletion(
 		filterText,
 		sortText,
 		kind: CompletionItemKind.Function,
-		detail,
 		insertTextFormat: InsertTextFormat.Snippet,
 		insertText,
 		tags: func.sassdoc?.deprecated ? [CompletionItemTag.Deprecated] : [],
-		documentation: {
-			kind: MarkupKind.Markdown,
-			value: documentation,
-		},
+		documentation,
 	};
 }

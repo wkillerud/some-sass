@@ -3,7 +3,6 @@ import {
 	getCurrentWord,
 	getTextBeforePosition,
 	getTextAfterPosition,
-	getLimitedString,
 	asDollarlessVariable,
 	stripTrailingComma,
 } from "../../utils/string";
@@ -28,13 +27,6 @@ describe("Utils/String", () => {
 
 		strictEqual(getTextAfterPosition(text, 5), "($a) {}");
 		strictEqual(getTextAfterPosition(text, 8), ") {}");
-	});
-
-	it("getLimitedString", () => {
-		const text = "vscode".repeat(24);
-
-		strictEqual(getLimitedString(text).length, 141);
-		strictEqual(getLimitedString(text, false).length, 140);
 	});
 
 	it("asDollarlessVariable", () => {

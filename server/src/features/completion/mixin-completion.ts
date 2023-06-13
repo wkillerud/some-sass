@@ -42,14 +42,7 @@ export function createMixinCompletionItems(
 		}
 
 		let documentation = makeMixinDocumentation(mixin);
-		const sassdoc = applySassDoc(mixin, {
-			displayOptions: {
-				content: true,
-				description: true,
-				deprecated: true,
-				output: true,
-			},
-		});
+		const sassdoc = applySassDoc(mixin);
 		if (sassdoc) {
 			documentation += `\n____\n${sassdoc}`;
 		}

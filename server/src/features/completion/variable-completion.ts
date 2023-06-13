@@ -8,7 +8,7 @@ import type { CompletionItem } from "vscode-languageserver-types";
 import { IScssDocument } from "../../parser";
 import { applySassDoc } from "../../utils/sassdoc";
 import { getBaseValueFrom, isReferencingVariable } from "../../utils/scss";
-import { asDollarlessVariable, getLimitedString } from "../../utils/string";
+import { asDollarlessVariable } from "../../utils/string";
 import { isColor } from "./color-completion";
 import type { CompletionContext } from "./completion-context";
 import { rePrivate } from "./completion-utils";
@@ -33,7 +33,7 @@ export function createVariableCompletionItems(
 			? CompletionItemKind.Color
 			: CompletionItemKind.Variable;
 
-		let documentation = getLimitedString(color || value || "");
+		let documentation = color || value || "";
 		let detail = `Variable declared in ${scssDocument.fileName}`;
 
 		let label = variable.name;
@@ -60,9 +60,7 @@ export function createVariableCompletionItems(
 				sortText = label.replace(/^$[_-]/, "");
 			}
 
-			const sassdoc = applySassDoc(variable, {
-				displayOptions: { description: true, deprecated: true, type: true },
-			});
+			const sassdoc = applySassDoc(variable);
 			if (sassdoc) {
 				documentation += `\n\n${sassdoc}`;
 			}

@@ -58,9 +58,7 @@ export function createFunctionCompletionItems(
 		const sortText = isPrivate ? label.replace(/^$[_-]/, "") : undefined;
 
 		let documentation = makeMixinDocumentation(func);
-		const sassdoc = applySassDoc(func, {
-			displayOptions: { description: true, deprecated: true, return: true },
-		});
+		const sassdoc = applySassDoc(func);
 		if (sassdoc) {
 			documentation += `\n____\n${sassdoc}`;
 		}

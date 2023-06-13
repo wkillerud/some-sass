@@ -17,7 +17,7 @@ import {
 } from "../../parser";
 import { applySassDoc } from "../../utils/sassdoc";
 import { getBaseValueFrom, isReferencingVariable } from "../../utils/scss";
-import { asDollarlessVariable, getLimitedString } from "../../utils/string";
+import { asDollarlessVariable } from "../../utils/string";
 import { sassBuiltInModules } from "../sass-built-in-modules";
 import { sassDocAnnotations } from "../sassdoc-annotations";
 
@@ -35,7 +35,7 @@ function formatVariableMarkupContent(
 		value = getBaseValueFrom(variable, sourceDocument).value;
 	}
 
-	value = getLimitedString(value || "");
+	value = value || "";
 
 	const result = {
 		kind: MarkupKind.Markdown,

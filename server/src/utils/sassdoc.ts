@@ -1,72 +1,24 @@
 import type { ScssSymbol } from "../parser";
 
-interface IApplySassDocOptions {
-	displayOptions?: {
-		alias?: boolean;
-		author?: boolean;
-		content?: boolean;
-		deprecated?: boolean;
-		description?: boolean;
-		example?: boolean;
-		link?: boolean;
-		output?: boolean;
-		parameter?: boolean;
-		property?: boolean;
-		require?: boolean;
-		return?: boolean;
-		see?: boolean;
-		since?: boolean;
-		throws?: boolean;
-		type?: boolean;
-	};
-}
-
-const defaultOptions = {
-	displayOptions: {
-		alias: true,
-		author: true,
-		content: true,
-		deprecated: true,
-		description: true,
-		example: true,
-		link: true,
-		output: true,
-		parameter: true,
-		property: true,
-		require: true,
-		return: true,
-		see: true,
-		since: true,
-		throws: true,
-		type: true,
-	},
-};
-
-export function applySassDoc(
-	symbol: ScssSymbol,
-	options?: IApplySassDocOptions,
-): string {
+export function applySassDoc(symbol: ScssSymbol): string {
 	if (!symbol.sassdoc) {
 		return "";
 	}
 
 	let description = "";
-
-	const displayOptions =
-		options?.displayOptions || defaultOptions.displayOptions;
 	const doc = symbol.sassdoc;
 
-	if (displayOptions.description && doc.description) {
+	if (doc.description) {
 		description += doc.description.trimStart();
 	}
 
 	// Make it visible early on if something is marked as deprecated
-	if (displayOptions.deprecated && doc.deprecated) {
+	if (doc.deprecated) {
 		description += `\n\n@deprecated ${doc.deprecated}`;
 	}
 
 	// Function and mixin parameters, listed one per line like JSDoc
-	if (displayOptions.parameter && doc.parameter) {
+	if (doc.parameter) {
 		for (const parameter of doc.parameter) {
 			description += "\n\n@param";
 
@@ -88,12 +40,12 @@ export function applySassDoc(
 
 	// Type is for standalone variable annotation
 	// Type and Parameters is likely mutually exclusive
-	if (displayOptions.type && doc.type) {
+	if (doc.type) {
 		description += `\n\n@type ${doc.type}`;
 	}
 
 	// Documents the properties of a map
-	if (displayOptions.property && doc.property) {
+	if (doc.property) {
 		for (const prop of doc.property) {
 			description += "\n\n@prop";
 
@@ -114,29 +66,29 @@ export function applySassDoc(
 	}
 
 	// For mixins that take @content
-	if (displayOptions.content && doc.content) {
+	if (doc.content) {
 		description += `\n\n@content ${doc.content}`;
 	}
 
 	// Describes mixin output
-	if (displayOptions.output && doc.output) {
+	if (doc.output) {
 		description += `\n\n@output ${doc.output}`;
 	}
 
 	// Describes function return values with a type and optional description
-	if (displayOptions.return && doc.return) {
+	if (doc.return) {
 		description += `\n\n@return ${doc.return.type}${
 			doc.return.description ? ` - ${doc.return.description}` : ""
 		}`;
 	}
 
-	if (displayOptions.throws && doc.throws) {
+	if (doc.throws) {
 		for (const thrown of doc.throws) {
 			description += `\n\n@throw ${thrown}`;
 		}
 	}
 
-	if (displayOptions.require && doc.require && doc.require.length > 0) {
+	if (doc.require && doc.require.length > 0) {
 		for (const requirement of doc.require) {
 			description += "\n\n@require";
 
@@ -156,7 +108,7 @@ export function applySassDoc(
 		}
 	}
 
-	if (displayOptions.alias && doc.alias) {
+	if (doc.alias) {
 		const aliases = typeof doc.alias === "string" ? [doc.alias] : doc.alias;
 		for (const alias of aliases) {
 			description += `\n\n@alias \`${alias}\``;
@@ -164,13 +116,13 @@ export function applySassDoc(
 	}
 
 	// Hint to related variables, functions, or mixins
-	if (displayOptions.see && doc.see) {
+	if (doc.see) {
 		for (const see of doc.see) {
 			description += `\n\n@see \`${see.name}\``;
 		}
 	}
 
-	if (displayOptions.since && doc.since) {
+	if (doc.since) {
 		for (const since of doc.since) {
 			description += `\n\n@since ${since.version}`;
 			if (since.description) {
@@ -180,13 +132,13 @@ export function applySassDoc(
 	}
 
 	// Show credit to authors
-	if (displayOptions.author && doc.author) {
+	if (doc.author) {
 		for (const author of doc.author) {
 			description += `\n\n@author ${author}`;
 		}
 	}
 
-	if (displayOptions.link && doc.link) {
+	if (doc.link) {
 		for (const link of doc.link) {
 			description += link.caption
 				? `\n\n[${link.caption}](${link.url})`
@@ -194,7 +146,7 @@ export function applySassDoc(
 		}
 	}
 
-	if (displayOptions.example && doc.example) {
+	if (doc.example) {
 		for (const example of doc.example) {
 			description += "\n\n@example";
 			if (example.description) {

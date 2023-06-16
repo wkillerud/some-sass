@@ -24,6 +24,7 @@ import {
 } from "./context-provider";
 import { ExtractProvider } from "./features/code-actions";
 import { doCompletion } from "./features/completion";
+import { findDocumentColors } from "./features/decorators/color-decorators";
 import { doDiagnostics } from "./features/diagnostics/diagnostics";
 import { goDefinition } from "./features/go-definition/go-definition";
 import { doHover } from "./features/hover/hover";
@@ -121,6 +122,7 @@ export class SomeSassServer {
 							resolveProvider: false,
 						},
 						renameProvider: { prepareProvider: true },
+						colorProvider: {},
 					},
 				};
 			},
@@ -386,6 +388,36 @@ export class SomeSassServer {
 
 			const edits = await doRename(document, offset, params.newName);
 			return edits;
+		});
+
+		this.connection.onDocumentColor((params) => {
+			const uri = documents.get(params.textDocument.uri);
+			if (uri === undefined) {
+				return null;
+			}
+
+			const { document } = getSCSSRegionsDocument(uri);
+			if (!document) {
+				return null;
+			}
+
+			const information = findDocumentColors(document);
+			return information;
+		});
+
+		this.connection.onColorPresentation(() => {
+			// const uri = documents.get(params.textDocument.uri);
+			// if (uri === undefined) {
+			// 	return null;
+			// }
+			// const { document } = getSCSSRegionsDocument(uri);
+			// if (!document) {
+			// 	return null;
+			// }
+			// const presentations = getColorPresentations(document, params.color, params.range);
+			// return presentations;
+
+			return []; // Don't replace the variable reference with raw color values...
 		});
 
 		this.connection.onShutdown(() => {

@@ -1,0 +1,85 @@
+import ColorDotJS from "colorjs.io";
+import { TextDocument } from "vscode-languageserver-textdocument";
+import { ColorInformation, SymbolKind } from "vscode-languageserver-types";
+import { useContext } from "../../context-provider";
+import { NodeType, ScssVariable } from "../../parser";
+import { isColor } from "../completion/color-completion";
+import { getDefinitionSymbol } from "../go-definition";
+
+export function findDocumentColors(document: TextDocument): ColorInformation[] {
+	const colorInformation: ColorInformation[] = [];
+
+	const { storage } = useContext();
+	const scssDocument = storage.get(document.uri);
+	if (!scssDocument) {
+		return colorInformation;
+	}
+
+	scssDocument.ast.accept((node) => {
+		if (node.type !== NodeType.VariableName) {
+			// continue
+			return true;
+		}
+
+		const parent = node.getParent();
+		if (
+			parent.type !== NodeType.VariableDeclaration &&
+			parent.type !== NodeType.FunctionParameter
+		) {
+			const identifier = {
+				name: node.getName(),
+				position: document.positionAt(node.offset),
+				kind: SymbolKind.Variable,
+			};
+
+			const [symbol] = getDefinitionSymbol(document, identifier);
+			// Symbol is null if current node _is_ the definition. In that case, we
+			// defer color decoration to the VS Code language server.
+			if (!symbol) {
+				// continue
+				return true;
+			}
+
+			const variable = symbol as ScssVariable;
+			if (!variable.value || !isColor(variable.value)) {
+				// continue
+				return true;
+			}
+
+			const srgbaColor = ColorDotJS.to(
+				ColorDotJS.parse(variable.value),
+				"srgb",
+			);
+			const color: ColorInformation = {
+				color: {
+					alpha: srgbaColor.alpha || 1,
+					red: srgbaColor.coords[0],
+					green: srgbaColor.coords[1],
+					blue: srgbaColor.coords[2],
+				},
+				range: {
+					start: document.positionAt(node.offset),
+					end: document.positionAt(node.offset + node.getName().length),
+				},
+			};
+			colorInformation.push(color);
+		}
+
+		return true;
+	});
+
+	return colorInformation;
+}
+
+// Maybe we just don't provide any options?
+// Clicking to see the other non-rgb options replaces the variable reference.
+// The below works, but is less helpful than I'd like. Keep for reference, in case of user feedback.
+// export function getColorPresentations(
+// 	document: TextDocument,
+// 	color: Color,
+// 	range: Range,
+// ): ColorPresentation[] {
+// 	const ls = getLanguageService();
+// 	const stylesheet = ls.parseStylesheet(document);
+// 	return ls.getColorPresentations(document, stylesheet, color, range);
+// }

@@ -390,7 +390,7 @@ export class SomeSassServer {
 			return edits;
 		});
 
-		this.connection.onDocumentColor((params) => {
+		this.connection.onDocumentColor(async (params) => {
 			const uri = documents.get(params.textDocument.uri);
 			if (uri === undefined) {
 				return null;
@@ -399,6 +399,16 @@ export class SomeSassServer {
 			const { document } = getSCSSRegionsDocument(uri);
 			if (!document) {
 				return null;
+			}
+
+			const { storage } = useContext();
+			const scssDocument = storage.get(document.uri);
+			if (!scssDocument) {
+				// For the first open document, we may have a race condition where the scanner
+				// hasn't finished before the documentColor request is sent from the client.
+				// In these cases, initiate a scan for the document and wait for it to finish,
+				// to ensure we get color decorators without having to edit the file first.
+				await scannerService.scan([URI.parse(document.uri)], workspaceRoot);
 			}
 
 			const information = findDocumentColors(document);

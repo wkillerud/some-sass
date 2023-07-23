@@ -3,6 +3,7 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 import { ColorInformation, SymbolKind } from "vscode-languageserver-types";
 import { useContext } from "../../context-provider";
 import { NodeType, ScssVariable } from "../../parser";
+import { getBaseValueFrom, isReferencingVariable } from "../../utils/scss";
 import { isColor } from "../completion/color-completion";
 import { getDefinitionSymbol } from "../go-definition";
 
@@ -32,7 +33,10 @@ export function findDocumentColors(document: TextDocument): ColorInformation[] {
 				kind: SymbolKind.Variable,
 			};
 
-			const [symbol] = getDefinitionSymbol(document, identifier);
+			const [symbol, sourceDocument] = getDefinitionSymbol(
+				document,
+				identifier,
+			);
 			// Symbol is null if current node _is_ the definition. In that case, we
 			// defer color decoration to the VS Code language server.
 			if (!symbol) {
@@ -41,15 +45,23 @@ export function findDocumentColors(document: TextDocument): ColorInformation[] {
 			}
 
 			const variable = symbol as ScssVariable;
-			if (!variable.value || !isColor(variable.value)) {
+
+			let value = variable.value;
+			if (!value) {
 				// continue
 				return true;
 			}
 
-			const srgbaColor = ColorDotJS.to(
-				ColorDotJS.parse(variable.value),
-				"srgb",
-			);
+			if (isReferencingVariable(variable)) {
+				value = getBaseValueFrom(variable, sourceDocument).value;
+			}
+
+			if (!value || !isColor(value)) {
+				// continue
+				return true;
+			}
+
+			const srgbaColor = ColorDotJS.to(ColorDotJS.parse(value), "srgb");
 			const color: ColorInformation = {
 				color: {
 					alpha: srgbaColor.alpha || 1,

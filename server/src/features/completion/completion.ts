@@ -307,6 +307,11 @@ function traverseTree(
 
 		// Check to see if we have to go deeper
 		for (const child of leaf.getLinks()) {
+			// we don't go deeper if it's a nested @use
+			if ("isAliased" in child) {
+				return;
+			}
+
 			if (
 				!child.link.target ||
 				(child as ScssImport).dynamic ||

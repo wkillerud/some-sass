@@ -9,7 +9,6 @@ import {
 	ScssVariable,
 	ScssMixin,
 	ScssFunction,
-	ScssImport,
 	ScssForward,
 	tokenizer,
 	Token,
@@ -393,13 +392,13 @@ function traverseTree(
 	}
 
 	// Check to see if we have to go deeper
-	for (const child of scssDocument.getLinks()) {
-		if (
-			!child.link.target ||
-			(child as ScssImport).dynamic ||
-			(child as ScssImport).css ||
-			child.link.target === scssDocument.uri
-		) {
+	// Don't follow uses, since we start with the document behind the first use, and symbols from further uses aren't available to us
+	// Don't follow imports, since the whole point here is to use the new module system
+	for (const child of scssDocument.getLinks({
+		uses: false,
+		imports: false,
+	})) {
+		if (!child.link.target || child.link.target === scssDocument.uri) {
 			continue;
 		}
 

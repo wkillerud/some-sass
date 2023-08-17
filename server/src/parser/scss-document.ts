@@ -141,15 +141,20 @@ export class ScssDocument implements IScssDocument {
 		return symbols;
 	}
 
-	public getLinks(options = { forwards: true }): ScssLink[] {
+	public getLinks(opts = {}): ScssLink[] {
+		const options = { forwards: true, uses: true, imports: true, ...opts };
 		const links: ScssLink[] = [];
 
-		for (const imp of this.imports.values()) {
-			links.push(imp);
+		if (options.imports) {
+			for (const imp of this.imports.values()) {
+				links.push(imp);
+			}
 		}
 
-		for (const use of this.uses.values()) {
-			links.push(use);
+		if (options.uses) {
+			for (const use of this.uses.values()) {
+				links.push(use);
+			}
 		}
 
 		if (options.forwards) {

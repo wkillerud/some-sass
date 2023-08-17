@@ -77,7 +77,11 @@ export interface IScssDocument extends TextDocument, IScssSymbols {
 	fileName: string;
 	/** Find and cache the real path (as opposed to symlinked) */
 	getRealPath: () => Promise<string | null>;
-	getLinks: (options?: { forwards: boolean }) => ScssLink[];
+	getLinks: (options?: {
+		forwards?: boolean;
+		uses?: boolean;
+		imports?: boolean;
+	}) => ScssLink[];
 	getSymbols: () => ScssSymbol[];
 	getNodeAt: (offset: number) => INode | null;
 	getNodeRange: (node: INode) => Range;

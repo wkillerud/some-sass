@@ -1,0 +1,3 @@
+@use "./second";
+
+$first: second.$second;

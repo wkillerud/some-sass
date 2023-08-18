@@ -262,31 +262,34 @@ export function doHover(document: TextDocument, offset: number): Hover | null {
 		}
 	}
 
-	for (const { reference, exports } of Object.values(sassBuiltInModules)) {
-		for (const [name, { description }] of Object.entries(exports)) {
-			if (name === identifier.name) {
-				// Make sure we're not just hovering over a CSS function.
-				// Confirm we are looking at something that is the child of a module.
-				const isModule =
-					hoverNode.getParent().type === NodeType.Module ||
-					hoverNode.getParent().getParent().type === NodeType.Module;
-				if (isModule) {
-					return {
-						contents: {
-							kind: MarkupKind.Markdown,
-							value: [
-								description,
-								"",
-								`[Sass reference](${reference}#${name})`,
-							].join("\n"),
-						},
-					};
+	if (contents === undefined) {
+		// Look to see if this is a built-in, but only if we have no other content.
+		// Folks may use the same names as built-ins in their modules.
+
+		for (const { reference, exports } of Object.values(sassBuiltInModules)) {
+			for (const [name, { description }] of Object.entries(exports)) {
+				if (name === identifier.name) {
+					// Make sure we're not just hovering over a CSS function.
+					// Confirm we are looking at something that is the child of a module.
+					const isModule =
+						hoverNode.getParent().type === NodeType.Module ||
+						hoverNode.getParent().getParent().type === NodeType.Module;
+					if (isModule) {
+						return {
+							contents: {
+								kind: MarkupKind.Markdown,
+								value: [
+									description,
+									"",
+									`[Sass reference](${reference}#${name})`,
+								].join("\n"),
+							},
+						};
+					}
 				}
 			}
 		}
-	}
 
-	if (contents === undefined) {
 		return null;
 	}
 

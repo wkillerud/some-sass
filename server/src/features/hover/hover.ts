@@ -9,7 +9,6 @@ import {
 	ScssVariable,
 	ScssMixin,
 	ScssFunction,
-	ScssImport,
 	ScssForward,
 	tokenizer,
 	Token,
@@ -263,31 +262,34 @@ export function doHover(document: TextDocument, offset: number): Hover | null {
 		}
 	}
 
-	for (const { reference, exports } of Object.values(sassBuiltInModules)) {
-		for (const [name, { description }] of Object.entries(exports)) {
-			if (name === identifier.name) {
-				// Make sure we're not just hovering over a CSS function.
-				// Confirm we are looking at something that is the child of a module.
-				const isModule =
-					hoverNode.getParent().type === NodeType.Module ||
-					hoverNode.getParent().getParent().type === NodeType.Module;
-				if (isModule) {
-					return {
-						contents: {
-							kind: MarkupKind.Markdown,
-							value: [
-								description,
-								"",
-								`[Sass reference](${reference}#${name})`,
-							].join("\n"),
-						},
-					};
+	if (contents === undefined) {
+		// Look to see if this is a built-in, but only if we have no other content.
+		// Folks may use the same names as built-ins in their modules.
+
+		for (const { reference, exports } of Object.values(sassBuiltInModules)) {
+			for (const [name, { description }] of Object.entries(exports)) {
+				if (name === identifier.name) {
+					// Make sure we're not just hovering over a CSS function.
+					// Confirm we are looking at something that is the child of a module.
+					const isModule =
+						hoverNode.getParent().type === NodeType.Module ||
+						hoverNode.getParent().getParent().type === NodeType.Module;
+					if (isModule) {
+						return {
+							contents: {
+								kind: MarkupKind.Markdown,
+								value: [
+									description,
+									"",
+									`[Sass reference](${reference}#${name})`,
+								].join("\n"),
+							},
+						};
+					}
 				}
 			}
 		}
-	}
 
-	if (contents === undefined) {
 		return null;
 	}
 
@@ -393,13 +395,13 @@ function traverseTree(
 	}
 
 	// Check to see if we have to go deeper
-	for (const child of scssDocument.getLinks()) {
-		if (
-			!child.link.target ||
-			(child as ScssImport).dynamic ||
-			(child as ScssImport).css ||
-			child.link.target === scssDocument.uri
-		) {
+	// Don't follow uses, since we start with the document behind the first use, and symbols from further uses aren't available to us
+	// Don't follow imports, since the whole point here is to use the new module system
+	for (const child of scssDocument.getLinks({
+		uses: false,
+		imports: false,
+	})) {
+		if (!child.link.target || child.link.target === scssDocument.uri) {
 			continue;
 		}
 

@@ -96,7 +96,6 @@ export class SomeSassServer {
 							triggerCharacters: [
 								// For SassDoc annotation completion
 								"@",
-								" ",
 								"/",
 
 								// For @use completion

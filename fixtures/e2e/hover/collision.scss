@@ -1,0 +1,6 @@
+@use "./config";
+@use "sass:map";
+
+.bar {
+  $_color: config.get("bar");
+}

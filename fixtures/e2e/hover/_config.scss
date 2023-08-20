@@ -1,0 +1,4 @@
+/// Deliberate name collision with sass:map
+@function get() {
+  @return 1;
+}

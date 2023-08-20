@@ -6,12 +6,7 @@ import {
 import type { CompletionItem } from "vscode-languageserver";
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import { useContext } from "../../context-provider";
-import type {
-	IScssDocument,
-	ScssForward,
-	ScssImport,
-	ScssUse,
-} from "../../parser";
+import type { IScssDocument, ScssForward, ScssUse } from "../../parser";
 import { sassBuiltInModules } from "../sass-built-in-modules";
 import type { SassBuiltInModule } from "../sass-built-in-modules";
 import { createCompletionContext } from "./completion-context";
@@ -306,13 +301,10 @@ function traverseTree(
 		accumulator.set(leaf.uri, completionItems);
 
 		// Check to see if we have to go deeper
-		for (const child of leaf.getLinks()) {
-			if (
-				!child.link.target ||
-				(child as ScssImport).dynamic ||
-				(child as ScssImport).css ||
-				child.link.target === scssDocument.uri
-			) {
+		// Don't follow uses, since we start with the document behind the first use, and symbols from further uses aren't available to us
+		// Don't follow imports, since the whole point here is to use the new module system
+		for (const child of leaf.getLinks({ uses: false, imports: false })) {
+			if (!child.link.target || child.link.target === scssDocument.uri) {
 				continue;
 			}
 

@@ -14,7 +14,6 @@ import type {
 	INode,
 	IScssDocument,
 	ScssForward,
-	ScssImport,
 	ScssSymbol,
 } from "../../parser";
 import { asDollarlessVariable } from "../../utils/string";
@@ -135,6 +134,7 @@ function traverseTree(
 	childDocument: IScssDocument,
 	result: ScssSymbol[],
 	accumulatedPrefix = "",
+	depth = 0,
 ): ScssSymbol[] {
 	const { storage } = useContext();
 	const scssDocument = storage.get(childDocument.uri);
@@ -166,13 +166,13 @@ function traverseTree(
 	}
 
 	// Check to see if we have to go deeper
-	for (const child of scssDocument.getLinks()) {
-		if (
-			!child.link.target ||
-			(child as ScssImport).dynamic ||
-			(child as ScssImport).css ||
-			child.link.target === scssDocument.uri
-		) {
+	// Don't follow uses beyond the first, since symbols from those aren't available to us anyway
+	// Don't follow imports, since the whole point here is to use the new module system
+	for (const child of scssDocument.getLinks({
+		uses: depth === 0,
+		imports: false,
+	})) {
+		if (!child.link.target || child.link.target === scssDocument.uri) {
 			continue;
 		}
 
@@ -186,7 +186,7 @@ function traverseTree(
 			prefix += (child as ScssForward).prefix;
 		}
 
-		traverseTree(openDocument, childDocument, result, prefix);
+		traverseTree(openDocument, childDocument, result, prefix, depth + 1);
 	}
 
 	return result;

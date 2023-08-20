@@ -3,12 +3,14 @@ import { testHover } from "./helper";
 
 describe("SCSS Hover Test", function () {
 	const docUri = getDocUri("hover/main.scss");
+	const collisionUri = getDocUri("hover/collision.scss");
 	const vueDocUri = getDocUri("hover/AppButton.vue");
 	const svelteDocUri = getDocUri("hover/AppButton.svelte");
 	const astroDocUri = getDocUri("hover/AppButton.astro");
 
 	before(async () => {
 		await showFile(docUri);
+		await showFile(collisionUri);
 		await showFile(vueDocUri);
 		await showFile(svelteDocUri);
 		await showFile(astroDocUri);
@@ -117,5 +119,14 @@ describe("SCSS Hover Test", function () {
 		};
 
 		await testHover(docUri, position(26, 22), expectedContents);
+	});
+
+	it("shows hover for user-defined symbol in case of naming collision with built-in", async () => {
+		// Prefixed symbols are shown with their original names
+		const expectedContents = {
+			contents: ["Deliberate name collision with sass:map"],
+		};
+
+		await testHover(collisionUri, position(5, 20), expectedContents);
 	});
 });

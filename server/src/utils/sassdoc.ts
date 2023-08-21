@@ -17,6 +17,10 @@ export function applySassDoc(symbol: ScssSymbol): string {
 		description += `\n\n@deprecated ${doc.deprecated}`;
 	}
 
+	if (doc.name && doc.name !== symbol.name) {
+		description += `\n\n@name ${doc.name}`;
+	}
+
 	// Function and mixin parameters, listed one per line like JSDoc
 	if (doc.parameter) {
 		for (const parameter of doc.parameter) {
@@ -155,6 +159,19 @@ export function applySassDoc(symbol: ScssSymbol): string {
 
 			description += ["\n", "```scss", example.code, "```"].join("\n");
 		}
+	}
+
+	if (doc.access === "private") {
+		description += `\n\n@access private`;
+	}
+
+	const groups = doc.group?.filter((g) => g !== "undefined");
+	if (groups && groups.length > 0) {
+		description += `\n\n@group ${groups.join(", ")}`;
+	}
+
+	if (doc.todo) {
+		description += `\n\n@todo ${doc.todo}`;
 	}
 
 	return description;

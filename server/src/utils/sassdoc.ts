@@ -17,7 +17,7 @@ export function applySassDoc(symbol: ScssSymbol): string {
 		description += `\n\n@deprecated ${doc.deprecated}`;
 	}
 
-	if (doc.name) {
+	if (doc.name && doc.name !== symbol.name) {
 		description += `\n\n@name ${doc.name}`;
 	}
 
@@ -40,14 +40,6 @@ export function applySassDoc(symbol: ScssSymbol): string {
 				description += ` - ${parameter.description}`;
 			}
 		}
-	}
-
-	if (doc.access) {
-		description += `\n\n@access ${doc.access}`;
-	}
-
-	if (doc.group && doc.group.length > 0) {
-		description += `\n\n@group ${doc.group.join(", ")}`;
 	}
 
 	// Type is for standalone variable annotation
@@ -167,6 +159,15 @@ export function applySassDoc(symbol: ScssSymbol): string {
 
 			description += ["\n", "```scss", example.code, "```"].join("\n");
 		}
+	}
+
+	if (doc.access === "private") {
+		description += `\n\n@access private`;
+	}
+
+	const groups = doc.group?.filter((g) => g !== "undefined");
+	if (groups && groups.length > 0) {
+		description += `\n\n@group ${groups.join(", ")}`;
 	}
 
 	if (doc.todo) {

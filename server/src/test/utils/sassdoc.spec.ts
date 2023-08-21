@@ -17,7 +17,38 @@ describe("Utils/SassDoc", () => {
 		strictEqual(applySassDoc(noDoc), "");
 	});
 
-	it("applySassDoc maximal state", () => {
+	it("omits name if identical to symbol name", () => {
+		const allDocs: ScssSymbol = {
+			name: "test",
+			kind: SymbolKind.Method,
+			offset: 0,
+			position: {
+				character: 0,
+				line: 0,
+			},
+			sassdoc: {
+				commentRange: {
+					start: 0,
+					end: 0,
+				},
+				context: {
+					code: "test",
+					line: {
+						start: 0,
+						end: 0,
+					},
+					type: "mixin",
+					name: "test",
+					scope: "global",
+				},
+				description: "This is a description",
+				name: "test",
+			},
+		};
+		strictEqual(applySassDoc(allDocs), `This is a description`);
+	});
+
+	it("omits access if public, even if defined", () => {
 		const allDocs: ScssSymbol = {
 			name: "test",
 			kind: SymbolKind.Method,
@@ -43,6 +74,37 @@ describe("Utils/SassDoc", () => {
 				},
 				description: "This is a description",
 				access: "public",
+			},
+		};
+		strictEqual(applySassDoc(allDocs), `This is a description`);
+	});
+
+	it("applySassDoc maximal state", () => {
+		const allDocs: ScssSymbol = {
+			name: "test",
+			kind: SymbolKind.Method,
+			offset: 0,
+			position: {
+				character: 0,
+				line: 0,
+			},
+			sassdoc: {
+				commentRange: {
+					start: 0,
+					end: 0,
+				},
+				context: {
+					code: "test",
+					line: {
+						start: 0,
+						end: 0,
+					},
+					type: "mixin",
+					name: "test",
+					scope: "global",
+				},
+				description: "This is a description",
+				access: "private",
 				alias: "alias",
 				aliased: ["test", "other-test"],
 				author: ["Johnny Appleseed", "Foo Bar"],
@@ -155,10 +217,6 @@ describe("Utils/SassDoc", () => {
 
 @param string\`parameter\` [yes] - helpful description
 
-@access public
-
-@group mixins, helpers
-
 @type color,string
 
 @prop {number}\`foo/bar\` [yes] - what
@@ -190,6 +248,10 @@ describe("Utils/SassDoc", () => {
 \`\`\`scss
 @include test;
 \`\`\`
+
+@access private
+
+@group mixins, helpers
 
 @todo nothing`,
 		);

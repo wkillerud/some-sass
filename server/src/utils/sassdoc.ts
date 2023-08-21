@@ -17,6 +17,10 @@ export function applySassDoc(symbol: ScssSymbol): string {
 		description += `\n\n@deprecated ${doc.deprecated}`;
 	}
 
+	if (doc.name) {
+		description += `\n\n@name ${doc.name}`;
+	}
+
 	// Function and mixin parameters, listed one per line like JSDoc
 	if (doc.parameter) {
 		for (const parameter of doc.parameter) {
@@ -36,6 +40,14 @@ export function applySassDoc(symbol: ScssSymbol): string {
 				description += ` - ${parameter.description}`;
 			}
 		}
+	}
+
+	if (doc.access) {
+		description += `\n\n@access ${doc.access}`;
+	}
+
+	if (doc.group && doc.group.length > 0) {
+		description += `\n\n@group ${doc.group.join(", ")}`;
 	}
 
 	// Type is for standalone variable annotation
@@ -155,6 +167,10 @@ export function applySassDoc(symbol: ScssSymbol): string {
 
 			description += ["\n", "```scss", example.code, "```"].join("\n");
 		}
+	}
+
+	if (doc.todo) {
+		description += `\n\n@todo ${doc.todo}`;
 	}
 
 	return description;

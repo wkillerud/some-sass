@@ -152,6 +152,9 @@ async function findDocumentSymbols(
 						hide: matchForward.groups?.["hide"]
 							? matchForward.groups["hide"].split(",").map((s) => s.trim())
 							: [],
+						show: matchForward.groups?.["show"]
+							? matchForward.groups["show"].split(",").map((s) => s.trim())
+							: [],
 					});
 				}
 

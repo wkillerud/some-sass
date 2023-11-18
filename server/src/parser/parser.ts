@@ -22,7 +22,7 @@ import type { IScssSymbols } from "./scss-symbol";
 export const reModuleAtRule = /@(?:use|forward|import)/;
 export const reUse = /@use ["'|](?<url>.+)["'|](?: as (?<namespace>\*|\w+))?;/;
 export const reForward =
-	/@forward ["'|](?<url>.+)["'|](?: as (?<prefix>\w+-)\*)?(?: hide (?<hide>.+))?;/;
+	/@forward ["'|](?<url>.+)["'|](?: as (?<prefix>\w+-)\*)?(?: hide (?<hide>.+))?(?: show (?<show>.+))?;/;
 export const reImport = /@import ["'|](?<url>.+)["'|]/;
 export const rePlaceholder = /^\s*%(?<name>\w+)/;
 export const rePlaceholderUsage = /\s*@extend\s+(?<name>%[\w\d-_]+)/;

@@ -240,6 +240,7 @@ function traverseTree(
 	accumulator: Map<string, CompletionItem[]>,
 	leaf: IScssDocument,
 	hiddenSymbols: string[] = [],
+	shownSymbols: string[] = [],
 	accumulatedPrefix = "",
 ) {
 	if (accumulator.has(leaf.uri)) {
@@ -263,6 +264,7 @@ function traverseTree(
 				document,
 				context,
 				hiddenSymbols,
+				shownSymbols,
 				accumulatedPrefix,
 			);
 			completionItems = completionItems.concat(variables);
@@ -274,6 +276,7 @@ function traverseTree(
 				document,
 				context,
 				hiddenSymbols,
+				shownSymbols,
 				accumulatedPrefix,
 			);
 			completionItems = completionItems.concat(mixins);
@@ -285,6 +288,7 @@ function traverseTree(
 				document,
 				context,
 				hiddenSymbols,
+				shownSymbols,
 				accumulatedPrefix,
 			);
 			completionItems = completionItems.concat(functions);
@@ -294,11 +298,16 @@ function traverseTree(
 			const placeholders = createPlaceholderCompletionItems(
 				scssDocument,
 				hiddenSymbols,
+				shownSymbols,
 			);
 			completionItems = completionItems.concat(placeholders);
 		}
 
 		accumulator.set(leaf.uri, completionItems);
+
+		// Reset these once we've processed the document they refered to
+		let hidden: string[] = [];
+		let shown: string[] = [];
 
 		// Check to see if we have to go deeper
 		// Don't follow uses, since we start with the document behind the first use, and symbols from further uses aren't available to us
@@ -313,12 +322,17 @@ function traverseTree(
 				continue;
 			}
 
-			let hidden = hiddenSymbols;
 			if (
 				(child as ScssForward).hide &&
 				(child as ScssForward).hide.length > 0
 			) {
-				hidden = hiddenSymbols.concat((child as ScssForward).hide);
+				hidden = hidden.concat((child as ScssForward).hide);
+			}
+			if (
+				(child as ScssForward).show &&
+				(child as ScssForward).show.length > 0
+			) {
+				shown = shown.concat((child as ScssForward).show);
 			}
 
 			let prefix = accumulatedPrefix;
@@ -332,6 +346,7 @@ function traverseTree(
 				accumulator,
 				childDocument,
 				hidden,
+				shown,
 				prefix,
 			);
 		}

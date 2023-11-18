@@ -24,6 +24,7 @@ export function createMixinCompletionItems(
 	currentDocument: TextDocument,
 	context: CompletionContext,
 	hiddenSymbols: string[] = [],
+	shownSymbols: string[] = [],
 	prefix = "",
 ): CompletionItem[] {
 	const completions: CompletionItem[] = [];
@@ -37,6 +38,10 @@ export function createMixinCompletionItems(
 		}
 
 		if (hiddenSymbols.includes(mixin.name)) {
+			continue;
+		}
+
+		if (shownSymbols.length > 0 && !shownSymbols.includes(mixin.name)) {
 			continue;
 		}
 

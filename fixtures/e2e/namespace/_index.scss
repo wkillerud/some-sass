@@ -1,3 +1,4 @@
 @forward "./functions" as fun-*;
 @forward "./mixins" as mix-* hide secret, other-secret;
 @forward "./variables" hide $secret;
+@forward "./show" show $one;

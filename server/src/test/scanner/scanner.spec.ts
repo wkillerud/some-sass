@@ -3,8 +3,8 @@ import { isMatch } from "micromatch";
 import { useContext } from "../../context-provider";
 import { NodeFileSystem } from "../../node-file-system";
 import ScannerService from "../../scanner";
+import { getUri } from "../fixture-helper";
 import * as helpers from "../helpers";
-import { getUri } from "./scanner-helper";
 
 describe("Services/Scanner", () => {
 	beforeEach(() => {

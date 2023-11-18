@@ -23,6 +23,7 @@ export function createFunctionCompletionItems(
 	currentDocument: TextDocument,
 	context: CompletionContext,
 	hiddenSymbols: string[] = [],
+	shownSymbols: string[] = [],
 	prefix = "",
 ): CompletionItem[] {
 	const completions: CompletionItem[] = [];
@@ -36,6 +37,10 @@ export function createFunctionCompletionItems(
 		}
 
 		if (hiddenSymbols.includes(func.name)) {
+			continue;
+		}
+
+		if (shownSymbols.length > 0 && !shownSymbols.includes(func.name)) {
 			continue;
 		}
 

@@ -18,6 +18,7 @@ export function createVariableCompletionItems(
 	currentDocument: TextDocument,
 	context: CompletionContext,
 	hiddenSymbols: string[] = [],
+	shownSymbols: string[] = [],
 	prefix = "",
 ): CompletionItem[] {
 	const completions: CompletionItem[] = [];
@@ -62,6 +63,10 @@ export function createVariableCompletionItems(
 			}
 
 			if (hiddenSymbols.includes(variable.name)) {
+				continue;
+			}
+
+			if (shownSymbols.length > 0 && !shownSymbols.includes(variable.name)) {
 				continue;
 			}
 

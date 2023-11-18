@@ -47,6 +47,7 @@ export interface ScssUse extends ScssLink {
 
 export interface ScssForward extends ScssLink {
 	hide: string[];
+	show: string[];
 	prefix?: string;
 }
 

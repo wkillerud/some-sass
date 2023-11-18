@@ -11,11 +11,16 @@ import { applySassDoc } from "../../utils/sassdoc";
 export function createPlaceholderCompletionItems(
 	scssDocument: IScssDocument,
 	hiddenSymbols: string[] = [],
+	shownSymbols: string[] = [],
 ): CompletionItem[] {
 	const completions: CompletionItem[] = [];
 
 	for (const placeholder of scssDocument.placeholders.values()) {
 		if (hiddenSymbols.includes(placeholder.name)) {
+			continue;
+		}
+
+		if (shownSymbols.length > 0 && !shownSymbols.includes(placeholder.name)) {
 			continue;
 		}
 

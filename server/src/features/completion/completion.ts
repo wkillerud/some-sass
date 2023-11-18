@@ -305,10 +305,6 @@ function traverseTree(
 
 		accumulator.set(leaf.uri, completionItems);
 
-		// Reset these once we've processed the document they refered to
-		let hidden: string[] = [];
-		let shown: string[] = [];
-
 		// Check to see if we have to go deeper
 		// Don't follow uses, since we start with the document behind the first use, and symbols from further uses aren't available to us
 		// Don't follow imports, since the whole point here is to use the new module system
@@ -322,6 +318,8 @@ function traverseTree(
 				continue;
 			}
 
+			let hidden = hiddenSymbols;
+			let shown = shownSymbols;
 			if (
 				(child as ScssForward).hide &&
 				(child as ScssForward).hide.length > 0

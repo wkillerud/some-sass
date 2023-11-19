@@ -5,9 +5,9 @@ about: Report a bug
 
 <!-- Please search existing issues to avoid creating duplicates. -->
 
-- VS Code Version:
-- SCSS IntelliSense Version:
-- Operating System:
+- VS Code version:
+- Extension version:
+- Operating system:
 
 <!--
   Please include minimal steps for reproducing the problem.

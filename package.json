@@ -101,6 +101,8 @@
 		}
 	},
 	"devDependencies": {
+		"@commitlint/cli": "18.4.2",
+		"@commitlint/config-conventional": "18.4.2",
 		"@types/node": "^16.11.43",
 		"@types/webpack-env": "1.17.0",
 		"@typescript-eslint/eslint-plugin": "^5.31.0",

@@ -1,6 +1,34 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"extends": [
-		"config:recommended"
-	]
+	"extends": ["config:recommended"],
+	"schedule": ["on the first day of the month"],
+	"dependencyDashboard": false,
+	"packageRules": [
+		{
+			"groupName": "linters",
+			"matchDepTypes": ["devDependencies"],
+			"matchPackagePatterns": ["lint", "prettier"],
+			"automerge": true
+		},
+		{
+			"groupName": "devDependencies (non-major)",
+			"excludePackagePatterns": ["lint", "prettier"],
+			"matchDepTypes": ["devDependencies"],
+			"matchUpdateTypes": ["minor", "patch"],
+			"matchCurrentVersion": "!/^0/",
+			"automerge": true
+		},
+		{
+			"matchPackagePatterns": ["vscode-css-languageservice"],
+			"automerge": false
+		},
+		{
+			"groupName": "dependencies (non-major)",
+			"matchDepTypes": ["dependencies"],
+			"matchUpdateTypes": ["minor", "patch"],
+			"matchCurrentVersion": "!/^0/",
+			"automerge": false
+		}
+	],
+	"automergeType": "branch"
 }

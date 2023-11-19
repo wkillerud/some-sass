@@ -6,11 +6,23 @@ Before you start, please make a new Issue. I don't always make new issues for al
 
 If you open a pull request, please **make sure to set the correct target**. This is a fork, and GitHub defaults to using the source repository as a target for pull requests. Please don't create needless noise in the upstream repository. The correct target is `wkillerud/vscode-scss` and the branch `main`.
 
+## Conventional commits
+
+This repo uses [conventional commits and `semantic-release`](https://github.com/semantic-release/semantic-release#how-does-it-work) to automatically publish changes merged to `main`.
+
+While not a library, stick to something resembling semantic versioning when writing commit messages.
+
+| Commit message                                                                                                                            | Release type                                                                                                                                                         |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fix: update css-languageservice`                                                                                                         | Patch. Bugfix release, updates for runtime dependencies.                                                                                                             |
+| `feat: add support for show keyword in forward`                                                                                           | Minor. New feature release.                                                                                                                                          |
+| `refactor: remove reduntant options for latest language version`<br><br>`BREAKING CHANGE: The scanImportedFiles option has been removed.` | Major. Breaking release, like removing an option or changing `engines` version. <br /> (Note that the `BREAKING CHANGE: ` token must be in the footer of the commit) |
+
 ## Development environment
 
 You will need these things installed:
 
-- Node.js
+- Node.js LTS
 - Visual Studio Code stable
 - The extension _TypeScript + Webpack Problem Matchers_ (`amodio.tsl-problem-matcher`)
 

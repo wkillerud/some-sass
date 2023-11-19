@@ -123,6 +123,12 @@ const browserClientConfig = {
 	module: {
 		rules: [
 			{
+				test: /\.m?js/,
+				resolve: {
+					fullySpecified: false,
+				},
+			},
+			{
 				test: /\.ts$/,
 				exclude: /node_modules/,
 				use: [
@@ -174,6 +180,12 @@ const browserServerConfig = {
 	},
 	module: {
 		rules: [
+			{
+				test: /\.m?js/,
+				resolve: {
+					fullySpecified: false,
+				},
+			},
 			{
 				test: /\.ts$/,
 				exclude: /node_modules/,

@@ -1,5 +1,8 @@
 {
 	"root": true,
+	"env": {
+		"node": true
+	},
 	"parser": "@typescript-eslint/parser",
 	"extends": [
 		"eslint:recommended",

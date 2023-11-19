@@ -20,6 +20,12 @@
 			"automerge": true
 		},
 		{
+			"groupName": "language client and server",
+			"matchDepTypes": ["dependencies"],
+			"matchPackagePatterns": ["vscode-language"],
+			"automerge": false
+		},
+		{
 			"groupName": "dependencies (non-major)",
 			"matchDepTypes": ["dependencies"],
 			"matchUpdateTypes": ["minor", "patch"],

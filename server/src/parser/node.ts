@@ -90,6 +90,7 @@ export enum NodeType {
 	LayerNameList,
 	LayerName,
 	PropertyAtRule,
+	Container,
 }
 
 export interface INode {

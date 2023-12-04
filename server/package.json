@@ -23,7 +23,7 @@
 		"vscode-uri": "^3.0.3"
 	},
 	"devDependencies": {
-		"@nodelib/fs.macchiato": "^1.0.4",
+		"@nodelib/fs.macchiato": "^2.0.0",
 		"@types/micromatch": "^4.0.0",
 		"@types/mocha": "^10.0.0",
 		"@types/node": "^20.0.0",

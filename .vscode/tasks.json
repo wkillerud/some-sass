@@ -29,6 +29,13 @@
 				"reveal": "never"
 			},
 			"problemMatcher": ["$ts-webpack-watch"]
+		},
+		{
+			"type": "npm",
+			"script": "pretest:web",
+			"problemMatcher": [],
+			"label": "npm: pretest:web",
+			"detail": "webpack --config ./webpack.test-web.config.js && cd web && npm run compile"
 		}
 	]
 }

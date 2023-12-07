@@ -50,6 +50,7 @@ export function createLanguageClientOptions(
 		 * Otherwise, each client will participate in each workspace.
 		 */
 		const pattern = `${currentWorkspace.uri.fsPath.replace(/\\/g, "/")}/**`;
+		const webPattern = `${currentWorkspace.uri.path}**`;
 
 		documentSelector = [
 			{ scheme: "file", language: "scss", pattern },
@@ -60,6 +61,10 @@ export function createLanguageClientOptions(
 			{ scheme: "vscode-vfs", language: "vue", pattern },
 			{ scheme: "vscode-vfs", language: "svelte", pattern },
 			{ scheme: "vscode-vfs", language: "astro", pattern },
+			{ scheme: "vscode-test-web", language: "scss", pattern: webPattern },
+			{ scheme: "vscode-test-web", language: "vue", pattern: webPattern },
+			{ scheme: "vscode-test-web", language: "svelte", pattern: webPattern },
+			{ scheme: "vscode-test-web", language: "astro", pattern: webPattern },
 		];
 	}
 

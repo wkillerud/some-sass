@@ -139,11 +139,16 @@
 		"vscode:prepublish": "npm run build",
 		"clean": "rimraf dist",
 		"build": "npm run clean && webpack --mode production --devtool hidden-source-map",
+		"build:debug": "npm run clean && webpack --mode development --devtool hidden-source-map",
 		"dev": "webpack --mode development --watch",
+		"start:web": "vscode-test-web --browserType=chromium",
+		"start:test-web": "vscode-test-web --browserType=chromium  --extensionDevelopmentPath=. ./fixtures/e2e",
 		"lint": "eslint \"**/*.ts\" --cache",
 		"test": "cd server && npm test",
 		"test:e2e": "npm run build && cd e2e && npm test",
-		"postinstall": "cd client && npm install && cd ../e2e && npm install && cd ../server && npm install"
+		"pretest:web": "webpack --config ./webpack.test-web.config.js && cd web && npm run compile",
+		"test:web": "cd web && npm run test",
+		"postinstall": "cd client && npm install && cd ../e2e && npm install && cd ../server && npm install && cd ../web && npm install"
 	},
 	"__metadata": {
 		"id": "6d35099c-3671-464c-ac0b-34a0c3823927",

@@ -143,7 +143,8 @@
 		"lint": "eslint \"**/*.ts\" --cache",
 		"test": "cd server && npm test",
 		"test:e2e": "npm run build && cd e2e && npm test",
-		"postinstall": "cd client && npm install && cd ../e2e && npm install && cd ../server && npm install"
+		"test:web": "npm run build && cd web && npm test",
+		"postinstall": "cd client && npm install && cd ../e2e && npm install && cd ../server && npm install && cd ../web && npm install"
 	},
 	"__metadata": {
 		"id": "6d35099c-3671-464c-ac0b-34a0c3823927",

@@ -6,6 +6,5 @@
 		"lib": ["ES2019"],
 		"rootDir": "src",
 		"strict": true
-	},
-	"include": ["./src/runTest.ts"]
+	}
 }

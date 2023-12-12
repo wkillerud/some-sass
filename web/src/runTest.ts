@@ -1,6 +1,5 @@
 import * as path from "path";
 import { runTests } from "@vscode/test-web";
-import { URI } from "vscode-uri";
 
 async function main() {
 	try {

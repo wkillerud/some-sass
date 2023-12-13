@@ -4,8 +4,9 @@ require("mocha/mocha");
 export function run(): Promise<void> {
 	return new Promise((c, e) => {
 		mocha.setup({
-			ui: "tdd",
+			ui: "bdd",
 			reporter: undefined,
+			timeout: 20000,
 		});
 
 		// bundles all files in the current directory matching `*.test`

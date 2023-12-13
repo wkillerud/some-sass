@@ -143,7 +143,8 @@
 		"lint": "eslint \"**/*.ts\" --cache",
 		"test": "cd server && npm test",
 		"test:e2e": "npm run build && cd e2e && npm test",
-		"test:web": "npm run build && cd web && npm test",
+		"pretest:web": "webpack --config ./webpack.test-web.config.js && cd web && npm run compile",
+		"test:web": "cd web && npm run test",
 		"postinstall": "cd client && npm install && cd ../e2e && npm install && cd ../server && npm install && cd ../web && npm install"
 	},
 	"__metadata": {

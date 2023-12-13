@@ -20,7 +20,7 @@
 		"vscode-languageserver": "^9.0.1"
 	},
 	"scripts": {
-		"test": "npm run compile && node ./dist/runTest.js",
-		"compile": "tsc -p tsconfig.runtest.json"
+		"compile": "tsc -p tsconfig.runtest.json",
+		"test": "node ./dist/runTest.js"
 	}
 }

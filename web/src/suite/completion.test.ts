@@ -2,17 +2,6 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import { getDocUri, position, showFile, sleep } from "./util";
 
-mocha.timeout(10000);
-
-suite("Web Extension Test Suite", () => {
-	vscode.window.showInformationMessage("Start all tests.");
-
-	test("Sample test", () => {
-		assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-		assert.strictEqual(-1, [1, 2, 3].indexOf(0));
-	});
-});
-
 type CompletionTestOptions = {
 	/**
 	 * @default false
@@ -33,8 +22,6 @@ async function testCompletion(
 		docUri,
 		position,
 	)) as vscode.CompletionList;
-
-	console.log(JSON.stringify(result, null, 2));
 
 	expectedItems.forEach((ei) => {
 		if (typeof ei === "string") {
@@ -133,11 +120,15 @@ async function testCompletion(
 	});
 }
 
-suite("Reverse placeholders", () => {
+describe("Reverse placeholders", () => {
 	const docUri = getDocUri("completion/reverse-placeholders/_theme.scss");
 
-	test("Offers completions for placeholder usages when implementing a placeholder selector", async () => {
-		await sleep(5000); // Let workspace process?
+	before(async () => {
+		await showFile(docUri);
+		await sleep(8000);
+	});
+
+	it("Offers completions for placeholder usages when implementing a placeholder selector", async () => {
 		await testCompletion(docUri, position(1, 2), [
 			{
 				label: "%app",

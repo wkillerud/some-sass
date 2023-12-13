@@ -7,7 +7,7 @@ async function main() {
 		const extensionDevelopmentPath = path.resolve(__dirname, "../../");
 
 		// The path to module with the test runner and tests
-		const extensionTestsPath = path.resolve(__dirname, "browser-tests");
+		const extensionTestsPath = path.resolve(__dirname, "suite/index");
 
 		const folderPath = path.resolve(__dirname, "../../fixtures/e2e");
 
@@ -18,6 +18,7 @@ async function main() {
 
 		// Start a web server that serves VSCode in a browser, run the tests
 		await runTests({
+			headless: true,
 			browserType: "chromium",
 			extensionDevelopmentPath,
 			extensionTestsPath,

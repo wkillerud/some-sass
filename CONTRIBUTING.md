@@ -126,4 +126,10 @@ Breakpoints set, go to the Run and Debug and run the Integration Tests configura
 
 ### Debugging integration tests for the web extension
 
-Unfortunately there are no integration tests for the web version at the moment.
+Like [debugging integration tests](#debugging-integration-tests), this is recommended only when you want to debug the tests themselves. The web integration tests can be found in `web/src/suite/`.
+
+Set breakpoints in the compiled output (`web/dist/suite/index.js`).
+
+> Note: at time of writing you may have to set the breakpoints after
+> the debugger has attached. I've had the best success rate just
+> spam clicking in the gutter to set the breakpoint :(

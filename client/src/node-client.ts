@@ -71,8 +71,13 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
 	async function didOpenTextDocument(document: TextDocument): Promise<void> {
 		if (
-			document.languageId !== "scss" ||
-			(document.uri.scheme !== "file" && document.uri.scheme !== "untitled")
+			document.uri.scheme !== "file" &&
+			document.uri.scheme !== "untitled" &&
+			document.uri.scheme !== "vscode-vfs" &&
+			document.languageId !== "scss" &&
+			document.languageId !== "vue" &&
+			document.languageId !== "svelte" &&
+			document.languageId !== "astro"
 		) {
 			return;
 		}

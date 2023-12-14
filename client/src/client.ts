@@ -60,6 +60,10 @@ export function createLanguageClientOptions(
 			{ scheme: "vscode-vfs", language: "vue", pattern },
 			{ scheme: "vscode-vfs", language: "svelte", pattern },
 			{ scheme: "vscode-vfs", language: "astro", pattern },
+			{ scheme: "vscode-test-web", language: "scss", pattern },
+			{ scheme: "vscode-test-web", language: "vue", pattern },
+			{ scheme: "vscode-test-web", language: "svelte", pattern },
+			{ scheme: "vscode-test-web", language: "astro", pattern },
 		];
 	}
 

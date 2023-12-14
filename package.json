@@ -140,6 +140,7 @@
 		"clean": "rimraf dist",
 		"build": "npm run clean && webpack --mode production --devtool hidden-source-map",
 		"dev": "webpack --mode development --watch",
+		"start:web": "vscode-test-web --browserType=chromium",
 		"lint": "eslint \"**/*.ts\" --cache",
 		"test": "cd server && npm test",
 		"test:e2e": "npm run build && cd e2e && npm test",

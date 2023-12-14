@@ -44,7 +44,7 @@
 			"outFiles": ["${workspaceFolder}/e2e/out/**/*.js"]
 		},
 		{
-			"type": "pwa-chrome",
+			"type": "chrome",
 			"request": "attach",
 			"name": "Attach to web integration test",
 			"skipFiles": ["<node_internals>/**"],
@@ -54,13 +54,12 @@
 				"!**/vs/**", // exclude core vscode sources
 				"!**/static/build/extensions/**" // exclude built-in extensions
 			],
-			"webRoot": "${workspaceFolder}/web",
 			"presentation": {
 				"hidden": true
 			}
 		},
 		{
-			"type": "pwa-node",
+			"type": "node",
 			"request": "launch",
 			"name": "Launch web integration test",
 			"outputCapture": "std",

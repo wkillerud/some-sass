@@ -197,7 +197,12 @@ export class SomeSassServer {
 				return null;
 			}
 
-			const { storage } = useContext();
+			const context = useContext();
+			if (!context) {
+				return;
+			}
+
+			const { storage } = context;
 			const newFiles: URI[] = [];
 			for (const change of event.changes) {
 				const uri = URI.parse(change.uri);
@@ -320,7 +325,12 @@ export class SomeSassServer {
 		});
 
 		this.connection.onCodeAction(async (params) => {
-			const { editorSettings } = useContext();
+			const context = useContext();
+			if (!context) {
+				return;
+			}
+
+			const { editorSettings } = context;
 			const codeActionProviders = [new ExtractProvider(editorSettings)];
 
 			const document = documents.get(params.textDocument.uri);
@@ -400,7 +410,12 @@ export class SomeSassServer {
 				return null;
 			}
 
-			const { storage } = useContext();
+			const context = useContext();
+			if (!context) {
+				return null;
+			}
+
+			const { storage } = context;
 			const scssDocument = storage.get(document.uri);
 			if (!scssDocument) {
 				// For the first open document, we may have a race condition where the scanner
@@ -430,8 +445,10 @@ export class SomeSassServer {
 		});
 
 		this.connection.onShutdown(() => {
-			const { storage } = useContext();
-			storage.clear();
+			const context = useContext();
+			if (context) {
+				context.storage.clear();
+			}
 		});
 
 		this.connection.listen();

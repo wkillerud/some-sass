@@ -7,11 +7,8 @@
 		"**/bower_components/**"
 	],
 	"somesass.scanImportedFiles": true,
-	"somesass.showErrors": false,
 	"somesass.suggestAllFromOpenDocument": false,
 	"somesass.suggestFromUseOnly": false,
-	"somesass.suggestVariables": true,
-	"somesass.suggestMixins": true,
-	"somesass.suggestFunctions": true,
+	"somesass.suggestionStyle": "all",
 	"somesass.suggestFunctionsInStringContextAfterSymbols": " (+-*%"
 }

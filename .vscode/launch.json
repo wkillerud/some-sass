@@ -3,18 +3,6 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Integration Tests",
-			"type": "extensionHost",
-			"request": "launch",
-			"runtimeExecutable": "${execPath}",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/e2e/out/suite",
-				"${workspaceFolder}/fixtures/e2e/"
-			],
-			"outFiles": ["${workspaceFolder}/e2e/out/**/*.js"]
-		},
-		{
 			"type": "extensionHost",
 			"request": "launch",
 			"name": "Launch extension",
@@ -42,6 +30,58 @@
 				"type": "npm",
 				"script": "dev"
 			}
+		},
+		{
+			"name": "Integration Tests",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionTestsPath=${workspaceFolder}/e2e/out/suite",
+				"${workspaceFolder}/fixtures/e2e/"
+			],
+			"outFiles": ["${workspaceFolder}/e2e/out/**/*.js"]
+		},
+		{
+			"type": "chrome",
+			"request": "attach",
+			"name": "Attach to web integration test",
+			"skipFiles": ["<node_internals>/**"],
+			"port": 9229,
+			"timeout": 30000, // give it time to download vscode if needed
+			"resolveSourceMapLocations": [
+				"!**/vs/**", // exclude core vscode sources
+				"!**/static/build/extensions/**" // exclude built-in extensions
+			],
+			"presentation": {
+				"hidden": true
+			}
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Launch web integration test",
+			"outputCapture": "std",
+			"program": "${workspaceFolder}/web/dist/runTest.js",
+			"args": ["--waitForDebugger=9229"],
+			"cascadeTerminateToConfigurations": ["Launch web integration test"],
+			"presentation": {
+				"hidden": true
+			},
+			"preLaunchTask": {
+				"type": "npm",
+				"script": "pretest:web"
+			}
+		}
+	],
+	"compounds": [
+		{
+			"name": "Web Integration Tests",
+			"configurations": [
+				"Launch web integration test",
+				"Attach to web integration test"
+			]
 		}
 	]
 }

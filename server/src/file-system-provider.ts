@@ -48,16 +48,7 @@ export function getFileSystemProvider(
 				return handler.stat(uri);
 			}
 			try {
-				let params = uri.toString();
-				if (uri.scheme === "vscode-test-web") {
-					params = URI.from({
-						authority: uri.authority,
-						scheme: uri.scheme,
-						fragment: uri.fragment,
-						query: uri.query,
-						path: uri.path.replace(/^\/static\/mount/, ""),
-					}).toString();
-				}
+				const params = uri.toString();
 				const res = await connection.sendRequest(FsStatRequest.type, params);
 				return res as FileStat;
 			} catch (e) {
@@ -76,16 +67,6 @@ export function getFileSystemProvider(
 			}
 
 			const params = uri.toString();
-			// if (uri.scheme === "vscode-test-web") {
-			// 	params = URI.from({
-			// 		authority: uri.authority,
-			// 		scheme: uri.scheme,
-			// 		fragment: uri.fragment,
-			// 		query: uri.query,
-			// 		path: uri.path.replace(/^\/static\/mount/, ""),
-			// 	}).toString();
-			// }
-
 			const res = await connection.sendRequest(FsReadFileRequest.type, {
 				uri: params,
 				encoding,
@@ -128,15 +109,6 @@ export function getFileSystemProvider(
 
 			try {
 				const params = uri.toString();
-				// if (uri.scheme === "vscode-test-web") {
-				// 	params = URI.from({
-				// 		authority: uri.authority,
-				// 		scheme: uri.scheme,
-				// 		fragment: uri.fragment,
-				// 		query: uri.query,
-				// 		path: uri.path.replace(/^\/static\/mount/, ""),
-				// 	}).toString();
-				// }
 				const res = await connection.sendRequest(FsStatRequest.type, params);
 				const exists = res.type !== FileType.Unknown;
 				return exists;

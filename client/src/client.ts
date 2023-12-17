@@ -49,7 +49,7 @@ export function createLanguageClientOptions(
 		 * The workspace path is used to separate clients in multi-workspace environment.
 		 * Otherwise, each client will participate in each workspace.
 		 */
-		const pattern = `${currentWorkspace.uri.fsPath.replace(/\\/g, "/")}**`;
+		const pattern = `${currentWorkspace.uri.fsPath.replace(/\\/g, "/")}/**`;
 
 		documentSelector = [
 			{ scheme: "file", language: "scss", pattern },

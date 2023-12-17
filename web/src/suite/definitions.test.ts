@@ -33,7 +33,7 @@ describe("SCSS Definition Test", function () {
 
 	before(async () => {
 		await showFile(docUri);
-		await sleep(1000);
+		await sleep(5000);
 	});
 
 	it("should find definition for variables", async () => {

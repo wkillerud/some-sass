@@ -48,10 +48,17 @@ export function getFileSystemProvider(
 				return handler.stat(uri);
 			}
 			try {
-				const res = await connection.sendRequest(
-					FsStatRequest.type,
-					uri.toString(),
-				);
+				let params = uri.toString();
+				if (uri.scheme === "vscode-test-web") {
+					params = URI.from({
+						authority: uri.authority,
+						scheme: uri.scheme,
+						fragment: uri.fragment,
+						query: uri.query,
+						path: uri.path.replace(/^\/static\/mount/, ""),
+					}).toString();
+				}
+				const res = await connection.sendRequest(FsStatRequest.type, params);
 				return res as FileStat;
 			} catch (e) {
 				return {
@@ -67,8 +74,20 @@ export function getFileSystemProvider(
 			if (handler) {
 				return await handler.readFile(uri);
 			}
+
+			const params = uri.toString();
+			// if (uri.scheme === "vscode-test-web") {
+			// 	params = URI.from({
+			// 		authority: uri.authority,
+			// 		scheme: uri.scheme,
+			// 		fragment: uri.fragment,
+			// 		query: uri.query,
+			// 		path: uri.path.replace(/^\/static\/mount/, ""),
+			// 	}).toString();
+			// }
+
 			const res = await connection.sendRequest(FsReadFileRequest.type, {
-				uri: uri.toString(),
+				uri: params,
 				encoding,
 			});
 			return res;
@@ -108,10 +127,17 @@ export function getFileSystemProvider(
 			}
 
 			try {
-				const res = await connection.sendRequest(
-					FsStatRequest.type,
-					uri.toString(),
-				);
+				const params = uri.toString();
+				// if (uri.scheme === "vscode-test-web") {
+				// 	params = URI.from({
+				// 		authority: uri.authority,
+				// 		scheme: uri.scheme,
+				// 		fragment: uri.fragment,
+				// 		query: uri.query,
+				// 		path: uri.path.replace(/^\/static\/mount/, ""),
+				// 	}).toString();
+				// }
+				const res = await connection.sendRequest(FsStatRequest.type, params);
 				const exists = res.type !== FileType.Unknown;
 				return exists;
 			} catch {
@@ -123,7 +149,6 @@ export function getFileSystemProvider(
 			if (handler) {
 				return handler.realPath(uri);
 			}
-
 			return Promise.resolve(uri);
 		},
 	};

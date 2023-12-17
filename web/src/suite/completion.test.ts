@@ -125,7 +125,7 @@ describe("Reverse placeholders", () => {
 
 	before(async () => {
 		await showFile(docUri);
-		await sleep(8000);
+		await sleep(1000);
 	});
 
 	it("Offers completions for placeholder usages when implementing a placeholder selector", async () => {

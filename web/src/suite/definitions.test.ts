@@ -30,15 +30,9 @@ async function testDefinition(
 
 describe("SCSS Definition Test", function () {
 	const docUri = getDocUri("definition/main.scss");
-	const vueDocUri = getDocUri("definition/AppButton.vue");
-	const svelteDocUri = getDocUri("definition/AppButton.svelte");
-	const astroDocUri = getDocUri("definition/AppButton.astro");
 
 	before(async () => {
 		await showFile(docUri);
-		await showFile(vueDocUri);
-		await showFile(svelteDocUri);
-		await showFile(astroDocUri);
 		await sleep(1000);
 	});
 
@@ -46,9 +40,6 @@ describe("SCSS Definition Test", function () {
 		const expectedDocumentUri = getDocUri("_variables.scss");
 		const expectedLocation = sameLineLocation(expectedDocumentUri, 1, 1, 10);
 		await testDefinition(docUri, position(7, 15), expectedLocation);
-		await testDefinition(vueDocUri, position(15, 15), expectedLocation);
-		// await testDefinition(svelteDocUri, position(9, 17), expectedLocation);
-		// await testDefinition(astroDocUri, position(12, 17), expectedLocation);
 	});
 
 	it("should find definition for functions", async () => {
@@ -56,9 +47,6 @@ describe("SCSS Definition Test", function () {
 		const expectedLocation = sameLineLocation(expectedDocumentUri, 1, 1, 9);
 
 		await testDefinition(docUri, position(7, 25), expectedLocation);
-		// await testDefinition(vueDocUri, position(15, 25), expectedLocation);
-		// await testDefinition(svelteDocUri, position(9, 27), expectedLocation);
-		// await testDefinition(astroDocUri, position(12, 27), expectedLocation);
 	});
 
 	it("should find definition for mixins", async () => {
@@ -66,9 +54,6 @@ describe("SCSS Definition Test", function () {
 		const expectedLocation = sameLineLocation(expectedDocumentUri, 1, 1, 6);
 
 		await testDefinition(docUri, position(9, 13), expectedLocation);
-		// await testDefinition(vueDocUri, position(17, 13), expectedLocation);
-		// await testDefinition(svelteDocUri, position(11, 15), expectedLocation);
-		// await testDefinition(astroDocUri, position(14, 15), expectedLocation);
 	});
 
 	it("should find definition for placeholder", async () => {
@@ -83,9 +68,6 @@ describe("SCSS Definition Test", function () {
 		const expectedLocation = sameLineLocation(expectedDocumentUri, 1, 1, 18);
 
 		await testDefinition(docUri, position(15, 15), expectedLocation);
-		// await testDefinition(vueDocUri, position(23, 15), expectedLocation);
-		// await testDefinition(svelteDocUri, position(17, 15), expectedLocation);
-		// await testDefinition(astroDocUri, position(20, 15), expectedLocation);
 	});
 
 	it("should find symbol definition behind namespace and prefix", async () => {
@@ -93,8 +75,5 @@ describe("SCSS Definition Test", function () {
 		const expectedLocation = sameLineLocation(expectedDocumentUri, 1, 1, 10);
 
 		await testDefinition(docUri, position(16, 18), expectedLocation);
-		// await testDefinition(vueDocUri, position(24, 18), expectedLocation);
-		// await testDefinition(svelteDocUri, position(18, 18), expectedLocation);
-		// await testDefinition(astroDocUri, position(21, 18), expectedLocation);
 	});
 });

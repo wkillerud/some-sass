@@ -20,6 +20,19 @@ export default class ScannerService {
 					// partials which may or may not have been forwarded with a prefix.
 					return;
 				}
+				if (uri.scheme === "vscode-test-web") {
+					return this.parse(
+						URI.from({
+							authority: uri.authority,
+							scheme: uri.scheme,
+							fragment: uri.fragment,
+							query: uri.query,
+							path: uri.path.replace(/^\/static\/mount/, ""),
+						}),
+						workspaceRoot,
+						0,
+					);
+				}
 				return this.parse(uri, workspaceRoot, 0);
 			}),
 		);

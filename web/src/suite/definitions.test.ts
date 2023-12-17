@@ -28,7 +28,7 @@ async function testDefinition(
 	assert.strictEqual(result[0].uri.fsPath, expectedLocation.uri.fsPath);
 }
 
-describe("SCSS Definition Test", function () {
+describe("Definitions", function () {
 	const docUri = getDocUri("definition/main.scss");
 
 	before(async () => {

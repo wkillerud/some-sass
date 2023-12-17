@@ -120,31 +120,218 @@ async function testCompletion(
 	});
 }
 
-describe("Reverse placeholders", () => {
-	const docUri = getDocUri("completion/reverse-placeholders/_theme.scss");
+describe("Completions", () => {
+	const docUri = getDocUri("completion/main.scss");
 
 	before(async () => {
 		await showFile(docUri);
-		await sleep(5000);
+		await sleep();
 	});
 
-	it("Offers completions for placeholder usages when implementing a placeholder selector", async () => {
-		await testCompletion(docUri, position(1, 2), [
-			{
-				label: "%app",
-				insertText: "app",
-			},
-			{
-				label: "%chat",
-				insertText: "chat",
-			},
-		]);
+	it("from partial file", async () => {
+		const expectedCompletions = [{ label: "$partial" }];
 
-		await testCompletion(docUri, position(3, 4), [
+		await testCompletion(docUri, position(17, 11), expectedCompletions);
+	});
+
+	it("for namespaces including prefixes", async () => {
+		let expectedCompletions = [
 			{
-				label: "%chat",
-				insertText: "chat",
+				label: "$var-var-variable",
+				insertText: '".$var-var-variable"',
+				filterText: '"ns.$var-var-variable"',
 			},
-		]);
+			{
+				label: "fun-fun-function",
+				insertText: '".fun-fun-function()"',
+			},
+		];
+
+		await testCompletion(docUri, position(23, 13), expectedCompletions);
+
+		expectedCompletions = [
+			{
+				label: "mix-mix-mixin",
+				insertText: '".mix-mix-mixin"',
+			},
+		];
+
+		await testCompletion(docUri, position(24, 15), expectedCompletions);
+	});
+
+	it("inside string interpolation", async () => {
+		const expectedCompletions = [
+			{
+				label: "$var-var-variable",
+				insertText: '".$var-var-variable"',
+				filterText: '"ns.$var-var-variable"',
+			},
+			{
+				label: "fun-fun-function",
+				insertText: '".fun-fun-function()"',
+			},
+		];
+
+		await testCompletion(docUri, position(25, 40), expectedCompletions);
+	});
+
+	it("inside string interpolation with preceeding non-space character", async () => {
+		const expectedCompletions = [
+			{
+				label: "$var-var-variable",
+				insertText: '".$var-var-variable"',
+				filterText: '"ns.$var-var-variable"',
+			},
+			{
+				label: "fun-fun-function",
+				insertText: '".fun-fun-function()"',
+			},
+		];
+
+		await testCompletion(docUri, position(26, 20), expectedCompletions);
+	});
+
+	it("as part of return statement", async () => {
+		const expectedCompletions = [
+			{
+				label: "$var-var-variable",
+				insertText: '".$var-var-variable"',
+				filterText: '"ns.$var-var-variable"',
+			},
+			{
+				label: "fun-fun-function",
+				insertText: '".fun-fun-function()"',
+			},
+		];
+
+		await testCompletion(docUri, position(30, 23), expectedCompletions);
+	});
+
+	describe("SassDoc", () => {
+		const docUri = getDocUri("completion/sassdoc.scss");
+
+		before(async () => {
+			await showFile(docUri);
+		});
+
+		it("completions for SassDoc block on mixin without parameters or @content", async () => {
+			const expectedCompletions = [
+				{
+					label: "SassDoc block",
+					insertText: '" ${0}\\n/// @output ${2}"',
+				},
+			];
+
+			await testCompletion(docUri, position(3, 4), expectedCompletions);
+		});
+
+		it("completions for SassDoc block on mixin with @content", async () => {
+			const expectedCompletions = [
+				{
+					label: "SassDoc block",
+					insertText: '" ${0}\\n/// @content ${1}\\n/// @output ${2}"',
+				},
+			];
+
+			await testCompletion(docUri, position(8, 4), expectedCompletions);
+		});
+
+		it("completions for SassDoc block on mixin with parameters", async () => {
+			const expectedCompletions = [
+				{
+					label: "SassDoc block",
+					insertText:
+						'" ${0}\\n/// @param {${1:Number}} \\\\$a [1px] ${2:-}\\n/// @param {${3:Number}} \\\\$b [2px] ${4:-}\\n/// @output ${6:-}"',
+				},
+			];
+
+			await testCompletion(docUri, position(13, 4), expectedCompletions);
+		});
+
+		it("completions for SassDoc block on mixin with parameters and @content", async () => {
+			const expectedCompletions = [
+				{
+					label: "SassDoc block",
+					insertText:
+						'" ${0}\\n/// @param {${1:type}} \\\\$a ${2:-}\\n/// @param {${3:type}} \\\\$b ${4:-}\\n/// @output ${6:-}"',
+				},
+			];
+
+			await testCompletion(docUri, position(18, 4), expectedCompletions);
+		});
+
+		it("completions for SassDoc block on parameterless function", async () => {
+			const expectedCompletions = [
+				{
+					label: "SassDoc block",
+					insertText:
+						'" ${0}\\n/// @param {${1:type}} \\\\ ${2:-}\\n/// @return {${3:type}} ${4:-}"',
+				},
+			];
+
+			await testCompletion(docUri, position(25, 4), expectedCompletions);
+		});
+
+		it("completions for SassDoc block on parameterfull function", async () => {
+			const expectedCompletions = [
+				{
+					label: "SassDoc block",
+					insertText:
+						'" ${0}\\n/// @param {${1:Number}} \\\\$a [1px] ${2:-}\\n/// @param {${3:Number}} \\\\$b [2px] ${4:-}\\n/// @return {${5:type}} ${6:-}"',
+				},
+			];
+
+			await testCompletion(docUri, position(30, 4), expectedCompletions);
+		});
+	});
+
+	describe("Placeholders", () => {
+		const docUri = getDocUri("completion/placeholders.scss");
+
+		before(async () => {
+			await showFile(docUri);
+		});
+
+		it("get completions", async () => {
+			const expectedCompletions = [
+				{
+					label: "%mediumAlert",
+					insertText: "mediumAlert",
+				},
+			];
+
+			await testCompletion(docUri, position(9, 14), expectedCompletions);
+		});
+	});
+
+	describe("Reverse placeholders", () => {
+		const docUri = getDocUri("completion/reverse-placeholders/_theme.scss");
+
+		before(async () => {
+			await showFile(docUri);
+			// TODO: figure out why we need to open main.scss and sleep here in the test. It works as expected in the browser.
+			await showFile(getDocUri("completion/reverse-placeholders/main.scss"));
+			await sleep();
+		});
+
+		it("when implementing a placeholder selector", async () => {
+			await testCompletion(docUri, position(1, 2), [
+				{
+					label: "%app",
+					insertText: "app",
+				},
+				{
+					label: "%chat",
+					insertText: "chat",
+				},
+			]);
+
+			await testCompletion(docUri, position(3, 4), [
+				{
+					label: "%chat",
+					insertText: "chat",
+				},
+			]);
+		});
 	});
 });

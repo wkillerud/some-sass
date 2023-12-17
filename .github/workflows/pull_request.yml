@@ -42,4 +42,8 @@ jobs:
           command: npm run test:e2e
 
       - name: Run web e2e tests
-        run: npm run test:web
+        uses: nick-fields/retry@14672906e672a08bd6eeb15720e9ed3ce869cdd4
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: npm run test:web

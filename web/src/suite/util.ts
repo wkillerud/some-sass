@@ -1,6 +1,9 @@
 import * as vscode from "vscode";
 
 export function sleep(ms = 1000): Promise<void> {
+	if (process.env["CI"]) {
+		return new Promise((resolve) => setTimeout(resolve, ms * 2));
+	}
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 

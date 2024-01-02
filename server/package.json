@@ -27,13 +27,13 @@
 		"@types/micromatch": "^4.0.0",
 		"@types/mocha": "^10.0.0",
 		"@types/node": "^20.0.0",
-		"@types/sinon": "^10.0.12",
+		"@types/sinon": "^17.0.0",
 		"assert": "^2.0.0",
 		"micromatch": "^4.0.5",
 		"mocha": "^10.0.0",
 		"nyc": "^15.1.0",
 		"rimraf": "^3.0.2",
-		"sinon": "^15.0.1"
+		"sinon": "^17.0.0"
 	},
 	"scripts": {
 		"clean": "rimraf out",

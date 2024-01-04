@@ -128,12 +128,10 @@ export class SomeSassServer {
 		);
 
 		this.connection.onInitialized(async () => {
-			const settings = await this.connection.workspace.getConfiguration(
-				"somesass",
-			);
-			const editorSettings = await this.connection.workspace.getConfiguration(
-				"editor",
-			);
+			const settings =
+				await this.connection.workspace.getConfiguration("somesass");
+			const editorSettings =
+				await this.connection.workspace.getConfiguration("editor");
 			const storageService = new StorageService();
 
 			createContext({

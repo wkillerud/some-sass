@@ -78,7 +78,7 @@ export function createPlaceholderDeclarationCompletionItems(): CompletionItem[] 
 							filterText,
 							insertText: filterText,
 							insertTextFormat: InsertTextFormat.Snippet,
-					  }
+						}
 					: undefined,
 				settings.suggestionStyle !== "nobracket"
 					? {
@@ -88,7 +88,7 @@ export function createPlaceholderDeclarationCompletionItems(): CompletionItem[] 
 							filterText,
 							insertText: filterText + " {\n\t$0\n}",
 							insertTextFormat: InsertTextFormat.Snippet,
-					  }
+						}
 					: undefined,
 			]);
 		}

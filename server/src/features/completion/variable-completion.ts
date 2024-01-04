@@ -92,8 +92,8 @@ export function createVariableCompletionItems(
 			insertText = context.word.endsWith(".")
 				? `${isEmbedded ? "" : "."}${label}`
 				: isEmbedded
-				? asDollarlessVariable(label)
-				: label;
+					? asDollarlessVariable(label)
+					: label;
 			filterText = context.word.endsWith(".")
 				? `${context.namespace}.${label}`
 				: label;
@@ -116,7 +116,7 @@ export function createVariableCompletionItems(
 					: {
 							kind: MarkupKind.Markdown,
 							value: documentation,
-					  },
+						},
 		});
 	}
 

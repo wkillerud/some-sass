@@ -51,8 +51,8 @@ export function indentText(text: string, settings: IEditorSettings): string {
 			typeof settings.indentSize === "number"
 				? settings.indentSize
 				: typeof settings.tabSize === "number"
-				? settings.tabSize
-				: 2;
+					? settings.tabSize
+					: 2;
 		return `${space.repeat(numberOfSpaces)}${text}`;
 	}
 

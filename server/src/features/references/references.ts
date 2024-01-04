@@ -200,7 +200,7 @@ export async function provideReferences(
 				? {
 						symbol: definitionSymbol,
 						document: definitionDocument,
-				  }
+					}
 				: null,
 	};
 }

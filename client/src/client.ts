@@ -108,7 +108,7 @@ export function createLanguageClientOptions(
 						baseUri: currentWorkspace.uri,
 						base: currentWorkspace.uri.fsPath,
 						pattern: "**/*.{scss,vue,svelte,astro}",
-				  })
+					})
 				: undefined,
 		},
 		initializationOptions: {

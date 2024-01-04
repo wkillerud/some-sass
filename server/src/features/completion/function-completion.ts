@@ -51,7 +51,7 @@ export function createFunctionCompletionItems(
 		const filterText = context.namespace
 			? `${context.namespace !== "*" ? context.namespace : ""}.${prefix}${
 					func.name
-			  }`
+				}`
 			: func.name;
 		const isEmbedded = context.originalExtension !== "scss";
 		const insertText = context.namespace

@@ -65,8 +65,9 @@ describe("SCSS Completion Test", function () {
 			},
 		];
 		await testCompletion(docUri, position(11, 11), expectedCompletions);
+		await testCompletion(svelteDocUri, position(14, 11), expectedCompletions);
 
-		// For Vue, Svelte and Astro, the existing $ is not replaced by VS Code, so omit it from insertText
+		// For Vue and Astro, the existing $ is not replaced by VS Code, so omit it from insertText
 		expectedCompletions = [
 			{
 				label: "$tilde",
@@ -74,7 +75,6 @@ describe("SCSS Completion Test", function () {
 			},
 		];
 		await testCompletion(vueDocUri, position(22, 11), expectedCompletions);
-		await testCompletion(svelteDocUri, position(14, 11), expectedCompletions);
 		await testCompletion(astroDocUri, position(17, 11), expectedCompletions);
 	});
 
@@ -188,19 +188,25 @@ describe("SCSS Completion Test", function () {
 	});
 
 	it("Offers variable completions on Vuelike file", async () => {
-		// In Vue, Svelte and Astro files:
+		// In Vue and Astro files:
 		// For variables _without_ a namespace ($color as opposed to namespace.$color),
 		// VS Code does not replace the existing $ when using the completion.
 		// The insertText must be without one to avoid $$color. However, filterText
 		// still need the $ sign for the suggestion to match.
-		const expectedCompletions = [
+		let expectedCompletions = [
 			{ label: "$color", insertText: '"color"', filterText: undefined },
 			{ label: "$fonts", insertText: '"fonts"', filterText: undefined },
 		];
 
 		await testCompletion(vueDocUri, position(16, 11), expectedCompletions);
-		await testCompletion(svelteDocUri, position(8, 11), expectedCompletions);
 		await testCompletion(astroDocUri, position(11, 11), expectedCompletions);
+
+		expectedCompletions = [
+			{ label: "$color", insertText: '"$color"', filterText: undefined },
+			{ label: "$fonts", insertText: '"$fonts"', filterText: undefined },
+		];
+
+		await testCompletion(svelteDocUri, position(8, 11), expectedCompletions);
 	});
 
 	it("Offers namespace completion inside string interpolation", async () => {

@@ -87,7 +87,7 @@ export function createVariableCompletionItems(
 			// Avoid ending up with namespace.prefix-$variable
 			label = `$${prefix}${asDollarlessVariable(variable.name)}`;
 			// The `.` in the namespace gets replaced unless we have a $ character after it.
-			// Except when we're embedded in Vue, Svelte or Astro, where the . is not replace.
+			// Except when we're embedded in Vue, Svelte or Astro, where the . is not replaced.
 			// Also, in embedded scenarios where we don't use a namespace, the existing $ sign is not replaced.
 			insertText = context.word.endsWith(".")
 				? `${isEmbedded ? "" : "."}${label}`
@@ -97,7 +97,12 @@ export function createVariableCompletionItems(
 			filterText = context.word.endsWith(".")
 				? `${context.namespace}.${label}`
 				: label;
-		} else if (isEmbedded) {
+		} else if (
+			context.originalExtension === "vue" ||
+			context.originalExtension === "astro"
+		) {
+			// In Vue and Astro files, the $ does not get replaced by the suggestion,
+			// so exclude it from the insertText.
 			insertText = asDollarlessVariable(label);
 		}
 

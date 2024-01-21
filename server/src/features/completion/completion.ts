@@ -215,7 +215,7 @@ function doBuiltInCompletion(
 			return {
 				label: name,
 				filterText: `${context.namespace}.${name}`,
-				insertText: context.word.endsWith(".")
+				insertText: context.word.includes(".")
 					? `.${name}${signature ? `(${parameterSnippet})` : ""}`
 					: name,
 				insertTextFormat: parameterSnippet

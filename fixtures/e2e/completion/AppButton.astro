@@ -30,4 +30,10 @@ $fonts: -apple-system;
   @include ns.
   --runtime-var: var(--other-var, #{ns.})
 }
+
+@use "sass:math";
+
+.foo {
+  padding: math.fl
+}
 </style>

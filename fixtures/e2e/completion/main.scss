@@ -29,3 +29,9 @@ $fonts: -apple-system;
 @function _multiply($value) {
   @return $value * ns.;
 }
+
+@use "sass:math";
+
+.foo {
+  padding: math.fl
+}

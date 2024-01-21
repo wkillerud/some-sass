@@ -212,12 +212,23 @@ function doBuiltInCompletion(
 ): void {
 	completions.items = Object.entries(module.exports).map(
 		([name, { description, signature, parameterSnippet, returns }]) => {
+			// Client needs the namespace as part of the text that is matched,
+			const filterText = `${context.namespace}.${name}`;
+
+			// Inserted text needs to include the `.` which will otherwise
+			// be replaced (except when we're embedded in Vue, Svelte or Astro).
+			// Example result: .floor(${1:number})
+			const isEmbedded = context.originalExtension !== "scss";
+			const insertText = context.word.includes(".")
+				? `${isEmbedded ? "" : "."}${name}${
+						signature ? `(${parameterSnippet})` : ""
+				  }`
+				: name;
+
 			return {
 				label: name,
-				filterText: `${context.namespace}.${name}`,
-				insertText: context.word.includes(".")
-					? `.${name}${signature ? `(${parameterSnippet})` : ""}`
-					: name,
+				filterText,
+				insertText,
 				insertTextFormat: parameterSnippet
 					? InsertTextFormat.Snippet
 					: InsertTextFormat.PlainText,

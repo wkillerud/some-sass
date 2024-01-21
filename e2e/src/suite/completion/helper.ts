@@ -48,6 +48,14 @@ export async function testCompletion(
 			}
 		} else {
 			const match = result.items.find((i) => {
+				if (Object.prototype.hasOwnProperty.call(ei, "filterText")) {
+					if (JSON.stringify(i.filterText) === ei.filterText) {
+						return true;
+					} else {
+						return false;
+					}
+				}
+
 				if (typeof i.label === "string") {
 					return i.label === ei.label;
 				}
@@ -76,23 +84,13 @@ export async function testCompletion(
 			if (ei.detail) {
 				assert.strictEqual(match.detail, ei.detail);
 			}
+
 			if (ei.insertText) {
 				assert.ok(
 					JSON.stringify(match.insertText).includes(ei.insertText),
 					`Expected insertText to include ${
 						ei.insertText
 					}. Actual: ${JSON.stringify(match.insertText)}`,
-				);
-			}
-
-			// This may deliberatly be undefined, in which case the filter matches the label
-			if (Object.prototype.hasOwnProperty.call(ei, "filterText")) {
-				assert.strictEqual(
-					JSON.stringify(match.filterText),
-					ei.filterText,
-					`Expected filterText to match ${
-						ei.filterText
-					}. Actual: ${JSON.stringify(match.filterText)}`,
 				);
 			}
 

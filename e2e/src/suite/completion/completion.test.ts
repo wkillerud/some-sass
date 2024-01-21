@@ -194,16 +194,16 @@ describe("SCSS Completion Test", function () {
 		// The insertText must be without one to avoid $$color. However, filterText
 		// still need the $ sign for the suggestion to match.
 		let expectedCompletions = [
-			{ label: "$color", insertText: '"color"', filterText: undefined },
-			{ label: "$fonts", insertText: '"fonts"', filterText: undefined },
+			{ label: "$color", insertText: '"color"' },
+			{ label: "$fonts", insertText: '"fonts"' },
 		];
 
 		await testCompletion(vueDocUri, position(16, 11), expectedCompletions);
 		await testCompletion(astroDocUri, position(11, 11), expectedCompletions);
 
 		expectedCompletions = [
-			{ label: "$color", insertText: '"$color"', filterText: undefined },
-			{ label: "$fonts", insertText: '"$fonts"', filterText: undefined },
+			{ label: "$color", insertText: '"$color"' },
+			{ label: "$fonts", insertText: '"$fonts"' },
 		];
 
 		await testCompletion(svelteDocUri, position(8, 11), expectedCompletions);
@@ -241,6 +241,32 @@ describe("SCSS Completion Test", function () {
 		await testCompletion(vueDocUri, position(36, 40), expectedCompletions);
 		await testCompletion(svelteDocUri, position(28, 40), expectedCompletions);
 		await testCompletion(astroDocUri, position(31, 40), expectedCompletions);
+	});
+
+	it("Offers completions for Sass built-ins", async () => {
+		let expectedCompletions = [
+			{
+				label: "floor",
+				insertText: '".floor(${1:number})"',
+				filterText: '"math.floor"',
+			},
+		];
+
+		await testCompletion(docUri, position(36, 19), expectedCompletions);
+
+		// For Vue, Svelte and Astro, the existing . from the namespace is not replaced by VS Code, so omit them from insertText.
+		// However, we still need them both in the filter text.
+		expectedCompletions = [
+			{
+				label: "floor",
+				insertText: '"floor(${1:number})"',
+				filterText: '"math.floor"',
+			},
+		];
+
+		await testCompletion(vueDocUri, position(42, 19), expectedCompletions);
+		await testCompletion(svelteDocUri, position(34, 19), expectedCompletions);
+		await testCompletion(astroDocUri, position(37, 19), expectedCompletions);
 	});
 
 	it("Offers namespace completion inside string interpolation with preceeding non-space character", async () => {

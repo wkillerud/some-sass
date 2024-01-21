@@ -175,6 +175,18 @@ describe("Completions", () => {
 		await testCompletion(docUri, position(25, 40), expectedCompletions);
 	});
 
+	it("for Sass built-ins", async () => {
+		const expectedCompletions = [
+			{
+				label: "floor",
+				insertText: '".floor(${1:number})"',
+				filterText: '"math.floor"',
+			},
+		];
+
+		await testCompletion(docUri, position(36, 19), expectedCompletions);
+	});
+
 	it("inside string interpolation with preceeding non-space character", async () => {
 		const expectedCompletions = [
 			{

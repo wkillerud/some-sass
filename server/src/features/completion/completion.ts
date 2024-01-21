@@ -222,7 +222,7 @@ function doBuiltInCompletion(
 			const insertText = context.word.includes(".")
 				? `${isEmbedded ? "" : "."}${name}${
 						signature ? `(${parameterSnippet})` : ""
-				  }`
+					}`
 				: name;
 
 			return {

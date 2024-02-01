@@ -115,7 +115,7 @@
 		"lint-staged": "^15.0.0",
 		"prettier": "^3.0.0",
 		"rimraf": "^5.0.0",
-		"semantic-release": "22.0.12",
+		"semantic-release": "23.0.0",
 		"semantic-release-vsce": "5.6.4",
 		"ts-loader": "^9.3.1",
 		"typescript": "^5.0.0",

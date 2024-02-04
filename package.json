@@ -134,7 +134,7 @@
 		]
 	},
 	"scripts": {
-		"prepare": "husky install",
+		"prepare": "husky",
 		"lint-staged": "lint-staged",
 		"vscode:prepublish": "npm run build",
 		"clean": "rimraf dist",

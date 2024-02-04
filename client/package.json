@@ -13,7 +13,7 @@
 	},
 	"dependencies": {
 		"fast-glob": "^3.2.12",
-		"vscode-css-languageservice": "^6.2.10",
+		"vscode-css-languageservice": "^6.2.12",
 		"vscode-languageclient": "^9.0.1",
 		"vscode-uri": "^3.0.7"
 	},

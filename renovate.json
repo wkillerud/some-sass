@@ -3,7 +3,7 @@
 	"extends": ["config:recommended"],
 	"schedule": ["on the first day of the month"],
 	"dependencyDashboard": false,
-	"ignoreDeps": ["scss-sassdoc-parser", "vscode-css-languageservice"],
+	"ignoreDeps": ["scss-sassdoc-parser"],
 	"packageRules": [
 		{
 			"groupName": "linters",
@@ -22,7 +22,7 @@
 		{
 			"groupName": "language client and server",
 			"matchDepTypes": ["dependencies"],
-			"matchPackagePatterns": ["vscode-language"],
+			"matchPackagePatterns": ["vscode-language", "vscode-css-languageservice"],
 			"automerge": false
 		},
 		{

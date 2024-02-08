@@ -14,7 +14,7 @@
 	"dependencies": {
 		"colorjs.io": "^0.4.2",
 		"fast-glob": "^3.2.11",
-		"scss-sassdoc-parser": "^1.0.0",
+		"scss-sassdoc-parser": "^3.0.1",
 		"scss-symbols-parser": "^2.0.1",
 		"vscode-css-languageservice": "^6.2.12",
 		"vscode-languageserver": "^9.0.1",

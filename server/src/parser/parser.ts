@@ -1,4 +1,4 @@
-import { parseString, type ParseResult } from "scss-sassdoc-parser";
+import { parse, type ParseResult } from "scss-sassdoc-parser";
 import {
 	Position,
 	Range,
@@ -218,7 +218,7 @@ async function findDocumentSymbols(
 
 	let sassdoc: ParseResult[] = [];
 	try {
-		sassdoc = await parseString(text);
+		sassdoc = await parse(text);
 	} catch (error) {
 		console.error((error as Error).message);
 	}

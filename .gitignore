@@ -7,6 +7,7 @@ npm-debug.log*
 node_modules/
 !fixtures/e2e/node_modules
 !fixtures/e2e/completion/node_modules
+!fixtures/pkg-import/node_modules
 
 # Compiled and temporary files
 dist/

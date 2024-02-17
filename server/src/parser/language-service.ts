@@ -34,6 +34,9 @@ export function getLanguageService(): LanguageService {
 				};
 			}
 		},
+		getContent(uri, encoding) {
+			return fs.readFile(URI.parse(uri), encoding);
+		},
 	};
 
 	ls = getSCSSLanguageService({ fileSystemProvider, clientCapabilities });

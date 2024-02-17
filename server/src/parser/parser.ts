@@ -362,19 +362,21 @@ function ensureIndex(target: string): string {
 	return `${path}/${fileName}/index${extension}`;
 }
 
-function urlMatches(url: string, linkTarget: string): boolean {
-	let safeUrl = url;
+function urlMatches(importString: string, fileUrl: string): boolean {
+	let safeUrl = importString.replace("pkg:", "");
 	while (/^[./@~]/.exec(safeUrl)) {
 		safeUrl = safeUrl.slice(1);
 	}
 
-	let match = linkTarget.includes(safeUrl);
+	// With pkg: and subpatch exports, the URL doesn't necessarily match the import string,
+	// but it should contain all parts of it.
+	let match = safeUrl.split("/").every((part) => fileUrl.includes(part));
 	if (!match) {
 		const lastSlash = safeUrl.lastIndexOf("/");
 		const toLastSlash = safeUrl.slice(0, Math.max(0, lastSlash));
 		const restOfUrl = safeUrl.slice(Math.max(0, lastSlash + 1));
 		const partial = `${toLastSlash}/_${restOfUrl}`;
-		match = linkTarget.includes(partial);
+		match = fileUrl.includes(partial);
 	}
 
 	return match;

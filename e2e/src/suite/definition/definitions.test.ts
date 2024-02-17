@@ -12,12 +12,15 @@ describe("SCSS Definition Test", function () {
 	const vueDocUri = getDocUri("definition/AppButton.vue");
 	const svelteDocUri = getDocUri("definition/AppButton.svelte");
 	const astroDocUri = getDocUri("definition/AppButton.astro");
+	const pkgImportUri = getDocUri("pkg-import/src/styles.scss");
+	const scopedPkgImportUri = getDocUri("pkg-import/src/scoped.scss");
 
 	before(async () => {
 		await showFile(docUri);
 		await showFile(vueDocUri);
 		await showFile(svelteDocUri);
 		await showFile(astroDocUri);
+		await showFile(pkgImportUri);
 		await sleepCI();
 	});
 
@@ -76,5 +79,21 @@ describe("SCSS Definition Test", function () {
 		await testDefinition(vueDocUri, position(24, 17), expectedLocation);
 		await testDefinition(svelteDocUri, position(18, 17), expectedLocation);
 		await testDefinition(astroDocUri, position(21, 17), expectedLocation);
+	});
+
+	it("finds symbol from pkg: import", async () => {
+		const expectedDocumentUri = getDocUri(
+			"pkg-import/node_modules/my-components/styles/colors.scss",
+		);
+		const expectedLocation = sameLineLocation(expectedDocumentUri, 3, 1, 15);
+		await testDefinition(pkgImportUri, position(4, 19), expectedLocation);
+	});
+
+	it("finds symbol from scoped pkg: import", async () => {
+		const expectedDocumentUri = getDocUri(
+			"pkg-import/node_modules/@my-scope/my-components/styles/colors.scss",
+		);
+		const expectedLocation = sameLineLocation(expectedDocumentUri, 3, 1, 15);
+		await testDefinition(scopedPkgImportUri, position(4, 19), expectedLocation);
 	});
 });

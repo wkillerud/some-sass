@@ -7,6 +7,7 @@ describe("SCSS Hover Test", function () {
 	const vueDocUri = getDocUri("hover/AppButton.vue");
 	const svelteDocUri = getDocUri("hover/AppButton.svelte");
 	const astroDocUri = getDocUri("hover/AppButton.astro");
+	const pkgImportUri = getDocUri("pkg-import/src/styles.scss");
 
 	before(async () => {
 		await showFile(docUri);
@@ -14,6 +15,7 @@ describe("SCSS Hover Test", function () {
 		await showFile(vueDocUri);
 		await showFile(svelteDocUri);
 		await showFile(astroDocUri);
+		await showFile(pkgImportUri);
 		await sleepCI();
 	});
 
@@ -128,5 +130,12 @@ describe("SCSS Hover Test", function () {
 		};
 
 		await testHover(collisionUri, position(5, 20), expectedContents);
+	});
+
+	it("shows hover for symbols from pkg: import", async () => {
+		const expectedContents = {
+			contents: ["Primary brand color"],
+		};
+		await testHover(pkgImportUri, position(4, 19), expectedContents);
 	});
 });

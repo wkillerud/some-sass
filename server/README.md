@@ -24,6 +24,27 @@ Then start the language server like so:
 some-sass-language-server --stdio
 ```
 
+Required initialization options:
+
+- `workspace` – typically the root directory of your project
+
+Optional initialization parameters:
+
+- `settings` – see [workspace configuration](#workspace-configuration)
+
+### Workspace configuration
+
+The language server requests configuration via `workspace/configuration` on the `somesass` key. All fields are optional.
+
+- `suggestAllFromOpenDocument` – VS Code has built-in code suggestions for symbols declared in the open document, so the default behavior for this server is to not include them. For other editors, you may want to turn this on (default: `false`).
+- `suggestFromUseOnly` – If your project uses the new module system with @use and @forward, you may want to only include suggestions from your used modules (default: `false`).
+- `suggestionStyle` - controls the style of suggestions for mixins and placeholders, either `nobracket`, `bracket` or `all` (includes both, if applicable) (default: `all`).
+- `scannerExclude` – array of minimatch/glob patterns that the scanner ignores (default: `["**/.git/**", "**/node_modules/**", "**/bower_components/**"]`).
+- `scannerDepth` – limit the directory depth of the initial scan for `.scss` files (default: 30).
+- `suggestFunctionsInStringContextAfterSymbols` – customize when to suggest functions inside strings (default: ` (+-*%`).
+
+The options can also be passed as initialization options, on the `settings` key.
+
 ## Editors with clients
 
 The language server has clients for

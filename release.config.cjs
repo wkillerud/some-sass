@@ -14,6 +14,13 @@ module.exports = {
 			},
 		],
 		[
+			// Release the server portion on npm for use with other editors
+			"@semantic-release/npm",
+			{
+				pkgRoot: "server",
+			},
+		],
+		[
 			"@semantic-release/github",
 			{
 				assets: [

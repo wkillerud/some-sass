@@ -1,7 +1,6 @@
 {
 	"name": "some-sass-vscode-client",
 	"description": "VSCode client for Some Sass.",
-	"publisher": "SomewhatStationery",
 	"license": "MIT",
 	"version": "1.0.0",
 	"repository": {

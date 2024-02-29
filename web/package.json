@@ -1,7 +1,6 @@
 {
 	"name": "some-sass-web",
 	"description": "End-to-end tests for vscode-scss web",
-	"publisher": "SomewhatStationery",
 	"license": "MIT",
 	"version": "1.0.0",
 	"repository": {

@@ -1,7 +1,6 @@
 {
 	"name": "some-sass-e2e",
 	"description": "End-to-end tests for vscode-scss.",
-	"publisher": "SomewhatStationery",
 	"license": "MIT",
 	"version": "1.0.0",
 	"repository": {

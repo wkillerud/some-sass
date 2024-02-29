@@ -1,16 +1,38 @@
 {
 	"name": "some-sass-language-server",
-	"description": "LSP server. Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
-	"publisher": "SomewhatStationery",
-	"license": "MIT",
+	"version": "1.0.1",
+	"description": "LSP server for SCSS. Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
+	"keywords": [
+		"scss",
+		"lsp",
+		"language-server-protocol"
+	],
 	"engines": {
+		"node": ">=20",
 		"vscode": "^1.66.0"
 	},
-	"version": "1.0.0",
+	"homepage": "https://github.com/wkillerud/vscode-scss/blob/main/server#readme",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/wkillerud/vscode-scss"
+		"url": "https://github.com/wkillerud/vscode-scss.git"
 	},
+	"bugs": {
+		"url": "https://github.com/wkillerud/vscode-scss/issues"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org/",
+		"tag": "latest"
+	},
+	"main": "dist/node-server.js",
+	"files": [
+		"dist/",
+		"bin/"
+	],
+	"bin": {
+		"some-sass-language-server": "bin/some-sass-language-server"
+	},
+	"author": "William Killerud <william@killerud.com> (https://www.williamkillerud.com/)",
+	"license": "MIT",
 	"dependencies": {
 		"colorjs.io": "^0.4.2",
 		"fast-glob": "^3.2.11",

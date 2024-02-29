@@ -103,6 +103,7 @@
 	"devDependencies": {
 		"@commitlint/cli": "18.4.2",
 		"@commitlint/config-conventional": "18.4.2",
+		"@semantic-release/npm": "11.0.2",
 		"@types/node": "^20.0.0",
 		"@types/webpack-env": "1.18.4",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
@@ -139,6 +140,7 @@
 		"vscode:prepublish": "npm run build",
 		"clean": "rimraf dist",
 		"build": "npm run clean && webpack --mode production --devtool hidden-source-map",
+		"postbuild": "mkdir ./server/dist && cp ./dist/node-server.* ./server/dist/",
 		"build:debug": "npm run clean && webpack --mode development --devtool hidden-source-map",
 		"dev": "webpack --mode development --watch",
 		"start:web": "vscode-test-web --browserType=chromium",

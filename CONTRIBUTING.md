@@ -1,6 +1,8 @@
 # Contributing
 
-Thank you for showing an interest in contributing 🌟
+This repo holds the [Some Sass](./README.md) extension for VS Code, and the [SCSS language server that powers it](./server/README.md). The language server is published independently to [npm](https://www.npmjs.com/package/some-sass-language-server) for use with other editors. The VS Code extension is published to the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=SomewhatStationery.some-sass) and [Open VSX](https://open-vsx.org/extension/SomewhatStationery/some-sass).
+
+Thank you for showing an interest in contributing, be it to the language server or to the VS Code extension 🌟
 
 Before you start, please make a [new Issue](https://github.com/wkillerud/vscode-scss/issues/new/choose). I don't always make new issues for all the things I work on. By making a new Issue we can avoid duplicating our efforts.
 
@@ -11,8 +13,9 @@ When you open a pull request, please make sure to set the correct target. This i
 You need these things installed:
 
 - Node.js LTS
-- Visual Studio Code stable
-- The extension _TypeScript + Webpack Problem Matchers_ (`amodio.tsl-problem-matcher`)
+- For the VS Code extension, but recommended either way:
+  - Visual Studio Code stable
+  - The extension _TypeScript + Webpack Problem Matchers_ (`amodio.tsl-problem-matcher`)
 
 ```
 # install dependencies
@@ -23,13 +26,15 @@ npm run test:e2e
 npm run test:web
 ```
 
+### If using VS Code
+
 Go to the _Run and Debug_ pane in VS Code and run _Launch extension_. The task builds changes automatically, but you have to restart the debugging session to see them take effect.
 
 If you get a warning, ensure you have the _TypeScript + Webpack Problem Matchers_ (`amodio.tsl-problem-matcher`) extension installed and active.
 
 ## Architecture
 
-This extension consists of a [client](https://github.com/wkillerud/vscode-scss/blob/main/client) part and a [server](https://github.com/wkillerud/vscode-scss/blob/main/server) part. The client starts the server [on activation](https://github.com/wkillerud/vscode-scss/blob/ceaa168ae39c1e30a2cbcdf54ec82d46f0ecd680/package.json#L27).
+This extension consists of a [client for VS Code](https://github.com/wkillerud/vscode-scss/blob/main/client) and a [language server](https://github.com/wkillerud/vscode-scss/blob/main/server). The client starts the server [on activation](https://github.com/wkillerud/vscode-scss/blob/ceaa168ae39c1e30a2cbcdf54ec82d46f0ecd680/package.json#L27).
 
 The server then:
 
@@ -39,7 +44,7 @@ The server then:
 
 The client requests information from the server when needed, and notifies the server when a file changes.
 
-See [server/src/server.ts](https://github.com/wkillerud/vscode-scss/blob/main/server/src/server.ts) for the event listeners on the server side., and the [features folder in the server](https://github.com/wkillerud/vscode-scss/tree/main/server/src/features) for code supporting the different features.
+See [server/src/server.ts](https://github.com/wkillerud/vscode-scss/blob/main/server/src/server.ts) for the event listeners on the server side, and the [features folder in the server](https://github.com/wkillerud/vscode-scss/tree/main/server/src/features) for code supporting the different features.
 
 ```mermaid
 sequenceDiagram
@@ -55,7 +60,7 @@ sequenceDiagram
 
 ### Browser version
 
-This extension also works in the browser. It works more or less the same as the regular Node version, except it doesn't have direct access to the file system.
+This extension also works with VS Code in the browser. It works more or less the same as the regular Node version, except it doesn't have direct access to the file system.
 
 To work around this, [the server](https://github.com/wkillerud/vscode-scss/blob/main/server/src/file-system-provider.ts) makes requests to [the client](https://github.com/wkillerud/vscode-scss/blob/main/client/src/client.ts), which then uses the [FileSystem API](https://code.visualstudio.com/api/references/vscode-api#FileSystem) to work with files and directories, before sending the result back to the server.
 
@@ -73,7 +78,7 @@ sequenceDiagram
 
 ## Manual testing
 
-To test your changes:
+To test your changes in VS Code:
 
 - Go to the Run and Debug section
 - Run the `Launch extension` configuration
@@ -153,7 +158,12 @@ At time of writing you may have to set the breakpoints after the debugger has at
 
 This repository uses [conventional commits and `semantic-release`](https://github.com/semantic-release/semantic-release#how-does-it-work) to automatically publish changes merged to `main`.
 
-While not a library, stick to something resembling semantic versioning when writing commit messages.
+Two assets are published:
+
+- The language server is published to npm
+- The VS Code extension is published to Visual Studio Marketplace and Open VSX
+
+Keep both in mind when deciding whether a change is a patch, minor or major release.
 
 | Commit message                                                                                                                            | Release type                                                                                                                                                         |
 | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

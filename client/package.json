@@ -18,9 +18,9 @@
 	},
 	"devDependencies": {
 		"@types/vscode": "^1.66.0",
-		"rimraf": "^5.0.0"
+		"shx": "^0.3.4"
 	},
 	"scripts": {
-		"clean": "rimraf out"
+		"clean": "shx rm -rf out"
 	}
 }

@@ -21,11 +21,11 @@
 		"assert": "^2.0.0",
 		"fast-glob": "^3.2.11",
 		"mocha": "^10.0.0",
-		"rimraf": "^5.0.0"
+		"shx": "^0.3.4"
 	},
 	"scripts": {
 		"test": "npm run clean && npm run compile && node ./out/runTest.js",
-		"clean": "rimraf out",
+		"clean": "shx rm -rf out",
 		"compile": "tsc -p ./"
 	}
 }

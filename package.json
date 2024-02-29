@@ -12,7 +12,7 @@
 	"homepage": "https://github.com/wkillerud/vscode-scss/blob/main/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/wkillerud/vscode-scss"
+		"url": "git@github.com:wkillerud/vscode-scss"
 	},
 	"keywords": [
 		"scss",
@@ -103,6 +103,7 @@
 	"devDependencies": {
 		"@commitlint/cli": "18.4.2",
 		"@commitlint/config-conventional": "18.4.2",
+		"@semantic-release/git": "10.0.1",
 		"@semantic-release/npm": "11.0.2",
 		"@types/node": "^20.0.0",
 		"@types/webpack-env": "1.18.4",
@@ -115,9 +116,9 @@
 		"husky": "^9.0.0",
 		"lint-staged": "^15.0.0",
 		"prettier": "^3.0.0",
-		"rimraf": "^5.0.0",
 		"semantic-release": "23.0.0",
 		"semantic-release-vsce": "5.6.4",
+		"shx": "0.3.4",
 		"ts-loader": "^9.3.1",
 		"typescript": "^5.0.0",
 		"webpack": "^5.73.0",
@@ -137,10 +138,11 @@
 	"scripts": {
 		"prepare": "husky",
 		"lint-staged": "lint-staged",
+		"prepublish": "npm run build",
 		"vscode:prepublish": "npm run build",
-		"clean": "rimraf dist",
+		"clean": "shx rm -rf dist",
 		"build": "npm run clean && webpack --mode production --devtool hidden-source-map",
-		"postbuild": "mkdir ./server/dist && cp ./dist/node-server.* ./server/dist/",
+		"postbuild": "shx mkdir -p ./server/dist && shx cp ./dist/node-server.* ./server/dist/",
 		"build:debug": "npm run clean && webpack --mode development --devtool hidden-source-map",
 		"dev": "webpack --mode development --watch",
 		"start:web": "vscode-test-web --browserType=chromium",

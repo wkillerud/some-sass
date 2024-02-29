@@ -54,13 +54,13 @@
 		"micromatch": "^4.0.5",
 		"mocha": "^10.0.0",
 		"nyc": "^15.1.0",
-		"rimraf": "^5.0.0",
+		"shx": "^0.3.4",
 		"sinon": "^17.0.0"
 	},
 	"scripts": {
-		"clean": "rimraf out",
+		"clean": "shx rm -rf out",
 		"test": "npm run test:clean && npm run test:compile && npm run test:unit",
-		"test:clean": "rimraf out",
+		"test:clean": "shx rm -rf out",
 		"test:compile": "tsc -p ./",
 		"test:unit": "mocha \"out/**/*.spec.js\"",
 		"test:coverage": "nyc npm run test:unit"

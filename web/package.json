@@ -13,10 +13,10 @@
 	},
 	"devDependencies": {
 		"@types/mocha": "10.0.6",
-		"@types/vscode": "1.86.0",
+		"@types/vscode": "1.87.0",
 		"@vscode/test-web": "0.0.52",
 		"assert": "2.1.0",
-		"mocha": "10.2.0",
+		"mocha": "10.3.0",
 		"vscode-languageserver": "^9.0.1"
 	},
 	"scripts": {

@@ -12,7 +12,7 @@
 		"url": "https://github.com/wkillerud/vscode-scss"
 	},
 	"dependencies": {
-		"colorjs.io": "^0.4.2",
+		"colorjs.io": "^0.5.0",
 		"fast-glob": "^3.2.11",
 		"scss-sassdoc-parser": "^3.0.1",
 		"scss-symbols-parser": "^2.0.1",

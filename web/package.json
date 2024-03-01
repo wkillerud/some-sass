@@ -14,7 +14,7 @@
 	"devDependencies": {
 		"@types/mocha": "10.0.6",
 		"@types/vscode": "1.86.0",
-		"@vscode/test-web": "0.0.51",
+		"@vscode/test-web": "0.0.52",
 		"assert": "2.1.0",
 		"mocha": "10.2.0",
 		"vscode-languageserver": "^9.0.1"

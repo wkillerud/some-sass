@@ -42,9 +42,20 @@ jobs:
       - name: Test
         run: npm run test
 
+      - name: Run e2e tests in simulated X environment
+        run: xvfb-run -a npm run test:e2e
+
+      - name: Run web e2e tests
+        uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: npm run test:web
+
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
         run: npx multi-semantic-release

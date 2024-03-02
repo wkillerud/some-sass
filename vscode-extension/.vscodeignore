@@ -1,0 +1,33 @@
+CONTRIBUTING.md
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Configuration
+.eslintrc.json
+tsconfig.json
+*.config.js
+*.config.cjs
+*.config.mjs
+
+# Dependencies
+node_modules/**
+# npm workspace links
+../**
+
+# Source and test files
+.vscode-test/
+.vscode-test-web/
+.nyc_output/
+coverage/
+test/
+types/
+**/*.ts
+**/*.map
+
+# Build artifacts
+out/
+*.vsix

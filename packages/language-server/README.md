@@ -14,7 +14,7 @@ This language server is designed to run alongside the [VS Code CSS language serv
 
 ## Usage
 
-See [Editors with clients](#editors-with-clients). If your editor is not listed, refer to your editor's documentation for integrating with a language server using LSP.
+See [Editors with clients](https://github.com/wkillerud/some-sass/blob/main/README.md#editors-with-clients). If your editor is not listed, refer to your editor's documentation for integrating with a language server using LSP.
 
 You can install the language server with `npm`:
 

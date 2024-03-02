@@ -118,7 +118,7 @@
 		"shx": "0.3.4"
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run build",
+		"vscode:prepublish": "npm install && npm run build",
 		"clean": "shx rm -rf dist",
 		"build": "npm run clean && webpack --mode production",
 		"dev": "npm run clean && webpack --mode development",

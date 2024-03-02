@@ -101,12 +101,12 @@
 		}
 	},
 	"devDependencies": {
-		"@commitlint/cli": "18.4.2",
-		"@commitlint/config-conventional": "18.4.2",
+		"@commitlint/cli": "19.0.3",
+		"@commitlint/config-conventional": "19.0.3",
 		"@types/node": "^20.0.0",
 		"@types/webpack-env": "1.18.4",
-		"@typescript-eslint/eslint-plugin": "^6.0.0",
-		"@typescript-eslint/parser": "^6.0.0",
+		"@typescript-eslint/eslint-plugin": "^7.0.0",
+		"@typescript-eslint/parser": "^7.0.0",
 		"eslint": "^8.19.0",
 		"eslint-config-prettier": "^9.0.0",
 		"eslint-plugin-import": "^2.26.0",

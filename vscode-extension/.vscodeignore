@@ -1,4 +1,5 @@
 CONTRIBUTING.md
+.DS_Store
 
 # Logs
 logs/
@@ -9,9 +10,13 @@ npm-debug.log*
 .eslintrc.json
 tsconfig.json
 *.config.js
+*.config.cjs
+*.config.mjs
 
 # Dependencies
 node_modules/**
+# npm workspace links
+../**
 
 # Source and test files
 .vscode-test/

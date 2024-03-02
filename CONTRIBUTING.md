@@ -2,7 +2,7 @@
 
 Thank you for showing an interest in contributing, be it to the language server or to the VS Code extension 🌟
 
-Before you start, please make a [new Issue](https://github.com/wkillerud/vscode-scss/issues/new/choose). I don't always make new issues for all the things I work on. By making a new Issue we can avoid duplicating our efforts.
+Before you start, please make a [new Issue](https://github.com/wkillerud/some-sass/issues/new/choose). I don't always make new issues for all the things I work on. By making a new Issue we can avoid duplicating our efforts.
 
 ## Development environment
 
@@ -28,17 +28,17 @@ If you get a warning, ensure you have the _TypeScript + Webpack Problem Matchers
 
 ## Architecture
 
-This extension consists of a [client for VS Code](https://github.com/wkillerud/vscode-scss/blob/main/vscode-extension) and a [language server](https://github.com/wkillerud/vscode-scss/blob/main/packages/language-server). The client starts the server on activation.
+This extension consists of a [client for VS Code](https://github.com/wkillerud/some-sass/blob/main/vscode-extension) and a [language server](https://github.com/wkillerud/some-sass/blob/main/packages/language-server). The client starts the server on activation.
 
 The server then:
 
-1. [scans the workspace](https://github.com/wkillerud/vscode-scss/blob/main/packages/language-server/src/scanner.ts)
-2. [parses](https://github.com/wkillerud/vscode-scss/blob/main/packages/language-server/src/parser/parser.ts) SCSS code
-3. puts the parsed documents in a [in-memory context](https://github.com/wkillerud/vscode-scss/blob/main/packages/language-server/src/context-provider.ts)
+1. [scans the workspace](https://github.com/wkillerud/some-sass/blob/main/packages/language-server/src/scanner.ts)
+2. [parses](https://github.com/wkillerud/some-sass/blob/main/packages/language-server/src/parser/parser.ts) SCSS code
+3. puts the parsed documents in a [in-memory context](https://github.com/wkillerud/some-sass/blob/main/packages/language-server/src/context-provider.ts)
 
 The client requests information from the server when needed, and notifies the server when a file changes.
 
-See [packages/langauge-server/src/server.ts](https://github.com/wkillerud/vscode-scss/blob/main/packages/langauge-server/src/server.ts) for the event listeners on the server side, and the [features folder in the server](https://github.com/wkillerud/vscode-scss/tree/main/packages/language-server/src/features) for code supporting the different features.
+See [packages/langauge-server/src/server.ts](https://github.com/wkillerud/some-sass/blob/main/packages/langauge-server/src/server.ts) for the event listeners on the server side, and the [features folder in the server](https://github.com/wkillerud/some-sass/tree/main/packages/language-server/src/features) for code supporting the different features.
 
 ```mermaid
 sequenceDiagram
@@ -56,7 +56,7 @@ sequenceDiagram
 
 This extension also works with VS Code in the browser. It works more or less the same as the regular Node version, except it doesn't have direct access to the file system.
 
-To work around this, [the server](https://github.com/wkillerud/vscode-scss/blob/main/packages/language-server/src/file-system-provider.ts) makes requests to [the client](https://github.com/wkillerud/vscode-scss/blob/main/vscode-extension/src/client.ts), which then uses the [FileSystem API](https://code.visualstudio.com/api/references/vscode-api#FileSystem) to work with files and directories, before sending the result back to the server.
+To work around this, [the server](https://github.com/wkillerud/some-sass/blob/main/packages/language-server/src/file-system-provider.ts) makes requests to [the client](https://github.com/wkillerud/some-sass/blob/main/vscode-extension/src/client.ts), which then uses the [FileSystem API](https://code.visualstudio.com/api/references/vscode-api#FileSystem) to work with files and directories, before sending the result back to the server.
 
 ```mermaid
 sequenceDiagram

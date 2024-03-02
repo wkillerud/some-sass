@@ -120,8 +120,8 @@ and use the provided suggestion. This way you can keep word based suggestions if
 	"emmet.excludeLanguages": [
 		// Markdown is excluded by default in VS Code
 		"markdown",
-		"scss"
-	]
+		"scss",
+	],
 }
 ```
 
@@ -209,7 +209,7 @@ after `@import` becomes CSS-only.
 
 ## Changelog
 
-Visit the [release section on GitHub](https://github.com/wkillerud/vscode-scss/releases) to see what has changed.
+Visit the [release section on GitHub](https://github.com/wkillerud/some-sass/releases) to see what has changed.
 
 ## License
 

@@ -9,10 +9,10 @@
 		"vscode": "^1.66.0"
 	},
 	"icon": "icon.png",
-	"homepage": "https://github.com/wkillerud/vscode-scss/blob/main/README.md",
+	"homepage": "https://github.com/wkillerud/some-sass/blob/main/vscode-extension/README.md",
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:wkillerud/vscode-scss"
+		"url": "git@github.com:wkillerud/some-sass"
 	},
 	"keywords": [
 		"scss",

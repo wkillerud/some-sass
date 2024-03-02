@@ -10,13 +10,13 @@
 	"engines": {
 		"node": ">=20"
 	},
-	"homepage": "https://github.com/wkillerud/vscode-scss/blob/main/packages/language-server#readme",
+	"homepage": "https://github.com/wkillerud/some-sass/blob/main/packages/language-server#readme",
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:wkillerud/vscode-scss.git"
+		"url": "git@github.com:wkillerud/some-sass.git"
 	},
 	"bugs": {
-		"url": "https://github.com/wkillerud/vscode-scss/issues"
+		"url": "https://github.com/wkillerud/some-sass/issues"
 	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org/",

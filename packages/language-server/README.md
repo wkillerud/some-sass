@@ -1,12 +1,16 @@
 # Some Sass Language Server
 
-This is the SCSS language server that powers the [Some Sass extension for Visual Studio Code](https://github.com/wkillerud/vscode-scss). It provides:
+This is the SCSS language server that powers the [Some Sass extension for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=SomewhatStationery.some-sass), available as an independent and reusable language server.
+
+The language server provides:
 
 - Full support for `@use` and `@forward`, including aliases, prefixes and hiding.
 - Workspace-wide code navigation and refactoring, such as Rename Symbol.
 - Rich documentation through [SassDoc](http://sassdoc.com).
 - Language features for `%placeholder-selectors`, both when using them and writing them.
 - Suggestions and hover info for built-in Sass modules, when used with `@use`.
+
+This language server is designed to run alongside the [VS Code CSS language server](https://github.com/hrsh7th/vscode-langservers-extracted).
 
 ## Usage
 
@@ -47,8 +51,8 @@ The options can also be passed as initialization options, on the `settings` key.
 
 ## Editors with clients
 
-See [this list](https://github.com/wkillerud/vscode-scss/blob/main/README.md#editors-with-clients).
+See [this list](https://github.com/wkillerud/some-sass/blob/main/README.md#editors-with-clients).
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/wkillerud/vscode-scss/blob/main/CONTRIBUTING.md).
+See [CONTRIBUTING.md](https://github.com/wkillerud/some-sass/blob/main/CONTRIBUTING.md).

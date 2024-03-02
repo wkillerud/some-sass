@@ -112,7 +112,7 @@
 		"@types/sinon": "17.0.3",
 		"@types/vscode": "1.86.0",
 		"@vscode/test-electron": "2.3.9",
-		"@vscode/test-web": "0.0.52",
+		"@vscode/test-web": "0.0.51",
 		"assert": "2.1.0",
 		"mocha": "10.3.0",
 		"shx": "0.3.4"

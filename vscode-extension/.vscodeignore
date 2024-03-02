@@ -1,0 +1,28 @@
+CONTRIBUTING.md
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Configuration
+.eslintrc.json
+tsconfig.json
+*.config.js
+
+# Dependencies
+node_modules/**
+
+# Source and test files
+.vscode-test/
+.vscode-test-web/
+.nyc_output/
+coverage/
+test/
+types/
+**/*.ts
+**/*.map
+
+# Build artifacts
+out/
+*.vsix

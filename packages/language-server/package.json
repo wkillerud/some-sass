@@ -1,0 +1,81 @@
+{
+	"name": "some-sass-language-server",
+	"version": "1.0.1",
+	"description": "LSP server for SCSS. Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
+	"keywords": [
+		"scss",
+		"lsp",
+		"language-server-protocol"
+	],
+	"engines": {
+		"node": ">=20"
+	},
+	"homepage": "https://github.com/wkillerud/vscode-scss/blob/main/packages/language-server#readme",
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:wkillerud/vscode-scss.git"
+	},
+	"bugs": {
+		"url": "https://github.com/wkillerud/vscode-scss/issues"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org/",
+		"tag": "latest"
+	},
+	"main": "dist/node-server.js",
+	"files": [
+		"dist/",
+		"bin/"
+	],
+	"bin": {
+		"some-sass-language-server": "bin/some-sass-language-server"
+	},
+	"exports": {
+		".": {
+			"browser": "./dist/browser-server.js",
+			"development": "./dist/development/node-server.js",
+			"default": "./dist/node-server.js"
+		},
+		"./development": {
+			"browser": "./dist/development/browser-server.js",
+			"default": "./dist/development/node-server.js"
+		}
+	},
+	"author": "William Killerud <william@killerud.com> (https://www.williamkillerud.com/)",
+	"license": "MIT",
+	"scripts": {
+		"build": "npm run clean && webpack --mode production && webpack --mode development",
+		"clean": "shx rm -rf dist",
+		"test": "npm run test:clean && npm run test:build && npm run test:unit",
+		"test:clean": "shx rm -rf out",
+		"test:build": "tsc -p ./ && shx cp -r ./test/fixtures ./out/test",
+		"test:unit": "mocha \"out/**/*.spec.js\"",
+		"test:coverage": "nyc npm run test:unit"
+	},
+	"devDependencies": {
+		"@nodelib/fs.macchiato": "2.0.0",
+		"@types/micromatch": "4.0.6",
+		"@types/mocha": "10.0.6",
+		"@types/node": "20.11.24",
+		"@types/sinon": "17.0.3",
+		"assert": "2.1.0",
+		"colorjs.io": "0.5.0",
+		"fast-glob": "3.3.2",
+		"merge-options": "3.0.4",
+		"micromatch": "4.0.5",
+		"mocha": "10.3.0",
+		"nyc": "15.1.0",
+		"path-browserify": "1.0.1",
+		"process": "0.11.10",
+		"scss-sassdoc-parser": "3.0.1",
+		"scss-symbols-parser": "2.0.1",
+		"shx": "0.3.4",
+		"sinon": "17.0.1",
+		"util": "0.12.5",
+		"vscode-css-languageservice": "6.2.12",
+		"vscode-languageserver": "9.0.1",
+		"vscode-languageserver-textdocument": "1.0.11",
+		"vscode-languageserver-types": "3.17.5",
+		"vscode-uri": "3.0.8"
+	}
+}

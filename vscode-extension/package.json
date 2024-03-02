@@ -1,0 +1,139 @@
+{
+	"name": "some-sass",
+	"displayName": "Some Sass: extended support for SCSS and SassDoc",
+	"description": "Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
+	"version": "2.14.8",
+	"publisher": "SomewhatStationery",
+	"license": "MIT",
+	"engines": {
+		"vscode": "^1.66.0"
+	},
+	"icon": "icon.png",
+	"homepage": "https://github.com/wkillerud/vscode-scss/blob/main/README.md",
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:wkillerud/vscode-scss"
+	},
+	"keywords": [
+		"scss",
+		"sassdoc",
+		"autocompletion",
+		"intellisense",
+		"refactor"
+	],
+	"categories": [
+		"Programming Languages"
+	],
+	"activationEvents": [
+		"onLanguage:scss",
+		"onLanguage:vue",
+		"onLanguage:svelte",
+		"onLanguage:astro",
+		"onCommand:_somesass.applyExtractCodeAction"
+	],
+	"capabilities": {
+		"virtualWorkspaces": true
+	},
+	"browser": "./dist/browser-client.js",
+	"main": "./dist/node-client.js",
+	"contributes": {
+		"configuration": {
+			"properties": {
+				"somesass.scannerDepth": {
+					"type": "number",
+					"default": 30,
+					"description": "The maximum number of nested directories to scan."
+				},
+				"somesass.scannerExclude": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [
+						"**/.git/**",
+						"**/node_modules/**",
+						"**/bower_components/**"
+					],
+					"description": "List of glob patterns for directories that are excluded when scanning."
+				},
+				"somesass.scanImportedFiles": {
+					"type": "boolean",
+					"default": true,
+					"deprecationMessage": "Will be removed at some point after `@import` becomes CSS-only.",
+					"description": "Allows scan imported files. Turning this off will severely limit functionality, and is not recommended."
+				},
+				"somesass.suggestionStyle": {
+					"type": "string",
+					"default": "all",
+					"description": "Controls the style of suggestions for mixins and placeholders.",
+					"enum": [
+						"all",
+						"nobracket",
+						"bracket"
+					],
+					"enumItemLabels": [
+						"All",
+						"No brackets",
+						"Only brackets"
+					],
+					"enumDescriptions": [
+						"Show all suggestions",
+						"Only show suggestions without brackets",
+						"Where brackets are suggested, omit duplicates without brackets"
+					]
+				},
+				"somesass.suggestAllFromOpenDocument": {
+					"type": "boolean",
+					"default": false,
+					"description": "VS Code has built-in code suggestions for symbols declared in the open document. If you prefer the suggestions from Some Sass, you can opt in by turning on this setting. There will be duplicates."
+				},
+				"somesass.suggestFromUseOnly": {
+					"type": "boolean",
+					"default": false,
+					"description": "If your project uses the new module system with @use and @forward, you may want to only include suggestions from your used modules."
+				},
+				"somesass.suggestFunctionsInStringContextAfterSymbols": {
+					"type": "string",
+					"default": " (+-*%",
+					"description": "Allows prompt Functions in String context after specified symbols."
+				}
+			}
+		}
+	},
+	"dependencies": {
+		"fast-glob": "3.3.2",
+		"some-sass-language-server": "1.0.1",
+		"vscode-css-languageservice": "6.2.12",
+		"vscode-languageclient": "9.0.1",
+		"vscode-uri": "3.0.7"
+	},
+	"devDependencies": {
+		"@types/mocha": "10.0.6",
+		"@types/sinon": "17.0.3",
+		"@types/vscode": "1.86.0",
+		"@vscode/test-electron": "2.3.9",
+		"@vscode/test-web": "0.0.52",
+		"assert": "2.1.0",
+		"mocha": "10.3.0",
+		"shx": "0.3.4"
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run build",
+		"clean": "shx rm -rf dist",
+		"build": "npm run clean && webpack --mode production",
+		"dev": "npm run clean && webpack --mode development",
+		"start:web": "vscode-test-web --browserType=chromium",
+		"start:test-web": "vscode-test-web --browserType=chromium  --extensionDevelopmentPath=. ./test/fixtures",
+		"lint": "eslint \"**/*.ts\" --cache",
+		"test": "npm run test:build",
+		"test:build": "tsc -p ./ && shx cp -r ./test/fixtures ./out/test && webpack --config ./webpack.test-web.config.js",
+		"test:e2e": "node ./out/test/e2e/runTest.js",
+		"test:web": "node ./out/test/web/runTest.js"
+	},
+	"__metadata": {
+		"id": "6d35099c-3671-464c-ac0b-34a0c3823927",
+		"publisherDisplayName": "Somewhat Stationery",
+		"publisherId": "02638283-c13a-4acf-9f26-24bdcfdfce24",
+		"isPreReleaseVersion": false
+	}
+}

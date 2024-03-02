@@ -5,8 +5,8 @@ npm-debug.log*
 
 # Dependency directory
 node_modules/
-!fixtures/e2e/node_modules
-!fixtures/e2e/completion/node_modules
+!vscode-extension/test/fixtures/node_modules
+!vscode-extension/test/fixtures/completion/node_modules
 
 # Compiled and temporary files
 dist/

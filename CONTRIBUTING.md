@@ -1,12 +1,8 @@
 # Contributing
 
-This repo holds the [Some Sass](./README.md) extension for VS Code, and the [SCSS language server that powers it](./server/README.md). The language server is published independently to [npm](https://www.npmjs.com/package/some-sass-language-server) for use with other editors. The VS Code extension is published to the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=SomewhatStationery.some-sass) and [Open VSX](https://open-vsx.org/extension/SomewhatStationery/some-sass).
-
 Thank you for showing an interest in contributing, be it to the language server or to the VS Code extension 🌟
 
 Before you start, please make a [new Issue](https://github.com/wkillerud/vscode-scss/issues/new/choose). I don't always make new issues for all the things I work on. By making a new Issue we can avoid duplicating our efforts.
-
-When you open a pull request, please make sure to set the correct target. This is a fork, and GitHub defaults to using the source repository as a target for pull requests. Try not to create needless noise in the upstream repository. The correct target is `wkillerud/vscode-scss` and the branch `main`.
 
 ## Development environment
 
@@ -22,29 +18,27 @@ You need these things installed:
 npm install
 # confirm existing tests are running
 npm test
-npm run test:e2e
-npm run test:web
 ```
 
 ### If using VS Code
 
-Go to the _Run and Debug_ pane in VS Code and run _Launch extension_. The task builds changes automatically, but you have to restart the debugging session to see them take effect.
+Go to the _Run and Debug_ pane in VS Code and run _Launch extension_. Rebuild the project and restart the debugging session to see changes take effect.
 
 If you get a warning, ensure you have the _TypeScript + Webpack Problem Matchers_ (`amodio.tsl-problem-matcher`) extension installed and active.
 
 ## Architecture
 
-This extension consists of a [client for VS Code](https://github.com/wkillerud/vscode-scss/blob/main/client) and a [language server](https://github.com/wkillerud/vscode-scss/blob/main/server). The client starts the server [on activation](https://github.com/wkillerud/vscode-scss/blob/ceaa168ae39c1e30a2cbcdf54ec82d46f0ecd680/package.json#L27).
+This extension consists of a [client for VS Code](https://github.com/wkillerud/vscode-scss/blob/main/vscode-extension) and a [language server](https://github.com/wkillerud/vscode-scss/blob/main/packages/language-server). The client starts the server on activation.
 
 The server then:
 
-1. [scans the workspace](https://github.com/wkillerud/vscode-scss/blob/main/server/src/scanner.ts)
-2. [parses](https://github.com/wkillerud/vscode-scss/blob/main/server/src/parser/parser.ts) SCSS code
-3. puts the parsed documents in a [in-memory context](https://github.com/wkillerud/vscode-scss/blob/main/server/src/context-provider.ts)
+1. [scans the workspace](https://github.com/wkillerud/vscode-scss/blob/main/packages/language-server/src/scanner.ts)
+2. [parses](https://github.com/wkillerud/vscode-scss/blob/main/packages/language-server/src/parser/parser.ts) SCSS code
+3. puts the parsed documents in a [in-memory context](https://github.com/wkillerud/vscode-scss/blob/main/packages/language-server/src/context-provider.ts)
 
 The client requests information from the server when needed, and notifies the server when a file changes.
 
-See [server/src/server.ts](https://github.com/wkillerud/vscode-scss/blob/main/server/src/server.ts) for the event listeners on the server side, and the [features folder in the server](https://github.com/wkillerud/vscode-scss/tree/main/server/src/features) for code supporting the different features.
+See [packages/langauge-server/src/server.ts](https://github.com/wkillerud/vscode-scss/blob/main/packages/langauge-server/src/server.ts) for the event listeners on the server side, and the [features folder in the server](https://github.com/wkillerud/vscode-scss/tree/main/packages/language-server/src/features) for code supporting the different features.
 
 ```mermaid
 sequenceDiagram
@@ -62,7 +56,7 @@ sequenceDiagram
 
 This extension also works with VS Code in the browser. It works more or less the same as the regular Node version, except it doesn't have direct access to the file system.
 
-To work around this, [the server](https://github.com/wkillerud/vscode-scss/blob/main/server/src/file-system-provider.ts) makes requests to [the client](https://github.com/wkillerud/vscode-scss/blob/main/client/src/client.ts), which then uses the [FileSystem API](https://code.visualstudio.com/api/references/vscode-api#FileSystem) to work with files and directories, before sending the result back to the server.
+To work around this, [the server](https://github.com/wkillerud/vscode-scss/blob/main/packages/language-server/src/file-system-provider.ts) makes requests to [the client](https://github.com/wkillerud/vscode-scss/blob/main/vscode-extension/src/client.ts), which then uses the [FileSystem API](https://code.visualstudio.com/api/references/vscode-api#FileSystem) to work with files and directories, before sending the result back to the server.
 
 ```mermaid
 sequenceDiagram
@@ -83,7 +77,7 @@ To test your changes in VS Code:
 - Go to the Run and Debug section
 - Run the `Launch extension` configuration
 
-A new window should open with the title `[Extension Development Host]`. In this window you can open whatever project you want to use for testing. If you don't have one you can open the folder `fixtures/e2e/` in this repository.
+A new window should open with the title `[Extension Development Host]`. In this window you can open whatever project you want to use for testing. If you don't have one you can open the folder `vscode-extension/test/fixtures/` in this repository.
 
 Every time you make a change you need to restart `Launch extension`.
 
@@ -99,9 +93,9 @@ Docs: [Test your web extension](https://code.visualstudio.com/api/extension-guid
 
 ### Debugging the Node (or regular) version
 
-You can set breakpoints to inspect what happens in your code. At time of writing you must set these breakpoints in the _compiled output_ in `dist/node-server.js`.
+You can set breakpoints to inspect what happens in your code. At time of writing you must set these breakpoints in the _compiled output_ in `vscode-extension/dist/node-server.js`.
 
-Open `dist/node-server.js`, search for a function name close to where you want to debug, and place breakpoints where you would like. Then:
+Open `vscode-extension/dist/node-server.js`, search for a function name close to where you want to debug, and place breakpoints where you would like. Then:
 
 - Go to the Run and Debug pane in VS Code.
 - Select `Launch extension` and start debugging.
@@ -116,7 +110,7 @@ You have two options when to debug the browser version:
 
    - Go to the Run and Debug section
    - Run the _Launch Web Extension in VS Code_ configuration
-   - Open `dist/browser-server.js`, search for a function name close to where you want to debug, and place breakpoints where you would like.
+   - Open `vscode-extension/dist/browser-server.js`, search for a function name close to where you want to debug, and place breakpoints where you would like.
 
 2. Run in Chromium:
    - In a terminal, run `npm run start:web`
@@ -124,9 +118,9 @@ You have two options when to debug the browser version:
 
 ### Debugging unit tests
 
-Tests compile to `server/out/test/`. If you want to debug using a unit test, you have to set breakpoints on the compiled output.
+Tests compile to `packages/language-server/out/test/`. If you want to debug using a unit test, you have to set breakpoints on the compiled output.
 
-Find your test, or the code you want to debug in the `server/out/` folder, and set breakpoints.
+Find your test, or the code you want to debug in the `packages/language-server/out/` folder, and set breakpoints.
 
 The extension Mocha Test Explorer (`hbenl.vscode-mocha-test-adapter`) is useful to launch individual tests in debug mode. Install the extension, open your unit test, and press the Debug button that should appear over your test.
 
@@ -142,7 +136,7 @@ If you want to debug the integration tests there are a few things to keep in min
 - You **must** use default settings for Some Sass. Tip: use the included Workspace Settings.
 - To compile changes in test code, run `npm run compile` in the `e2e` directory.
 
-You set breakpoints in the compiled output. Integration tests compile to `e2e/out/suite/`. Breakpoints can _only be set in test code_, meaning any code in the `e2e/out/` folder.
+You set breakpoints in the compiled output. Integration tests compile to `vscode-extension/out/suite/`. Breakpoints can _only be set in test code_, meaning any code in the `e2e/out/` folder.
 
 Breakpoints set, go to the _Run and Debug_ pane in VS Code and run the Integration Tests configuration.
 

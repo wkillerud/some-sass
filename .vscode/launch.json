@@ -7,13 +7,9 @@
 			"request": "launch",
 			"name": "Launch extension",
 			"runtimeExecutable": "${execPath}",
-			"args": ["--extensionDevelopmentPath=${workspaceRoot}"],
-			"outFiles": ["${workspaceRoot}/dist/**/*.js"],
-			"autoAttachChildProcesses": true,
-			"preLaunchTask": {
-				"type": "npm",
-				"script": "dev"
-			}
+			"args": ["--extensionDevelopmentPath=${workspaceRoot}/vscode-extension"],
+			"outFiles": ["${workspaceRoot}/vscode-extension/dist/**/*.js"],
+			"autoAttachChildProcesses": true
 		},
 		{
 			"name": "Launch Web Extension in VS Code",
@@ -21,15 +17,11 @@
 			"debugWebWorkerHost": true,
 			"request": "launch",
 			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionDevelopmentPath=${workspaceFolder}/vscode-extension",
 				"--extensionDevelopmentKind=web"
 			],
-			"outFiles": ["${workspaceFolder}/dist/browser-*.js"],
-			"autoAttachChildProcesses": true,
-			"preLaunchTask": {
-				"type": "npm",
-				"script": "dev"
-			}
+			"outFiles": ["${workspaceFolder}/vscode-extension/dist/browser-*.js"],
+			"autoAttachChildProcesses": true
 		},
 		{
 			"name": "Integration Tests",
@@ -37,11 +29,11 @@
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/e2e/out/suite",
-				"${workspaceFolder}/fixtures/e2e/"
+				"--extensionDevelopmentPath=${workspaceFolder}/vscode-extension",
+				"--extensionTestsPath=${workspaceFolder}/vscode-extension/out/test/e2e/suite",
+				"${workspaceFolder}/vscode-extension/out/test/fixtures/"
 			],
-			"outFiles": ["${workspaceFolder}/e2e/out/**/*.js"]
+			"outFiles": ["${workspaceFolder}/vscode-extension/out/test/e2e/**/*.js"]
 		},
 		{
 			"type": "chrome",
@@ -63,15 +55,11 @@
 			"request": "launch",
 			"name": "Launch web integration test",
 			"outputCapture": "std",
-			"program": "${workspaceFolder}/web/dist/runTest.js",
+			"program": "${workspaceFolder}/vscode-extension/out/test/web/runTest.js",
 			"args": ["--waitForDebugger=9229"],
 			"cascadeTerminateToConfigurations": ["Launch web integration test"],
 			"presentation": {
 				"hidden": true
-			},
-			"preLaunchTask": {
-				"type": "npm",
-				"script": "pretest:web"
 			}
 		}
 	],

@@ -10,6 +10,7 @@ module.exports = {
 			"semantic-release-vsce",
 			{
 				packageVsix: true,
+				packageRoot: "./vscode-extension",
 			},
 		],
 		[

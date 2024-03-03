@@ -5,7 +5,7 @@ import type { ScssImport } from "./parser";
 import { parseDocument } from "./parser";
 import { getSCSSRegionsDocument } from "./utils/embedded";
 
-export default class ScannerService {
+export default class WorkspaceScannerService {
 	public async scan(files: URI[], workspaceRoot: URI): Promise<void> {
 		const { settings } = useContext();
 		await Promise.all(

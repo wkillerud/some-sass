@@ -35,10 +35,10 @@ import { searchWorkspaceSymbol } from "./features/workspace-symbols/workspace-sy
 import type { FileSystemProvider } from "./file-system";
 import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";
-import ScannerService from "./scanner";
 import type { ISettings } from "./settings";
 import StorageService from "./storage";
 import { getSCSSRegionsDocument } from "./utils/embedded";
+import WorkspaceScannerService from "./workspace-scanner";
 
 interface InitializationOption {
 	workspace: string;
@@ -56,7 +56,7 @@ export class SomeSassServer {
 
 	public listen(): void {
 		let workspaceRoot: URI;
-		let scannerService: ScannerService;
+		let scannerService: WorkspaceScannerService;
 		let fileSystemProvider: FileSystemProvider;
 		let clientCapabilities: ClientCapabilities;
 
@@ -144,7 +144,7 @@ export class SomeSassServer {
 				storage: storageService,
 			});
 
-			scannerService = new ScannerService();
+			scannerService = new WorkspaceScannerService();
 
 			const files = await fileSystemProvider.findFiles(
 				"**/*.{scss,svelte,astro,vue}",

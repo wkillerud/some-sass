@@ -2,7 +2,7 @@ import { ok, strictEqual } from "assert";
 import { isMatch } from "micromatch";
 import { useContext } from "../../src/context-provider";
 import { NodeFileSystem } from "../../src/node-file-system";
-import ScannerService from "../../src/scanner";
+import WorkspaceScannerService from "../../src/workspace-scanner";
 import { getUri } from "../fixture-helper";
 import * as helpers from "../helpers";
 
@@ -14,7 +14,7 @@ describe("Services/Scanner", () => {
 	it("should follow links", async () => {
 		const workspaceUri = getUri("scanner/follow-links/");
 		const docUri = getUri("scanner/follow-links/styles.scss");
-		const scanner = new ScannerService();
+		const scanner = new WorkspaceScannerService();
 		await scanner.scan([docUri], workspaceUri);
 
 		const { storage } = useContext();
@@ -32,7 +32,7 @@ describe("Services/Scanner", () => {
 
 		const workspaceUri = getUri("scanner/self-reference/");
 		const docUri = getUri("scanner/self-reference/styles.scss");
-		const scanner = new ScannerService();
+		const scanner = new WorkspaceScannerService();
 		await scanner.scan([docUri], workspaceUri);
 
 		const { storage } = useContext();

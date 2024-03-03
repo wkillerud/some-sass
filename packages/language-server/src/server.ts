@@ -67,6 +67,7 @@ export class SomeSassServer {
 		// Make the text document manager listen on the connection
 		// _for open, change and close text document events
 		documents.listen(this.connection);
+		this.connection.console.log(`[Server(${process.pid})] Listening`);
 
 		// After the server has started the client sends an initilize request. The server receives
 		// _in the passed params the rootPath of the workspace plus the client capabilites
@@ -83,8 +84,8 @@ export class SomeSassServer {
 
 				workspaceRoot = URI.parse(options.workspace);
 
-				this.connection.console.log(
-					`[Server(${process.pid}) ${workspaceRoot}] Started and initialize received`,
+				this.connection.console.debug(
+					`[Server(${process.pid}) ${workspaceRoot}] Initialize received`,
 				);
 
 				return {
@@ -153,7 +154,7 @@ export class SomeSassServer {
 			try {
 				await scannerService.scan(files, workspaceRoot);
 			} catch (error) {
-				console.log(String(error));
+				this.connection.console.log(String(error));
 			}
 		});
 
@@ -166,7 +167,7 @@ export class SomeSassServer {
 				await scannerService.update(change.document, workspaceRoot);
 			} catch (error) {
 				// Something went wrong trying to parse the changed document.
-				console.error((error as Error).message);
+				this.connection.console.error((error as Error).message);
 				return;
 			}
 

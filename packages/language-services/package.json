@@ -1,0 +1,67 @@
+{
+	"name": "@somesass/language-services",
+	"version": "1.0.0",
+	"description": "The features powering some-sass-language-server",
+	"keywords": [
+		"scss",
+		"sass"
+	],
+	"engines": {
+		"node": ">=20"
+	},
+	"homepage": "https://github.com/wkillerud/some-sass/blob/main/packages/language-services#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+ssh://git@github.com/wkillerud/some-sass.git"
+	},
+	"bugs": {
+		"url": "https://github.com/wkillerud/some-sass/issues"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org/",
+		"tag": "latest"
+	},
+	"files": [
+		"dist/",
+		"!dist/test/",
+		"!dist/**/*.test.js"
+	],
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./*": {
+			"types": "./dist/*.d.ts",
+			"default": "./dist/*.js"
+		},
+		"./feature/*": {
+			"types": "./dist/feature/*.d.ts",
+			"default": "./dist/feature/*.js"
+		}
+	},
+	"author": "William Killerud <william@killerud.com> (https://www.williamkillerud.com/)",
+	"license": "MIT",
+	"scripts": {
+		"prepublishOnly": "npm run build",
+		"build": "npm run clean && tsc",
+		"clean": "shx rm -rf dist",
+		"test": "npm run clean && tsc && shx cp -r src/test/fixtures dist/test/fixtures && mocha --require source-map-support/register"
+	},
+	"dependencies": {
+		"@lezer/common": "1.2.1",
+		"@lezer/sass": "1.0.4",
+		"vscode-css-languageservice": "6.2.12",
+		"vscode-languageserver-textdocument": "1.0.11",
+		"vscode-languageserver-types": "3.17.5",
+		"vscode-uri": "3.0.8"
+	},
+	"devDependencies": {
+		"@types/mocha": "10.0.6",
+		"mocha": "10.3.0",
+		"shx": "0.3.4",
+		"typescript": "5.3.3"
+	}
+}

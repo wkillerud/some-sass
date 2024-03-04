@@ -1,3 +1,4 @@
+import { getLanguageService as getSomeSassLanguageService } from "@somesass/language-services";
 import { parse, type ParseResult } from "scss-sassdoc-parser";
 import {
 	Position,
@@ -36,13 +37,7 @@ export async function parseDocument(
 	const { fs } = useContext();
 	const ls = getLanguageService();
 	const ast = ls.parseStylesheet(document) as INode;
-	const symbols = await findDocumentSymbols(
-		document,
-		ast,
-		workspaceRoot,
-		fs,
-		ls,
-	);
+	const symbols = await findDocumentSymbols(document, ast, workspaceRoot, ls);
 	return new ScssDocument(fs, document, symbols, ast);
 }
 
@@ -50,7 +45,6 @@ async function findDocumentSymbols(
 	document: TextDocument,
 	ast: INode,
 	workspaceRoot: URI,
-	fs: FileSystemProvider,
 	ls: LanguageService,
 ): Promise<IScssSymbols> {
 	const result: IScssSymbols = {
@@ -64,9 +58,15 @@ async function findDocumentSymbols(
 		placeholderUsages: new Map(),
 	};
 
-	const links = await ls.findDocumentLinks2(
+	const { fs, clientCapabilities } = useContext();
+	const sls = getSomeSassLanguageService({
+		fileSystemProvider: fs,
+		clientCapabilities,
+	});
+	const stylesheet = sls.parseStylesheet(document);
+	const links = await sls.findDocumentLinks(
 		document,
-		ast,
+		stylesheet,
 		buildDocumentContext(document.uri, workspaceRoot),
 	);
 

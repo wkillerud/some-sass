@@ -1,4 +1,4 @@
-import { strictEqual, deepStrictEqual, ok } from "assert";
+import { strictEqual, deepStrictEqual, ok, match } from "assert";
 import { stub, SinonStub } from "sinon";
 import { FileType } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
@@ -123,15 +123,26 @@ describe("Services/Parser", () => {
 			// Uses
 			const uses = [...symbols.uses.values()];
 			strictEqual(uses.length, 2, "expected to find two uses");
-			strictEqual(uses[0]?.namespace, "vars");
-			strictEqual(uses[0]?.isAliased, true);
 
-			strictEqual(uses[1]?.namespace, "*");
-			strictEqual(uses[1]?.isAliased, true);
+			const [variables, corners] = uses;
+			strictEqual(variables.namespace, "vars");
+			match(
+				variables.link.target || "",
+				/file:.*\/language-server\/variables\.scss$/,
+			);
+			strictEqual(variables.isAliased, true);
+
+			strictEqual(corners.namespace, "*");
+			match(
+				corners.link.target || "",
+				/file:.*\/language-server\/corners\.scss$/,
+			);
+			strictEqual(corners.isAliased, true);
 
 			// Forward
 			const forwards = [...symbols.forwards.values()];
 			strictEqual(forwards.length, 1, "expected to find one forward");
+			match(forwards[0]?.link.target || "", /file:.*\/colors\.scss$/);
 			strictEqual(forwards[0]?.prefix, "color-");
 			deepStrictEqual(forwards[0]?.hide, [
 				"$varslingsfarger",
@@ -167,6 +178,17 @@ describe("Services/Parser", () => {
 			const uses = [...symbols.uses.values()];
 
 			strictEqual(uses.length, 3, "expected to find three uses");
+
+			const [upper, middle, lower] = uses;
+			match(upper.link.target || "", /file:.*\/language-server\/upper\.scss$/);
+			match(
+				middle.link.target || "",
+				/file:.*\/language-server\/middle\/middle\.scss$/,
+			);
+			match(
+				lower.link.target || "",
+				/file:.*\/language-server\/middle\/lower\/lower\.scss$/,
+			);
 		});
 
 		it("should not crash on link to the same document", async () => {

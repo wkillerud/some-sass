@@ -23,6 +23,7 @@ type UnresolvedLink = {
 
 const startsWithSchemeRegex = /^\w+:\/\//;
 const startsWithData = /^data:/;
+const sassLangFile = /\.(sass|scss)$/;
 
 export class SassNavigation {
 	#aliasSettings: AliasSettings | undefined = undefined;
@@ -99,7 +100,7 @@ export class SassNavigation {
 		return resolvedLinks;
 	}
 
-	private toUnresolvedLink(
+	protected toUnresolvedLink(
 		source: string,
 		from: number,
 		to: number,
@@ -251,7 +252,7 @@ export class SassNavigation {
 		return undefined;
 	}
 
-	private async resolvePathToModule(
+	protected async resolvePathToModule(
 		_moduleName: string,
 		documentFolderUri: string,
 		rootFolderUri: string | undefined,
@@ -298,7 +299,7 @@ export class SassNavigation {
 		return path.substring(0, firstSlash);
 	}
 
-	private async resolvePkgModulePath(
+	protected async resolvePkgModulePath(
 		target: string,
 		documentUri: string,
 		documentContext: DocumentContext,
@@ -331,16 +332,9 @@ export class SassNavigation {
 					if (packageJson.exports) {
 						if (!subpath) {
 							// look for the default/index export
-							const entry: string | undefined =
-								// @ts-expect-error If ['.'] is a string this just produces undefined
-								packageJson.exports["."]["sass"] ||
-								// @ts-expect-error If ['.'] is a string this just produces undefined
-								packageJson.exports["."]["style"] ||
-								// @ts-expect-error If ['.'] is a string this just produces undefined
-								packageJson.exports["."]["default"];
-
-							// the 'default' entry can be whatever, typically .js – confirm it looks like `scss`
-							if (entry && entry.match(/\.[sass|scss]$/)) {
+							const entry = this.getSubpathEntry(packageJson.exports["."]);
+							// the 'default' entry can be whatever, typically .js – confirm it looks like Sass
+							if (entry && entry.match(sassLangFile)) {
 								const entryPath = joinPath(modulePath, entry);
 								return entryPath;
 							}
@@ -348,26 +342,26 @@ export class SassNavigation {
 							// The import string may be with or without .scss.
 							// Likewise the exports entry. Look up both paths.
 							// However, they need to be relative (start with ./).
-							const lookupSubpath = subpath.endsWith(".scss")
-								? `./${subpath.replace(".scss", "")}`
+							const lookupSubpath = subpath.match(sassLangFile)
+								? `./${subpath.replace(sassLangFile, "")}`
 								: `./${subpath}`;
-							const lookupSubpathScss = subpath.endsWith(".scss")
+							const lookupSubpathScss = subpath.match(sassLangFile)
 								? `./${subpath}`
 								: `./${subpath}.scss`;
-							const subpathObject =
-								packageJson.exports[lookupSubpathScss] ||
-								packageJson.exports[lookupSubpath];
-							if (subpathObject) {
-								const entry =
-									// @ts-expect-error If subpathObject is a string this just produces undefined
-									subpathObject["sass"] ||
-									// @ts-expect-error If subpathObject is a string this just produces undefined
-									subpathObject["styles"] ||
-									// @ts-expect-error If subpathObject is a string this just produces undefined
-									subpathObject["default"];
+							const lookupSubpathSass = subpath.match(sassLangFile)
+								? `./${subpath}`
+								: `./${subpath}.sass`;
 
-								// the 'default' entry can be whatever, typically .js – confirm it looks like `scss`
-								if (entry && entry.endsWith(".scss")) {
+							const subpathObject =
+								packageJson.exports[lookupSubpath] ||
+								packageJson.exports[lookupSubpathScss] ||
+								packageJson.exports[lookupSubpathSass];
+
+							if (subpathObject) {
+								const entry = this.getSubpathEntry(subpathObject);
+
+								// the 'default' entry can be whatever, typically .js – confirm it looks like Sass
+								if (entry && entry.match(sassLangFile)) {
 									const entryPath = joinPath(modulePath, entry);
 									return entryPath;
 								}
@@ -380,25 +374,19 @@ export class SassNavigation {
 									if (!maybePattern.includes("*")) {
 										continue;
 									}
-									// Patterns may also be without `.scss` on the left side, so compare without on both sides
+									// Patterns may also be without file extensions on the left side, so compare without on both sides
 									const re = new RegExp(
 										maybePattern
 											.replace("./", "\\./")
-											.replace(".scss", "")
+											.replace(sassLangFile, "")
 											.replace("*", "(.+)"),
 									);
 									const match = re.exec(lookupSubpath);
 									if (match) {
-										const entry =
-											// @ts-expect-error If subpathObject is a string this just produces undefined
-											subpathObject["sass"] ||
-											// @ts-expect-error If subpathObject is a string this just produces undefined
-											subpathObject["styles"] ||
-											// @ts-expect-error If subpathObject is a string this just produces undefined
-											subpathObject["default"];
+										const entry = this.getSubpathEntry(subpathObject);
 
 										// the 'default' entry can be whatever, typically .js – confirm it looks like `scss`
-										if (entry && entry.endsWith(".scss")) {
+										if (entry && entry.match(sassLangFile)) {
 											// The right-hand side of a subpath pattern is also a pattern.
 											// Replace the pattern with the match from our regexp capture group above.
 											const expandedPattern = entry.replace("*", match[1]);
@@ -451,7 +439,7 @@ export class SassNavigation {
 		}
 	}
 
-	toPathVariations(target: string): DocumentUri[] {
+	protected toPathVariations(target: string): DocumentUri[] {
 		// No variation for links that ends with .css suffix
 		if (target.endsWith(".css")) {
 			return [target];
@@ -490,5 +478,18 @@ export class SassNavigation {
 			Utils.joinPath(dirname, basename + ".css").toString(true),
 		];
 		return variants;
+	}
+
+	protected getSubpathEntry(
+		subpathObject: string | Record<string, unknown>,
+	): string | undefined {
+		return (
+			// @ts-expect-error If subpathObject is a string this just produces undefined
+			subpathObject["sass"] ||
+			// @ts-expect-error If subpathObject is a string this just produces undefined
+			subpathObject["styles"] ||
+			// @ts-expect-error If subpathObject is a string this just produces undefined
+			subpathObject["default"]
+		);
 	}
 }

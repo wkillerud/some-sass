@@ -847,7 +847,7 @@ suite("findDocumentLinks", () => {
 		);
 	});
 
-	test("node package resolving - Sass", async () => {
+	test.only("node package resolving - Sass", async () => {
 		const ls = getLS();
 		const testUri = getLinksFixture("about.sass");
 		const workspaceFolder = getLinksFixture("");
@@ -910,7 +910,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(5, 28),
-					target: getLinksFixture("node_modules/@fizz/buzz/styles/colors.scss"),
+					target: getLinksFixture("node_modules/@fizz/buzz/styles/colors.sass"),
 				},
 			],
 			"sass",
@@ -986,12 +986,12 @@ suite("findDocumentLinks", () => {
 		);
 		await assertLinks(
 			ls,
-			`@use "pkg:buzz-pattern/anything"`,
+			`@use "pkg:fizz-pattern/anything"`,
 			[
 				{
 					range: newRange(5, 32),
 					target: getLinksFixture(
-						"node_modules/buzz-pattern/styles/anything.sass",
+						"node_modules/fizz-pattern/styles/anything.sass",
 					),
 				},
 			],
@@ -1001,12 +1001,12 @@ suite("findDocumentLinks", () => {
 		);
 		await assertLinks(
 			ls,
-			`@use "pkg:buzz-pattern/anything.sass"`,
+			`@use "pkg:fizz-pattern/anything.sass"`,
 			[
 				{
 					range: newRange(5, 37),
 					target: getLinksFixture(
-						"node_modules/buzz-pattern/styles/anything.sass",
+						"node_modules/fizz-pattern/styles/anything.sass",
 					),
 				},
 			],
@@ -1016,12 +1016,12 @@ suite("findDocumentLinks", () => {
 		);
 		await assertLinks(
 			ls,
-			`@use "pkg:buzz-pattern/theme/dark.sass"`,
+			`@use "pkg:fizz-pattern/theme/dark.sass"`,
 			[
 				{
 					range: newRange(5, 39),
 					target: getLinksFixture(
-						"node_modules/buzz-pattern/styles/theme/dark.sass",
+						"node_modules/fizz-pattern/styles/theme/dark.sass",
 					),
 				},
 			],

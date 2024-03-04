@@ -89,115 +89,102 @@ suite("findDocumentLinks", () => {
 		}
 	}
 
-	function getTestResource(_path: string) {
+	function getLinksFixture(_path: string) {
 		return URI.file(
-			path.join(__dirname, "../test/fixtures/linksTestFixtures", _path),
+			path.join(__dirname, "../test/fixtures/links", _path),
 		).toString(true);
 	}
 
 	test("invalid partial file links returns no link", async () => {
-		const fixtureRoot = path.resolve(
-			__dirname,
-			"../test/fixtures/linkFixture/non-existent",
-		);
-		const getDocumentUri = (relativePath: string) => {
-			return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
-		};
-
 		await assertNoDynamicLinks(
-			getDocumentUri("./index.scss"),
+			getLinksFixture("./non-existent/index.scss"),
 			`@import 'foo'`,
-			getDocumentUri("foo"),
+			getLinksFixture("./non-existent/foo"),
 		);
 
 		await assertNoDynamicLinks(
-			getDocumentUri("./index.scss"),
+			getLinksFixture("./non-existent/index.scss"),
 			`@import './foo'`,
-			getDocumentUri("foo"),
+			getLinksFixture("./non-existent/foo"),
 		);
 
 		await assertNoDynamicLinks(
-			getDocumentUri("./index.scss"),
+			getLinksFixture("./non-existent/index.scss"),
 			`@import './_foo'`,
-			getDocumentUri("_foo"),
+			getLinksFixture("./non-existent/_foo"),
 		);
 
 		await assertNoDynamicLinks(
-			getDocumentUri("./index.scss"),
+			getLinksFixture("./non-existent/index.scss"),
 			`@import './foo-baz'`,
-			getDocumentUri("foo-baz"),
+			getLinksFixture("./non-existent/foo-baz"),
 		);
 	});
 
 	test("partial file dynamic links", async () => {
-		const fixtureRoot = path.resolve(__dirname, "../test/fixtures/linkFixture");
-		const getDocumentUri = (relativePath: string) => {
-			return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
-		};
-
 		await assertDynamicLinks(
-			getDocumentUri("./noUnderscore/index.scss"),
+			getLinksFixture("./noUnderscore/index.scss"),
 			`@import 'foo'`,
 			[
 				{
 					range: newRange(8, 13),
-					target: getDocumentUri("./noUnderscore/foo.scss"),
+					target: getLinksFixture("./noUnderscore/foo.scss"),
 				},
 			],
 		);
 
 		await assertDynamicLinks(
-			getDocumentUri("./underscore/index.scss"),
+			getLinksFixture("./underscore/index.scss"),
 			`@import 'foo'`,
 			[
 				{
 					range: newRange(8, 13),
-					target: getDocumentUri("./underscore/_foo.scss"),
+					target: getLinksFixture("./underscore/_foo.scss"),
 				},
 			],
 		);
 
 		await assertDynamicLinks(
-			getDocumentUri("./underscore/index.scss"),
+			getLinksFixture("./underscore/index.scss"),
 			`@import 'foo.scss'`,
 			[
 				{
 					range: newRange(8, 18),
-					target: getDocumentUri("./underscore/_foo.scss"),
+					target: getLinksFixture("./underscore/_foo.scss"),
 				},
 			],
 		);
 
 		await assertDynamicLinks(
-			getDocumentUri("./both/index.scss"),
+			getLinksFixture("./both/index.scss"),
 			`@import 'foo'`,
-			[{ range: newRange(8, 13), target: getDocumentUri("./both/foo.scss") }],
+			[{ range: newRange(8, 13), target: getLinksFixture("./both/foo.scss") }],
 		);
 
 		await assertDynamicLinks(
-			getDocumentUri("./both/index.scss"),
+			getLinksFixture("./both/index.scss"),
 			`@import '_foo'`,
-			[{ range: newRange(8, 14), target: getDocumentUri("./both/_foo.scss") }],
+			[{ range: newRange(8, 14), target: getLinksFixture("./both/_foo.scss") }],
 		);
 
 		await assertDynamicLinks(
-			getDocumentUri("./index/index.scss"),
+			getLinksFixture("./index/index.scss"),
 			`@import 'foo'`,
 			[
 				{
 					range: newRange(8, 13),
-					target: getDocumentUri("./index/foo/index.scss"),
+					target: getLinksFixture("./index/foo/index.scss"),
 				},
 			],
 		);
 
 		await assertDynamicLinks(
-			getDocumentUri("./index/index.scss"),
+			getLinksFixture("./index/index.scss"),
 			`@import 'bar'`,
 			[
 				{
 					range: newRange(8, 13),
-					target: getDocumentUri("./index/bar/_index.scss"),
+					target: getLinksFixture("./index/bar/_index.scss"),
 				},
 			],
 		);
@@ -238,10 +225,6 @@ suite("findDocumentLinks", () => {
 				"@BothDir/": "/both/",
 			},
 		};
-		const fixtureRoot = path.resolve(__dirname, "../test/fixtures/linkFixture");
-		const getDocumentUri = (relativePath: string) => {
-			return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
-		};
 
 		const ls = getLS();
 		ls.configure(settings);
@@ -251,74 +234,76 @@ suite("findDocumentLinks", () => {
 		]);
 
 		await assertDynamicLinks(
-			getDocumentUri("./"),
+			getLinksFixture("./"),
 			`@import '@NoUnderscoreDir/foo'`,
 			[
 				{
 					range: newRange(8, 30),
-					target: getDocumentUri("./noUnderscore/foo.scss"),
+					target: getLinksFixture("./noUnderscore/foo.scss"),
 				},
 			],
 			settings,
 		);
 
 		await assertDynamicLinks(
-			getDocumentUri("./"),
+			getLinksFixture("./"),
 			`@import '@UnderscoreDir/foo'`,
 			[
 				{
 					range: newRange(8, 28),
-					target: getDocumentUri("./underscore/_foo.scss"),
+					target: getLinksFixture("./underscore/_foo.scss"),
 				},
 			],
 			settings,
 		);
 
 		await assertDynamicLinks(
-			getDocumentUri("./"),
+			getLinksFixture("./"),
 			`@import '@BothDir/foo'`,
-			[{ range: newRange(8, 22), target: getDocumentUri("./both/foo.scss") }],
+			[{ range: newRange(8, 22), target: getLinksFixture("./both/foo.scss") }],
 			settings,
 		);
 
 		await assertDynamicLinks(
-			getDocumentUri("./"),
+			getLinksFixture("./"),
 			`@import '@BothDir/_foo'`,
-			[{ range: newRange(8, 23), target: getDocumentUri("./both/_foo.scss") }],
+			[{ range: newRange(8, 23), target: getLinksFixture("./both/_foo.scss") }],
 			settings,
 		);
 	});
 
 	test("module file links", async () => {
-		const fixtureRoot = path.resolve(
-			__dirname,
-			"../test/fixtures/linkFixture/module",
-		);
-		const getDocumentUri = (relativePath: string) => {
-			return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
-		};
-
 		await assertDynamicLinks(
-			getDocumentUri("./index.scss"),
+			getLinksFixture("./module/index.scss"),
 			`@use './foo' as f`,
-			[{ range: newRange(5, 12), target: getDocumentUri("./foo.scss") }],
+			[
+				{
+					range: newRange(5, 12),
+					target: getLinksFixture("./module/foo.scss"),
+				},
+			],
 		);
 
 		await assertDynamicLinks(
-			getDocumentUri("./index.scss"),
+			getLinksFixture("./module/index.scss"),
 			`@forward './foo' hide $private`,
-			[{ range: newRange(9, 16), target: getDocumentUri("./foo.scss") }],
+			[
+				{
+					range: newRange(9, 16),
+					target: getLinksFixture("./module/foo.scss"),
+				},
+			],
 		);
 
 		await assertNoDynamicLinks(
-			getDocumentUri("./index.scss"),
+			getLinksFixture("./module/index.scss"),
 			`@use 'sass:math'`,
 			undefined,
 		);
 		await assertNoDynamicLinks(
-			getDocumentUri("./index.scss"),
+			getLinksFixture("./module/index.scss"),
 			`@use './non-existent'`,
-			getDocumentUri("non-existent"),
+			getLinksFixture("./module/non-existent"),
 		);
 	});
 
@@ -344,8 +329,8 @@ suite("findDocumentLinks", () => {
 
 	test("node module resolving", async function () {
 		const ls = getLS();
-		const testUri = getTestResource("about.scss");
-		const workspaceFolder = getTestResource("");
+		const testUri = getLinksFixture("about.scss");
+		const workspaceFolder = getLinksFixture("");
 
 		await assertLinks(
 			ls,
@@ -353,7 +338,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(29, 46),
-					target: getTestResource("node_modules/foo/hello.html"),
+					target: getLinksFixture("node_modules/foo/hello.html"),
 				},
 			],
 			"scss",
@@ -366,7 +351,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(29, 45),
-					target: getTestResource("node_modules/foo/hello.html"),
+					target: getLinksFixture("node_modules/foo/hello.html"),
 				},
 			],
 			"scss",
@@ -379,7 +364,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(5, 19),
-					target: getTestResource("node_modules/@foo/bar/_baz.scss"),
+					target: getLinksFixture("node_modules/@foo/bar/_baz.scss"),
 				},
 			],
 			"scss",
@@ -392,7 +377,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(5, 15),
-					target: getTestResource("node_modules/@foo/bar/_index.scss"),
+					target: getLinksFixture("node_modules/@foo/bar/_index.scss"),
 				},
 			],
 			"scss",
@@ -402,7 +387,7 @@ suite("findDocumentLinks", () => {
 		await assertLinks(
 			ls,
 			'@import "green/d"',
-			[{ range: newRange(8, 17), target: getTestResource("green/d.scss") }],
+			[{ range: newRange(8, 17), target: getLinksFixture("green/d.scss") }],
 			"scss",
 			testUri,
 			workspaceFolder,
@@ -410,7 +395,7 @@ suite("findDocumentLinks", () => {
 		await assertLinks(
 			ls,
 			'@import "./green/d"',
-			[{ range: newRange(8, 19), target: getTestResource("green/d.scss") }],
+			[{ range: newRange(8, 19), target: getLinksFixture("green/d.scss") }],
 			"scss",
 			testUri,
 			workspaceFolder,
@@ -421,7 +406,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(8, 17),
-					target: getTestResource("node_modules/green/_e.scss"),
+					target: getLinksFixture("node_modules/green/_e.scss"),
 				},
 			],
 			"scss",
@@ -432,15 +417,15 @@ suite("findDocumentLinks", () => {
 
 	test("node package resolving", async () => {
 		const ls = getLS();
-		const testUri = getTestResource("about.scss");
-		const workspaceFolder = getTestResource("");
+		const testUri = getLinksFixture("about.scss");
+		const workspaceFolder = getLinksFixture("");
 		await assertLinks(
 			ls,
 			`@use "pkg:bar"`,
 			[
 				{
 					range: newRange(5, 14),
-					target: getTestResource("node_modules/bar/styles/index.scss"),
+					target: getLinksFixture("node_modules/bar/styles/index.scss"),
 				},
 			],
 			"scss",
@@ -453,7 +438,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(5, 21),
-					target: getTestResource("node_modules/bar/styles/colors.scss"),
+					target: getLinksFixture("node_modules/bar/styles/colors.scss"),
 				},
 			],
 			"scss",
@@ -466,7 +451,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(5, 26),
-					target: getTestResource("node_modules/bar/styles/colors.scss"),
+					target: getLinksFixture("node_modules/bar/styles/colors.scss"),
 				},
 			],
 			"scss",
@@ -479,7 +464,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(5, 19),
-					target: getTestResource("node_modules/@foo/baz/styles/index.scss"),
+					target: getLinksFixture("node_modules/@foo/baz/styles/index.scss"),
 				},
 			],
 			"scss",
@@ -492,7 +477,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(5, 26),
-					target: getTestResource("node_modules/@foo/baz/styles/colors.scss"),
+					target: getLinksFixture("node_modules/@foo/baz/styles/colors.scss"),
 				},
 			],
 			"scss",
@@ -505,7 +490,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(5, 31),
-					target: getTestResource("node_modules/@foo/baz/styles/colors.scss"),
+					target: getLinksFixture("node_modules/@foo/baz/styles/colors.scss"),
 				},
 			],
 			"scss",
@@ -518,7 +503,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(5, 26),
-					target: getTestResource("node_modules/@foo/baz/styles/button.scss"),
+					target: getLinksFixture("node_modules/@foo/baz/styles/button.scss"),
 				},
 			],
 			"scss",
@@ -531,7 +516,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(5, 31),
-					target: getTestResource("node_modules/@foo/baz/styles/button.scss"),
+					target: getLinksFixture("node_modules/@foo/baz/styles/button.scss"),
 				},
 			],
 			"scss",
@@ -544,7 +529,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(5, 20),
-					target: getTestResource("node_modules/root-sass/styles/index.scss"),
+					target: getLinksFixture("node_modules/root-sass/styles/index.scss"),
 				},
 			],
 			"scss",
@@ -557,7 +542,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(5, 21),
-					target: getTestResource("node_modules/root-style/styles/index.scss"),
+					target: getLinksFixture("node_modules/root-style/styles/index.scss"),
 				},
 			],
 			"scss",
@@ -570,7 +555,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(5, 31),
-					target: getTestResource(
+					target: getLinksFixture(
 						"node_modules/bar-pattern/styles/anything.scss",
 					),
 				},
@@ -585,7 +570,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(5, 36),
-					target: getTestResource(
+					target: getLinksFixture(
 						"node_modules/bar-pattern/styles/anything.scss",
 					),
 				},
@@ -600,7 +585,7 @@ suite("findDocumentLinks", () => {
 			[
 				{
 					range: newRange(5, 38),
-					target: getTestResource(
+					target: getLinksFixture(
 						"node_modules/bar-pattern/styles/theme/dark.scss",
 					),
 				},

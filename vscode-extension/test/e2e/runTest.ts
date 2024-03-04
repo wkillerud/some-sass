@@ -63,11 +63,13 @@ async function main() {
 			launchArgs: [workspaceDir],
 		});
 	} catch (e) {
+		/* eslint-disable no-console */
 		console.error("Failed to run tests");
 		const error = e as Error;
 		console.error(error.name);
 		console.error(error.message);
 		console.error(error.stack);
+		/* eslint-enable no-console */
 		process.exit(1);
 	}
 }

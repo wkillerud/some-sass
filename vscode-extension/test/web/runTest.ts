@@ -2,6 +2,7 @@ import * as path from "path";
 import { runTests } from "@vscode/test-web";
 
 process.on("uncaughtException", (e) => {
+	// eslint-disable-next-line no-console
 	console.error(e);
 });
 
@@ -38,6 +39,7 @@ async function main() {
 				: undefined,
 		});
 	} catch (err) {
+		// eslint-disable-next-line no-console
 		console.error("Failed to run tests");
 		process.exit(1);
 	}

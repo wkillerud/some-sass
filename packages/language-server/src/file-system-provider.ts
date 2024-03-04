@@ -97,7 +97,6 @@ export function getFileSystemProvider(
 				});
 				return res.map((stringUri) => URI.parse(stringUri));
 			} catch (e) {
-				console.error((e as Error).message);
 				return [];
 			}
 		},

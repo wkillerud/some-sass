@@ -96,12 +96,11 @@ export default class WorkspaceScannerService {
 						workspaceRoot,
 						depth + 1,
 					);
-				} catch (error) {
-					console.error((error as Error).message);
+				} catch {
+					// Try the next file
 				}
 			}
 		} catch (error) {
-			console.error((error as Error).message);
 			// Something went wrong parsing this file. Try to parse the others.
 		}
 	}

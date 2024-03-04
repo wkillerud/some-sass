@@ -219,8 +219,8 @@ async function findDocumentSymbols(
 	let sassdoc: ParseResult[] = [];
 	try {
 		sassdoc = await parse(text);
-	} catch (error) {
-		console.error((error as Error).message);
+	} catch {
+		// do nothing
 	}
 
 	const symbols = ls.findDocumentSymbols2(document, ast);

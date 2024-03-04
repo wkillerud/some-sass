@@ -25,9 +25,7 @@ export async function doDiagnostics(
 	const { storage } = useContext();
 	const openDocument = storage.get(document.uri);
 	if (!openDocument) {
-		console.error(
-			"Tried to do diagnostics on a document that has not been scanned. This should never happen.",
-		);
+		// Tried to do diagnostics on a document that has not been scanned. This should never happen.
 		return diagnostics;
 	}
 

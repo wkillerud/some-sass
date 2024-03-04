@@ -2,11 +2,11 @@ import type { TextDocument } from "vscode-languageserver-textdocument";
 import { DocumentLink, Range, DocumentUri } from "vscode-languageserver-types";
 import { URI, Utils } from "vscode-uri";
 import {
-	SyntaxNodeTypes,
 	type DocumentContext,
 	type LanguageServiceOptions,
 	type Stylesheet,
 	AliasSettings,
+	SyntaxNodeTypes,
 } from "../language-services-types";
 import { dirname, joinPath } from "../utils/resources";
 
@@ -328,7 +328,7 @@ export class SassNavigation {
 					if (packageJson.exports) {
 						if (!subpath) {
 							// look for the default/index export
-							const entry =
+							const entry: string | undefined =
 								// @ts-expect-error If ['.'] is a string this just produces undefined
 								packageJson.exports["."]["sass"] ||
 								// @ts-expect-error If ['.'] is a string this just produces undefined
@@ -337,7 +337,7 @@ export class SassNavigation {
 								packageJson.exports["."]["default"];
 
 							// the 'default' entry can be whatever, typically .js – confirm it looks like `scss`
-							if (entry && entry.endsWith(".scss")) {
+							if (entry && entry.match(/\.[sass|scss]$/)) {
 								const entryPath = joinPath(modulePath, entry);
 								return entryPath;
 							}

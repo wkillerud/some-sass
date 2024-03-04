@@ -1,3 +1,7 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
 import * as assert from "node:assert";
 import * as path from "node:path";
 import { TextDocument } from "vscode-languageserver-textdocument";
@@ -41,12 +45,13 @@ suite("findDocumentLinks", () => {
 		input: string,
 		expected: DocumentLink[],
 		settings?: LanguageSettings,
+		lang: string = "scss",
 	) {
 		const ls = getLS();
 		if (settings) {
 			ls.configure(settings);
 		}
-		const document = TextDocument.create(docUri, "scss", 0, input);
+		const document = TextDocument.create(docUri, lang, 0, input);
 		const stylesheet = ls.parseStylesheet(document);
 		const links = await ls.findDocumentLinks(
 			document,
@@ -60,9 +65,10 @@ suite("findDocumentLinks", () => {
 		docUri: string,
 		input: string,
 		extecedTarget: string | undefined,
+		lang: string = "scss",
 	) {
 		const ls = getLS();
-		const document = TextDocument.create(docUri, "scss", 0, input);
+		const document = TextDocument.create(docUri, lang, 0, input);
 		const stylesheet = ls.parseStylesheet(document);
 		const links = await ls.findDocumentLinks(
 			document,
@@ -103,7 +109,19 @@ suite("findDocumentLinks", () => {
 		);
 
 		await assertNoDynamicLinks(
+			getLinksFixture("./non-existent/index.sass"),
+			`@import 'foo'`,
+			getLinksFixture("./non-existent/foo"),
+		);
+
+		await assertNoDynamicLinks(
 			getLinksFixture("./non-existent/index.scss"),
+			`@import './foo'`,
+			getLinksFixture("./non-existent/foo"),
+		);
+
+		await assertNoDynamicLinks(
+			getLinksFixture("./non-existent/index.sass"),
 			`@import './foo'`,
 			getLinksFixture("./non-existent/foo"),
 		);
@@ -115,7 +133,19 @@ suite("findDocumentLinks", () => {
 		);
 
 		await assertNoDynamicLinks(
+			getLinksFixture("./non-existent/index.sass"),
+			`@import './_foo'`,
+			getLinksFixture("./non-existent/_foo"),
+		);
+
+		await assertNoDynamicLinks(
 			getLinksFixture("./non-existent/index.scss"),
+			`@import './foo-baz'`,
+			getLinksFixture("./non-existent/foo-baz"),
+		);
+
+		await assertNoDynamicLinks(
+			getLinksFixture("./non-existent/index.sass"),
 			`@import './foo-baz'`,
 			getLinksFixture("./non-existent/foo-baz"),
 		);
@@ -134,12 +164,34 @@ suite("findDocumentLinks", () => {
 		);
 
 		await assertDynamicLinks(
+			getLinksFixture("./noUnderscore/index.scss"),
+			`@import 'bar'`,
+			[
+				{
+					range: newRange(8, 13),
+					target: getLinksFixture("./noUnderscore/bar.sass"),
+				},
+			],
+		);
+
+		await assertDynamicLinks(
 			getLinksFixture("./underscore/index.scss"),
 			`@import 'foo'`,
 			[
 				{
 					range: newRange(8, 13),
 					target: getLinksFixture("./underscore/_foo.scss"),
+				},
+			],
+		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./underscore/index.scss"),
+			`@import 'bar'`,
+			[
+				{
+					range: newRange(8, 13),
+					target: getLinksFixture("./underscore/_bar.sass"),
 				},
 			],
 		);
@@ -156,6 +208,17 @@ suite("findDocumentLinks", () => {
 		);
 
 		await assertDynamicLinks(
+			getLinksFixture("./underscore/index.scss"),
+			`@import 'bar.sass'`,
+			[
+				{
+					range: newRange(8, 18),
+					target: getLinksFixture("./underscore/_bar.sass"),
+				},
+			],
+		);
+
+		await assertDynamicLinks(
 			getLinksFixture("./both/index.scss"),
 			`@import 'foo'`,
 			[{ range: newRange(8, 13), target: getLinksFixture("./both/foo.scss") }],
@@ -163,8 +226,20 @@ suite("findDocumentLinks", () => {
 
 		await assertDynamicLinks(
 			getLinksFixture("./both/index.scss"),
+			`@import 'bar'`,
+			[{ range: newRange(8, 13), target: getLinksFixture("./both/bar.sass") }],
+		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./both/index.scss"),
 			`@import '_foo'`,
 			[{ range: newRange(8, 14), target: getLinksFixture("./both/_foo.scss") }],
+		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./both/index.scss"),
+			`@import '_bar'`,
+			[{ range: newRange(8, 14), target: getLinksFixture("./both/_bar.sass") }],
 		);
 
 		await assertDynamicLinks(
@@ -180,11 +255,33 @@ suite("findDocumentLinks", () => {
 
 		await assertDynamicLinks(
 			getLinksFixture("./index/index.scss"),
+			`@import 'fizz'`,
+			[
+				{
+					range: newRange(8, 14),
+					target: getLinksFixture("./index/fizz/index.sass"),
+				},
+			],
+		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./index/index.scss"),
 			`@import 'bar'`,
 			[
 				{
 					range: newRange(8, 13),
 					target: getLinksFixture("./index/bar/_index.scss"),
+				},
+			],
+		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./index/index.scss"),
+			`@import 'buzz'`,
+			[
+				{
+					range: newRange(8, 14),
+					target: getLinksFixture("./index/buzz/_index.sass"),
 				},
 			],
 		);
@@ -203,6 +300,11 @@ suite("findDocumentLinks", () => {
 		await assertLinks(ls, `@import 'foo.scss' print;`, [
 			{ range: newRange(8, 18), target: "test://test/foo.scss" },
 		]);
+
+		await assertLinks(ls, `@import 'foo.sass' print;`, [
+			{ range: newRange(8, 18), target: "test://test/foo.sass" },
+		]);
+
 		await assertLinks(
 			ls,
 			`@import 'http://foo.com/foo.css'`,
@@ -272,6 +374,62 @@ suite("findDocumentLinks", () => {
 		);
 	});
 
+	test("aliased links - Sass", async function () {
+		const settings: LanguageSettings = {
+			importAliases: {
+				"@SassStylesheet": "/src/assets/styles.sass",
+				"@NoUnderscoreDir/": "/noUnderscore/",
+				"@UnderscoreDir/": "/underscore/",
+				"@BothDir/": "/both/",
+			},
+		};
+
+		const ls = getLS();
+		ls.configure(settings);
+
+		await assertLinks(ls, '@import "@SassStylesheet"', [
+			{ range: newRange(8, 25), target: "test://test/src/assets/styles.sass" },
+		]);
+
+		await assertDynamicLinks(
+			getLinksFixture("./"),
+			`@import '@NoUnderscoreDir/bar'`,
+			[
+				{
+					range: newRange(8, 30),
+					target: getLinksFixture("./noUnderscore/bar.sass"),
+				},
+			],
+			settings,
+		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./"),
+			`@import '@UnderscoreDir/bar'`,
+			[
+				{
+					range: newRange(8, 28),
+					target: getLinksFixture("./underscore/_bar.sass"),
+				},
+			],
+			settings,
+		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./"),
+			`@import '@BothDir/bar'`,
+			[{ range: newRange(8, 22), target: getLinksFixture("./both/bar.sass") }],
+			settings,
+		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./"),
+			`@import '@BothDir/_bar'`,
+			[{ range: newRange(8, 23), target: getLinksFixture("./both/_bar.sass") }],
+			settings,
+		);
+	});
+
 	test("module file links", async () => {
 		await assertDynamicLinks(
 			getLinksFixture("./module/index.scss"),
@@ -291,6 +449,41 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(9, 16),
 					target: getLinksFixture("./module/foo.scss"),
+				},
+			],
+		);
+
+		await assertNoDynamicLinks(
+			getLinksFixture("./module/index.scss"),
+			`@use 'sass:math'`,
+			undefined,
+		);
+		await assertNoDynamicLinks(
+			getLinksFixture("./module/index.scss"),
+			`@use './non-existent'`,
+			getLinksFixture("./module/non-existent"),
+		);
+	});
+
+	test("module file links - Sass", async () => {
+		await assertDynamicLinks(
+			getLinksFixture("./module/index.scss"),
+			`@use './bar' as f`,
+			[
+				{
+					range: newRange(5, 12),
+					target: getLinksFixture("./module/bar.sass"),
+				},
+			],
+		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./module/index.scss"),
+			`@forward './bar' hide $private`,
+			[
+				{
+					range: newRange(9, 16),
+					target: getLinksFixture("./module/bar.sass"),
 				},
 			],
 		);
@@ -373,11 +566,37 @@ suite("findDocumentLinks", () => {
 		);
 		await assertLinks(
 			ls,
+			`@use '@foo/bar/buzz'`,
+			[
+				{
+					range: newRange(5, 20),
+					target: getLinksFixture("node_modules/@foo/bar/_buzz.sass"),
+				},
+			],
+			"scss",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
 			`@use '@foo/bar'`,
 			[
 				{
 					range: newRange(5, 15),
 					target: getLinksFixture("node_modules/@foo/bar/_index.scss"),
+				},
+			],
+			"scss",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
+			`@use '@foo/buzz'`,
+			[
+				{
+					range: newRange(5, 16),
+					target: getLinksFixture("node_modules/@foo/buzz/_index.sass"),
 				},
 			],
 			"scss",
@@ -410,6 +629,35 @@ suite("findDocumentLinks", () => {
 				},
 			],
 			"scss",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
+			'@import "blue/b"',
+			[{ range: newRange(8, 16), target: getLinksFixture("blue/b.sass") }],
+			"sass",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
+			'@import "./blue/b"',
+			[{ range: newRange(8, 18), target: getLinksFixture("blue/b.sass") }],
+			"sass",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
+			'@import "blue/c"',
+			[
+				{
+					range: newRange(8, 16),
+					target: getLinksFixture("node_modules/blue/_c.sass"),
+				},
+			],
+			"sass",
 			testUri,
 			workspaceFolder,
 		);
@@ -525,11 +773,11 @@ suite("findDocumentLinks", () => {
 		);
 		await assertLinks(
 			ls,
-			`@use "pkg:root-sass"`,
+			`@use "pkg:root-scss"`,
 			[
 				{
 					range: newRange(5, 20),
-					target: getLinksFixture("node_modules/root-sass/styles/index.scss"),
+					target: getLinksFixture("node_modules/root-scss/styles/index.scss"),
 				},
 			],
 			"scss",
@@ -591,6 +839,190 @@ suite("findDocumentLinks", () => {
 				},
 			],
 			"scss",
+			testUri,
+			workspaceFolder,
+		);
+	});
+
+	test("node package resolving - Sass", async () => {
+		const ls = getLS();
+		const testUri = getLinksFixture("about.sass");
+		const workspaceFolder = getLinksFixture("");
+		await assertLinks(
+			ls,
+			`@use "pkg:fizz"`,
+			[
+				{
+					range: newRange(5, 15),
+					target: getLinksFixture("node_modules/fizz/styles/index.sass"),
+				},
+			],
+			"sass",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
+			`@use "pkg:fizz/colors"`,
+			[
+				{
+					range: newRange(5, 22),
+					target: getLinksFixture("node_modules/fizz/styles/colors.sass"),
+				},
+			],
+			"sass",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
+			`@use "pkg:fizz/colors.sass"`,
+			[
+				{
+					range: newRange(5, 27),
+					target: getLinksFixture("node_modules/fizz/styles/colors.sass"),
+				},
+			],
+			"sass",
+			testUri,
+			workspaceFolder,
+		);
+
+		await assertLinks(
+			ls,
+			`@use "pkg:@fizz/buzz"`,
+			[
+				{
+					range: newRange(5, 21),
+					target: getLinksFixture("node_modules/@fizz/buzz/styles/index.sass"),
+				},
+			],
+			"sass",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
+			`@use "pkg:@fizz/buzz/colors"`,
+			[
+				{
+					range: newRange(5, 28),
+					target: getLinksFixture("node_modules/@fizz/buzz/styles/colors.scss"),
+				},
+			],
+			"sass",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
+			`@use "pkg:@fizz/buzz/colors.sass"`,
+			[
+				{
+					range: newRange(5, 33),
+					target: getLinksFixture("node_modules/@fizz/buzz/styles/colors.sass"),
+				},
+			],
+			"sass",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
+			`@use "pkg:@fizz/buzz/button"`,
+			[
+				{
+					range: newRange(5, 28),
+					target: getLinksFixture("node_modules/@fizz/buzz/styles/button.sass"),
+				},
+			],
+			"sass",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
+			`@use "pkg:@fizz/buzz/button.sass"`,
+			[
+				{
+					range: newRange(5, 33),
+					target: getLinksFixture("node_modules/@fizz/buzz/styles/button.sass"),
+				},
+			],
+			"sass",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
+			`@use "pkg:root-sass"`,
+			[
+				{
+					range: newRange(5, 20),
+					target: getLinksFixture("node_modules/root-sass/styles/index.sass"),
+				},
+			],
+			"sass",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
+			`@use "pkg:root-style-sass"`,
+			[
+				{
+					range: newRange(5, 26),
+					target: getLinksFixture(
+						"node_modules/root-style-sass/styles/index.sass",
+					),
+				},
+			],
+			"sass",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
+			`@use "pkg:buzz-pattern/anything"`,
+			[
+				{
+					range: newRange(5, 32),
+					target: getLinksFixture(
+						"node_modules/buzz-pattern/styles/anything.sass",
+					),
+				},
+			],
+			"sass",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
+			`@use "pkg:buzz-pattern/anything.sass"`,
+			[
+				{
+					range: newRange(5, 37),
+					target: getLinksFixture(
+						"node_modules/buzz-pattern/styles/anything.sass",
+					),
+				},
+			],
+			"sass",
+			testUri,
+			workspaceFolder,
+		);
+		await assertLinks(
+			ls,
+			`@use "pkg:buzz-pattern/theme/dark.sass"`,
+			[
+				{
+					range: newRange(5, 39),
+					target: getLinksFixture(
+						"node_modules/buzz-pattern/styles/theme/dark.sass",
+					),
+				},
+			],
+			"sass",
 			testUri,
 			workspaceFolder,
 		);

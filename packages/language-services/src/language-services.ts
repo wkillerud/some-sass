@@ -1,8 +1,8 @@
-import { SassNavigation } from "./feature/navigation";
 import type {
 	LanguageService,
 	LanguageServiceOptions,
-} from "./language-services-types";
+} from "@somesass/language-server-types";
+import { SassNavigation } from "./feature/navigation";
 import { parseStylesheet } from "./parser";
 
 export function getLanguageService(

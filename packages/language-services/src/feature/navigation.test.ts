@@ -4,11 +4,14 @@
  *--------------------------------------------------------------------------------------------*/
 import * as assert from "node:assert";
 import * as path from "node:path";
-import { TextDocument } from "vscode-languageserver-textdocument";
-import { DocumentLink } from "vscode-languageserver-types";
-import { URI } from "vscode-uri";
+import {
+	DocumentLink,
+	LanguageService,
+	LanguageSettings,
+	TextDocument,
+	URI,
+} from "@somesass/language-server-types";
 import { getLanguageService } from "../language-services";
-import { LanguageService, LanguageSettings } from "../language-services-types";
 import { getDocumentContext } from "../test/test-document-context";
 import { NodeFileSystem } from "../test/test-fs-provider";
 import { newRange } from "../test/test-resources";

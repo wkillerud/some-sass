@@ -26,12 +26,12 @@
 		"!dist/test/",
 		"!dist/**/*.test.js"
 	],
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
+	"main": "dist/language-services.js",
+	"types": "dist/language-services.d.ts",
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"default": "./dist/index.js"
+			"types": "./dist/language-services.d.ts",
+			"default": "./dist/language-services.js"
 		},
 		"./*": {
 			"types": "./dist/*.d.ts",
@@ -51,12 +51,8 @@
 		"test": "npm run clean && tsc && shx cp -r src/test/fixtures dist/test/fixtures && mocha --require source-map-support/register"
 	},
 	"dependencies": {
-		"@lezer/common": "1.2.1",
 		"@lezer/sass": "1.0.4",
-		"vscode-css-languageservice": "6.2.12",
-		"vscode-languageserver-textdocument": "1.0.11",
-		"vscode-languageserver-types": "3.17.5",
-		"vscode-uri": "3.0.8"
+		"@somesass/language-server-types": "1.0.0"
 	},
 	"devDependencies": {
 		"@types/mocha": "10.0.6",

@@ -1,13 +1,16 @@
-import type { TextDocument } from "vscode-languageserver-textdocument";
-import { DocumentLink, Range, DocumentUri } from "vscode-languageserver-types";
-import { URI, Utils } from "vscode-uri";
 import {
 	type DocumentContext,
 	type LanguageServiceOptions,
 	type Stylesheet,
 	AliasSettings,
 	SyntaxNodeTypes,
-} from "../language-services-types";
+	DocumentLink,
+	TextDocument,
+	Range,
+	URI,
+	DocumentUri,
+	Utils,
+} from "@somesass/language-server-types";
 import { dirname, joinPath } from "../utils/resources";
 
 type UnresolvedLink = {

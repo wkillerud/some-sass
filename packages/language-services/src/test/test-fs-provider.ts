@@ -1,8 +1,12 @@
 import { promises, constants, existsSync } from "fs";
+import {
+	FileStat,
+	FileSystemProvider,
+	FileType,
+	URI,
+	Utils,
+} from "@somesass/language-server-types";
 import * as fg from "fast-glob";
-import { type FileStat, FileType } from "vscode-css-languageservice";
-import { URI, Utils } from "vscode-uri";
-import type { FileSystemProvider } from "../language-services-types";
 
 export class NodeFileSystem implements FileSystemProvider {
 	async findFiles(

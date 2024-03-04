@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as url from "node:url";
-import { DocumentContext } from "../language-services-types";
+import { DocumentContext } from "@somesass/language-server-types";
 import { joinPath } from "../utils/resources";
 
 export function getDocumentContext(workspaceFolder?: string): DocumentContext {

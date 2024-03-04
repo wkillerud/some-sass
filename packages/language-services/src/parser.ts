@@ -1,6 +1,5 @@
 import { parser } from "@lezer/sass";
-import type { TextDocument } from "vscode-languageserver-textdocument";
-import { Stylesheet } from "./language-services-types";
+import type { Stylesheet, TextDocument } from "@somesass/language-server-types";
 
 export function parseStylesheet(document: TextDocument): Stylesheet {
 	return parser

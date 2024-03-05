@@ -1,5 +1,4 @@
-import { ClientCapabilities } from "vscode-css-languageservice";
-import { URI } from "vscode-uri";
+import type { ClientCapabilities, URI } from "@somesass/language-server-types";
 import { FileSystemProvider } from "./file-system";
 import { IEditorSettings, ISettings } from "./settings";
 import StorageService from "./storage";

@@ -1,12 +1,15 @@
-import { FileType } from "vscode-css-languageservice";
+import {
+	FileType,
+	TextDocument,
+	URI,
+	Utils,
+} from "@somesass/language-server-types";
 import {
 	type CompletionItem,
 	CompletionItemKind,
 	CompletionList,
 	MarkupKind,
 } from "vscode-languageserver";
-import type { TextDocument } from "vscode-languageserver-textdocument";
-import { URI, Utils } from "vscode-uri";
 import { useContext } from "../../context-provider";
 import { sassBuiltInModules } from "../sass-built-in-modules";
 import type { CompletionContext } from "./completion-context";

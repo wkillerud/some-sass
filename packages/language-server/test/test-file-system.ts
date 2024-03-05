@@ -1,6 +1,10 @@
 import { promises } from "fs";
-import { FileStat, FileType } from "vscode-css-languageservice";
-import { URI, Utils } from "vscode-uri";
+import {
+	FileStat,
+	FileType,
+	URI,
+	Utils,
+} from "@somesass/language-server-types";
 import type { FileSystemProvider } from "../src/file-system";
 import type StorageService from "../src/storage";
 

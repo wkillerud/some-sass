@@ -1,7 +1,10 @@
 import { resolve, join } from "path";
-import { Position, Range } from "vscode-css-languageservice";
-import { TextDocument } from "vscode-languageserver-textdocument";
-import { URI } from "vscode-uri";
+import {
+	Position,
+	Range,
+	TextDocument,
+	URI,
+} from "@somesass/language-server-types";
 import { createContext, useContext } from "../src/context-provider";
 import { FileSystemProvider } from "../src/file-system";
 import { parseDocument, type INode } from "../src/parser";

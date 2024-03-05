@@ -1,6 +1,5 @@
-import { type FileStat, FileType } from "vscode-css-languageservice";
+import { type FileStat, FileType, URI } from "@somesass/language-server-types";
 import { type Connection, RequestType } from "vscode-languageserver";
-import { URI } from "vscode-uri";
 import {
 	REQUEST_FS_FIND_FILES,
 	REQUEST_FS_READ_DIRECTORY,

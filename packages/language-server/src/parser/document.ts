@@ -1,5 +1,8 @@
-import type { DocumentContext } from "vscode-css-languageservice";
-import { URI, Utils } from "vscode-uri";
+import {
+	type DocumentContext,
+	URI,
+	Utils,
+} from "@somesass/language-server-types";
 
 export function buildDocumentContext(
 	documentUri: string,

@@ -1,6 +1,5 @@
-import { FileStat, FileType } from "vscode-css-languageservice";
+import type { FileStat, FileType, URI } from "@somesass/language-server-types";
 import type { CancellationToken } from "vscode-languageserver";
-import type { URI } from "vscode-uri";
 
 /**
  * API to abstract away whether or not we have direct file system access.

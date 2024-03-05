@@ -1,14 +1,14 @@
-import { getLanguageService as getSomeSassLanguageService } from "@somesass/language-services";
-import { parse, type ParseResult } from "scss-sassdoc-parser";
 import {
 	Position,
 	Range,
 	SymbolKind,
 	DocumentLink,
-	LanguageService,
-} from "vscode-css-languageservice";
-import type { TextDocument } from "vscode-languageserver-textdocument";
-import { URI } from "vscode-uri";
+	TextDocument,
+	URI,
+} from "@somesass/language-server-types";
+import { getLanguageService as getSomeSassLanguageService } from "@somesass/language-services";
+import { parse, type ParseResult } from "scss-sassdoc-parser";
+import { LanguageService } from "vscode-css-languageservice";
 import { useContext } from "../context-provider";
 import { sassBuiltInModuleNames } from "../features/sass-built-in-modules";
 import type { FileSystemProvider } from "../file-system";

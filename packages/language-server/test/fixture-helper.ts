@@ -1,5 +1,5 @@
 import * as path from "path";
-import { URI } from "vscode-uri";
+import { URI } from "@somesass/language-server-types";
 
 function getDocPath(p: string) {
 	return path.resolve(__dirname, "./fixtures", p);

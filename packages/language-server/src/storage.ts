@@ -1,4 +1,4 @@
-import type { URI } from "vscode-uri";
+import type { URI } from "@somesass/language-server-types";
 import type { IScssDocument } from "./parser";
 
 export type Storage = Map<StorageItemKey, StorageItemValue>;

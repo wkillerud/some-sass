@@ -1,7 +1,6 @@
 import { strictEqual, deepStrictEqual, ok, match } from "assert";
+import { FileType, URI } from "@somesass/language-server-types";
 import { stub, SinonStub } from "sinon";
-import { FileType } from "vscode-css-languageservice";
-import { URI } from "vscode-uri";
 import { useContext } from "../../src/context-provider";
 import {
 	parseDocument,

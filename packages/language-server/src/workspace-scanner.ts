@@ -1,5 +1,4 @@
-import { TextDocument } from "vscode-languageserver-textdocument";
-import { URI } from "vscode-uri";
+import { TextDocument, URI } from "@somesass/language-server-types";
 import { useContext } from "./context-provider";
 import type { ScssImport } from "./parser";
 import { parseDocument } from "./parser";

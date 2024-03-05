@@ -1,7 +1,11 @@
 import { promises, constants, existsSync } from "fs";
+import {
+	type FileStat,
+	FileType,
+	URI,
+	Utils,
+} from "@somesass/language-server-types";
 import * as fg from "fast-glob";
-import { type FileStat, FileType } from "vscode-css-languageservice";
-import { URI, Utils } from "vscode-uri";
 import type { FileSystemProvider } from "./file-system";
 
 export class NodeFileSystem implements FileSystemProvider {

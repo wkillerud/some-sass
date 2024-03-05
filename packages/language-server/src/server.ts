@@ -1,3 +1,4 @@
+import { TextDocument, URI } from "@somesass/language-server-types";
 import {
 	ClientCapabilities,
 	CodeAction,
@@ -15,8 +16,6 @@ import type {
 	InitializeParams,
 	InitializeResult,
 } from "vscode-languageserver/node";
-import { TextDocument } from "vscode-languageserver-textdocument";
-import { URI } from "vscode-uri";
 import {
 	changeConfiguration,
 	createContext,

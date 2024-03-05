@@ -1,9 +1,9 @@
-import { FileType, getSCSSLanguageService } from "vscode-css-languageservice";
-import type {
-	LanguageService,
-	FileSystemProvider as CSSFileSystemProvider,
+import { URI, FileType } from "@somesass/language-server-types";
+import {
+	type LanguageService,
+	type FileSystemProvider as CSSFileSystemProvider,
+	getSCSSLanguageService,
 } from "vscode-css-languageservice";
-import { URI } from "vscode-uri";
 import { useContext } from "../context-provider";
 
 let ls: LanguageService;

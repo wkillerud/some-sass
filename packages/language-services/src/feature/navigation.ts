@@ -4,8 +4,8 @@ import {
 	type Stylesheet,
 	AliasSettings,
 	SyntaxNodeTypes,
-	DocumentLink,
 	TextDocument,
+	SassDocumentLink,
 	Range,
 	URI,
 	DocumentUri,
@@ -14,7 +14,7 @@ import {
 import { dirname, joinPath } from "../utils/resources";
 
 type UnresolvedLink = {
-	link: DocumentLink;
+	link: SassDocumentLink;
 	/**
 	 * `true` if the link is to a Sass module, as opposed to for instance url()
 	 */
@@ -24,6 +24,9 @@ type UnresolvedLink = {
 const startsWithSchemeRegex = /^\w+:\/\//;
 const startsWithData = /^data:/;
 const sassLangFile = /\.(sass|scss)$/;
+const reUse = /@use ["|'](?<url>.+)["|'](?: as (?<namespace>\*|\w+))?/;
+const reForward =
+	/@forward ["|'](?<url>.+)["|'](?: as (?<prefix>\w+-)|\*)?(?: hide (?<hide>.+))?(?: show (?<show>.+))?[;|\n]?/;
 
 export class SassNavigation {
 	#aliasSettings: AliasSettings | undefined = undefined;
@@ -41,84 +44,148 @@ export class SassNavigation {
 		document: TextDocument,
 		stylesheet: Stylesheet,
 		documentContext: DocumentContext,
-	): Promise<DocumentLink[]> {
-		const linkNodeTypeNames: string[] = [
-			SyntaxNodeTypes.UseStatement,
-			SyntaxNodeTypes.ForwardStatement,
-			SyntaxNodeTypes.ImportStatement,
-		];
-
+	): Promise<SassDocumentLink[]> {
 		const source = document.getText();
 		const cursor = stylesheet.cursor();
 
-		const unresolvedLinks: UnresolvedLink[] = [];
+		const unresolved: UnresolvedLink[] = [];
 		while (cursor.next()) {
-			const isModuleLink = linkNodeTypeNames.includes(cursor.node.type.name);
 			if (
-				isModuleLink ||
+				cursor.node.type.name === SyntaxNodeTypes.UseStatement ||
+				cursor.node.type.name === SyntaxNodeTypes.ForwardStatement ||
+				cursor.node.type.name === SyntaxNodeTypes.ImportStatement ||
 				cursor.node.type.name === SyntaxNodeTypes.CallLiteral
 			) {
-				const innerCursor = cursor.node.cursor();
-				while (innerCursor.next()) {
+				const inner = cursor.node.cursor();
+				while (inner.next()) {
 					if (
-						innerCursor.node.type.name ===
-							SyntaxNodeTypes.ParenthesizedContent ||
-						innerCursor.node.type.name === SyntaxNodeTypes.StringLiteral
+						inner.node.type.name === SyntaxNodeTypes.ParenthesizedContent ||
+						inner.node.type.name === SyntaxNodeTypes.StringLiteral
 					) {
-						const from = innerCursor.node.from;
-						const to = innerCursor.node.to;
-						unresolvedLinks.push(
-							this.toUnresolvedLink(source, from, to, document, isModuleLink),
-						);
+						const from = inner.node.from;
+						const to = inner.node.to;
+
+						let target = source.substring(from, to);
+						if (target.startsWith(`'`) || target.startsWith(`"`)) {
+							target = target.slice(1, -1);
+						}
+
+						if (cursor.node.type.name === SyntaxNodeTypes.UseStatement) {
+							const statement = source.substring(
+								cursor.node.from,
+								cursor.node.to + (cursor.node.nextSibling?.to || 0), // TODO: should perhaps try to fix so the alias stuff is part of the parser grammar
+							);
+							const matches = reUse.exec(statement);
+							let namespace = matches?.groups?.["namespace"];
+
+							if (!namespace) {
+								namespace = target.replace("./", "").replace("pkg:", "");
+								if (namespace.includes("/")) {
+									const lastSlash = namespace.lastIndexOf("/");
+									const extension = namespace.lastIndexOf(".");
+									namespace = target.substring(
+										lastSlash + 1,
+										extension !== -1 ? extension : undefined,
+									);
+								}
+								namespace = namespace.startsWith("_")
+									? namespace.slice(1)
+									: namespace;
+
+								if (namespace === "index") {
+									// The link points to an index file. Use the folder name above as a namespace.
+									const linkOmitIndex = target.slice(
+										0,
+										Math.max(0, namespace.lastIndexOf("/")),
+									);
+									const newLastSlash = linkOmitIndex.lastIndexOf("/");
+									namespace = linkOmitIndex.slice(
+										Math.max(0, newLastSlash + 1),
+									);
+								}
+							}
+							unresolved.push({
+								link: {
+									target,
+									range: Range.create(
+										document.positionAt(from),
+										document.positionAt(to),
+									),
+									namespace,
+								},
+								isModuleLink: true,
+							});
+							break;
+						}
+						if (cursor.node.type.name === SyntaxNodeTypes.ForwardStatement) {
+							const statement = source.substring(
+								cursor.node.from,
+								cursor.node.to + (cursor.node.nextSibling?.to || 0), // TODO: should perhaps try to fix so the forward stuff is part of the parser grammar
+							);
+							const matches = reForward.exec(statement);
+
+							const prefix: string | undefined = matches?.groups?.["prefix"];
+							const hide: string[] | undefined = matches?.groups?.["hide"]
+								? matches?.groups["hide"].split(",").map((s) => s.trim())
+								: undefined;
+							const show: string[] | undefined = matches?.groups?.["show"]
+								? matches?.groups["show"].split(",").map((s) => s.trim())
+								: undefined;
+
+							unresolved.push({
+								link: {
+									target,
+									range: Range.create(
+										document.positionAt(from),
+										document.positionAt(to),
+									),
+									prefix,
+									hide,
+									show,
+								},
+								isModuleLink: true,
+							});
+							break;
+						}
+
+						unresolved.push({
+							link: {
+								target,
+								range: Range.create(
+									document.positionAt(from),
+									document.positionAt(to),
+								),
+							},
+							isModuleLink:
+								cursor.node.type.name === SyntaxNodeTypes.ImportStatement,
+						});
 						break;
 					}
 				}
 			}
 		}
 
-		const resolvedLinks: DocumentLink[] = [];
-		for (const unresolved of unresolvedLinks) {
-			const link = unresolved.link;
+		const resolved: SassDocumentLink[] = [];
+		for (const { link, isModuleLink } of unresolved) {
 			const target = link.target;
 			if (!target || startsWithData.test(target)) {
 				// no links for data:
 			} else if (startsWithSchemeRegex.test(target)) {
-				resolvedLinks.push(link);
+				resolved.push(link);
 			} else {
 				const resolvedTarget = await this.resolveReference(
 					target,
 					document.uri,
 					documentContext,
-					unresolved.isModuleLink,
+					isModuleLink,
 				);
 				if (resolvedTarget !== undefined) {
 					link.target = resolvedTarget;
-					resolvedLinks.push(link);
+					resolved.push(link);
 				}
 			}
 		}
-		return resolvedLinks;
-	}
-
-	protected toUnresolvedLink(
-		source: string,
-		from: number,
-		to: number,
-		document: TextDocument,
-		isModuleLink: boolean,
-	): UnresolvedLink {
-		let target = source.substring(from, to);
-		if (target.startsWith(`'`) || target.startsWith(`"`)) {
-			target = target.slice(1, -1);
-		}
-
-		return {
-			link: {
-				target,
-				range: Range.create(document.positionAt(from), document.positionAt(to)),
-			},
-			isModuleLink,
-		};
+		return resolved;
 	}
 
 	protected async mapReference(

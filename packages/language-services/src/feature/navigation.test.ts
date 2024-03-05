@@ -5,9 +5,9 @@
 import * as assert from "node:assert";
 import * as path from "node:path";
 import {
-	DocumentLink,
 	LanguageService,
 	LanguageSettings,
+	SassDocumentLink,
 	TextDocument,
 	URI,
 } from "@somesass/language-server-types";
@@ -23,7 +23,7 @@ suite("findDocumentLinks", () => {
 	async function assertLinks(
 		ls: LanguageService,
 		input: string,
-		expected: DocumentLink[],
+		expected: SassDocumentLink[],
 		lang: string = "css",
 		testUri?: string,
 		workspaceFolder?: string,
@@ -46,7 +46,7 @@ suite("findDocumentLinks", () => {
 	async function assertDynamicLinks(
 		docUri: string,
 		input: string,
-		expected: DocumentLink[],
+		expected: SassDocumentLink[],
 		settings?: LanguageSettings,
 		lang: string = "scss",
 	) {
@@ -433,25 +433,79 @@ suite("findDocumentLinks", () => {
 		);
 	});
 
-	test("module file links", async () => {
+	test.only("module file links", async () => {
 		await assertDynamicLinks(
 			getLinksFixture("./module/index.scss"),
-			`@use './foo' as f`,
+			`@use './foo'
+a
+  text-decoration: underline`,
 			[
 				{
 					range: newRange(5, 12),
 					target: getLinksFixture("./module/foo.scss"),
+					namespace: "foo",
 				},
 			],
 		);
 
 		await assertDynamicLinks(
 			getLinksFixture("./module/index.scss"),
-			`@forward './foo' hide $private`,
+			`@use './foo' as f
+a
+	text-decoration: underline`,
+			[
+				{
+					range: newRange(5, 12),
+					target: getLinksFixture("./module/foo.scss"),
+					namespace: "f",
+				},
+			],
+		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./module/index.scss"),
+			`@forward './foo' hide $private
+a
+	text-decoration: underline`,
 			[
 				{
 					range: newRange(9, 16),
 					target: getLinksFixture("./module/foo.scss"),
+					hide: ["$private"],
+					prefix: undefined,
+					show: undefined,
+				},
+			],
+		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./module/index.scss"),
+			`@forward './foo' show $public
+a
+	text-decoration: underline`,
+			[
+				{
+					range: newRange(9, 16),
+					target: getLinksFixture("./module/foo.scss"),
+					hide: undefined,
+					show: ["$public"],
+					prefix: undefined,
+				},
+			],
+		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./module/index.scss"),
+			`@forward './foo' as foo- show $public
+		a
+			text-decoration: underline`,
+			[
+				{
+					range: newRange(9, 16),
+					target: getLinksFixture("./module/foo.scss"),
+					hide: undefined,
+					show: ["$public"],
+					prefix: "foo-",
 				},
 			],
 		);
@@ -471,11 +525,48 @@ suite("findDocumentLinks", () => {
 	test("module file links - Sass", async () => {
 		await assertDynamicLinks(
 			getLinksFixture("./module/index.scss"),
-			`@use './bar' as f`,
+			`@use './bar'`,
 			[
 				{
 					range: newRange(5, 12),
 					target: getLinksFixture("./module/bar.sass"),
+					namespace: "bar",
+				},
+			],
+		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./module/index.scss"),
+			`@use './bar.sass'`,
+			[
+				{
+					range: newRange(5, 12),
+					target: getLinksFixture("./module/bar.sass"),
+					namespace: "bar",
+				},
+			],
+		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./module/index.scss"),
+			`@use './_bar.sass'`,
+			[
+				{
+					range: newRange(5, 12),
+					target: getLinksFixture("./module/bar.sass"),
+					namespace: "bar",
+				},
+			],
+		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./module/index.scss"),
+			`@use './bar' as *`,
+			[
+				{
+					range: newRange(5, 12),
+					target: getLinksFixture("./module/bar.sass"),
+					namespace: "*",
 				},
 			],
 		);
@@ -487,6 +578,7 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(9, 16),
 					target: getLinksFixture("./module/bar.sass"),
+					hide: ["$private"],
 				},
 			],
 		);
@@ -847,7 +939,7 @@ suite("findDocumentLinks", () => {
 		);
 	});
 
-	test.only("node package resolving - Sass", async () => {
+	test("node package resolving - Sass", async () => {
 		const ls = getLS();
 		const testUri = getLinksFixture("about.sass");
 		const workspaceFolder = getLinksFixture("");

@@ -101,11 +101,10 @@
 		}
 	},
 	"dependencies": {
+		"@somesass/language-server-types": "1.0.0",
 		"fast-glob": "3.3.2",
 		"some-sass-language-server": "*",
-		"vscode-css-languageservice": "6.2.12",
-		"vscode-languageclient": "9.0.1",
-		"vscode-uri": "3.0.7"
+		"vscode-languageclient": "9.0.1"
 	},
 	"devDependencies": {
 		"@types/mocha": "10.0.6",

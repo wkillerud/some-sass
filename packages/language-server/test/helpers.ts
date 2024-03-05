@@ -7,8 +7,7 @@ import {
 } from "@somesass/language-server-types";
 import { createContext, useContext } from "../src/context-provider";
 import { FileSystemProvider } from "../src/file-system";
-import { parseDocument, type INode } from "../src/parser";
-import { getLanguageService } from "../src/parser/language-service";
+import { parseDocument } from "../src/parser";
 import type { ISettings } from "../src/settings";
 import StorageService from "../src/storage";
 import { TestFileSystem } from "./test-file-system";
@@ -38,12 +37,6 @@ export async function makeDocument(
 	const { storage } = useContext();
 	storage.set(uri, scssDocument);
 	return document;
-}
-
-export async function makeAst(lines: string[]): Promise<INode> {
-	const document = await makeDocument(lines);
-	const ls = getLanguageService();
-	return ls.parseStylesheet(document) as INode;
 }
 
 export function makeSameLineRange(line = 1, start = 1, end = 1): Range {

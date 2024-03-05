@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Tree } from "@lezer/common";
+import { Tree, SyntaxNode } from "@lezer/common";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
 	Range,
@@ -46,6 +46,7 @@ import {
 import { URI, Utils } from "vscode-uri";
 
 export {
+	SyntaxNode,
 	URI,
 	Utils,
 	TextDocument,
@@ -87,6 +88,38 @@ export {
 	DocumentHighlightKind,
 };
 
+export interface SassDocumentLink extends DocumentLink {
+	/**
+	 * The namespace of the module.
+	 *
+	 * | Link               | Namespace  |
+	 * | ------------------ | ---------- |
+	 * | `"./colors"`       | `"colors"` |
+	 * | `"./colors" as c`  | `"c"`      |
+	 * | `"./colors" as *`  | `"*"`      |
+	 * | `"./_colors"`      | `"colors"` |
+	 * | `"./_colors.scss"` | `"colors"` |
+	 *
+	 * @see https://sass-lang.com/documentation/at-rules/use/#choosing-a-namespace
+	 */
+	namespace?: string;
+	/**
+	 * @see https://sass-lang.com/documentation/at-rules/forward/#controlling-visibility
+	 */
+	hide?: string[];
+	/**
+	 * @see https://sass-lang.com/documentation/at-rules/forward/#controlling-visibility
+	 */
+	show?: string[];
+	/**
+	 * @see https://sass-lang.com/documentation/at-rules/forward/#adding-a-prefix
+	 */
+	prefix?: string;
+}
+
+/**
+ * The root of the abstract syntax {@link Tree}.
+ */
 export type Stylesheet = Tree;
 
 export * from "@lezer/common";
@@ -98,7 +131,7 @@ export interface LanguageService {
 		document: TextDocument,
 		stylesheet: Stylesheet,
 		documentContext: DocumentContext,
-	): Promise<DocumentLink[]>;
+	): Promise<SassDocumentLink[]>;
 }
 
 export type Rename =
@@ -117,9 +150,6 @@ export interface AliasSettings {
 	[key: string]: string;
 }
 
-/**
- * Describes what LSP capabilities the client supports
- */
 export interface ClientCapabilities {
 	textDocument?: {
 		completion?: {
@@ -149,9 +179,6 @@ export namespace ClientCapabilities {
 }
 
 export interface LanguageServiceOptions {
-	/**
-	 * Describes the LSP capabilities the client supports.
-	 */
 	clientCapabilities?: ClientCapabilities;
 	/**
 	 * Abstract file system access away from the service to support
@@ -164,29 +191,13 @@ export interface LanguageServiceOptions {
 }
 
 export enum FileType {
-	/**
-	 * The file type is unknown.
-	 */
 	Unknown = 0,
-	/**
-	 * A regular file.
-	 */
 	File = 1,
-	/**
-	 * A directory.
-	 */
 	Directory = 2,
-	/**
-	 * A symbolic link to a file.
-	 */
 	SymbolicLink = 64,
 }
 
 export interface FileStat {
-	/**
-	 * The type of the file, e.g. is a regular file, a directory, or symbolic link
-	 * to a file.
-	 */
 	type: FileType;
 	/**
 	 * The creation timestamp in milliseconds elapsed since January 1, 1970 00:00:00 UTC.

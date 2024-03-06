@@ -12,3 +12,4 @@ The language server is [published independently to npm](https://www.npmjs.com/pa
 The language server has clients for
 
 - [Visual Studio Code](./vscode-extension#readme)
+- [Neovim](https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#somesass_ls)

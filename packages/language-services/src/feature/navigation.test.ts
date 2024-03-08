@@ -709,10 +709,19 @@ suite("findDocumentLinks", () => {
 			],
 		);
 
-		await assertNoDynamicLinks(
+		await assertDynamicLinks(
 			getLinksFixture("./module/index.scss"),
 			`@use 'sass:math';`,
-			undefined,
+			[
+				{
+					range: newRange(5, 16),
+					target: "sass:math",
+					hide: undefined,
+					as: undefined,
+					show: undefined,
+					type: SyntaxNodeType.UseStatement,
+				},
+			],
 		);
 
 		await assertNoDynamicLinks(
@@ -783,10 +792,19 @@ suite("findDocumentLinks", () => {
 			],
 		);
 
-		await assertNoDynamicLinks(
+		await assertDynamicLinks(
 			getLinksFixture("./module/index.scss"),
 			`@use 'sass:math'`,
-			undefined,
+			[
+				{
+					range: newRange(5, 16),
+					target: "sass:math",
+					hide: undefined,
+					as: undefined,
+					show: undefined,
+					type: SyntaxNodeType.UseStatement,
+				},
+			],
 		);
 		await assertNoDynamicLinks(
 			getLinksFixture("./module/index.scss"),

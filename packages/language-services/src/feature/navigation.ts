@@ -193,6 +193,11 @@ export class SassNavigation {
 			} else if (startsWithSchemeRegex.test(target)) {
 				resolved.push(link);
 			} else {
+				if (target.startsWith("sass:")) {
+					// Sass built-in
+					resolved.push(link);
+					continue;
+				}
 				const resolvedTarget = await this.resolveReference(
 					target,
 					document.uri,
@@ -234,11 +239,6 @@ export class SassNavigation {
 		isModuleLink = false,
 		settings = this.#aliasSettings,
 	): Promise<string | undefined> {
-		if (target.startsWith("sass:")) {
-			// Sass built-in
-			return undefined;
-		}
-
 		// Following [css-loader](https://github.com/webpack-contrib/css-loader#url)
 		// and [sass-loader's](https://github.com/webpack-contrib/sass-loader#imports)
 		// convention, if an import path starts with ~ then use node module resolution

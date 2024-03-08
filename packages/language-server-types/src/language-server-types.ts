@@ -137,7 +137,9 @@ export type Stylesheet = Tree;
 
 export * from "@lezer/common";
 
-export interface SassDocumentSymbol extends DocumentSymbol {}
+export interface SassDocumentSymbol extends DocumentSymbol {
+	type: SyntaxNodeType;
+}
 
 export interface LanguageService {
 	configure(settings?: LanguageSettings): void;

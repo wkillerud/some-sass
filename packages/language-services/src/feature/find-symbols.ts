@@ -91,7 +91,7 @@ function findTreeSymbols(
 
 /**
  * // TODO: flesh this one out once you know which SyntaxNodeType are relevant
- * Returns one of these SymbolKind, defaulting to SymbolKind.String
+ * Returns one of these SymbolKind, defaulting to SymbolKind.String. Match the expected SymbolKind from vscode-css-languageservice
  * - SymbolKind.Module,
  * - SymbolKind.Namespace,
  * - SymbolKind.Class,
@@ -117,6 +117,8 @@ function findTreeSymbols(
  */
 function typeToKind(type: SyntaxNodeType): SymbolKind {
 	switch (type) {
+		case SyntaxNodeType.MediaStatement:
+			return SymbolKind.Module;
 		case SyntaxNodeType.CallExpression:
 			return SymbolKind.Method;
 		case SyntaxNodeType.ClassName:

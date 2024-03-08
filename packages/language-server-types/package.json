@@ -30,7 +30,8 @@
 	"license": "MIT",
 	"scripts": {
 		"prepublishOnly": "npm run build",
-		"build": "shx rm -rf dist && tsc"
+		"build": "shx rm -rf dist && tsc",
+		"test": "npm run build"
 	},
 	"dependencies": {
 		"@lezer/common": "1.2.1",

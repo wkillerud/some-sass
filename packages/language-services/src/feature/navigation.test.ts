@@ -436,9 +436,7 @@ suite("findDocumentLinks", () => {
 	test.only("module file links", async () => {
 		await assertDynamicLinks(
 			getLinksFixture("./module/index.scss"),
-			`@use './foo'
-a
-  text-decoration: underline`,
+			`@use './foo'; a { text-decoration: underline; }`,
 			[
 				{
 					range: newRange(5, 12),
@@ -450,9 +448,7 @@ a
 
 		await assertDynamicLinks(
 			getLinksFixture("./module/index.scss"),
-			`@use './foo' as f
-a
-	text-decoration: underline`,
+			`@use './foo' as f; a { text-decoration: underline; }`,
 			[
 				{
 					range: newRange(5, 12),
@@ -464,9 +460,7 @@ a
 
 		await assertDynamicLinks(
 			getLinksFixture("./module/index.scss"),
-			`@forward './foo' hide $private
-a
-	text-decoration: underline`,
+			`@forward './foo' hide $private; a { text-decoration: underline; }`,
 			[
 				{
 					range: newRange(9, 16),
@@ -480,9 +474,7 @@ a
 
 		await assertDynamicLinks(
 			getLinksFixture("./module/index.scss"),
-			`@forward './foo' show $public
-a
-	text-decoration: underline`,
+			`@forward './foo' show $public; a { text-decoration: underline; }`,
 			[
 				{
 					range: newRange(9, 16),
@@ -496,9 +488,7 @@ a
 
 		await assertDynamicLinks(
 			getLinksFixture("./module/index.scss"),
-			`@forward './foo' as foo- show $public
-		a
-			text-decoration: underline`,
+			`@forward './foo' as foo- show $public; a { text-decoration: underline; }`,
 			[
 				{
 					range: newRange(9, 16),
@@ -510,14 +500,29 @@ a
 			],
 		);
 
+		await assertDynamicLinks(
+			getLinksFixture("./module/index.scss"),
+			'@forward "foo" as color-* hide $varslingsfarger, varslingsfarge; a { text-decoration: underline; }',
+			[
+				{
+					range: newRange(9, 14),
+					target: getLinksFixture("./module/foo.scss"),
+					hide: ["$varslingsfarger", "varslingsfarge"],
+					show: undefined,
+					prefix: "color-",
+				},
+			],
+		);
+
 		await assertNoDynamicLinks(
 			getLinksFixture("./module/index.scss"),
-			`@use 'sass:math'`,
+			`@use 'sass:math';`,
 			undefined,
 		);
+
 		await assertNoDynamicLinks(
 			getLinksFixture("./module/index.scss"),
-			`@use './non-existent'`,
+			`@use './non-existent';`,
 			getLinksFixture("./module/non-existent"),
 		);
 	});

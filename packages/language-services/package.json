@@ -48,7 +48,7 @@
 		"prepublishOnly": "npm run build",
 		"build": "npm run clean && tsc",
 		"clean": "shx rm -rf dist",
-		"test": "npm run clean && tsc && shx cp -r src/test/fixtures dist/test/fixtures && mocha --require source-map-support/register"
+		"test": "npm run build && shx cp -r src/test/fixtures dist/test/fixtures && mocha --require source-map-support/register"
 	},
 	"dependencies": {
 		"@lezer/sass": "1.0.4",

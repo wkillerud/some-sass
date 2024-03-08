@@ -26,7 +26,7 @@ const startsWithData = /^data:/;
 const sassLangFile = /\.(sass|scss)$/;
 const reUse = /@use ["|'](?<url>.+)["|'](?: as (?<namespace>\*|\w+))?/;
 const reForward =
-	/@forward ["|'](?<url>.+)["|'](?: as (?<prefix>\w+-)|\*)?(?: hide (?<hide>.+))?(?: show (?<show>.+))?[;|\n]?/;
+	/@forward ["|'](?<url>.+)["|'](?: as (?<prefix>\w+-)|\*)?(?: hide (?<hide>[$,\s\w\d-]+))?(?: show (?<show>[$,\s\w\d-]+))?/;
 
 export class SassNavigation {
 	#aliasSettings: AliasSettings | undefined = undefined;
@@ -120,7 +120,10 @@ export class SassNavigation {
 						if (cursor.node.type.name === SyntaxNodeTypes.ForwardStatement) {
 							const statement = source.substring(
 								cursor.node.from,
-								cursor.node.to + (cursor.node.nextSibling?.to || 0), // TODO: should perhaps try to fix so the forward stuff is part of the parser grammar
+								cursor.node.to +
+									((cursor.node.nextSibling?.to || 0) +
+										(cursor.node.nextSibling?.node?.nextSibling?.to || 0)), // TODO: should perhaps try to fix so the forward stuff is part of the parser grammar
+								// this is untenable...
 							);
 							const matches = reForward.exec(statement);
 

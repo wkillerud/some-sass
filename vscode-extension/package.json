@@ -124,8 +124,8 @@
 		"start:web": "vscode-test-web --browserType=chromium",
 		"start:test-web": "vscode-test-web --browserType=chromium  --extensionDevelopmentPath=. ./test/fixtures",
 		"lint": "eslint \"**/*.ts\" --cache",
-		"test": "npm run test:build",
 		"test:build": "tsc -p ./ && shx cp -r ./test/fixtures ./out/test && webpack --config ./webpack.test-web.config.js",
+		"pretest:e2e": "npm run test:build",
 		"test:e2e": "node ./out/test/e2e/runTest.js",
 		"test:web": "node ./out/test/web/runTest.js"
 	},

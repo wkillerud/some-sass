@@ -8,10 +8,13 @@ import {
 	SassDocumentLink,
 	Range,
 	URI,
-	DocumentUri,
-	Utils,
 } from "@somesass/language-server-types";
 import { dirname, joinPath } from "../utils/resources";
+import { getNamespaceFromLink } from "./navigation/get-namespace-from-link";
+import {
+	getSubpathEntry,
+	toPathVariations,
+} from "./navigation/module-resolution";
 
 type UnresolvedLink = {
 	link: SassDocumentLink;
@@ -228,7 +231,7 @@ export class SassNavigation {
 			target &&
 			isModuleLink
 		) {
-			const pathVariations = this.toPathVariations(target);
+			const pathVariations = toPathVariations(target);
 			for (const variation of pathVariations) {
 				if (await this.fileExists(variation)) {
 					return variation;
@@ -425,7 +428,7 @@ export class SassNavigation {
 					if (packageJson.exports) {
 						if (!subpath) {
 							// look for the default/index export
-							const entry = this.getSubpathEntry(packageJson.exports["."]);
+							const entry = getSubpathEntry(packageJson.exports["."]);
 							// the 'default' entry can be whatever, typically .js – confirm it looks like Sass
 							if (entry && entry.match(sassLangFile)) {
 								const entryPath = joinPath(modulePath, entry);
@@ -451,7 +454,7 @@ export class SassNavigation {
 								packageJson.exports[lookupSubpathSass];
 
 							if (subpathObject) {
-								const entry = this.getSubpathEntry(subpathObject);
+								const entry = getSubpathEntry(subpathObject);
 
 								// the 'default' entry can be whatever, typically .js – confirm it looks like Sass
 								if (entry && entry.match(sassLangFile)) {
@@ -476,7 +479,7 @@ export class SassNavigation {
 									);
 									const match = re.exec(lookupSubpath);
 									if (match) {
-										const entry = this.getSubpathEntry(subpathObject);
+										const entry = getSubpathEntry(subpathObject);
 
 										// the 'default' entry can be whatever, typically .js – confirm it looks like `scss`
 										if (entry && entry.match(sassLangFile)) {
@@ -531,87 +534,4 @@ export class SassNavigation {
 			return null;
 		}
 	}
-
-	protected toPathVariations(target: string): DocumentUri[] {
-		// No variation for links that ends with .css suffix
-		if (target.endsWith(".css")) {
-			return [target];
-		}
-
-		// If a link is like a/, try resolving a/index.scss, a/_index.scss, a/index.sass and a/_index.sass
-		if (target.endsWith("/")) {
-			return [
-				target + "index.scss",
-				target + "_index.scss",
-				target + "index.sass",
-				target + "_index.sass",
-			];
-		}
-
-		const targetUri = URI.parse(target.replace(/\.s[ac]ss$/, ""));
-		const basename = Utils.basename(targetUri);
-		const dirname = Utils.dirname(targetUri);
-		if (basename.startsWith("_")) {
-			// No variation for links such as _a
-			return [
-				Utils.joinPath(dirname, basename + ".scss").toString(true),
-				Utils.joinPath(dirname, basename + ".sass").toString(true),
-			];
-		}
-
-		const variants = [
-			Utils.joinPath(dirname, basename + ".scss").toString(true),
-			Utils.joinPath(dirname, "_" + basename + ".scss").toString(true),
-			target + "/index.scss",
-			target + "/_index.scss",
-			Utils.joinPath(dirname, basename + ".sass").toString(true),
-			Utils.joinPath(dirname, "_" + basename + ".sass").toString(true),
-			target + "/index.sass",
-			target + "/_index.sass",
-			Utils.joinPath(dirname, basename + ".css").toString(true),
-		];
-		return variants;
-	}
-
-	protected getSubpathEntry(
-		subpathObject: string | Record<string, unknown>,
-	): string | undefined {
-		return (
-			// @ts-expect-error If subpathObject is a string this just produces undefined
-			subpathObject["sass"] ||
-			// @ts-expect-error If subpathObject is a string this just produces undefined
-			subpathObject["styles"] ||
-			// @ts-expect-error If subpathObject is a string this just produces undefined
-			subpathObject["default"]
-		);
-	}
-}
-
-function getNamespaceFromLink(target: string): string {
-	if (target.startsWith("sass")) {
-		return target.split(":")[1];
-	}
-
-	const bareTarget = target.replace("pkg:", "").replace("./", "");
-	let from = 0;
-	let to = bareTarget.length;
-	if (bareTarget.includes("/")) {
-		from = bareTarget.lastIndexOf("/") + 1;
-	}
-	if (bareTarget.includes(".")) {
-		to = bareTarget.lastIndexOf(".");
-	}
-	let namespace = bareTarget.substring(from, to);
-	namespace = namespace.startsWith("_") ? namespace.slice(1) : namespace;
-	if (namespace === "index") {
-		// The link points to an index file. Use the folder name above as a namespace.
-		const linkOmitIndex = bareTarget.slice(
-			0,
-			Math.max(0, bareTarget.lastIndexOf("/")),
-		);
-		const newLastSlash = linkOmitIndex.lastIndexOf("/");
-		namespace = linkOmitIndex.slice(Math.max(0, newLastSlash + 1));
-	}
-
-	return namespace;
 }

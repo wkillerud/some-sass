@@ -48,7 +48,7 @@ IncludeStatement {
 }
 
 UseStatement {
-  @specialize[@name=use]<AtKeyword, "@use"> value (ckw<"as"> value)? (ckw<"with"> callArgList)? semi
+  @specialize[@name=use]<AtKeyword, "@use"> value (ckw<"as"> UseAs)? (ckw<"with"> callArgList)? semi
 }
 
 ExtendStatement {
@@ -60,7 +60,7 @@ RootStatement {
 }
 
 ForwardStatement {
-  @specialize[@name=forward]<AtKeyword, "@forward"> value (ckw<"hide" | "show"> commaSep<value>)* semi
+  @specialize[@name=forward]<AtKeyword, "@forward"> value (ckw<"as"> ForwardPrefix)? (ckw<"hide" | "show"> commaSep<value>)* semi
 }
 
 MixinStatement {
@@ -243,6 +243,10 @@ semi { ";" | newline | eof }
 @external tokens indentedMixins from "./tokens" { IndentedMixin, IndentedInclude }
 
 @tokens {
+	ForwardPrefix { $[a-zA-Z_-]+ "-*" }
+
+	UseAs { $[a-zA-Z_-]+  | "*" }
+
   UniversalSelector { "*" }
 
   NestingSelector { "&" }

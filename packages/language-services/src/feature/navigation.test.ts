@@ -8,6 +8,7 @@ import {
 	LanguageService,
 	LanguageSettings,
 	SassDocumentLink,
+	SyntaxNodeType,
 	TextDocument,
 	URI,
 } from "@somesass/language-server-types";
@@ -162,6 +163,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 13),
 					target: getLinksFixture("./noUnderscore/foo.scss"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 		);
@@ -173,6 +178,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 13),
 					target: getLinksFixture("./noUnderscore/bar.sass"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 		);
@@ -184,6 +193,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 13),
 					target: getLinksFixture("./underscore/_foo.scss"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 		);
@@ -195,6 +208,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 13),
 					target: getLinksFixture("./underscore/_bar.sass"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 		);
@@ -206,6 +223,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 18),
 					target: getLinksFixture("./underscore/_foo.scss"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 		);
@@ -217,6 +238,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 18),
 					target: getLinksFixture("./underscore/_bar.sass"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 		);
@@ -224,25 +249,61 @@ suite("findDocumentLinks", () => {
 		await assertDynamicLinks(
 			getLinksFixture("./both/index.scss"),
 			`@import 'foo'`,
-			[{ range: newRange(8, 13), target: getLinksFixture("./both/foo.scss") }],
+			[
+				{
+					range: newRange(8, 13),
+					target: getLinksFixture("./both/foo.scss"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
 		);
 
 		await assertDynamicLinks(
 			getLinksFixture("./both/index.scss"),
 			`@import 'bar'`,
-			[{ range: newRange(8, 13), target: getLinksFixture("./both/bar.sass") }],
+			[
+				{
+					range: newRange(8, 13),
+					target: getLinksFixture("./both/bar.sass"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
 		);
 
 		await assertDynamicLinks(
 			getLinksFixture("./both/index.scss"),
 			`@import '_foo'`,
-			[{ range: newRange(8, 14), target: getLinksFixture("./both/_foo.scss") }],
+			[
+				{
+					range: newRange(8, 14),
+					target: getLinksFixture("./both/_foo.scss"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
 		);
 
 		await assertDynamicLinks(
 			getLinksFixture("./both/index.scss"),
 			`@import '_bar'`,
-			[{ range: newRange(8, 14), target: getLinksFixture("./both/_bar.sass") }],
+			[
+				{
+					range: newRange(8, 14),
+					target: getLinksFixture("./both/_bar.sass"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
 		);
 
 		await assertDynamicLinks(
@@ -252,6 +313,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 13),
 					target: getLinksFixture("./index/foo/index.scss"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 		);
@@ -263,6 +328,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 14),
 					target: getLinksFixture("./index/fizz/index.sass"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 		);
@@ -274,6 +343,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 13),
 					target: getLinksFixture("./index/bar/_index.scss"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 		);
@@ -285,6 +358,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 14),
 					target: getLinksFixture("./index/buzz/_index.sass"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 		);
@@ -296,28 +373,70 @@ suite("findDocumentLinks", () => {
 		await assertLinks(
 			ls,
 			`@import 'foo.css'`,
-			[{ range: newRange(8, 17), target: "test://test/foo.css" }],
+			[
+				{
+					range: newRange(8, 17),
+					target: "test://test/foo.css",
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
 			"scss",
 		);
 
 		await assertLinks(ls, `@import 'foo.scss' print;`, [
-			{ range: newRange(8, 18), target: "test://test/foo.scss" },
+			{
+				range: newRange(8, 18),
+				target: "test://test/foo.scss",
+				type: SyntaxNodeType.ImportStatement,
+				as: undefined,
+				show: undefined,
+				hide: undefined,
+			},
 		]);
 
 		await assertLinks(ls, `@import 'foo.sass' print;`, [
-			{ range: newRange(8, 18), target: "test://test/foo.sass" },
+			{
+				range: newRange(8, 18),
+				target: "test://test/foo.sass",
+				type: SyntaxNodeType.ImportStatement,
+				as: undefined,
+				show: undefined,
+				hide: undefined,
+			},
 		]);
 
 		await assertLinks(
 			ls,
 			`@import 'http://foo.com/foo.css'`,
-			[{ range: newRange(8, 32), target: "http://foo.com/foo.css" }],
+			[
+				{
+					range: newRange(8, 32),
+					target: "http://foo.com/foo.css",
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
 			"scss",
 		);
 
 		await assertLinks(ls, `@import url("foo.css") print;`, [
-			{ range: newRange(12, 21), target: "test://test/foo.css" },
-			{ range: newRange(12, 21), target: "test://test/foo.css" }, // todo: potential improvement, but it's fine...
+			{
+				range: newRange(12, 21),
+				target: "test://test/foo.css",
+				type: SyntaxNodeType.ImportStatement,
+				as: undefined,
+				hide: undefined,
+				show: undefined, // hmm, clue! why is this treated as an import statement? print;?
+			},
+			{
+				range: newRange(12, 21),
+				target: "test://test/foo.css",
+			}, // todo: potential improvement, but it's fine...
 		]);
 	});
 
@@ -335,7 +454,14 @@ suite("findDocumentLinks", () => {
 		ls.configure(settings);
 
 		await assertLinks(ls, '@import "@SassStylesheet"', [
-			{ range: newRange(8, 25), target: "test://test/src/assets/styles.scss" },
+			{
+				range: newRange(8, 25),
+				target: "test://test/src/assets/styles.scss",
+				type: SyntaxNodeType.ImportStatement,
+				as: undefined,
+				show: undefined,
+				hide: undefined,
+			},
 		]);
 
 		await assertDynamicLinks(
@@ -345,6 +471,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 30),
 					target: getLinksFixture("./noUnderscore/foo.scss"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			settings,
@@ -357,6 +487,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 28),
 					target: getLinksFixture("./underscore/_foo.scss"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			settings,
@@ -365,14 +499,32 @@ suite("findDocumentLinks", () => {
 		await assertDynamicLinks(
 			getLinksFixture("./"),
 			`@import '@BothDir/foo'`,
-			[{ range: newRange(8, 22), target: getLinksFixture("./both/foo.scss") }],
+			[
+				{
+					range: newRange(8, 22),
+					target: getLinksFixture("./both/foo.scss"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
 			settings,
 		);
 
 		await assertDynamicLinks(
 			getLinksFixture("./"),
 			`@import '@BothDir/_foo'`,
-			[{ range: newRange(8, 23), target: getLinksFixture("./both/_foo.scss") }],
+			[
+				{
+					range: newRange(8, 23),
+					target: getLinksFixture("./both/_foo.scss"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
 			settings,
 		);
 	});
@@ -391,7 +543,14 @@ suite("findDocumentLinks", () => {
 		ls.configure(settings);
 
 		await assertLinks(ls, '@import "@SassStylesheet"', [
-			{ range: newRange(8, 25), target: "test://test/src/assets/styles.sass" },
+			{
+				range: newRange(8, 25),
+				target: "test://test/src/assets/styles.sass",
+				type: SyntaxNodeType.ImportStatement,
+				as: undefined,
+				show: undefined,
+				hide: undefined,
+			},
 		]);
 
 		await assertDynamicLinks(
@@ -401,6 +560,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 30),
 					target: getLinksFixture("./noUnderscore/bar.sass"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			settings,
@@ -413,6 +576,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 28),
 					target: getLinksFixture("./underscore/_bar.sass"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			settings,
@@ -421,19 +588,37 @@ suite("findDocumentLinks", () => {
 		await assertDynamicLinks(
 			getLinksFixture("./"),
 			`@import '@BothDir/bar'`,
-			[{ range: newRange(8, 22), target: getLinksFixture("./both/bar.sass") }],
+			[
+				{
+					range: newRange(8, 22),
+					target: getLinksFixture("./both/bar.sass"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
 			settings,
 		);
 
 		await assertDynamicLinks(
 			getLinksFixture("./"),
 			`@import '@BothDir/_bar'`,
-			[{ range: newRange(8, 23), target: getLinksFixture("./both/_bar.sass") }],
+			[
+				{
+					range: newRange(8, 23),
+					target: getLinksFixture("./both/_bar.sass"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
 			settings,
 		);
 	});
 
-	test.only("module file links", async () => {
+	test("module file links", async () => {
 		await assertDynamicLinks(
 			getLinksFixture("./module/index.scss"),
 			`@use './foo'; a { text-decoration: underline; }`,
@@ -441,7 +626,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 12),
 					target: getLinksFixture("./module/foo.scss"),
-					namespace: "foo",
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+					type: SyntaxNodeType.UseStatement,
 				},
 			],
 		);
@@ -453,7 +641,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 12),
 					target: getLinksFixture("./module/foo.scss"),
-					namespace: "f",
+					as: "f",
+					show: undefined,
+					hide: undefined,
+					type: SyntaxNodeType.UseStatement,
 				},
 			],
 		);
@@ -466,8 +657,9 @@ suite("findDocumentLinks", () => {
 					range: newRange(9, 16),
 					target: getLinksFixture("./module/foo.scss"),
 					hide: ["$private"],
-					prefix: undefined,
+					as: undefined,
 					show: undefined,
+					type: SyntaxNodeType.ForwardStatement,
 				},
 			],
 		);
@@ -479,23 +671,25 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(9, 16),
 					target: getLinksFixture("./module/foo.scss"),
+					as: undefined,
 					hide: undefined,
 					show: ["$public"],
-					prefix: undefined,
+					type: SyntaxNodeType.ForwardStatement,
 				},
 			],
 		);
 
 		await assertDynamicLinks(
 			getLinksFixture("./module/index.scss"),
-			`@forward './foo' as foo- show $public; a { text-decoration: underline; }`,
+			`@forward './foo' as foo-* show $public; a { text-decoration: underline; }`,
 			[
 				{
 					range: newRange(9, 16),
 					target: getLinksFixture("./module/foo.scss"),
+					as: "foo-",
 					hide: undefined,
 					show: ["$public"],
-					prefix: "foo-",
+					type: SyntaxNodeType.ForwardStatement,
 				},
 			],
 		);
@@ -507,9 +701,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(9, 14),
 					target: getLinksFixture("./module/foo.scss"),
+					as: "color-",
 					hide: ["$varslingsfarger", "varslingsfarge"],
 					show: undefined,
-					prefix: "color-",
+					type: SyntaxNodeType.ForwardStatement,
 				},
 			],
 		);
@@ -535,7 +730,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 12),
 					target: getLinksFixture("./module/bar.sass"),
-					namespace: "bar",
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+					type: SyntaxNodeType.UseStatement,
 				},
 			],
 		);
@@ -545,21 +743,12 @@ suite("findDocumentLinks", () => {
 			`@use './bar.sass'`,
 			[
 				{
-					range: newRange(5, 12),
+					range: newRange(5, 17),
 					target: getLinksFixture("./module/bar.sass"),
-					namespace: "bar",
-				},
-			],
-		);
-
-		await assertDynamicLinks(
-			getLinksFixture("./module/index.scss"),
-			`@use './_bar.sass'`,
-			[
-				{
-					range: newRange(5, 12),
-					target: getLinksFixture("./module/bar.sass"),
-					namespace: "bar",
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+					type: SyntaxNodeType.UseStatement,
 				},
 			],
 		);
@@ -571,7 +760,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 12),
 					target: getLinksFixture("./module/bar.sass"),
-					namespace: "*",
+					as: "*",
+					show: undefined,
+					hide: undefined,
+					type: SyntaxNodeType.UseStatement,
 				},
 			],
 		);
@@ -584,6 +776,9 @@ suite("findDocumentLinks", () => {
 					range: newRange(9, 16),
 					target: getLinksFixture("./module/bar.sass"),
 					hide: ["$private"],
+					as: undefined,
+					show: undefined,
+					type: SyntaxNodeType.ForwardStatement,
 				},
 			],
 		);
@@ -658,6 +853,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 19),
 					target: getLinksFixture("node_modules/@foo/bar/_baz.scss"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -671,6 +870,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 20),
 					target: getLinksFixture("node_modules/@foo/bar/_buzz.sass"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -684,6 +887,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 15),
 					target: getLinksFixture("node_modules/@foo/bar/_index.scss"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -697,6 +904,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 16),
 					target: getLinksFixture("node_modules/@foo/buzz/_index.sass"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -706,7 +917,16 @@ suite("findDocumentLinks", () => {
 		await assertLinks(
 			ls,
 			'@import "green/d"',
-			[{ range: newRange(8, 17), target: getLinksFixture("green/d.scss") }],
+			[
+				{
+					range: newRange(8, 17),
+					target: getLinksFixture("green/d.scss"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
 			"scss",
 			testUri,
 			workspaceFolder,
@@ -714,7 +934,16 @@ suite("findDocumentLinks", () => {
 		await assertLinks(
 			ls,
 			'@import "./green/d"',
-			[{ range: newRange(8, 19), target: getLinksFixture("green/d.scss") }],
+			[
+				{
+					range: newRange(8, 19),
+					target: getLinksFixture("green/d.scss"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
 			"scss",
 			testUri,
 			workspaceFolder,
@@ -726,6 +955,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 17),
 					target: getLinksFixture("node_modules/green/_e.scss"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -735,7 +968,16 @@ suite("findDocumentLinks", () => {
 		await assertLinks(
 			ls,
 			'@import "blue/b"',
-			[{ range: newRange(8, 16), target: getLinksFixture("blue/b.sass") }],
+			[
+				{
+					range: newRange(8, 16),
+					target: getLinksFixture("blue/b.sass"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
 			"sass",
 			testUri,
 			workspaceFolder,
@@ -743,7 +985,16 @@ suite("findDocumentLinks", () => {
 		await assertLinks(
 			ls,
 			'@import "./blue/b"',
-			[{ range: newRange(8, 18), target: getLinksFixture("blue/b.sass") }],
+			[
+				{
+					range: newRange(8, 18),
+					target: getLinksFixture("blue/b.sass"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
 			"sass",
 			testUri,
 			workspaceFolder,
@@ -755,6 +1006,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(8, 16),
 					target: getLinksFixture("node_modules/blue/_c.sass"),
+					type: SyntaxNodeType.ImportStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"sass",
@@ -774,6 +1029,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 14),
 					target: getLinksFixture("node_modules/bar/styles/index.scss"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -787,6 +1046,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 21),
 					target: getLinksFixture("node_modules/bar/styles/colors.scss"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -800,6 +1063,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 26),
 					target: getLinksFixture("node_modules/bar/styles/colors.scss"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -813,6 +1080,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 19),
 					target: getLinksFixture("node_modules/@foo/baz/styles/index.scss"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -826,6 +1097,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 26),
 					target: getLinksFixture("node_modules/@foo/baz/styles/colors.scss"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -839,6 +1114,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 31),
 					target: getLinksFixture("node_modules/@foo/baz/styles/colors.scss"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -852,6 +1131,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 26),
 					target: getLinksFixture("node_modules/@foo/baz/styles/button.scss"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -865,6 +1148,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 31),
 					target: getLinksFixture("node_modules/@foo/baz/styles/button.scss"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -878,6 +1165,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 20),
 					target: getLinksFixture("node_modules/root-scss/styles/index.scss"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -891,6 +1182,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 21),
 					target: getLinksFixture("node_modules/root-style/styles/index.scss"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -906,6 +1201,10 @@ suite("findDocumentLinks", () => {
 					target: getLinksFixture(
 						"node_modules/bar-pattern/styles/anything.scss",
 					),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -921,6 +1220,10 @@ suite("findDocumentLinks", () => {
 					target: getLinksFixture(
 						"node_modules/bar-pattern/styles/anything.scss",
 					),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -936,6 +1239,10 @@ suite("findDocumentLinks", () => {
 					target: getLinksFixture(
 						"node_modules/bar-pattern/styles/theme/dark.scss",
 					),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"scss",
@@ -955,6 +1262,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 15),
 					target: getLinksFixture("node_modules/fizz/styles/index.sass"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"sass",
@@ -968,6 +1279,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 22),
 					target: getLinksFixture("node_modules/fizz/styles/colors.sass"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"sass",
@@ -981,6 +1296,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 27),
 					target: getLinksFixture("node_modules/fizz/styles/colors.sass"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"sass",
@@ -995,6 +1314,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 21),
 					target: getLinksFixture("node_modules/@fizz/buzz/styles/index.sass"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"sass",
@@ -1008,6 +1331,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 28),
 					target: getLinksFixture("node_modules/@fizz/buzz/styles/colors.sass"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"sass",
@@ -1021,6 +1348,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 33),
 					target: getLinksFixture("node_modules/@fizz/buzz/styles/colors.sass"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"sass",
@@ -1034,6 +1365,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 28),
 					target: getLinksFixture("node_modules/@fizz/buzz/styles/button.sass"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"sass",
@@ -1047,6 +1382,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 33),
 					target: getLinksFixture("node_modules/@fizz/buzz/styles/button.sass"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"sass",
@@ -1060,6 +1399,10 @@ suite("findDocumentLinks", () => {
 				{
 					range: newRange(5, 20),
 					target: getLinksFixture("node_modules/root-sass/styles/index.sass"),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"sass",
@@ -1075,6 +1418,10 @@ suite("findDocumentLinks", () => {
 					target: getLinksFixture(
 						"node_modules/root-style-sass/styles/index.sass",
 					),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"sass",
@@ -1090,6 +1437,10 @@ suite("findDocumentLinks", () => {
 					target: getLinksFixture(
 						"node_modules/fizz-pattern/styles/anything.sass",
 					),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"sass",
@@ -1105,6 +1456,10 @@ suite("findDocumentLinks", () => {
 					target: getLinksFixture(
 						"node_modules/fizz-pattern/styles/anything.sass",
 					),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"sass",
@@ -1120,6 +1475,10 @@ suite("findDocumentLinks", () => {
 					target: getLinksFixture(
 						"node_modules/fizz-pattern/styles/theme/dark.sass",
 					),
+					type: SyntaxNodeType.UseStatement,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
 				},
 			],
 			"sass",

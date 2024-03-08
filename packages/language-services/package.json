@@ -51,7 +51,7 @@
 		"test": "npm run build && shx cp -r src/test/fixtures dist/test/fixtures && mocha --require source-map-support/register"
 	},
 	"dependencies": {
-		"@lezer/sass": "1.0.4",
+		"@somesass/parser": "1.0.0",
 		"@somesass/language-server-types": "1.0.0"
 	},
 	"devDependencies": {

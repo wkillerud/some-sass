@@ -3,7 +3,7 @@ import {
 	type LanguageServiceOptions,
 	type Stylesheet,
 	AliasSettings,
-	SyntaxNodeTypes,
+	SyntaxNodeType,
 	TextDocument,
 	SassDocumentLink,
 	Range,
@@ -24,9 +24,6 @@ type UnresolvedLink = {
 const startsWithSchemeRegex = /^\w+:\/\//;
 const startsWithData = /^data:/;
 const sassLangFile = /\.(sass|scss)$/;
-const reUse = /@use ["|'](?<url>.+)["|'](?: as (?<namespace>\*|\w+))?/;
-const reForward =
-	/@forward ["|'](?<url>.+)["|'](?: as (?<prefix>\w+-)|\*)?(?: hide (?<hide>[$,\s\w\d-]+))?(?: show (?<show>[$,\s\w\d-]+))?/;
 
 export class SassNavigation {
 	#aliasSettings: AliasSettings | undefined = undefined;
@@ -51,16 +48,16 @@ export class SassNavigation {
 		const unresolved: UnresolvedLink[] = [];
 		while (cursor.next()) {
 			if (
-				cursor.node.type.name === SyntaxNodeTypes.UseStatement ||
-				cursor.node.type.name === SyntaxNodeTypes.ForwardStatement ||
-				cursor.node.type.name === SyntaxNodeTypes.ImportStatement ||
-				cursor.node.type.name === SyntaxNodeTypes.CallLiteral
+				cursor.node.type.name === SyntaxNodeType.UseStatement ||
+				cursor.node.type.name === SyntaxNodeType.ForwardStatement ||
+				cursor.node.type.name === SyntaxNodeType.ImportStatement ||
+				cursor.node.type.name === SyntaxNodeType.CallLiteral
 			) {
 				const inner = cursor.node.cursor();
 				while (inner.next()) {
 					if (
-						inner.node.type.name === SyntaxNodeTypes.ParenthesizedContent ||
-						inner.node.type.name === SyntaxNodeTypes.StringLiteral
+						inner.node.type.name === SyntaxNodeType.ParenthesizedContent ||
+						inner.node.type.name === SyntaxNodeType.StringLiteral
 					) {
 						const from = inner.node.from;
 						const to = inner.node.to;
@@ -70,81 +67,102 @@ export class SassNavigation {
 							target = target.slice(1, -1);
 						}
 
-						if (cursor.node.type.name === SyntaxNodeTypes.UseStatement) {
-							const statement = source.substring(
-								cursor.node.from,
-								cursor.node.to + (cursor.node.nextSibling?.to || 0), // TODO: should perhaps try to fix so the alias stuff is part of the parser grammar
-							);
-							const matches = reUse.exec(statement);
-							let namespace = matches?.groups?.["namespace"];
-
-							if (!namespace) {
-								namespace = target.replace("./", "").replace("pkg:", "");
-								if (namespace.includes("/")) {
-									const lastSlash = namespace.lastIndexOf("/");
-									const extension = namespace.lastIndexOf(".");
-									namespace = target.substring(
-										lastSlash + 1,
-										extension !== -1 ? extension : undefined,
+						if (
+							cursor.node.type.name === SyntaxNodeType.UseStatement ||
+							cursor.node.type.name === SyntaxNodeType.ForwardStatement ||
+							cursor.node.type.name === SyntaxNodeType.ImportStatement
+						) {
+							let as: string | undefined = undefined;
+							const showHide: {
+								show: string[] | undefined;
+								hide: string[] | undefined;
+							} = {
+								show: undefined,
+								hide: undefined,
+							};
+							const meta = inner.node.cursor();
+							while (meta.next()) {
+								if (meta.node.type.name === SyntaxNodeType.Keyword) {
+									const keyword = source.substring(
+										meta.node.from,
+										meta.node.to,
 									);
+									switch (keyword) {
+										case "as": {
+											const asCursor = meta.node.cursor();
+											asCursor.next();
+											if (
+												asCursor.node.type.name !==
+													SyntaxNodeType.ForwardPrefix &&
+												asCursor.node.type.name !== SyntaxNodeType.UseAs
+											) {
+												// syntax error
+												break;
+											}
+											as = source.substring(
+												asCursor.node.from,
+												asCursor.node.to,
+											);
+
+											if (
+												asCursor.node.type.name === SyntaxNodeType.ForwardPrefix
+											) {
+												as = as.replace("*", "");
+											}
+											break;
+										}
+										case "hide":
+										case "show": {
+											const visibility = meta.node.cursor();
+											while (visibility.next()) {
+												if (
+													visibility.node.type.name === SyntaxNodeType.Comma
+												) {
+													continue;
+												}
+												if (
+													visibility.node.type.name !==
+														SyntaxNodeType.ValueName &&
+													visibility.node.type.name !==
+														SyntaxNodeType.SassVariableName
+												) {
+													break;
+												}
+												if (!showHide[keyword]) {
+													showHide[keyword] = [];
+												}
+												showHide[keyword]!.push(
+													source.substring(
+														visibility.node.from,
+														visibility.node.to,
+													),
+												);
+											}
+											break;
+										}
+										default:
+											break;
+									}
 								}
-								namespace = namespace.startsWith("_")
-									? namespace.slice(1)
-									: namespace;
-
-								if (namespace === "index") {
-									// The link points to an index file. Use the folder name above as a namespace.
-									const linkOmitIndex = target.slice(
-										0,
-										Math.max(0, namespace.lastIndexOf("/")),
-									);
-									const newLastSlash = linkOmitIndex.lastIndexOf("/");
-									namespace = linkOmitIndex.slice(
-										Math.max(0, newLastSlash + 1),
-									);
+								if (
+									meta.node.type.name === SyntaxNodeType.Semicolon ||
+									meta.node.type.name === SyntaxNodeType.Newline ||
+									meta.node.type.name === SyntaxNodeType.EOF
+								) {
+									break;
 								}
 							}
+
 							unresolved.push({
 								link: {
+									...showHide,
+									type: cursor.node.type.name,
+									as,
 									target,
 									range: Range.create(
 										document.positionAt(from),
 										document.positionAt(to),
 									),
-									namespace,
-								},
-								isModuleLink: true,
-							});
-							break;
-						}
-						if (cursor.node.type.name === SyntaxNodeTypes.ForwardStatement) {
-							const statement = source.substring(
-								cursor.node.from,
-								cursor.node.to +
-									((cursor.node.nextSibling?.to || 0) +
-										(cursor.node.nextSibling?.node?.nextSibling?.to || 0)), // TODO: should perhaps try to fix so the forward stuff is part of the parser grammar
-								// this is untenable...
-							);
-							const matches = reForward.exec(statement);
-
-							const prefix: string | undefined = matches?.groups?.["prefix"];
-							const hide: string[] | undefined = matches?.groups?.["hide"]
-								? matches?.groups["hide"].split(",").map((s) => s.trim())
-								: undefined;
-							const show: string[] | undefined = matches?.groups?.["show"]
-								? matches?.groups["show"].split(",").map((s) => s.trim())
-								: undefined;
-
-							unresolved.push({
-								link: {
-									target,
-									range: Range.create(
-										document.positionAt(from),
-										document.positionAt(to),
-									),
-									prefix,
-									hide,
-									show,
 								},
 								isModuleLink: true,
 							});
@@ -159,8 +177,7 @@ export class SassNavigation {
 									document.positionAt(to),
 								),
 							},
-							isModuleLink:
-								cursor.node.type.name === SyntaxNodeTypes.ImportStatement,
+							isModuleLink: false,
 						});
 						break;
 					}

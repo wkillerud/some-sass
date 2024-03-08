@@ -90,7 +90,8 @@ export {
 
 export interface SassDocumentLink extends DocumentLink {
 	/**
-	 * The namespace of the module.
+	 * use: the namespace of the module
+	 * forward: the prefix value
 	 *
 	 * | Link               | Namespace  |
 	 * | ------------------ | ---------- |
@@ -101,8 +102,9 @@ export interface SassDocumentLink extends DocumentLink {
 	 * | `"./_colors.scss"` | `"colors"` |
 	 *
 	 * @see https://sass-lang.com/documentation/at-rules/use/#choosing-a-namespace
+	 * @see https://sass-lang.com/documentation/at-rules/forward/#adding-a-prefix
 	 */
-	namespace?: string;
+	as?: string;
 	/**
 	 * @see https://sass-lang.com/documentation/at-rules/forward/#controlling-visibility
 	 */
@@ -111,10 +113,10 @@ export interface SassDocumentLink extends DocumentLink {
 	 * @see https://sass-lang.com/documentation/at-rules/forward/#controlling-visibility
 	 */
 	show?: string[];
-	/**
-	 * @see https://sass-lang.com/documentation/at-rules/forward/#adding-a-prefix
-	 */
-	prefix?: string;
+	type:
+		| SyntaxNodeTypes.ImportStatement
+		| SyntaxNodeTypes.UseStatement
+		| SyntaxNodeTypes.ForwardStatement;
 }
 
 /**

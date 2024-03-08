@@ -113,7 +113,7 @@ export interface SassDocumentLink extends DocumentLink {
 	 * @see https://sass-lang.com/documentation/at-rules/forward/#controlling-visibility
 	 */
 	show?: string[];
-	type:
+	type?:
 		| SyntaxNodeTypes.ImportStatement
 		| SyntaxNodeTypes.UseStatement
 		| SyntaxNodeTypes.ForwardStatement;
@@ -398,6 +398,8 @@ export enum SyntaxNodeTypes {
 	KeyframeList = "KeyframeList",
 	supports = "supports",
 	ControlKeyword = "ControlKeyword",
+	ForwardPrefix = "ForwardPrefix",
+	UseAs = "UseAs",
 
 	Newline = "newline",
 	EOF = "eof",

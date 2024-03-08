@@ -2,19 +2,19 @@ import type {
 	LanguageService,
 	LanguageServiceOptions,
 } from "@somesass/language-server-types";
-import { SassNavigation } from "./feature/navigation";
+import { SassLinkFinder } from "./feature/find-links";
 import { parseStylesheet } from "./parser";
 
 export function getLanguageService(
 	options: LanguageServiceOptions = {},
 ): LanguageService {
-	const navigation = new SassNavigation(options);
+	const linkFinder = new SassLinkFinder(options);
 
 	return {
 		configure: (settings) => {
-			navigation.configure(settings?.importAliases);
+			linkFinder.configure(settings?.importAliases);
 		},
 		parseStylesheet,
-		findDocumentLinks: navigation.findDocumentLinks.bind(navigation),
+		findDocumentLinks: linkFinder.findDocumentLinks.bind(linkFinder),
 	};
 }

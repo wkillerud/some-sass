@@ -137,6 +137,8 @@ export type Stylesheet = Tree;
 
 export * from "@lezer/common";
 
+export interface SassDocumentSymbol extends DocumentSymbol {}
+
 export interface LanguageService {
 	configure(settings?: LanguageSettings): void;
 	parseStylesheet(document: TextDocument): Stylesheet;
@@ -145,6 +147,10 @@ export interface LanguageService {
 		stylesheet: Stylesheet,
 		documentContext: DocumentContext,
 	): Promise<SassDocumentLink[]>;
+	findDocumentSymbols(
+		document: TextDocument,
+		stylesheet: Stylesheet,
+	): SassDocumentSymbol[];
 }
 
 export type Rename =

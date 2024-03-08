@@ -10,11 +10,11 @@ import {
 	URI,
 } from "@somesass/language-server-types";
 import { dirname, joinPath } from "../utils/resources";
-import { getNamespaceFromLink } from "./navigation/get-namespace-from-link";
+import { getNamespaceFromLink } from "./find-links/get-namespace-from-link";
 import {
 	getSubpathEntry,
 	toPathVariations,
-} from "./navigation/module-resolution";
+} from "./find-links/module-resolution";
 
 type UnresolvedLink = {
 	link: SassDocumentLink;
@@ -28,7 +28,7 @@ const startsWithSchemeRegex = /^\w+:\/\//;
 const startsWithData = /^data:/;
 const sassLangFile = /\.(sass|scss)$/;
 
-export class SassNavigation {
+export class SassLinkFinder {
 	#aliasSettings: AliasSettings | undefined = undefined;
 	#languageServerOptions: LanguageServiceOptions;
 

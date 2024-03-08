@@ -114,9 +114,9 @@ export interface SassDocumentLink extends DocumentLink {
 	 */
 	show?: string[];
 	type?:
-		| SyntaxNodeTypes.ImportStatement
-		| SyntaxNodeTypes.UseStatement
-		| SyntaxNodeTypes.ForwardStatement;
+		| SyntaxNodeType.ImportStatement
+		| SyntaxNodeType.UseStatement
+		| SyntaxNodeType.ForwardStatement;
 }
 
 /**
@@ -276,7 +276,7 @@ export enum AtKeyword {
  * Enum of the different node types defined in the grammar.
  * @see https://github.com/lezer-parser/sass/blob/main/src/sass.grammar
  */
-export enum SyntaxNodeTypes {
+export enum SyntaxNodeType {
 	Whitespace = "whitespace",
 	Comment = "Comment",
 	LineComment = "LineComment",

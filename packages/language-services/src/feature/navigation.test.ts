@@ -806,6 +806,22 @@ suite("findDocumentLinks", () => {
 				},
 			],
 		);
+
+		await assertDynamicLinks(
+			getLinksFixture("./module/index.scss"),
+			`@use 'sass:math' as mafs`,
+			[
+				{
+					range: newRange(5, 16),
+					target: "sass:math",
+					hide: undefined,
+					as: "mafs",
+					show: undefined,
+					type: SyntaxNodeType.UseStatement,
+				},
+			],
+		);
+
 		await assertNoDynamicLinks(
 			getLinksFixture("./module/index.scss"),
 			`@use './non-existent'`,

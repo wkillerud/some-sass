@@ -1,6 +1,72 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`complex selector 1`] = `
+exports[`basic document symbols - sass 1`] = `
+[
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": ".foo",
+    "range": {
+      "end": {
+        "character": 0,
+        "line": 1,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 4,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "ClassSelector",
+  },
+]
+`;
+
+exports[`basic document symbols 1`] = `
+[
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": ".foo",
+    "range": {
+      "end": {
+        "character": 7,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 4,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "ClassSelector",
+  },
+]
+`;
+
+exports[`complex selector - sass 1`] = `
 [
   {
     "children": [
@@ -11,11 +77,11 @@ exports[`complex selector 1`] = `
         "name": "not",
         "range": {
           "end": {
-            "character": 8,
+            "character": 19,
             "line": 0,
           },
           "start": {
-            "character": 5,
+            "character": 0,
             "line": 0,
           },
         },
@@ -41,11 +107,130 @@ exports[`complex selector 1`] = `
             "name": ".selected",
             "range": {
               "end": {
+                "character": 19,
+                "line": 0,
+              },
+              "start": {
+                "character": 8,
+                "line": 0,
+              },
+            },
+            "selectionRange": {
+              "end": {
                 "character": 18,
                 "line": 0,
               },
               "start": {
                 "character": 9,
+                "line": 0,
+              },
+            },
+            "tags": undefined,
+            "type": "ClassSelector",
+          },
+        ],
+        "detail": undefined,
+        "kind": 6,
+        "name": "(.selected)",
+        "range": {
+          "end": {
+            "character": 19,
+            "line": 0,
+          },
+          "start": {
+            "character": 0,
+            "line": 0,
+          },
+        },
+        "selectionRange": {
+          "end": {
+            "character": 19,
+            "line": 0,
+          },
+          "start": {
+            "character": 8,
+            "line": 0,
+          },
+        },
+        "tags": undefined,
+        "type": "ArgList",
+      },
+    ],
+    "detail": undefined,
+    "kind": 5,
+    "name": ".foo:not(.selected)",
+    "range": {
+      "end": {
+        "character": 0,
+        "line": 1,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 19,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "PseudoClassSelector",
+  },
+]
+`;
+
+exports[`complex selector 1`] = `
+[
+  {
+    "children": [
+      {
+        "children": undefined,
+        "detail": undefined,
+        "kind": 5,
+        "name": "not",
+        "range": {
+          "end": {
+            "character": 19,
+            "line": 0,
+          },
+          "start": {
+            "character": 0,
+            "line": 0,
+          },
+        },
+        "selectionRange": {
+          "end": {
+            "character": 8,
+            "line": 0,
+          },
+          "start": {
+            "character": 5,
+            "line": 0,
+          },
+        },
+        "tags": undefined,
+        "type": "PseudoClassName",
+      },
+      {
+        "children": [
+          {
+            "children": undefined,
+            "detail": undefined,
+            "kind": 5,
+            "name": ".selected",
+            "range": {
+              "end": {
+                "character": 19,
+                "line": 0,
+              },
+              "start": {
+                "character": 8,
                 "line": 0,
               },
             },
@@ -116,14 +301,366 @@ exports[`complex selector 1`] = `
     "tags": undefined,
     "type": "PseudoClassSelector",
   },
+]
+`;
+
+exports[`function declaration - sass 1`] = `
+[
+  {
+    "children": [
+      {
+        "children": undefined,
+        "detail": undefined,
+        "kind": 6,
+        "name": "fibonacci",
+        "range": {
+          "end": {
+            "character": 23,
+            "line": 0,
+          },
+          "start": {
+            "character": 10,
+            "line": 0,
+          },
+        },
+        "selectionRange": {
+          "end": {
+            "character": 19,
+            "line": 0,
+          },
+          "start": {
+            "character": 10,
+            "line": 0,
+          },
+        },
+        "tags": undefined,
+        "type": "Callee",
+      },
+      {
+        "children": [
+          {
+            "children": undefined,
+            "detail": undefined,
+            "kind": 13,
+            "name": "$n",
+            "range": {
+              "end": {
+                "character": 23,
+                "line": 0,
+              },
+              "start": {
+                "character": 19,
+                "line": 0,
+              },
+            },
+            "selectionRange": {
+              "end": {
+                "character": 22,
+                "line": 0,
+              },
+              "start": {
+                "character": 20,
+                "line": 0,
+              },
+            },
+            "tags": undefined,
+            "type": "SassVariableName",
+          },
+        ],
+        "detail": undefined,
+        "kind": 6,
+        "name": "($n)",
+        "range": {
+          "end": {
+            "character": 23,
+            "line": 0,
+          },
+          "start": {
+            "character": 10,
+            "line": 0,
+          },
+        },
+        "selectionRange": {
+          "end": {
+            "character": 23,
+            "line": 0,
+          },
+          "start": {
+            "character": 19,
+            "line": 0,
+          },
+        },
+        "tags": undefined,
+        "type": "ArgList",
+      },
+    ],
+    "detail": undefined,
+    "kind": 12,
+    "name": "fibonacci($n)",
+    "range": {
+      "end": {
+        "character": 0,
+        "line": 1,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 23,
+        "line": 0,
+      },
+      "start": {
+        "character": 10,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "MixinStatement",
+  },
+  {
+    "children": [
+      {
+        "children": undefined,
+        "detail": undefined,
+        "kind": 6,
+        "name": "fibonacci",
+        "range": {
+          "end": {
+            "character": 23,
+            "line": 0,
+          },
+          "start": {
+            "character": 10,
+            "line": 0,
+          },
+        },
+        "selectionRange": {
+          "end": {
+            "character": 19,
+            "line": 0,
+          },
+          "start": {
+            "character": 10,
+            "line": 0,
+          },
+        },
+        "tags": undefined,
+        "type": "Callee",
+      },
+      {
+        "children": [
+          {
+            "children": undefined,
+            "detail": undefined,
+            "kind": 13,
+            "name": "$n",
+            "range": {
+              "end": {
+                "character": 23,
+                "line": 0,
+              },
+              "start": {
+                "character": 19,
+                "line": 0,
+              },
+            },
+            "selectionRange": {
+              "end": {
+                "character": 22,
+                "line": 0,
+              },
+              "start": {
+                "character": 20,
+                "line": 0,
+              },
+            },
+            "tags": undefined,
+            "type": "SassVariableName",
+          },
+        ],
+        "detail": undefined,
+        "kind": 6,
+        "name": "($n)",
+        "range": {
+          "end": {
+            "character": 23,
+            "line": 0,
+          },
+          "start": {
+            "character": 10,
+            "line": 0,
+          },
+        },
+        "selectionRange": {
+          "end": {
+            "character": 23,
+            "line": 0,
+          },
+          "start": {
+            "character": 19,
+            "line": 0,
+          },
+        },
+        "tags": undefined,
+        "type": "ArgList",
+      },
+    ],
+    "detail": undefined,
+    "kind": 6,
+    "name": "fibonacci($n)",
+    "range": {
+      "end": {
+        "character": 0,
+        "line": 1,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 23,
+        "line": 0,
+      },
+      "start": {
+        "character": 10,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "CallExpression",
+  },
   {
     "children": undefined,
     "detail": undefined,
-    "kind": 5,
-    "name": ".foo",
+    "kind": 13,
+    "name": "$n",
     "range": {
       "end": {
-        "character": 4,
+        "character": 23,
+        "line": 0,
+      },
+      "start": {
+        "character": 19,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 22,
+        "line": 0,
+      },
+      "start": {
+        "character": 20,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "SassVariableName",
+  },
+]
+`;
+
+exports[`function declaration 1`] = `
+[
+  {
+    "children": [
+      {
+        "children": undefined,
+        "detail": undefined,
+        "kind": 6,
+        "name": "fibonacci",
+        "range": {
+          "end": {
+            "character": 23,
+            "line": 0,
+          },
+          "start": {
+            "character": 10,
+            "line": 0,
+          },
+        },
+        "selectionRange": {
+          "end": {
+            "character": 19,
+            "line": 0,
+          },
+          "start": {
+            "character": 10,
+            "line": 0,
+          },
+        },
+        "tags": undefined,
+        "type": "Callee",
+      },
+      {
+        "children": [
+          {
+            "children": undefined,
+            "detail": undefined,
+            "kind": 13,
+            "name": "$n",
+            "range": {
+              "end": {
+                "character": 23,
+                "line": 0,
+              },
+              "start": {
+                "character": 19,
+                "line": 0,
+              },
+            },
+            "selectionRange": {
+              "end": {
+                "character": 22,
+                "line": 0,
+              },
+              "start": {
+                "character": 20,
+                "line": 0,
+              },
+            },
+            "tags": undefined,
+            "type": "SassVariableName",
+          },
+        ],
+        "detail": undefined,
+        "kind": 6,
+        "name": "($n)",
+        "range": {
+          "end": {
+            "character": 23,
+            "line": 0,
+          },
+          "start": {
+            "character": 10,
+            "line": 0,
+          },
+        },
+        "selectionRange": {
+          "end": {
+            "character": 23,
+            "line": 0,
+          },
+          "start": {
+            "character": 19,
+            "line": 0,
+          },
+        },
+        "tags": undefined,
+        "type": "ArgList",
+      },
+    ],
+    "detail": undefined,
+    "kind": 12,
+    "name": "fibonacci($n)",
+    "range": {
+      "end": {
+        "character": 27,
         "line": 0,
       },
       "start": {
@@ -133,7 +670,216 @@ exports[`complex selector 1`] = `
     },
     "selectionRange": {
       "end": {
-        "character": 4,
+        "character": 23,
+        "line": 0,
+      },
+      "start": {
+        "character": 10,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "MixinStatement",
+  },
+  {
+    "children": [
+      {
+        "children": undefined,
+        "detail": undefined,
+        "kind": 6,
+        "name": "fibonacci",
+        "range": {
+          "end": {
+            "character": 23,
+            "line": 0,
+          },
+          "start": {
+            "character": 10,
+            "line": 0,
+          },
+        },
+        "selectionRange": {
+          "end": {
+            "character": 19,
+            "line": 0,
+          },
+          "start": {
+            "character": 10,
+            "line": 0,
+          },
+        },
+        "tags": undefined,
+        "type": "Callee",
+      },
+      {
+        "children": [
+          {
+            "children": undefined,
+            "detail": undefined,
+            "kind": 13,
+            "name": "$n",
+            "range": {
+              "end": {
+                "character": 23,
+                "line": 0,
+              },
+              "start": {
+                "character": 19,
+                "line": 0,
+              },
+            },
+            "selectionRange": {
+              "end": {
+                "character": 22,
+                "line": 0,
+              },
+              "start": {
+                "character": 20,
+                "line": 0,
+              },
+            },
+            "tags": undefined,
+            "type": "SassVariableName",
+          },
+        ],
+        "detail": undefined,
+        "kind": 6,
+        "name": "($n)",
+        "range": {
+          "end": {
+            "character": 23,
+            "line": 0,
+          },
+          "start": {
+            "character": 10,
+            "line": 0,
+          },
+        },
+        "selectionRange": {
+          "end": {
+            "character": 23,
+            "line": 0,
+          },
+          "start": {
+            "character": 19,
+            "line": 0,
+          },
+        },
+        "tags": undefined,
+        "type": "ArgList",
+      },
+    ],
+    "detail": undefined,
+    "kind": 6,
+    "name": "fibonacci($n)",
+    "range": {
+      "end": {
+        "character": 27,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 23,
+        "line": 0,
+      },
+      "start": {
+        "character": 10,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "CallExpression",
+  },
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 13,
+    "name": "$n",
+    "range": {
+      "end": {
+        "character": 23,
+        "line": 0,
+      },
+      "start": {
+        "character": 19,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 22,
+        "line": 0,
+      },
+      "start": {
+        "character": 20,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "SassVariableName",
+  },
+]
+`;
+
+exports[`media query - sass 1`] = `
+[
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 2,
+    "name": "@media screen, print
+",
+    "range": {
+      "end": {
+        "character": 0,
+        "line": 1,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 0,
+        "line": 1,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "MediaStatement",
+  },
+]
+`;
+
+exports[`media query 1`] = `
+[
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 2,
+    "name": "@media screen, print {}",
+    "range": {
+      "end": {
+        "character": 23,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 23,
         "line": 0,
       },
       "start": {
@@ -142,91 +888,383 @@ exports[`complex selector 1`] = `
       },
     },
     "tags": undefined,
-    "type": "ClassSelector",
+    "type": "MediaStatement",
   },
-  {
-    "children": undefined,
-    "detail": undefined,
-    "kind": 5,
-    "name": "not",
-    "range": {
-      "end": {
-        "character": 8,
-        "line": 0,
-      },
-      "start": {
-        "character": 5,
-        "line": 0,
-      },
-    },
-    "selectionRange": {
-      "end": {
-        "character": 8,
-        "line": 0,
-      },
-      "start": {
-        "character": 5,
-        "line": 0,
-      },
-    },
-    "tags": undefined,
-    "type": "PseudoClassName",
-  },
+]
+`;
+
+exports[`mixin - sass 1`] = `
+[
   {
     "children": undefined,
     "detail": undefined,
     "kind": 6,
-    "name": "(.selected)",
+    "name": "foo",
     "range": {
       "end": {
-        "character": 19,
-        "line": 0,
+        "character": 0,
+        "line": 1,
       },
       "start": {
-        "character": 8,
+        "character": 0,
         "line": 0,
       },
     },
     "selectionRange": {
       "end": {
-        "character": 19,
+        "character": 10,
         "line": 0,
       },
       "start": {
-        "character": 8,
+        "character": 7,
         "line": 0,
       },
     },
     "tags": undefined,
-    "type": "ArgList",
+    "type": "MixinStatement",
   },
+]
+`;
+
+exports[`mixin 1`] = `
+[
   {
     "children": undefined,
     "detail": undefined,
-    "kind": 5,
-    "name": ".selected",
+    "kind": 6,
+    "name": "foo",
     "range": {
       "end": {
-        "character": 18,
+        "character": 14,
         "line": 0,
       },
       "start": {
-        "character": 9,
+        "character": 0,
         "line": 0,
       },
     },
     "selectionRange": {
       "end": {
-        "character": 18,
+        "character": 10,
         "line": 0,
       },
       "start": {
+        "character": 7,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "MixinStatement",
+  },
+]
+`;
+
+exports[`mixin without a name - sass 1`] = `
+[
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 6,
+    "name": "<undefined>",
+    "range": {
+      "end": {
+        "character": 0,
+        "line": 1,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 0,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "MixinStatement",
+  },
+]
+`;
+
+exports[`mixin without a name 1`] = `
+[
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 6,
+    "name": "<undefined>",
+    "range": {
+      "end": {
         "character": 9,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 0,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "MixinStatement",
+  },
+]
+`;
+
+exports[`multiple selectors for same block, each range starts with the selector offset - sass 1`] = `
+[
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": ".voo.doo",
+    "range": {
+      "end": {
+        "character": 0,
+        "line": 1,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 8,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
         "line": 0,
       },
     },
     "tags": undefined,
     "type": "ClassSelector",
+  },
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": ".voo",
+    "range": {
+      "end": {
+        "character": 8,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 4,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "ClassSelector",
+  },
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": ".bar",
+    "range": {
+      "end": {
+        "character": 0,
+        "line": 1,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 14,
+        "line": 0,
+      },
+      "start": {
+        "character": 10,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "ClassSelector",
+  },
+]
+`;
+
+exports[`multiple selectors for same block, each range starts with the selector offset 1`] = `
+[
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": ".voo.doo",
+    "range": {
+      "end": {
+        "character": 17,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 8,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "ClassSelector",
+  },
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": ".voo",
+    "range": {
+      "end": {
+        "character": 8,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 4,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "ClassSelector",
+  },
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": ".bar",
+    "range": {
+      "end": {
+        "character": 17,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 14,
+        "line": 0,
+      },
+      "start": {
+        "character": 10,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "ClassSelector",
+  },
+]
+`;
+
+exports[`variable - sass 1`] = `
+[
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 13,
+    "name": "$color",
+    "range": {
+      "end": {
+        "character": 12,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 6,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "SassVariableName",
+  },
+]
+`;
+
+exports[`variable 1`] = `
+[
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 13,
+    "name": "$color",
+    "range": {
+      "end": {
+        "character": 12,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 6,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "SassVariableName",
   },
 ]
 `;

@@ -139,6 +139,7 @@ export * from "@lezer/common";
 
 export interface SassDocumentSymbol extends DocumentSymbol {
 	type: SyntaxNodeType;
+	children?: SassDocumentSymbol[];
 }
 
 export interface LanguageService {

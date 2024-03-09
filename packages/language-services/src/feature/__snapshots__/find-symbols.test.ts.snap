@@ -1,0 +1,232 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`complex selector 1`] = `
+[
+  {
+    "children": [
+      {
+        "children": undefined,
+        "detail": undefined,
+        "kind": 5,
+        "name": "not",
+        "range": {
+          "end": {
+            "character": 8,
+            "line": 0,
+          },
+          "start": {
+            "character": 5,
+            "line": 0,
+          },
+        },
+        "selectionRange": {
+          "end": {
+            "character": 8,
+            "line": 0,
+          },
+          "start": {
+            "character": 5,
+            "line": 0,
+          },
+        },
+        "tags": undefined,
+        "type": "PseudoClassName",
+      },
+      {
+        "children": [
+          {
+            "children": undefined,
+            "detail": undefined,
+            "kind": 5,
+            "name": ".selected",
+            "range": {
+              "end": {
+                "character": 18,
+                "line": 0,
+              },
+              "start": {
+                "character": 9,
+                "line": 0,
+              },
+            },
+            "selectionRange": {
+              "end": {
+                "character": 18,
+                "line": 0,
+              },
+              "start": {
+                "character": 9,
+                "line": 0,
+              },
+            },
+            "tags": undefined,
+            "type": "ClassSelector",
+          },
+        ],
+        "detail": undefined,
+        "kind": 6,
+        "name": "(.selected)",
+        "range": {
+          "end": {
+            "character": 19,
+            "line": 0,
+          },
+          "start": {
+            "character": 0,
+            "line": 0,
+          },
+        },
+        "selectionRange": {
+          "end": {
+            "character": 19,
+            "line": 0,
+          },
+          "start": {
+            "character": 8,
+            "line": 0,
+          },
+        },
+        "tags": undefined,
+        "type": "ArgList",
+      },
+    ],
+    "detail": undefined,
+    "kind": 5,
+    "name": ".foo:not(.selected)",
+    "range": {
+      "end": {
+        "character": 22,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 19,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "PseudoClassSelector",
+  },
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": ".foo",
+    "range": {
+      "end": {
+        "character": 4,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 4,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "ClassSelector",
+  },
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": "not",
+    "range": {
+      "end": {
+        "character": 8,
+        "line": 0,
+      },
+      "start": {
+        "character": 5,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 8,
+        "line": 0,
+      },
+      "start": {
+        "character": 5,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "PseudoClassName",
+  },
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 6,
+    "name": "(.selected)",
+    "range": {
+      "end": {
+        "character": 19,
+        "line": 0,
+      },
+      "start": {
+        "character": 8,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 19,
+        "line": 0,
+      },
+      "start": {
+        "character": 8,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "ArgList",
+  },
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": ".selected",
+    "range": {
+      "end": {
+        "character": 18,
+        "line": 0,
+      },
+      "start": {
+        "character": 9,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 18,
+        "line": 0,
+      },
+      "start": {
+        "character": 9,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "ClassSelector",
+  },
+]
+`;

@@ -2,7 +2,6 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-import * as assert from "node:assert";
 import * as path from "node:path";
 import {
 	LanguageService,
@@ -12,6 +11,7 @@ import {
 	TextDocument,
 	URI,
 } from "@somesass/language-server-types";
+import { expect, describe, test } from "vitest";
 import { getLanguageService } from "../language-services";
 import { getDocumentContext } from "../test/test-document-context";
 import { NodeFileSystem } from "../test/test-fs-provider";
@@ -20,7 +20,7 @@ import { newRange } from "../test/test-resources";
 const getLS = () =>
 	getLanguageService({ fileSystemProvider: new NodeFileSystem() });
 
-suite("findDocumentLinks", () => {
+describe("findDocumentLinks", () => {
 	async function assertLinks(
 		ls: LanguageService,
 		input: string,
@@ -41,7 +41,7 @@ suite("findDocumentLinks", () => {
 			stylesheet,
 			getDocumentContext(workspaceFolder || "test://test"),
 		);
-		assert.deepEqual(links, expected);
+		expect(links).toEqual(expected);
 	}
 
 	async function assertDynamicLinks(
@@ -62,7 +62,7 @@ suite("findDocumentLinks", () => {
 			stylesheet,
 			getDocumentContext(document.uri),
 		);
-		assert.deepEqual(links, expected);
+		expect(links).toEqual(expected);
 	}
 
 	async function assertNoDynamicLinks(
@@ -80,21 +80,17 @@ suite("findDocumentLinks", () => {
 			getDocumentContext(document.uri),
 		);
 		if (extecedTarget) {
-			assert.deepEqual(
+			expect(
 				links.length,
-				1,
 				`${docUri.toString()} should only return itself`,
-			);
-			assert.deepEqual(
+			).toEqual(1);
+			expect(
 				links[0].target,
-				extecedTarget,
 				`${docUri.toString()} should only return itself`,
-			);
+			).toEqual(extecedTarget);
 		} else {
-			assert.deepEqual(
-				links.length,
+			expect(links.length, `${docUri.toString()} should have no link`).toEqual(
 				0,
-				`${docUri.toString()} hould have no link`,
 			);
 		}
 	}

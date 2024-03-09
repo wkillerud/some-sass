@@ -1,4 +1,4 @@
-import { strictEqual } from "assert";
+import { describe, assert, test } from "vitest";
 import {
 	getCurrentWord,
 	getTextBeforePosition,
@@ -8,35 +8,35 @@ import {
 } from "../../src/utils/string";
 
 describe("Utils/String", () => {
-	it("getCurrentWord", () => {
+	test("getCurrentWord", () => {
 		const text = ".text($a) {}";
 
-		strictEqual(getCurrentWord(text, 5), ".text");
-		strictEqual(getCurrentWord(text, 8), "$a");
+		assert.strictEqual(getCurrentWord(text, 5), ".text");
+		assert.strictEqual(getCurrentWord(text, 8), "$a");
 	});
 
-	it("getTextBeforePosition", () => {
+	test("getTextBeforePosition", () => {
 		const text = "\n.text($a) {}";
 
-		strictEqual(getTextBeforePosition(text, 6), ".text");
-		strictEqual(getTextBeforePosition(text, 9), ".text($a");
+		assert.strictEqual(getTextBeforePosition(text, 6), ".text");
+		assert.strictEqual(getTextBeforePosition(text, 9), ".text($a");
 	});
 
-	it("getTextAfterPosition", () => {
+	test("getTextAfterPosition", () => {
 		const text = ".text($a) {}";
 
-		strictEqual(getTextAfterPosition(text, 5), "($a) {}");
-		strictEqual(getTextAfterPosition(text, 8), ") {}");
+		assert.strictEqual(getTextAfterPosition(text, 5), "($a) {}");
+		assert.strictEqual(getTextAfterPosition(text, 8), ") {}");
 	});
 
-	it("asDollarlessVariable", () => {
-		strictEqual(asDollarlessVariable("$some-text"), "some-text");
-		strictEqual(asDollarlessVariable("$someText"), "someText");
-		strictEqual(asDollarlessVariable("$$$ (⌐■_■) $$$"), "$$ (⌐■_■) $$$");
+	test("asDollarlessVariable", () => {
+		assert.strictEqual(asDollarlessVariable("$some-text"), "some-text");
+		assert.strictEqual(asDollarlessVariable("$someText"), "someText");
+		assert.strictEqual(asDollarlessVariable("$$$ (⌐■_■) $$$"), "$$ (⌐■_■) $$$");
 	});
 
-	it("stripTrailingComma", () => {
-		strictEqual(stripTrailingComma("dev.$fun-day,"), "dev.$fun-day");
-		strictEqual(stripTrailingComma("dev.$fun-day"), "dev.$fun-day");
+	test("stripTrailingComma", () => {
+		assert.strictEqual(stripTrailingComma("dev.$fun-day,"), "dev.$fun-day");
+		assert.strictEqual(stripTrailingComma("dev.$fun-day"), "dev.$fun-day");
 	});
 });

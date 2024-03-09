@@ -1,4 +1,4 @@
-import { strictEqual, deepStrictEqual, ok } from "assert";
+import { assert, beforeEach, describe, test } from "vitest";
 import { provideReferences } from "../../src/features/references";
 import * as helpers from "../helpers";
 
@@ -7,7 +7,7 @@ describe("Providers/References", () => {
 		helpers.createTestContext();
 	});
 
-	it("provideReferences - Variables", async () => {
+	test("provideReferences - Variables", async () => {
 		await helpers.makeDocument('$day: "monday";', {
 			uri: "ki.scss",
 		});
@@ -38,17 +38,17 @@ describe("Providers/References", () => {
 			includeDeclaration: true,
 		});
 
-		ok(actual, "provideReferences returned null for a variable");
-		strictEqual(
+		assert.ok(actual, "provideReferences returned null for a variable");
+		assert.strictEqual(
 			actual?.references.length,
 			3,
 			"Expected three references to $day: two usage and one declaration",
 		);
 
-		const [ki, helen, gato] = actual.references;
+		const [ki, helen, gato] = actual!.references;
 
-		ok(ki?.location.uri.endsWith("ki.scss"));
-		deepStrictEqual(ki?.location.range, {
+		assert.ok(ki?.location.uri.endsWith("ki.scss"));
+		assert.deepStrictEqual(ki?.location.range, {
 			start: {
 				line: 0,
 				character: 0,
@@ -59,8 +59,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(helen?.location.uri.endsWith("helen.scss"));
-		deepStrictEqual(helen?.location.range, {
+		assert.ok(helen?.location.uri.endsWith("helen.scss"));
+		assert.deepStrictEqual(helen?.location.range, {
 			start: {
 				line: 3,
 				character: 13,
@@ -71,8 +71,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(gato?.location.uri.endsWith("gato.scss"));
-		deepStrictEqual(gato?.location.range, {
+		assert.ok(gato?.location.uri.endsWith("gato.scss"));
+		assert.deepStrictEqual(gato?.location.range, {
 			start: {
 				line: 4,
 				character: 13,
@@ -84,7 +84,7 @@ describe("Providers/References", () => {
 		});
 	});
 
-	it("provideReferences - @forward variable with prefix", async () => {
+	test("provideReferences - @forward variable with prefix", async () => {
 		await helpers.makeDocument('$day: "monday";', {
 			uri: "ki.scss",
 		});
@@ -120,17 +120,20 @@ describe("Providers/References", () => {
 			includeDeclaration: true,
 		});
 
-		ok(actual, "provideReferences returned null for a prefixed variable");
-		strictEqual(
+		assert.ok(
+			actual,
+			"provideReferences returned null for a prefixed variable",
+		);
+		assert.strictEqual(
 			actual?.references.length,
 			3,
 			"Expected three references to $day: one prefixed usage and one not, plus the declaration",
 		);
 
-		const [ki, coast, winter] = actual.references;
+		const [ki, coast, winter] = actual!.references;
 
-		ok(ki?.location.uri.endsWith("ki.scss"));
-		deepStrictEqual(ki?.location.range, {
+		assert.ok(ki?.location.uri.endsWith("ki.scss"));
+		assert.deepStrictEqual(ki?.location.range, {
 			start: {
 				line: 0,
 				character: 0,
@@ -141,8 +144,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(coast?.location.uri.endsWith("coast.scss"));
-		deepStrictEqual(coast?.location.range, {
+		assert.ok(coast?.location.uri.endsWith("coast.scss"));
+		assert.deepStrictEqual(coast?.location.range, {
 			start: {
 				line: 3,
 				character: 14,
@@ -153,8 +156,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(winter?.location.uri.endsWith("winter.scss"));
-		deepStrictEqual(winter?.location.range, {
+		assert.ok(winter?.location.uri.endsWith("winter.scss"));
+		assert.deepStrictEqual(winter?.location.range, {
 			start: {
 				line: 4,
 				character: 13,
@@ -166,7 +169,7 @@ describe("Providers/References", () => {
 		});
 	});
 
-	it("provideReferences - @forward visibility for variable", async () => {
+	test("provideReferences - @forward visibility for variable", async () => {
 		await helpers.makeDocument(["$secret: 1;"], {
 			uri: "var.scss",
 		});
@@ -183,20 +186,20 @@ describe("Providers/References", () => {
 			includeDeclaration: true,
 		});
 
-		ok(
+		assert.ok(
 			actual,
 			"provideReferences returned null for a variable referenced in an @forward hide",
 		);
-		strictEqual(
+		assert.strictEqual(
 			actual?.references.length,
 			2,
 			"Expected two references to `secret`: one declaration and one as part of a @forward statement (in hide).",
 		);
 
-		const [variable, dev] = actual.references;
+		const [variable, dev] = actual!.references;
 
-		ok(variable?.location.uri.endsWith("var.scss"));
-		deepStrictEqual(variable?.location.range, {
+		assert.ok(variable?.location.uri.endsWith("var.scss"));
+		assert.deepStrictEqual(variable?.location.range, {
 			start: {
 				line: 0,
 				character: 0,
@@ -207,8 +210,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(dev?.location.uri.endsWith("dev.scss"));
-		deepStrictEqual(dev?.location.range, {
+		assert.ok(dev?.location.uri.endsWith("dev.scss"));
+		assert.deepStrictEqual(dev?.location.range, {
 			start: {
 				line: 0,
 				character: 29,
@@ -220,7 +223,7 @@ describe("Providers/References", () => {
 		});
 	});
 
-	it("provideReferences - Functions", async () => {
+	test("provideReferences - Functions", async () => {
 		await helpers.makeDocument(
 			"@function hello() { @return 1; }",
 
@@ -256,17 +259,17 @@ describe("Providers/References", () => {
 			includeDeclaration: true,
 		});
 
-		ok(actual, "provideReferences returned null for a function");
-		strictEqual(
+		assert.ok(actual, "provideReferences returned null for a function");
+		assert.strictEqual(
 			actual?.references.length,
 			3,
 			"Expected three references to hello: two usages and one declaration",
 		);
 
-		const [func, one, two] = actual.references;
+		const [func, one, two] = actual!.references;
 
-		ok(func?.location.uri.endsWith("func.scss"));
-		deepStrictEqual(func?.location.range, {
+		assert.ok(func?.location.uri.endsWith("func.scss"));
+		assert.deepStrictEqual(func?.location.range, {
 			start: {
 				line: 0,
 				character: 10,
@@ -277,8 +280,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(one?.location.uri.endsWith("one.scss"));
-		deepStrictEqual(one?.location.range, {
+		assert.ok(one?.location.uri.endsWith("one.scss"));
+		assert.deepStrictEqual(one?.location.range, {
 			start: {
 				line: 3,
 				character: 19,
@@ -289,8 +292,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(two?.location.uri.endsWith("two.scss"));
-		deepStrictEqual(two?.location.range, {
+		assert.ok(two?.location.uri.endsWith("two.scss"));
+		assert.deepStrictEqual(two?.location.range, {
 			start: {
 				line: 4,
 				character: 19,
@@ -302,7 +305,7 @@ describe("Providers/References", () => {
 		});
 	});
 
-	it("provideReferences - @forward function with prefix", async () => {
+	test("provideReferences - @forward function with prefix", async () => {
 		await helpers.makeDocument(
 			"@function hello() { @return 1; }",
 
@@ -342,17 +345,20 @@ describe("Providers/References", () => {
 			includeDeclaration: true,
 		});
 
-		ok(actual, "provideReferences returned null for a prefixed function");
-		strictEqual(
+		assert.ok(
+			actual,
+			"provideReferences returned null for a prefixed function",
+		);
+		assert.strictEqual(
 			actual?.references.length,
 			3,
 			"Expected three references to hello: one prefixed usage and one not, plus the declaration",
 		);
 
-		const [func, one, two] = actual.references;
+		const [func, one, two] = actual!.references;
 
-		ok(func?.location.uri.endsWith("func.scss"));
-		deepStrictEqual(func?.location.range, {
+		assert.ok(func?.location.uri.endsWith("func.scss"));
+		assert.deepStrictEqual(func?.location.range, {
 			start: {
 				line: 0,
 				character: 10,
@@ -363,8 +369,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(one?.location.uri.endsWith("one.scss"));
-		deepStrictEqual(one?.location.range, {
+		assert.ok(one?.location.uri.endsWith("one.scss"));
+		assert.deepStrictEqual(one?.location.range, {
 			start: {
 				line: 3,
 				character: 18,
@@ -375,8 +381,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(two?.location.uri.endsWith("two.scss"));
-		deepStrictEqual(two?.location.range, {
+		assert.ok(two?.location.uri.endsWith("two.scss"));
+		assert.deepStrictEqual(two?.location.range, {
 			start: {
 				line: 4,
 				character: 19,
@@ -388,7 +394,7 @@ describe("Providers/References", () => {
 		});
 	});
 
-	it("provideReferences - @forward visibility with function", async () => {
+	test("provideReferences - @forward visibility with function", async () => {
 		await helpers.makeDocument(
 			"@function secret() { @return 1; }",
 
@@ -409,20 +415,20 @@ describe("Providers/References", () => {
 			includeDeclaration: true,
 		});
 
-		ok(
+		assert.ok(
 			actual,
 			"provideReferences returned null for a function referenced in an @forward hide",
 		);
-		strictEqual(
+		assert.strictEqual(
 			actual?.references.length,
 			2,
 			"Expected two references to `secret`: one declaration and one as part of a @forward statement (in hide).",
 		);
 
-		const [func, dev] = actual.references;
+		const [func, dev] = actual!.references;
 
-		ok(func?.location.uri.endsWith("func.scss"));
-		deepStrictEqual(func?.location.range, {
+		assert.ok(func?.location.uri.endsWith("func.scss"));
+		assert.deepStrictEqual(func?.location.range, {
 			start: {
 				line: 0,
 				character: 10,
@@ -433,8 +439,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(dev?.location.uri.endsWith("dev.scss"));
-		deepStrictEqual(dev?.location.range, {
+		assert.ok(dev?.location.uri.endsWith("dev.scss"));
+		assert.deepStrictEqual(dev?.location.range, {
 			start: {
 				line: 0,
 				character: 30,
@@ -446,7 +452,7 @@ describe("Providers/References", () => {
 		});
 	});
 
-	it("provideReferences - Mixins", async () => {
+	test("provideReferences - Mixins", async () => {
 		await helpers.makeDocument(
 			["@mixin hello() {", "	line-height: 1;", "}"],
 
@@ -482,17 +488,17 @@ describe("Providers/References", () => {
 			includeDeclaration: true,
 		});
 
-		ok(actual, "provideReferences returned null for a mixin");
-		strictEqual(
+		assert.ok(actual, "provideReferences returned null for a mixin");
+		assert.strictEqual(
 			actual?.references.length,
 			3,
 			"Expected three references to hello: two usages and one declaration",
 		);
 
-		const [mix, one, two] = actual.references;
+		const [mix, one, two] = actual!.references;
 
-		ok(mix?.location.uri.endsWith("mix.scss"));
-		deepStrictEqual(mix?.location.range, {
+		assert.ok(mix?.location.uri.endsWith("mix.scss"));
+		assert.deepStrictEqual(mix?.location.range, {
 			start: {
 				line: 0,
 				character: 7,
@@ -503,8 +509,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(one?.location.uri.endsWith("one.scss"));
-		deepStrictEqual(one?.location.range, {
+		assert.ok(one?.location.uri.endsWith("one.scss"));
+		assert.deepStrictEqual(one?.location.range, {
 			start: {
 				line: 3,
 				character: 14,
@@ -515,8 +521,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(two?.location.uri.endsWith("two.scss"));
-		deepStrictEqual(two?.location.range, {
+		assert.ok(two?.location.uri.endsWith("two.scss"));
+		assert.deepStrictEqual(two?.location.range, {
 			start: {
 				line: 4,
 				character: 14,
@@ -528,7 +534,7 @@ describe("Providers/References", () => {
 		});
 	});
 
-	it("provideReferences - @forward mixin with prefix", async () => {
+	test("provideReferences - @forward mixin with prefix", async () => {
 		await helpers.makeDocument(
 			["@mixin hello() {", "	line-height: 1;", "}"],
 
@@ -568,17 +574,17 @@ describe("Providers/References", () => {
 			includeDeclaration: true,
 		});
 
-		ok(actual, "provideReferences returned null for a mixin");
-		strictEqual(
+		assert.ok(actual, "provideReferences returned null for a mixin");
+		assert.strictEqual(
 			actual?.references.length,
 			3,
 			"Expected three references to hello: one prefixed usage and one not, plus the declaration",
 		);
 
-		const [mix, one, two] = actual.references;
+		const [mix, one, two] = actual!.references;
 
-		ok(mix?.location.uri.endsWith("mix.scss"));
-		deepStrictEqual(mix?.location.range, {
+		assert.ok(mix?.location.uri.endsWith("mix.scss"));
+		assert.deepStrictEqual(mix?.location.range, {
 			start: {
 				line: 0,
 				character: 7,
@@ -589,8 +595,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(one?.location.uri.endsWith("one.scss"));
-		deepStrictEqual(one?.location.range, {
+		assert.ok(one?.location.uri.endsWith("one.scss"));
+		assert.deepStrictEqual(one?.location.range, {
 			start: {
 				line: 3,
 				character: 14,
@@ -601,8 +607,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(two?.location.uri.endsWith("two.scss"));
-		deepStrictEqual(two?.location.range, {
+		assert.ok(two?.location.uri.endsWith("two.scss"));
+		assert.deepStrictEqual(two?.location.range, {
 			start: {
 				line: 4,
 				character: 14,
@@ -614,7 +620,7 @@ describe("Providers/References", () => {
 		});
 	});
 
-	it("provideReferences - @forward visibility for mixin", async () => {
+	test("provideReferences - @forward visibility for mixin", async () => {
 		await helpers.makeDocument(
 			["@mixin secret() {", "	line-height: 1;", "}"],
 
@@ -635,20 +641,20 @@ describe("Providers/References", () => {
 			includeDeclaration: true,
 		});
 
-		ok(
+		assert.ok(
 			actual,
 			"provideReferences returned null for a mixin referenced in an @forward hide",
 		);
-		strictEqual(
+		assert.strictEqual(
 			actual?.references.length,
 			2,
 			"Expected two references to `secret`: one declaration and one as part of a @forward statement (in hide).",
 		);
 
-		const [mix, dev] = actual.references;
+		const [mix, dev] = actual!.references;
 
-		ok(mix?.location.uri.endsWith("mix.scss"));
-		deepStrictEqual(mix?.location.range, {
+		assert.ok(mix?.location.uri.endsWith("mix.scss"));
+		assert.deepStrictEqual(mix?.location.range, {
 			start: {
 				line: 0,
 				character: 7,
@@ -659,8 +665,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(dev?.location.uri.endsWith("dev.scss"));
-		deepStrictEqual(dev?.location.range, {
+		assert.ok(dev?.location.uri.endsWith("dev.scss"));
+		assert.deepStrictEqual(dev?.location.range, {
 			start: {
 				line: 0,
 				character: 29,
@@ -672,7 +678,7 @@ describe("Providers/References", () => {
 		});
 	});
 
-	it("providesReference - @forward function parameter with prefix", async () => {
+	test("providesReference - @forward function parameter with prefix", async () => {
 		await helpers.makeDocument(
 			[
 				"@function hello($var) { @return $var; }",
@@ -707,20 +713,20 @@ describe("Providers/References", () => {
 		const name = await provideReferences(usage, 73, {
 			includeDeclaration: true,
 		});
-		ok(
+		assert.ok(
 			name,
 			"provideReferences returned null for a prefixed variable as a function parameter",
 		);
-		strictEqual(
+		assert.strictEqual(
 			name?.references.length,
 			2,
 			"Expected two references to $fun-name",
 		);
 
-		const [, one] = name.references;
+		const [, one] = name!.references;
 
-		ok(one?.location.uri.endsWith("one.scss"));
-		deepStrictEqual(one?.location.range, {
+		assert.ok(one?.location.uri.endsWith("one.scss"));
+		assert.deepStrictEqual(one?.location.range, {
 			start: {
 				line: 4,
 				character: 28,
@@ -732,7 +738,7 @@ describe("Providers/References", () => {
 		});
 	});
 
-	it("providesReference - @forward in map with prefix", async () => {
+	test("providesReference - @forward in map with prefix", async () => {
 		await helpers.makeDocument(
 			["@function hello() { @return 1; }", '$day: "monday";'],
 
@@ -764,20 +770,20 @@ describe("Providers/References", () => {
 			includeDeclaration: true,
 		});
 
-		ok(
+		assert.ok(
 			funDay,
 			"provideReferences returned null for a prefixed variable in a map",
 		);
-		strictEqual(
+		assert.strictEqual(
 			funDay?.references.length,
 			2,
 			"Expected two references to $day",
 		);
 
-		const [, one] = funDay.references;
+		const [, one] = funDay!.references;
 
-		ok(one?.location.uri.endsWith("one.scss"));
-		deepStrictEqual(one?.location.range, {
+		assert.ok(one?.location.uri.endsWith("one.scss"));
+		assert.deepStrictEqual(one?.location.range, {
 			start: {
 				line: 3,
 				character: 15,
@@ -791,18 +797,18 @@ describe("Providers/References", () => {
 		const hello = await provideReferences(usage, 64, {
 			includeDeclaration: true,
 		});
-		ok(
+		assert.ok(
 			hello,
 			"provideReferences returned null for a prefixed function in a map",
 		);
-		strictEqual(
+		assert.strictEqual(
 			hello?.references.length,
 			2,
 			"Expected two references to hello",
 		);
 	});
 
-	it("provideReferences - excludes declaration if context says so", async () => {
+	test("provideReferences - excludes declaration if context says so", async () => {
 		await helpers.makeDocument(
 			["@function hello() { @return 1; }", '$day: "monday";'],
 
@@ -834,23 +840,31 @@ describe("Providers/References", () => {
 			includeDeclaration: false,
 		});
 
-		ok(
+		assert.ok(
 			funDay,
 			"provideReferences returned null for a variable excluding declarations",
 		);
-		strictEqual(funDay?.references.length, 1, "Expected one reference to $day");
+		assert.strictEqual(
+			funDay?.references.length,
+			1,
+			"Expected one reference to $day",
+		);
 
 		const hello = await provideReferences(usage, 64, {
 			includeDeclaration: false,
 		});
-		ok(
+		assert.ok(
 			hello,
 			"provideReferences returned null for a function excluding declarations",
 		);
-		strictEqual(hello?.references.length, 1, "Expected one reference to hello");
+		assert.strictEqual(
+			hello?.references.length,
+			1,
+			"Expected one reference to hello",
+		);
 	});
 
-	it("provideReferences - Sass built-in", async () => {
+	test("provideReferences - Sass built-in", async () => {
 		const usage = await helpers.makeDocument(
 			[
 				'@use "sass:color";',
@@ -880,18 +894,18 @@ describe("Providers/References", () => {
 		const references = await provideReferences(usage, 34, {
 			includeDeclaration: true,
 		});
-		ok(references, "provideReferences returned null for Sass built-in");
+		assert.ok(references, "provideReferences returned null for Sass built-in");
 
-		strictEqual(
+		assert.strictEqual(
 			references?.references.length,
 			2,
 			"Expected two references to scale",
 		);
 
-		const [one, two] = references.references;
+		const [one, two] = references!.references;
 
-		ok(one?.location.uri.endsWith("one.scss"));
-		deepStrictEqual(one?.location.range, {
+		assert.ok(one?.location.uri.endsWith("one.scss"));
+		assert.deepStrictEqual(one?.location.range, {
 			start: {
 				line: 1,
 				character: 15,
@@ -902,8 +916,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(two?.location.uri.endsWith("two.scss"));
-		deepStrictEqual(two?.location.range, {
+		assert.ok(two?.location.uri.endsWith("two.scss"));
+		assert.deepStrictEqual(two?.location.range, {
 			start: {
 				line: 1,
 				character: 21,
@@ -915,7 +929,7 @@ describe("Providers/References", () => {
 		});
 	});
 
-	it("provideReferences - placeholders", async () => {
+	test("provideReferences - placeholders", async () => {
 		await helpers.makeDocument(
 			["%alert {", "	color: blue;", "}"],
 
@@ -951,17 +965,17 @@ describe("Providers/References", () => {
 			includeDeclaration: true,
 		});
 
-		ok(actual, "provideReferences returned null for a placeholder");
-		strictEqual(
+		assert.ok(actual, "provideReferences returned null for a placeholder");
+		assert.strictEqual(
 			actual?.references.length,
 			3,
 			"Expected three references to alert: two usages and one declaration",
 		);
 
-		const [place, one, two] = actual.references;
+		const [place, one, two] = actual!.references;
 
-		ok(place?.location.uri.endsWith("place.scss"));
-		deepStrictEqual(place?.location.range, {
+		assert.ok(place?.location.uri.endsWith("place.scss"));
+		assert.deepStrictEqual(place?.location.range, {
 			start: {
 				line: 0,
 				character: 0,
@@ -972,8 +986,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(one?.location.uri.endsWith("one.scss"));
-		deepStrictEqual(one?.location.range, {
+		assert.ok(one?.location.uri.endsWith("one.scss"));
+		assert.deepStrictEqual(one?.location.range, {
 			start: {
 				line: 3,
 				character: 9,
@@ -984,8 +998,8 @@ describe("Providers/References", () => {
 			},
 		});
 
-		ok(two?.location.uri.endsWith("two.scss"));
-		deepStrictEqual(two?.location.range, {
+		assert.ok(two?.location.uri.endsWith("two.scss"));
+		assert.deepStrictEqual(two?.location.range, {
 			start: {
 				line: 4,
 				character: 9,

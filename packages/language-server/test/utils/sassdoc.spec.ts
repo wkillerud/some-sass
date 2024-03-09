@@ -1,10 +1,10 @@
-import { strictEqual } from "assert";
-import { SymbolKind } from "vscode-languageserver-types";
+import { SymbolKind } from "@somesass/language-server-types";
+import { describe, assert, test } from "vitest";
 import { ScssSymbol } from "../../src/parser";
 import { applySassDoc } from "../../src/utils/sassdoc";
 
 describe("Utils/SassDoc", () => {
-	it("applySassDoc empty state", () => {
+	test("applySassDoc empty state", () => {
 		const noDoc: ScssSymbol = {
 			name: "test",
 			kind: SymbolKind.Property,
@@ -14,10 +14,10 @@ describe("Utils/SassDoc", () => {
 				line: 0,
 			},
 		};
-		strictEqual(applySassDoc(noDoc), "");
+		assert.strictEqual(applySassDoc(noDoc), "");
 	});
 
-	it("omits name if identical to symbol name", () => {
+	test("omits name if identical to symbol name", () => {
 		const allDocs: ScssSymbol = {
 			name: "test",
 			kind: SymbolKind.Method,
@@ -45,10 +45,10 @@ describe("Utils/SassDoc", () => {
 				name: "test",
 			},
 		};
-		strictEqual(applySassDoc(allDocs), `This is a description`);
+		assert.strictEqual(applySassDoc(allDocs), `This is a description`);
 	});
 
-	it("omits access if public, even if defined", () => {
+	test("omits access if public, even if defined", () => {
 		const allDocs: ScssSymbol = {
 			name: "test",
 			kind: SymbolKind.Method,
@@ -76,10 +76,10 @@ describe("Utils/SassDoc", () => {
 				access: "public",
 			},
 		};
-		strictEqual(applySassDoc(allDocs), `This is a description`);
+		assert.strictEqual(applySassDoc(allDocs), `This is a description`);
 	});
 
-	it("applySassDoc maximal state", () => {
+	test("applySassDoc maximal state", () => {
 		const allDocs: ScssSymbol = {
 			name: "test",
 			kind: SymbolKind.Method,
@@ -207,7 +207,7 @@ describe("Utils/SassDoc", () => {
 			},
 		};
 
-		strictEqual(
+		assert.strictEqual(
 			applySassDoc(allDocs),
 			`This is a description
 

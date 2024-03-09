@@ -1,11 +1,11 @@
-import { deepStrictEqual } from "assert";
 import { EOL } from "os";
+import { assert, describe, test } from "vitest";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { Position, Range } from "vscode-languageserver-types";
 import { ExtractProvider } from "../../../src/features/code-actions";
 
 describe("Providers/Extract", () => {
-	it("supports extracting a variable", async () => {
+	test("supports extracting a variable", async () => {
 		const provider = new ExtractProvider({
 			tabSize: 2,
 			insertSpaces: true,
@@ -28,7 +28,7 @@ describe("Providers/Extract", () => {
 			selection,
 		);
 
-		deepStrictEqual(variableAction.edit?.documentChanges, [
+		assert.deepStrictEqual(variableAction.edit?.documentChanges, [
 			{
 				edits: [
 					{
@@ -53,7 +53,7 @@ describe("Providers/Extract", () => {
 		]);
 	});
 
-	it("supports extracting a multiline variable", async () => {
+	test("supports extracting a multiline variable", async () => {
 		const provider = new ExtractProvider({
 			tabSize: 2,
 			insertSpaces: false,
@@ -78,7 +78,7 @@ describe("Providers/Extract", () => {
 			selection,
 		);
 
-		deepStrictEqual(variableAction.edit?.documentChanges, [
+		assert.deepStrictEqual(variableAction.edit?.documentChanges, [
 			{
 				edits: [
 					{
@@ -105,7 +105,7 @@ box-shadow: $_variable;`,
 		]);
 	});
 
-	it("supports extracting a mixin with tab indents", async () => {
+	test("supports extracting a mixin with tab indents", async () => {
 		const provider = new ExtractProvider({
 			tabSize: 2,
 			insertSpaces: false,
@@ -137,7 +137,7 @@ a.cta {
 			selection,
 		);
 
-		deepStrictEqual(mixinAction.edit?.documentChanges, [
+		assert.deepStrictEqual(mixinAction.edit?.documentChanges, [
 			{
 				edits: [
 					{
@@ -171,7 +171,7 @@ a.cta {
 		]);
 	});
 
-	it("supports extracting a mixin with space indents", async () => {
+	test("supports extracting a mixin with space indents", async () => {
 		const provider = new ExtractProvider({
 			tabSize: 2,
 			insertSpaces: true,
@@ -203,7 +203,7 @@ a.cta {
 			selection,
 		);
 
-		deepStrictEqual(mixinAction.edit?.documentChanges, [
+		assert.deepStrictEqual(mixinAction.edit?.documentChanges, [
 			{
 				edits: [
 					{
@@ -237,7 +237,7 @@ a.cta {
 		]);
 	});
 
-	it("supports extracting a function with tab indents", async () => {
+	test("supports extracting a function with tab indents", async () => {
 		const provider = new ExtractProvider({
 			tabSize: 2,
 			insertSpaces: false,
@@ -262,7 +262,7 @@ a.cta {
 			selection,
 		);
 
-		deepStrictEqual(functionAction.edit?.documentChanges, [
+		assert.deepStrictEqual(functionAction.edit?.documentChanges, [
 			{
 				edits: [
 					{
@@ -291,7 +291,7 @@ box-shadow: _function();`,
 		]);
 	});
 
-	it("supports extracting a function with space indents", async () => {
+	test("supports extracting a function with space indents", async () => {
 		const provider = new ExtractProvider({
 			tabSize: 2,
 			insertSpaces: true,
@@ -316,7 +316,7 @@ box-shadow: _function();`,
 			selection,
 		);
 
-		deepStrictEqual(functionAction.edit?.documentChanges, [
+		assert.deepStrictEqual(functionAction.edit?.documentChanges, [
 			{
 				edits: [
 					{

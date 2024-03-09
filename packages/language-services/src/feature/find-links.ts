@@ -95,23 +95,23 @@ export class SassLinkFinder {
 											const asCursor = meta.node.cursor();
 											asCursor.next();
 											if (
-												asCursor.node.type.name !==
-													SyntaxNodeType.ForwardPrefix &&
-												asCursor.node.type.name !== SyntaxNodeType.UseAs
+												asCursor.node.type.name !== SyntaxNodeType.ValueName &&
+												asCursor.node.type.name !== SyntaxNodeType.Star
 											) {
 												// syntax error
 												break;
 											}
+
 											as = source.substring(
 												asCursor.node.from,
 												asCursor.node.to,
 											);
 
-											if (
-												asCursor.node.type.name === SyntaxNodeType.ForwardPrefix
-											) {
-												as = as.replace("*", "");
-											}
+											// if (
+											// 	asCursor.node.type.name === SyntaxNodeType.ForwardPrefix
+											// ) {
+											// 	as = as.replace("*", "");
+											// }
 											break;
 										}
 										case "hide":

@@ -1,5 +1,8 @@
-import { strictEqual, deepStrictEqual, ok } from "assert";
-import { DiagnosticSeverity, DiagnosticTag } from "vscode-languageserver-types";
+import {
+	DiagnosticSeverity,
+	DiagnosticTag,
+} from "@somesass/language-server-types";
+import { assert, beforeEach, describe, test } from "vitest";
 import { EXTENSION_NAME } from "../../src/constants";
 import { doDiagnostics } from "../../src/features/diagnostics/diagnostics";
 import * as helpers from "../helpers";
@@ -7,7 +10,7 @@ import * as helpers from "../helpers";
 describe("Providers/Diagnostics", () => {
 	beforeEach(() => helpers.createTestContext());
 
-	it("doDiagnostics - Variables", async () => {
+	test("doDiagnostics - Variables", async () => {
 		const document = await helpers.makeDocument([
 			"/// @deprecated Use something else",
 			"$a: 1;",
@@ -16,7 +19,7 @@ describe("Providers/Diagnostics", () => {
 
 		const actual = await doDiagnostics(document);
 
-		deepStrictEqual(actual, [
+		assert.deepStrictEqual(actual, [
 			{
 				message: "Use something else",
 				range: {
@@ -30,7 +33,7 @@ describe("Providers/Diagnostics", () => {
 		]);
 	});
 
-	it("doDiagnostics - Functions", async () => {
+	test("doDiagnostics - Functions", async () => {
 		const document = await helpers.makeDocument([
 			"/// @deprecated Use something else",
 			"@function old-function() {",
@@ -41,7 +44,7 @@ describe("Providers/Diagnostics", () => {
 
 		const actual = await doDiagnostics(document);
 
-		deepStrictEqual(actual, [
+		assert.deepStrictEqual(actual, [
 			{
 				message: "Use something else",
 				range: {
@@ -55,7 +58,7 @@ describe("Providers/Diagnostics", () => {
 		]);
 	});
 
-	it("doDiagnostics - Mixins", async () => {
+	test("doDiagnostics - Mixins", async () => {
 		const document = await helpers.makeDocument([
 			"/// @deprecated Use something else",
 			"@mixin old-mixin {",
@@ -66,7 +69,7 @@ describe("Providers/Diagnostics", () => {
 
 		const actual = await doDiagnostics(document);
 
-		deepStrictEqual(actual, [
+		assert.deepStrictEqual(actual, [
 			{
 				message: "Use something else",
 				range: {
@@ -80,7 +83,7 @@ describe("Providers/Diagnostics", () => {
 		]);
 	});
 
-	it("doDiagnostics - all of the above", async () => {
+	test("doDiagnostics - all of the above", async () => {
 		const document = await helpers.makeDocument([
 			"/// @deprecated Use something else",
 			"$a: 1;",
@@ -101,15 +104,15 @@ describe("Providers/Diagnostics", () => {
 
 		const actual = await doDiagnostics(document);
 
-		strictEqual(actual.length, 3);
+		assert.strictEqual(actual.length, 3);
 
-		ok(
+		assert.ok(
 			actual.every((d) => Boolean(d.message)),
 			"Every diagnostic must have a message",
 		);
 	});
 
-	it("doDiagnostics - support annotation without description", async () => {
+	test("doDiagnostics - support annotation without description", async () => {
 		const document = await helpers.makeDocument([
 			"/// @deprecated",
 			"$a: 1;",
@@ -130,16 +133,16 @@ describe("Providers/Diagnostics", () => {
 
 		const actual = await doDiagnostics(document);
 
-		strictEqual(actual.length, 3);
+		assert.strictEqual(actual.length, 3);
 
 		// Make sure we set a default message for the deprecated tag
-		ok(
+		assert.ok(
 			actual.every((d) => Boolean(d.message)),
 			"Every diagnostic must have a message",
 		);
 	});
 
-	it("doDiagnostics - support namespaces with prefix", async () => {
+	test("doDiagnostics - support namespaces with prefix", async () => {
 		await helpers.makeDocument(["/// @deprecated", "$old-a: 1;"], {
 			uri: "variables.scss",
 		});
@@ -177,16 +180,16 @@ describe("Providers/Diagnostics", () => {
 		// For some reason we get duplicate diagnostics for mixins.
 		// Haven't been able to track down why getVariableFunctionMixinReferences produces two of the same node.
 		// It's probably fine...
-		strictEqual(actual.length, 4);
+		assert.strictEqual(actual.length, 4);
 
 		// Make sure we set a default message for the deprecated tag
-		ok(
+		assert.ok(
 			actual.every((d) => Boolean(d.message)),
 			"Every diagnostic must have a message",
 		);
 	});
 
-	it("doDiagnostics - Placeholders", async () => {
+	test("doDiagnostics - Placeholders", async () => {
 		const document = await helpers.makeDocument([
 			"/// @deprecated Use something else",
 			"%oldPlaceholder {",
@@ -197,7 +200,7 @@ describe("Providers/Diagnostics", () => {
 
 		const actual = await doDiagnostics(document);
 
-		deepStrictEqual(actual, [
+		assert.deepStrictEqual(actual, [
 			{
 				message: "Use something else",
 				range: {

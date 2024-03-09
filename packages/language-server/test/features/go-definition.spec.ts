@@ -1,4 +1,4 @@
-import { strictEqual, deepStrictEqual, ok } from "assert";
+import { assert, beforeEach, describe, test } from "vitest";
 import { SymbolKind } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { useContext } from "../../src/context-provider";
@@ -70,82 +70,82 @@ describe("Providers/GoDefinition", () => {
 		);
 	});
 
-	it("doGoDefinition - Variables", async () => {
+	test("doGoDefinition - Variables", async () => {
 		const document = await helpers.makeDocument(".a { content: $a; }");
 
 		const actual = goDefinition(document, 15);
 
-		ok(actual);
-		strictEqual(actual?.uri, "./one.scss");
-		deepStrictEqual(actual?.range, {
+		assert.ok(actual);
+		assert.strictEqual(actual?.uri, "./one.scss");
+		assert.deepStrictEqual(actual?.range, {
 			start: { line: 1, character: 1 },
 			end: { line: 1, character: 3 },
 		});
 	});
 
-	it("doGoDefinition - Variable definition", async () => {
+	test("doGoDefinition - Variable definition", async () => {
 		const document = await helpers.makeDocument("$a: 1;");
 
 		const actual = goDefinition(document, 2);
 
-		strictEqual(actual, null);
+		assert.strictEqual(actual, null);
 	});
 
-	it("doGoDefinition - Mixins", async () => {
+	test("doGoDefinition - Mixins", async () => {
 		const document = await helpers.makeDocument(".a { @include mixin(); }");
 
 		const actual = goDefinition(document, 16);
 
-		ok(actual);
-		strictEqual(actual?.uri, "./one.scss");
-		deepStrictEqual(actual?.range, {
+		assert.ok(actual);
+		assert.strictEqual(actual?.uri, "./one.scss");
+		assert.deepStrictEqual(actual?.range, {
 			start: { line: 1, character: 1 },
 			end: { line: 1, character: 6 },
 		});
 	});
 
-	it("doGoDefinition - Mixin definition", async () => {
+	test("doGoDefinition - Mixin definition", async () => {
 		const document = await helpers.makeDocument("@mixin mixin($a) {}");
 
 		const actual = goDefinition(document, 8);
 
-		strictEqual(actual, null);
+		assert.strictEqual(actual, null);
 	});
 
-	it("doGoDefinition - Mixin Arguments", async () => {
+	test("doGoDefinition - Mixin Arguments", async () => {
 		const document = await helpers.makeDocument("@mixin mixin($a) {}");
 
 		const actual = goDefinition(document, 10);
 
-		strictEqual(actual, null);
+		assert.strictEqual(actual, null);
 	});
 
-	it("doGoDefinition - Functions", async () => {
+	test("doGoDefinition - Functions", async () => {
 		const document = await helpers.makeDocument(".a { content: make(1); }");
 
 		const actual = goDefinition(document, 16);
 
-		ok(actual);
-		strictEqual(actual?.uri, "./one.scss");
-		deepStrictEqual(actual?.range, {
+		assert.ok(actual);
+		assert.strictEqual(actual?.uri, "./one.scss");
+		assert.deepStrictEqual(actual?.range, {
 			start: { line: 1, character: 1 },
 			end: { line: 1, character: 5 },
 		});
 	});
 
-	it("doGoDefinition - Function definition", async () => {
+	test("doGoDefinition - Function definition", async () => {
 		const document = await helpers.makeDocument("@function make($a) {}");
 
 		const actual = goDefinition(document, 8);
 
-		strictEqual(actual, null);
+		assert.strictEqual(actual, null);
 	});
 
-	it("doGoDefinition - Function Arguments", async () => {
+	test("doGoDefinition - Function Arguments", async () => {
 		const document = await helpers.makeDocument("@function make($a) {}");
 
 		const actual = goDefinition(document, 13);
 
-		strictEqual(actual, null);
+		assert.strictEqual(actual, null);
 	});
 });

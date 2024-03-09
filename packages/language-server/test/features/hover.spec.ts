@@ -1,7 +1,7 @@
-import { deepStrictEqual } from "assert";
+import { TextDocument } from "@somesass/language-server-types";
+import { assert, beforeEach, describe, test } from "vitest";
 import { MarkupKind, SymbolKind } from "vscode-languageserver";
 import type { Hover } from "vscode-languageserver";
-import { TextDocument } from "vscode-languageserver-textdocument";
 import { useContext } from "../../src/context-provider";
 import { doHover } from "../../src/features/hover/hover";
 import { INode, ScssDocument } from "../../src/parser";
@@ -81,10 +81,10 @@ describe("Providers/Hover", () => {
 		);
 	});
 
-	it("should suggest local symbols", async () => {
+	test("should suggest local symbols", async () => {
 		const actual = await getHover(["$one: 1;", ".a { content: $one|; }"]);
 
-		deepStrictEqual(actual?.contents, {
+		assert.deepStrictEqual(actual?.contents, {
 			kind: MarkupKind.Markdown,
 			value: [
 				"```scss",
@@ -96,10 +96,10 @@ describe("Providers/Hover", () => {
 		});
 	});
 
-	it("should suggest global variables", async () => {
+	test("should suggest global variables", async () => {
 		const actual = await getHover([".a { content: $variable|; }"]);
 
-		deepStrictEqual(actual?.contents, {
+		assert.deepStrictEqual(actual?.contents, {
 			kind: MarkupKind.Markdown,
 			value: [
 				"```scss",
@@ -111,10 +111,10 @@ describe("Providers/Hover", () => {
 		});
 	});
 
-	it("should suggest global mixins", async () => {
+	test("should suggest global mixins", async () => {
 		const actual = await getHover([".a { @include mixin| }"]);
 
-		deepStrictEqual(actual?.contents, {
+		assert.deepStrictEqual(actual?.contents, {
 			kind: MarkupKind.Markdown,
 			value: [
 				"```scss",
@@ -126,10 +126,10 @@ describe("Providers/Hover", () => {
 		});
 	});
 
-	it("should suggest global functions", async () => {
+	test("should suggest global functions", async () => {
 		const actual = await getHover([".a {", "	width: func|();", "}"]);
 
-		deepStrictEqual(actual?.contents, {
+		assert.deepStrictEqual(actual?.contents, {
 			kind: MarkupKind.Markdown,
 			value: [
 				"```scss",

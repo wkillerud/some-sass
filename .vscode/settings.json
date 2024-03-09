@@ -1,5 +1,5 @@
 {
-	"mochaExplorer.cwd": "server",
+	"mochaExplorer.cwd": "vscode-extension",
 	"somesass.scannerDepth": 30,
 	"somesass.scannerExclude": [
 		"**/.git/**",

@@ -1,4 +1,4 @@
-import * as assert from "assert";
+import { assert, beforeEach, describe, test } from "vitest";
 import { changeConfiguration, useContext } from "../../src/context-provider";
 import { doCompletion } from "../../src/features/completion";
 import { NodeFileSystem } from "../../src/node-file-system";
@@ -18,7 +18,7 @@ describe("Providers/Completion", () => {
 	});
 
 	describe("Hide", () => {
-		it("supports multi-level hiding", async () => {
+		test("supports multi-level hiding", async () => {
 			const workspaceUri = getUri("completion/multi-level-hide/");
 			const docUri = getUri("completion/multi-level-hide/styles.scss");
 			const scanner = new WorkspaceScannerService();
@@ -41,7 +41,7 @@ describe("Providers/Completion", () => {
 			assert.equal(completions.items[0].label, "$color-grey");
 		});
 
-		it("doesn't hide symbol with same name in different part of dependency graph", async () => {
+		test("doesn't hide symbol with same name in different part of dependency graph", async () => {
 			const workspaceUri = getUri("completion/same-symbol-name-hide/");
 			const docUri = getUri("completion/same-symbol-name-hide/styles.scss");
 			const scanner = new WorkspaceScannerService();
@@ -65,7 +65,7 @@ describe("Providers/Completion", () => {
 	});
 
 	describe("Show", () => {
-		it("doesn't show symbol with same name in different part of dependency graph", async () => {
+		test("doesn't show symbol with same name in different part of dependency graph", async () => {
 			const workspaceUri = getUri("completion/same-symbol-name-show/");
 			const docUri = getUri("completion/same-symbol-name-show/styles.scss");
 			const scanner = new WorkspaceScannerService();

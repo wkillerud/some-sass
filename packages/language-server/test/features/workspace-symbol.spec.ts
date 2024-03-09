@@ -1,6 +1,5 @@
-import { strictEqual } from "assert";
-import { SymbolKind } from "vscode-languageserver";
-import { TextDocument } from "vscode-languageserver-textdocument";
+import { SymbolKind, TextDocument } from "@somesass/language-server-types";
+import { assert, beforeEach, describe, test } from "vitest";
 import { useContext } from "../../src/context-provider";
 import { searchWorkspaceSymbol } from "../../src/features/workspace-symbols/workspace-symbol";
 import { INode, ScssDocument } from "../../src/parser";
@@ -81,33 +80,28 @@ describe("Providers/WorkspaceSymbol", () => {
 		);
 	});
 
-	it("searchWorkspaceSymbol - Empty query", async () => {
+	test("searchWorkspaceSymbol - Empty query", async () => {
 		const actual = await searchWorkspaceSymbol("", "");
-
-		strictEqual(actual.length, 4);
+		assert.strictEqual(actual.length, 4);
 	});
 
-	it("searchWorkspaceSymbol - query for variable", async () => {
+	test("searchWorkspaceSymbol - query for variable", async () => {
 		const actual = await searchWorkspaceSymbol("$", "");
-
-		strictEqual(actual.length, 1);
+		assert.strictEqual(actual.length, 1);
 	});
 
-	it("searchWorkspaceSymbol - query for function", async () => {
+	test("searchWorkspaceSymbol - query for function", async () => {
 		const actual = await searchWorkspaceSymbol("ma", "");
-
-		strictEqual(actual.length, 1);
+		assert.strictEqual(actual.length, 1);
 	});
 
-	it("searchWorkspaceSymbol - query for mixin", async () => {
+	test("searchWorkspaceSymbol - query for mixin", async () => {
 		const actual = await searchWorkspaceSymbol("mi", "");
-
-		strictEqual(actual.length, 1);
+		assert.strictEqual(actual.length, 1);
 	});
 
-	it("searchWorkspaceSymbol - query for placeholder", async () => {
+	test("searchWorkspaceSymbol - query for placeholder", async () => {
 		const actual = await searchWorkspaceSymbol("%", "");
-
-		strictEqual(actual.length, 1);
+		assert.strictEqual(actual.length, 1);
 	});
 });

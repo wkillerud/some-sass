@@ -11,7 +11,7 @@ import {
 	TextDocument,
 	URI,
 } from "@somesass/language-server-types";
-import { expect, describe, test } from "vitest";
+import { assert, describe, test } from "vitest";
 import { getLanguageService } from "../language-services";
 import { getDocumentContext } from "../test/test-document-context";
 import { NodeFileSystem } from "../test/test-fs-provider";
@@ -41,7 +41,7 @@ describe("findDocumentLinks", () => {
 			stylesheet,
 			getDocumentContext(workspaceFolder || "test://test"),
 		);
-		expect(links).toEqual(expected);
+		assert.deepEqual(links, expected);
 	}
 
 	async function assertDynamicLinks(
@@ -62,13 +62,13 @@ describe("findDocumentLinks", () => {
 			stylesheet,
 			getDocumentContext(document.uri),
 		);
-		expect(links).toEqual(expected);
+		assert.deepEqual(links, expected);
 	}
 
 	async function assertNoDynamicLinks(
 		docUri: string,
 		input: string,
-		extecedTarget: string | undefined,
+		expectedTarget: string | undefined,
 		lang: string = "scss",
 	) {
 		const ls = getLS();
@@ -79,18 +79,22 @@ describe("findDocumentLinks", () => {
 			stylesheet,
 			getDocumentContext(document.uri),
 		);
-		if (extecedTarget) {
-			expect(
+		if (expectedTarget) {
+			assert.deepEqual(
 				links.length,
+				1,
 				`${docUri.toString()} should only return itself`,
-			).toEqual(1);
-			expect(
+			);
+			assert.deepEqual(
 				links[0].target,
+				expectedTarget,
 				`${docUri.toString()} should only return itself`,
-			).toEqual(extecedTarget);
+			);
 		} else {
-			expect(links.length, `${docUri.toString()} should have no link`).toEqual(
+			assert.deepEqual(
+				links.length,
 				0,
+				`${docUri.toString()} should have no link`,
 			);
 		}
 	}

@@ -49,6 +49,244 @@ The language server requests configuration via `workspace/configuration` on the 
 
 The options can also be passed as initialization options, on the `settings` key.
 
+## Capabilities
+
+This language server is designed to run alongside the [VS Code CSS language server](https://github.com/hrsh7th/vscode-langservers-extracted).
+
+<table>
+	<caption style="visibility:hidden">Comparison of <code>vscode-css-languageservice</code> and <code>some-sass-language-service</code></caption>
+	<thead>
+		<tr>
+			<th>Request</th>
+			<th>Capability</th>
+			<th>vscode-css</th>
+			<th>some-sass</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<th rowspan="2">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_codeAction">
+					<code>textDocument/codeAction</code>
+				</a>
+			</th>
+			<td>CSS code actions</td>
+			<td>✅</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>SCSS code actions</td>
+			<td></td>
+			<td>✅</td>
+		</tr>
+		<tr>
+			<th rowspan="1">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_colorPresentation">
+					<code>textDocument/colorPresentation</code>
+				</a>
+			</th>
+			<td>Color picker for CSS colors</td>
+			<td>✅</td>
+			<td></td>
+		</tr>
+		<tr>
+			<th rowspan="4">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_completion">
+					<code>textDocument/completion</code>
+				</a>
+			</th>
+			<td>CSS completions</td>
+			<td>✅</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>SCSS same-document completions</td>
+			<td>✅</td>
+			<td>✅</td>
+		</tr>
+		<tr>
+			<td>SCSS workspace completions</td>
+			<td></td>
+			<td>✅</td>
+		</tr>
+		<tr>
+			<td>SassDoc completions</td>
+			<td></td>
+			<td>✅</td>
+		</tr>
+		<tr>
+			<th rowspan="2">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_definition">
+					<code>textDocument/definition</code>
+				</a>
+			</th>
+			<td>Same-document definition</td>
+			<td>✅</td>
+			<td>✅</td>
+		</tr>
+		<tr>
+			<td>Workspace definition</td>
+			<td></td>
+			<td>✅</td>
+		</tr>
+		<tr>
+			<th rowspan="2">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_documentColor">
+					<code>textDocument/documentColor</code>
+				</a>
+			</th>
+			<td>CSS colors</td>
+			<td>✅</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>SCSS variable colors</td>
+			<td></td>
+			<td>✅</td>
+		</tr>
+		<tr>
+			<th rowspan="1">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_documentHighlight">
+					<code>textDocument/documentHighlight</code>
+				</a>
+			</th>
+			<td>Highlight references in document</td>
+			<td>✅</td>
+			<td></td>
+		</tr>
+		<tr>
+			<th rowspan="1">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_documentLink">
+					<code>textDocument/documentLink</code>
+				</a>
+			</th>
+			<td>Navigate to linked document</td>
+			<td>✅</td>
+			<td></td>
+		</tr>
+		<tr>
+			<th rowspan="1">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_documentSymbol">
+					<code>textDocument/documentSymbol</code>
+				</a>
+			</th>
+			<td>Go to symbol in document</td>
+			<td>✅</td>
+			<td></td>
+		</tr>
+		<tr>
+			<th rowspan="1">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_foldingRange">
+					<code>textDocument/foldingRange</code>
+				</a>
+			</th>
+			<td>Code block folding</td>
+			<td>✅</td>
+			<td></td>
+		</tr>
+		<tr>
+			<th rowspan="1">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_formatting">
+					<code>textDocument/formatting</code>
+				</a>
+			</th>
+			<td>Format document</td>
+			<td>✅</td>
+			<td></td>
+		</tr>
+		<tr>
+			<th rowspan="3">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_hover">
+					<code>textDocument/hover</code>
+				</a>
+			</th>
+			<td>CSS hover info</td>
+			<td>✅</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>SCSS hover info</td>
+			<td></td>
+			<td>✅</td>
+		</tr>
+		<tr>
+			<td>SassDoc hover info</td>
+			<td></td>
+			<td>✅</td>
+		</tr>
+		<tr>
+			<th rowspan="1">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_rangeFormatting">
+					<code>textDocument/rangeFormatting</code>
+				</a>
+			</th>
+			<td>Format selection</td>
+			<td>✅</td>
+			<td></td>
+		</tr>
+		<tr>
+			<th rowspan="2">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_references">
+					<code>textDocument/references</code>
+				</a>
+			</th>
+			<td>CSS references</td>
+			<td>✅</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>SCSS references</td>
+			<td></td>
+			<td>✅</td>
+		</tr>
+		<tr>
+			<th rowspan="2">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_rename">
+					<code>textDocument/rename</code>
+				</a>
+			</th>
+			<td>Same-document rename</td>
+			<td>✅</td>
+			<td>✅</td>
+		</tr>
+		<tr>
+			<td>Workspace rename</td>
+			<td></td>
+			<td>✅</td>
+		</tr>
+		<tr>
+			<th rowspan="1">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_selectionRange">
+					<code>textDocument/selectionRange</code>
+				</a>
+			</th>
+			<td>Ranges for expand/shrink selection</td>
+			<td>✅</td>
+			<td></td>
+		</tr>
+		<tr>
+			<th rowspan="1">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_signatureHelp">
+					<code>textDocument/signatureHelp</code>
+				</a>
+			</th>
+			<td>SCSS function/mixin signature help</td>
+			<td></td>
+			<td>✅</td>
+		</tr>
+		<tr>
+			<th rowspan="1">
+				<a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_symbol">
+					<code>workspace/symbol</code>
+				</a>
+			</th>
+			<td>Go to symbol in workspace</td>
+			<td></td>
+			<td>✅</td>
+		</tr>
+	</tbody>
+</table>
+
 ## Editors with clients
 
 See [this list](https://github.com/wkillerud/some-sass/blob/main/README.md#editors-with-clients).

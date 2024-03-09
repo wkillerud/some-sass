@@ -40,23 +40,32 @@ function findTreeSymbols(
 			continue;
 		}
 
+		const parent = tree.node;
 		let children: SassDocumentSymbol[] | undefined = undefined;
-
 		if (type === SyntaxNodeType.PseudoClassSelector) {
 			children = [];
-
-			const pseudoClassName = tree.node.getChild(
-				SyntaxNodeType.PseudoClassName,
-			);
-
+			const pseudoClassName = parent.getChild(SyntaxNodeType.PseudoClassName);
 			if (pseudoClassName) {
+				// Advance the cursor so we avoid duplicating the children as root-level symbols
+				while (tree.node.type.name !== SyntaxNodeType.PseudoClassName) {
+					tree.next();
+				}
 				children.push(toDocumentSymbol(pseudoClassName, source, document));
 			}
-			const argsList = tree.node.getChild(SyntaxNodeType.ArgList);
+			const argsList = parent.getChild(SyntaxNodeType.ArgList);
 			if (argsList) {
+				// Advance the cursor so we avoid duplicating the children as root-level symbols
+				while (tree.node.type.name !== SyntaxNodeType.ArgList) {
+					tree.next();
+				}
 				const value = argsList.getChild(SyntaxNodeType.ClassSelector);
 				let args: SassDocumentSymbol[] | undefined = undefined;
 				if (value) {
+					// Advance the cursor so we avoid duplicating the children as root-level symbols
+					// @ts-expect-error We've moved on, TS
+					while (tree.node.type.name !== SyntaxNodeType.ClassSelector) {
+						tree.next();
+					}
 					args = [toDocumentSymbol(value, source, document)];
 				}
 				children.push(toDocumentSymbol(argsList, source, document, args));
@@ -64,7 +73,7 @@ function findTreeSymbols(
 		}
 
 		const symbol: SassDocumentSymbol = toDocumentSymbol(
-			tree.node,
+			parent,
 			source,
 			document,
 			children,

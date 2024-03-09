@@ -1,9 +1,12 @@
-import { URI, type TextDocument } from "@somesass/language-server-types";
+import {
+	URI,
+	type TextDocument,
+	Stylesheet,
+	SyntaxNode,
+} from "@somesass/language-server-types";
 import { Position, Range } from "vscode-languageserver-types";
 import type { FileSystemProvider } from "../file-system";
 import { getLinesFromText } from "../utils/string";
-import { getNodeAtOffset } from "./ast";
-import type { INode } from "./node";
 import type {
 	IScssDocument,
 	IScssSymbols,
@@ -21,7 +24,7 @@ import type {
 
 export class ScssDocument implements IScssDocument {
 	public textDocument: TextDocument;
-	public ast: INode;
+	public ast: Stylesheet;
 	public fileName: string;
 	public uri: string;
 
@@ -41,7 +44,7 @@ export class ScssDocument implements IScssDocument {
 		fs: FileSystemProvider,
 		document: TextDocument,
 		symbols: IScssSymbols,
-		ast: INode,
+		ast: Stylesheet,
 	) {
 		this.ast = ast;
 		this.fs = fs;
@@ -91,14 +94,14 @@ export class ScssDocument implements IScssDocument {
 		return this.textDocument.getText(range);
 	}
 
-	public getNodeAt(offset: number): INode | null {
-		return getNodeAtOffset(this.ast, offset);
+	public getNodeAt(offset: number): SyntaxNode {
+		return this.ast.resolve(offset);
 	}
 
-	public getNodeRange(node: INode): Range {
+	public getNodeRange(node: SyntaxNode): Range {
 		return Range.create(
-			this.textDocument.positionAt(node.offset),
-			this.textDocument.positionAt(node.end),
+			this.textDocument.positionAt(node.from),
+			this.textDocument.positionAt(node.to),
 		);
 	}
 

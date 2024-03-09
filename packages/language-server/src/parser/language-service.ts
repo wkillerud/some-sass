@@ -1,9 +1,9 @@
-import { URI, FileType } from "@somesass/language-server-types";
 import {
-	type LanguageService,
-	type FileSystemProvider as CSSFileSystemProvider,
-	getSCSSLanguageService,
-} from "vscode-css-languageservice";
+	URI,
+	FileType,
+	LanguageService,
+	FileSystemProvider,
+} from "@somesass/language-server-types";
 import { useContext } from "../context-provider";
 
 let ls: LanguageService;
@@ -15,13 +15,13 @@ export function getLanguageService(): LanguageService {
 
 	const { fs, clientCapabilities } = useContext();
 
-	const fileSystemProvider: CSSFileSystemProvider = {
+	const fileSystemProvider: FileSystemProvider = {
 		readDirectory(uri) {
 			return fs.readDirectory(uri);
 		},
-		async stat(uri: string) {
+		async stat(uri: URI) {
 			try {
-				return await fs.stat(URI.parse(uri));
+				return await fs.stat(uri);
 			} catch (error) {
 				if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
 					throw error;

@@ -4,15 +4,18 @@ import {
 	TextDocument,
 	URI,
 	SyntaxNodeType,
+	Stylesheet,
+	LanguageService,
 } from "@somesass/language-server-types";
-import { getLanguageService as getSomeSassLanguageService } from "@somesass/language-services";
+import {
+	getLanguageService,
+	getLanguageService as getSomeSassLanguageService,
+} from "@somesass/language-services";
 import { parse, type ParseResult } from "scss-sassdoc-parser";
-import { LanguageService } from "vscode-css-languageservice";
 import { useContext } from "../context-provider";
 import { asDollarlessVariable, getLinesFromText } from "../utils/string";
 import { getNodeAtOffset, getParentNodeByType } from "./ast";
 import { buildDocumentContext } from "./document";
-import { getLanguageService } from "./language-service";
 import { INode, NodeType } from "./node";
 import { ScssDocument } from "./scss-document";
 import type { IScssSymbols } from "./scss-symbol";
@@ -27,15 +30,15 @@ export async function parseDocument(
 	workspaceRoot: URI,
 ): Promise<ScssDocument> {
 	const { fs } = useContext();
-	const ls = getLanguageService();
-	const ast = ls.parseStylesheet(document) as INode;
+	const ls = getLanguageService({ fileSystemProvider: fs });
+	const ast = ls.parseStylesheet(document);
 	const symbols = await findDocumentSymbols(document, ast, workspaceRoot, ls);
 	return new ScssDocument(fs, document, symbols, ast);
 }
 
 async function findDocumentSymbols(
 	document: TextDocument,
-	ast: INode,
+	ast: Stylesheet,
 	workspaceRoot: URI,
 	ls: LanguageService,
 ): Promise<IScssSymbols> {
@@ -133,7 +136,9 @@ async function findDocumentSymbols(
 		// do nothing
 	}
 
-	const symbols = ls.findDocumentSymbols2(document, ast);
+	// TODO: you are here. Things are broken. Same procedure as for links.
+	// Gradually migrate over to logic in language-service, make tests pass in the server/e2e.
+	const symbols = ls.findDocumentSymbols(document, ast);
 
 	for (const symbol of symbols) {
 		const position = symbol.range.start;

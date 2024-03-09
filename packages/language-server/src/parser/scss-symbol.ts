@@ -1,12 +1,13 @@
-import type { Parameter, ParseResult } from "scss-sassdoc-parser";
-import type { TextDocument } from "vscode-languageserver-textdocument";
-import type {
-	DocumentLink,
+import {
 	Position,
-	SymbolKind,
 	Range,
-} from "vscode-languageserver-types";
-import type { INode } from "./node";
+	SassDocumentLink,
+	Stylesheet,
+	SymbolKind,
+	SyntaxNode,
+	TextDocument,
+} from "@somesass/language-server-types";
+import type { Parameter, ParseResult } from "scss-sassdoc-parser";
 
 export interface ScssSymbol {
 	kind: SymbolKind;
@@ -36,7 +37,7 @@ export type ScssPlaceholder = ScssSymbol;
 export type ScssPlaceholderUsage = ScssSymbol;
 
 export interface ScssLink {
-	link: DocumentLink;
+	link: SassDocumentLink;
 }
 
 export interface ScssUse extends ScssLink {
@@ -69,7 +70,7 @@ export interface IScssSymbols {
 
 export interface IScssDocument extends TextDocument, IScssSymbols {
 	textDocument: TextDocument;
-	ast: INode;
+	ast: Stylesheet;
 	/**
 	 * The last part of the URI, including extension.
 	 * For instance, given the URI `file:///home/test.scss`,
@@ -84,6 +85,6 @@ export interface IScssDocument extends TextDocument, IScssSymbols {
 		imports?: boolean;
 	}) => ScssLink[];
 	getSymbols: () => ScssSymbol[];
-	getNodeAt: (offset: number) => INode | null;
-	getNodeRange: (node: INode) => Range;
+	getNodeAt: (offset: number) => SyntaxNode;
+	getNodeRange: (node: SyntaxNode) => Range;
 }

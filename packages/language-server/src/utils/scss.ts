@@ -1,6 +1,6 @@
+import { SyntaxNodeType } from "@somesass/language-server-types";
 import { getDefinition } from "../features/go-definition";
-import { IScssDocument, NodeType, ScssVariable } from "../parser";
-import { getParentNodeByType } from "../parser/ast";
+import { IScssDocument, ScssVariable } from "../parser";
 
 export function isReferencingVariable(variable: ScssVariable): boolean {
 	if (!variable.value) {
@@ -15,7 +15,7 @@ export function getBaseValueFrom(
 	depth = 0,
 ): ScssVariable {
 	if (depth > 10) {
-		// Really?
+		// Break out of what I assume is a circular reference at this point
 		return variable;
 	}
 
@@ -24,12 +24,23 @@ export function getBaseValueFrom(
 		return variable;
 	}
 
-	const declaration = getParentNodeByType(node, NodeType.VariableDeclaration);
-	if (!declaration) {
+	let isDeclaration = false;
+	const cursor = node.cursor();
+	do {
+		if (cursor.type.name === SyntaxNodeType.StyleSheet) {
+			break;
+		}
+		if (cursor.type.name === SyntaxNodeType.Declaration) {
+			isDeclaration = true;
+			break;
+		}
+	} while (cursor.parent());
+
+	if (!isDeclaration) {
 		return variable;
 	}
 
-	const value = declaration.getValue()?.getText();
+	const value = variable.value;
 	if (!value) {
 		return variable;
 	}

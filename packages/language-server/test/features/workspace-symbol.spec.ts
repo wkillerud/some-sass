@@ -1,9 +1,9 @@
 import { SymbolKind, TextDocument } from "@somesass/language-server-types";
+import { getLanguageService } from "@somesass/language-services";
 import { assert, beforeEach, describe, test } from "vitest";
 import { useContext } from "../../src/context-provider";
 import { searchWorkspaceSymbol } from "../../src/features/workspace-symbols/workspace-symbol";
 import { ScssDocument } from "../../src/parser";
-import { getLanguageService } from "../../src/parser/language-service";
 import * as helpers from "../helpers";
 
 describe("workspace/symbol", () => {

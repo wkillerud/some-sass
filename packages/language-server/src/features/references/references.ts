@@ -1,8 +1,15 @@
-import type { TextDocument } from "vscode-languageserver-textdocument";
-import type { Position, ReferenceContext } from "vscode-languageserver-types";
-import { Location, Range, SymbolKind } from "vscode-languageserver-types";
+import {
+	Location,
+	Position,
+	Range,
+	ReferenceContext,
+	SymbolKind,
+	SyntaxNode,
+	SyntaxNodeType,
+	TextDocument,
+} from "@somesass/language-server-types";
 import { useContext } from "../../context-provider";
-import type { INode, IScssDocument, ScssSymbol } from "../../parser";
+import type { IScssDocument, ScssSymbol } from "../../parser";
 import { NodeType, tokenizer } from "../../parser";
 import type StorageService from "../../storage";
 import {
@@ -12,6 +19,12 @@ import {
 } from "../../utils/string";
 import { getDefinitionSymbol } from "../go-definition/go-definition";
 import { sassBuiltInModules } from "../sass-built-in-modules";
+
+interface Identifier {
+	kind: SymbolKind;
+	position: Position;
+	name: string;
+}
 
 type References = {
 	definition: {
@@ -34,18 +47,16 @@ export async function provideReferences(
 	context: ReferenceContext,
 ): Promise<References | null> {
 	const { storage } = useContext();
+
 	const scssDocument = storage.get(document.uri);
 	if (!scssDocument) {
 		return null;
 	}
 
 	const referenceNode = scssDocument.getNodeAt(offset);
-	if (!referenceNode || !referenceNode.type) {
-		return null;
-	}
-
-	const referenceIdentifier = getIdentifier(document, referenceNode, context);
-	if (!referenceIdentifier) {
+	const asIdentifier = getIdentifier(document, referenceNode, context);
+	if (!asIdentifier) {
+		// Not an identifier, no references to be found
 		return null;
 	}
 
@@ -55,11 +66,8 @@ export async function provideReferences(
 	// Check to see if the current document is the one declaring the symbol before we go looking through the project
 	for (const symbol of scssDocument.getSymbols()) {
 		const symbolName = asDollarlessVariable(symbol.name);
-		const identifierName = asDollarlessVariable(referenceIdentifier.name);
-		if (
-			symbolName === identifierName &&
-			symbol.kind === referenceIdentifier.kind
-		) {
+		const identifierName = asDollarlessVariable(asIdentifier.name);
+		if (symbolName === identifierName && symbol.kind === asIdentifier.kind) {
 			definitionSymbol = symbol;
 			definitionDocument = scssDocument;
 		}
@@ -68,7 +76,7 @@ export async function provideReferences(
 	if (!definitionSymbol || !definitionDocument) {
 		[definitionSymbol, definitionDocument] = getDefinitionSymbol(
 			document,
-			referenceIdentifier,
+			asIdentifier,
 		);
 	}
 
@@ -79,7 +87,7 @@ export async function provideReferences(
 
 		for (const [module, { exports }] of Object.entries(sassBuiltInModules)) {
 			for (const [name] of Object.entries(exports)) {
-				if (name === referenceIdentifier.name) {
+				if (name === asIdentifier.name) {
 					builtin = [module.split(":")[1] as string, name];
 				}
 			}
@@ -128,7 +136,7 @@ export async function provideReferences(
 
 				// The tokenizer treats the namespace and variable name as a single word.
 				// We need the offset for the actual variable, so find its position in the word.
-				if (adjustedText !== referenceIdentifier.name) {
+				if (adjustedText !== asIdentifier.name) {
 					adjustedText = adjustedText.split(".")[1] || adjustedText;
 					adjustedOffset += text.indexOf(adjustedText);
 				}
@@ -205,12 +213,6 @@ export async function provideReferences(
 	};
 }
 
-interface Identifier {
-	kind: SymbolKind;
-	position: Position;
-	name: string;
-}
-
 function createReference(
 	scssDocument: IScssDocument,
 	adjustedOffset: number,
@@ -225,26 +227,26 @@ function createReference(
 
 function getIdentifier(
 	document: TextDocument,
-	hoverNode: INode,
+	hoverNode: SyntaxNode,
 	context: ReferenceContext,
 ): Identifier | null {
+	const source = document.getText();
 	let identifier: Identifier | null = null;
 
-	if (hoverNode.type === NodeType.VariableName) {
+	if (hoverNode.type.name === SyntaxNodeType.SassVariableName) {
 		if (!context.includeDeclaration) {
-			const parent = hoverNode.getParent();
-			if (parent.type === NodeType.VariableDeclaration) {
+			const parent = hoverNode.parent;
+			if (parent?.type.name === SyntaxNodeType.Declaration) {
 				return null;
 			}
 		}
-
 		return {
-			name: hoverNode.getName(),
-			position: document.positionAt(hoverNode.offset),
+			name: source.substring(hoverNode.from, hoverNode.to),
+			position: document.positionAt(hoverNode.from),
 			kind: SymbolKind.Variable,
 		};
-	} else if (hoverNode.type === NodeType.Identifier) {
-		if (hoverNode.getParent()?.type === NodeType.ForwardVisibility) {
+	} else if (hoverNode.type.name === SyntaxNodeType.ForwardStatement) {
+		if (hoverNode.) {
 			// At this point the identifier can be both a function and a mixin.
 			// To figure it out we need to look for the original definition as
 			// both a function and a mixin.

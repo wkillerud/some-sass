@@ -1,10 +1,10 @@
-import { TextDocument } from "vscode-languageserver-textdocument";
 import {
+	TextDocument,
 	Range,
 	SymbolKind,
 	TextEdit,
 	WorkspaceEdit,
-} from "vscode-languageserver-types";
+} from "@somesass/language-server-types";
 import { useContext } from "../../context-provider";
 import { createCompletionContext } from "../completion/completion-context";
 import { provideReferences } from "../references";
@@ -67,7 +67,9 @@ export async function prepareRename(
 
 	// Exclude any forward-prefixes from the renaming.
 	if (references.definition) {
-		const renamingName = referenceNode.getText();
+		const renamingName = scssDocument.getText(
+			scssDocument.getNodeRange(referenceNode),
+		);
 		const definitionName = references.definition.symbol.name;
 		if (renamingName !== definitionName) {
 			const diff = renamingName.length - definitionName.length;

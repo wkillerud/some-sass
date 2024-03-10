@@ -3,7 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Tree, SyntaxNode } from "@lezer/common";
+import { Tree, TreeCursor, TreeFragment, SyntaxNode } from "@lezer/common";
+import type { ParseResult } from "scss-sassdoc-parser";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
 	Range,
@@ -17,6 +18,7 @@ import {
 	FoldingRange,
 	FoldingRangeKind,
 	SelectionRange,
+	ReferenceContext,
 	SymbolTag,
 	Diagnostic,
 	DiagnosticTag,
@@ -46,51 +48,6 @@ import {
 	DocumentHighlightKind,
 } from "vscode-languageserver-types";
 import { URI, Utils } from "vscode-uri";
-
-export {
-	SyntaxNode,
-	URI,
-	Utils,
-	TextDocument,
-	Range,
-	Position,
-	DocumentUri,
-	MarkupContent,
-	MarkupKind,
-	Color,
-	ColorInformation,
-	ColorPresentation,
-	FoldingRange,
-	FoldingRangeKind,
-	SelectionRange,
-	Diagnostic,
-	DiagnosticTag,
-	DiagnosticSeverity,
-	CompletionItem,
-	CompletionItemKind,
-	CompletionList,
-	CompletionItemTag,
-	InsertTextFormat,
-	DefinitionLink,
-	SymbolInformation,
-	SymbolKind,
-	SymbolTag,
-	DocumentSymbol,
-	Location,
-	Hover,
-	MarkedString,
-	CodeActionContext,
-	Command,
-	CodeAction,
-	DocumentHighlight,
-	DocumentLink,
-	WorkspaceEdit,
-	TextEdit,
-	CodeActionKind,
-	TextDocumentEdit,
-	VersionedTextDocumentIdentifier,
-	DocumentHighlightKind,
-};
 
 export interface SassDocumentLink extends DocumentLink {
 	/**
@@ -139,11 +96,10 @@ export interface SassDocumentLink extends DocumentLink {
  */
 export type Stylesheet = Tree;
 
-export * from "@lezer/common";
-
 export interface SassDocumentSymbol extends DocumentSymbol {
 	type: SyntaxNodeType;
 	children?: SassDocumentSymbol[];
+	sassdoc?: ParseResult;
 }
 
 export interface LanguageService {
@@ -428,3 +384,71 @@ export enum SyntaxNodeType {
 	Newline = "newline",
 	EOF = "eof",
 }
+
+export interface SassTextDocument extends TextDocument {
+	ast: Stylesheet;
+	/**
+	 * The last part of the URI, including extension.
+	 * For instance, given the URI `file:///home/test.scss`,
+	 * the fileName is `test.scss`.
+	 */
+	fileName: string;
+	/** Find and cache the real path (as opposed to symlinked) */
+	getRealPath: () => Promise<string | null>;
+	getLinks: (options?: {
+		forwards?: boolean;
+		uses?: boolean;
+		imports?: boolean;
+	}) => SassDocumentLink[];
+	getSymbolAt: (offset: number) => SassDocumentSymbol;
+	getSymbols: () => SassDocumentSymbol[];
+}
+
+export {
+	Tree,
+	TreeCursor,
+	TreeFragment,
+	SyntaxNode,
+	URI,
+	Utils,
+	TextDocument,
+	Range,
+	Position,
+	DocumentUri,
+	MarkupContent,
+	ReferenceContext,
+	MarkupKind,
+	Color,
+	ColorInformation,
+	ColorPresentation,
+	FoldingRange,
+	FoldingRangeKind,
+	SelectionRange,
+	Diagnostic,
+	DiagnosticTag,
+	DiagnosticSeverity,
+	CompletionItem,
+	CompletionItemKind,
+	CompletionList,
+	CompletionItemTag,
+	InsertTextFormat,
+	DefinitionLink,
+	SymbolInformation,
+	SymbolKind,
+	SymbolTag,
+	DocumentSymbol,
+	Location,
+	Hover,
+	MarkedString,
+	CodeActionContext,
+	Command,
+	CodeAction,
+	DocumentHighlight,
+	DocumentLink,
+	WorkspaceEdit,
+	TextEdit,
+	CodeActionKind,
+	TextDocumentEdit,
+	VersionedTextDocumentIdentifier,
+	DocumentHighlightKind,
+};

@@ -1,4 +1,5 @@
 import { TextDocument } from "@somesass/language-server-types";
+import { getLanguageService } from "@somesass/language-services";
 import { assert, beforeEach, describe, test } from "vitest";
 import {
 	CompletionItem,
@@ -12,8 +13,7 @@ import { parseStringLiteralChoices } from "../../src/features/completion/complet
 import { rePartialUse } from "../../src/features/completion/import-completion";
 import { sassBuiltInModules } from "../../src/features/sass-built-in-modules";
 import { sassDocAnnotations } from "../../src/features/sassdoc-annotations";
-import { INode, ScssDocument } from "../../src/parser";
-import { getLanguageService } from "../../src/parser/language-service";
+import { ScssDocument } from "../../src/parser";
 import { ISettings } from "../../src/settings";
 import * as helpers from "../helpers";
 
@@ -39,7 +39,7 @@ describe("Providers/Completion", () => {
 		const document = TextDocument.create("./one.scss", "scss", 1, "");
 
 		const ls = getLanguageService();
-		const ast = ls.parseStylesheet(document) as INode;
+		const ast = ls.parseStylesheet(document);
 
 		const { fs, storage } = useContext();
 

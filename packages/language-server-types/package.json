@@ -35,6 +35,7 @@
 	},
 	"dependencies": {
 		"@lezer/common": "1.2.1",
+		"scss-sassdoc-parser": "3.0.1",
 		"vscode-languageserver-textdocument": "1.0.11",
 		"vscode-languageserver-types": "3.17.5",
 		"vscode-uri": "3.0.8"

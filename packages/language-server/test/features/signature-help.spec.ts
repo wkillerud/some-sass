@@ -1,11 +1,11 @@
 import { SymbolKind, TextDocument } from "@somesass/language-server-types";
+import { getLanguageService } from "@somesass/language-services";
 import { assert, beforeEach, describe, test } from "vitest";
 import { SignatureHelp } from "vscode-languageserver";
 import { useContext } from "../../src/context-provider";
 import { hasInFacts } from "../../src/features/signature-help/facts";
 import { doSignatureHelp } from "../../src/features/signature-help/signature-help";
-import { INode, ScssDocument } from "../../src/parser";
-import { getLanguageService } from "../../src/parser/language-service";
+import { ScssDocument } from "../../src/parser";
 import * as helpers from "../helpers";
 
 async function getSignatureHelp(lines: string[]): Promise<SignatureHelp> {
@@ -23,7 +23,7 @@ describe("Providers/SignatureHelp", () => {
 
 		const document = TextDocument.create("./one.scss", "scss", 1, "");
 		const ls = getLanguageService();
-		const ast = ls.parseStylesheet(document) as INode;
+		const ast = ls.parseStylesheet(document);
 
 		const { fs, storage } = useContext();
 

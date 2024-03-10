@@ -52,7 +52,8 @@
 	},
 	"dependencies": {
 		"@somesass/language-server-types": "1.0.0",
-		"@lezer/sass": "1.0.5"
+		"@lezer/sass": "1.0.5",
+		"scss-sassdoc-parser": "3.0.1"
 	},
 	"devDependencies": {
 		"shx": "0.3.4",

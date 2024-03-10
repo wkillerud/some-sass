@@ -1,10 +1,10 @@
+import { getLanguageService } from "@somesass/language-services";
 import { assert, beforeEach, describe, test } from "vitest";
 import { SymbolKind } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { useContext } from "../../src/context-provider";
 import { goDefinition } from "../../src/features/go-definition/go-definition";
-import { INode, ScssDocument } from "../../src/parser";
-import { getLanguageService } from "../../src/parser/language-service";
+import { ScssDocument } from "../../src/parser";
 import * as helpers from "../helpers";
 
 describe("Providers/GoDefinition", () => {
@@ -13,7 +13,7 @@ describe("Providers/GoDefinition", () => {
 
 		const document = TextDocument.create("./one.scss", "scss", 1, "");
 		const ls = getLanguageService();
-		const ast = ls.parseStylesheet(document) as INode;
+		const ast = ls.parseStylesheet(document);
 
 		const { fs, storage } = useContext();
 

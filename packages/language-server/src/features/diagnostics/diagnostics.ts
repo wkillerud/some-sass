@@ -1,70 +1,56 @@
 import {
-	DiagnosticSeverity,
-	DiagnosticTag,
+	SassDocumentSymbol,
 	SymbolKind,
-} from "vscode-languageserver-types";
-import type {
+	SyntaxNodeType,
 	Diagnostic,
-	VersionedTextDocumentIdentifier,
-} from "vscode-languageserver-types";
+	TextDocument,
+	DiagnosticTag,
+	DiagnosticSeverity,
+} from "@somesass/language-server-types";
+import { getLanguageService } from "@somesass/language-services";
 import { EXTENSION_NAME } from "../../constants";
 import { useContext } from "../../context-provider";
-import { NodeType } from "../../parser";
-import type {
-	INode,
-	IScssDocument,
-	ScssForward,
-	ScssSymbol,
-} from "../../parser";
+import type { IScssDocument, ScssForward, ScssSymbol } from "../../parser";
 import { asDollarlessVariable } from "../../utils/string";
 
 export async function doDiagnostics(
-	document: VersionedTextDocumentIdentifier,
+	document: TextDocument,
 ): Promise<Diagnostic[]> {
 	const diagnostics: Diagnostic[] = [];
-	const { storage } = useContext();
-	const openDocument = storage.get(document.uri);
-	if (!openDocument) {
-		// Tried to do diagnostics on a document that has not been scanned. This should never happen.
+
+	const { storage, fs, clientCapabilities } = useContext();
+	const sassDocument = storage.get(document.uri);
+	if (!sassDocument) {
 		return diagnostics;
 	}
 
-	const references: INode[] = getReferences(openDocument.ast);
+	const ls = getLanguageService({ fileSystemProvider: fs, clientCapabilities });
+	const references: SassDocumentSymbol[] = ls
+		.findDocumentSymbols(sassDocument, sassDocument.ast)
+		.filter(isReference(sassDocument));
+
 	if (references.length === 0) {
 		return diagnostics;
 	}
 
-	// Do traversal once, and then do diagnostics on the symbols for each reference
+	// Get all symbols in the module import tree
 	const symbols: ScssSymbol[] = [];
-	doSymbolHunting(openDocument, symbols);
+	doSymbolHunting(sassDocument, symbols);
+	if (symbols.length === 0) {
+		return diagnostics;
+	}
 
-	for (const node of references) {
-		for (const symbol of symbols) {
-			let nodeKind: SymbolKind | null = null;
-
-			switch (node.type) {
-				case NodeType.Function:
-					nodeKind = SymbolKind.Function;
-					break;
-				case NodeType.MixinReference:
-					nodeKind = SymbolKind.Method;
-					break;
-				case NodeType.VariableName:
-					nodeKind = SymbolKind.Variable;
-					break;
-				case NodeType.SimpleSelector:
-					nodeKind = SymbolKind.Class;
-					break;
-			}
-
-			if (nodeKind === null) {
-				continue;
-			}
-
-			const name =
-				nodeKind === SymbolKind.Class ? node.getText() : node.getName();
-			if (symbol.kind === nodeKind && name === symbol.name) {
-				const diagnostic = createDiagnostic(openDocument, node, symbol);
+	// For each symbol referenced in the current document
+	for (const sassDocumentSymbol of references) {
+		// Look through the symbols in our import tree and match it to the
+		// reference we found in the open document. Look for data on
+		// the declaration such as a deprecation notice.
+		for (const scssSymbol of symbols) {
+			if (
+				scssSymbol.kind === sassDocumentSymbol.kind &&
+				scssSymbol.name === sassDocumentSymbol.name
+			) {
+				const diagnostic = createDiagnostic(sassDocumentSymbol, scssSymbol);
 				if (diagnostic) {
 					diagnostics.push(diagnostic);
 				}
@@ -75,48 +61,56 @@ export async function doDiagnostics(
 	return diagnostics;
 }
 
-function getReferences(fromNode: INode): INode[] {
-	return fromNode.getChildren().flatMap((child) => {
-		if (child.type === NodeType.VariableName) {
-			const parent = child.getParent();
+/**
+ * @param sassDocument
+ * @returns True if the symbol is a reference, as opposed to a declaration
+ */
+function isReference(
+	sassDocument: IScssDocument,
+): (
+	value: SassDocumentSymbol,
+	index: number,
+	array: SassDocumentSymbol[],
+) => unknown {
+	return (symbol) => {
+		if (symbol.kind === SymbolKind.Variable) {
+			const variable = sassDocument.ast.resolve(
+				sassDocument.offsetAt(symbol.selectionRange.start),
+			);
+			const variableParent = variable.parent;
 			if (
-				parent.type !== NodeType.FunctionParameter &&
-				parent.type !== NodeType.VariableDeclaration
+				variableParent?.node.type.name !== SyntaxNodeType.Declaration &&
+				variableParent?.node.type.name !== SyntaxNodeType.ArgList
 			) {
-				return [child];
-			}
-		} else if (child.type === NodeType.Identifier) {
-			let i = 0;
-			let node = child;
-			while (
-				node.type !== NodeType.MixinReference &&
-				node.type !== NodeType.Function &&
-				i !== 2
-			) {
-				node = node.getParent();
-				i++;
-			}
-
-			if (
-				node.type === NodeType.MixinReference ||
-				node.type === NodeType.Function
-			) {
-				return [node];
-			}
-		} else if (child.type === NodeType.SimpleSelector) {
-			let node = child;
-			let i = 0;
-			while (node.type !== NodeType.ExtendsReference && i !== 2) {
-				node = node.getParent();
-				i++;
-			}
-			if (node.type === NodeType.ExtendsReference) {
-				return [child];
+				return true;
 			}
 		}
 
-		return getReferences(child);
-	});
+		if (symbol.type === SyntaxNodeType.IncludeStatement) {
+			return true;
+		}
+
+		if (
+			symbol.kind === SymbolKind.Function &&
+			symbol.type !== SyntaxNodeType.MixinStatement // this indicates a declaration, rather than a reference
+		) {
+			return true;
+		}
+
+		if (symbol.type === SyntaxNodeType.PlaceholderSelector) {
+			const placeholder = sassDocument.ast.resolve(
+				sassDocument.offsetAt(symbol.selectionRange.start),
+			);
+			const placeholderParent = placeholder.parent;
+			if (
+				placeholderParent?.node.type.name === SyntaxNodeType.ExtendStatement
+			) {
+				return true;
+			}
+		}
+
+		return false;
+	};
 }
 
 function doSymbolHunting(
@@ -191,14 +185,13 @@ function traverseTree(
 }
 
 function createDiagnostic(
-	openDocument: IScssDocument,
-	node: INode,
+	node: SassDocumentSymbol,
 	symbol: ScssSymbol,
 ): Diagnostic | null {
 	if (typeof symbol.sassdoc?.deprecated !== "undefined") {
 		return {
 			message: symbol.sassdoc.deprecated || `${symbol.name} is deprecated`,
-			range: openDocument.getNodeRange(node),
+			range: node.range,
 			source: EXTENSION_NAME,
 			tags: [DiagnosticTag.Deprecated],
 			severity: DiagnosticSeverity.Hint,

@@ -1,11 +1,11 @@
 import {
-	Position,
 	SymbolKind,
 	TextDocument,
 	URI,
 	SyntaxNodeType,
 	Stylesheet,
 	LanguageService,
+	SassDocumentSymbol,
 } from "@somesass/language-server-types";
 import {
 	getLanguageService,
@@ -13,12 +13,10 @@ import {
 } from "@somesass/language-services";
 import { parse, type ParseResult } from "scss-sassdoc-parser";
 import { useContext } from "../context-provider";
-import { asDollarlessVariable, getLinesFromText } from "../utils/string";
-import { getNodeAtOffset, getParentNodeByType } from "./ast";
+import { asDollarlessVariable } from "../utils/string";
 import { buildDocumentContext } from "./document";
-import { INode, NodeType } from "./node";
 import { ScssDocument } from "./scss-document";
-import type { IScssSymbols } from "./scss-symbol";
+import type { IScssSymbols, ScssParameter } from "./scss-symbol";
 
 export const rePlaceholder = /^\s*%(?<name>\w+)/;
 export const rePlaceholderUsage = /\s*@extend\s+(?<name>%[\w\d-_]+)/;
@@ -59,76 +57,52 @@ async function findDocumentSymbols(
 		clientCapabilities,
 	});
 	const stylesheet = sls.parseStylesheet(document);
+
 	const links = await sls.findDocumentLinks(
 		document,
 		stylesheet,
 		buildDocumentContext(document.uri, workspaceRoot),
 	);
-
-	const text = document.getText();
-	const lines = getLinesFromText(text);
-
-	for (let lineNumber = 0; lineNumber < lines.length; lineNumber++) {
-		const line = lines.at(lineNumber);
-		if (typeof line === "undefined") {
+	for (const link of links) {
+		if (
+			!link.target ||
+			link.target.endsWith(".css") ||
+			link.target === document.uri
+		) {
 			continue;
 		}
 
-		for (const link of links) {
-			if (
-				!link.target ||
-				link.target.endsWith(".css") ||
-				link.target === document.uri
-			) {
-				continue;
+		switch (link.type) {
+			case SyntaxNodeType.UseStatement: {
+				result.uses.set(link.target, {
+					link,
+					namespace: link.namespace,
+					isAliased: Boolean(link.namespace),
+				});
+				break;
 			}
-
-			switch (link.type) {
-				case SyntaxNodeType.UseStatement: {
-					result.uses.set(link.target, {
-						link,
-						namespace: link.namespace,
-						isAliased: Boolean(link.namespace),
-					});
-					break;
-				}
-				case SyntaxNodeType.ForwardStatement: {
-					result.forwards.set(link.target, {
-						link,
-						prefix: link.as,
-						show: link.show || [],
-						hide: link.hide || [],
-					});
-					break;
-				}
-				case SyntaxNodeType.ImportStatement: {
-					result.imports.set(link.target, {
-						link,
-						dynamic: reDynamicPath.test(link.target), // TODO: do I even use this?
-						css: link.target.endsWith(".css"),
-					});
-					break;
-				}
+			case SyntaxNodeType.ForwardStatement: {
+				result.forwards.set(link.target, {
+					link,
+					prefix: link.as,
+					show: link.show || [],
+					hide: link.hide || [],
+				});
+				break;
 			}
-		}
-
-		if (rePlaceholderUsage.test(line)) {
-			const match = rePlaceholderUsage.exec(line);
-			if (match) {
-				const name = match.groups?.["name"];
-				if (name) {
-					const position = Position.create(lineNumber, line.indexOf(name));
-					result.placeholderUsages.set(name, {
-						name,
-						position,
-						offset: document.offsetAt(position),
-						kind: SymbolKind.Class,
-					});
-				}
+			case SyntaxNodeType.ImportStatement: {
+				result.imports.set(link.target, {
+					link,
+					dynamic: reDynamicPath.test(link.target), // TODO: do I even use this?
+					css: link.target.endsWith(".css"),
+				});
+				break;
 			}
 		}
 	}
 
+	// TODO: make language-services featue
+	const text = document.getText();
 	let sassdoc: ParseResult[] = [];
 	try {
 		sassdoc = await parse(text);
@@ -139,9 +113,8 @@ async function findDocumentSymbols(
 	// TODO: you are here. Things are broken. Same procedure as for links.
 	// Gradually migrate over to logic in language-service, make tests pass in the server/e2e.
 	const symbols = ls.findDocumentSymbols(document, ast);
-
 	for (const symbol of symbols) {
-		const position = symbol.range.start;
+		const position = symbol.range.start; // TODO: should these both use selectionRange.start?
 		const offset = document.offsetAt(symbol.range.start);
 		switch (symbol.kind) {
 			case SymbolKind.Variable: {
@@ -155,7 +128,7 @@ async function findDocumentSymbols(
 					kind: SymbolKind.Variable,
 					offset,
 					position,
-					value: getVariableValue(ast, offset),
+					value: symbol.detail,
 					sassdoc: docs,
 				});
 
@@ -171,7 +144,7 @@ async function findDocumentSymbols(
 					kind: SymbolKind.Method,
 					offset,
 					position,
-					parameters: getMethodParameters(ast, offset, docs),
+					parameters: getMethodParameters(document, symbol, docs),
 					sassdoc: docs,
 				});
 
@@ -188,7 +161,7 @@ async function findDocumentSymbols(
 					kind: SymbolKind.Function,
 					offset,
 					position,
-					parameters: getMethodParameters(ast, offset, docs),
+					parameters: getMethodParameters(document, symbol, docs),
 					sassdoc: docs,
 				});
 
@@ -196,20 +169,36 @@ async function findDocumentSymbols(
 			}
 
 			case SymbolKind.Class: {
-				if (symbol.name.startsWith("%")) {
-					const sansPercent = symbol.name.substring(1);
-					const docs = sassdoc.find(
-						(v) =>
-							v.context.name === sansPercent &&
-							v.context.type === "placeholder",
-					);
-					result.placeholders.set(symbol.name, {
-						name: symbol.name,
-						kind: SymbolKind.Class,
-						offset,
-						position,
-						sassdoc: docs,
-					});
+				if (symbol.type === SyntaxNodeType.PlaceholderSelector) {
+					const placeholder = ast.resolve(offset);
+					const placeholderParent = placeholder.parent;
+					const isUsage =
+						placeholderParent?.node.type.name ===
+						SyntaxNodeType.ExtendStatement;
+
+					if (isUsage) {
+						result.placeholderUsages.set(name, {
+							name,
+							kind: SymbolKind.Class,
+							offset,
+							position,
+						});
+					} else {
+						const sansPercent = symbol.name.substring(1);
+						const docs = sassdoc.find(
+							(v) =>
+								v.context.name === sansPercent &&
+								v.context.type === "placeholder",
+						);
+
+						result.placeholders.set(symbol.name, {
+							name: symbol.name,
+							kind: symbol.kind,
+							offset,
+							position,
+							sassdoc: docs,
+						});
+					}
 				}
 				break;
 			}
@@ -220,50 +209,28 @@ async function findDocumentSymbols(
 	return result;
 }
 
-function getVariableValue(ast: INode, offset: number): string | null {
-	const node = getNodeAtOffset(ast, offset);
-
-	if (node === null) {
-		return null;
-	}
-
-	const parent = getParentNodeByType(node, NodeType.VariableDeclaration);
-
-	return parent?.getValue()?.getText() || null;
-}
-
 function getMethodParameters(
-	ast: INode,
-	offset: number,
+	document: TextDocument,
+	symbol: SassDocumentSymbol,
 	sassDoc: ParseResult | undefined,
-) {
-	const node = getNodeAtOffset(ast, offset);
-
-	if (node === null) {
+): ScssParameter[] {
+	if (!symbol.children) {
 		return [];
 	}
+	return symbol.children.map((child) => {
+		const name = child.name;
 
-	return node
-		.getParameters()
-		.getChildren()
-		.map((child) => {
-			const defaultValueNode = child.getDefaultValue();
+		const dollarlessName = asDollarlessVariable(name);
+		const docs = sassDoc
+			? sassDoc.parameter?.find((p) => p.name === dollarlessName)
+			: undefined;
 
-			const value =
-				defaultValueNode === undefined ? null : defaultValueNode.getText();
-			const name = child.getName();
-
-			const dollarlessName = asDollarlessVariable(name);
-			const docs = sassDoc
-				? sassDoc.parameter?.find((p) => p.name === dollarlessName)
-				: undefined;
-
-			return {
-				name,
-				offset: child.offset,
-				value,
-				kind: SymbolKind.Variable,
-				sassdoc: docs,
-			};
-		});
+		const parameter: ScssParameter = {
+			name,
+			value: child.detail,
+			sassdoc: docs,
+			offset: document.offsetAt(child.selectionRange.start),
+		};
+		return parameter;
+	});
 }

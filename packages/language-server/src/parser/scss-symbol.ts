@@ -19,7 +19,7 @@ export interface ScssSymbol {
 
 export interface ScssVariable extends ScssSymbol {
 	mixin?: string;
-	value: string | null;
+	value?: string | null;
 }
 
 export interface ScssParameter

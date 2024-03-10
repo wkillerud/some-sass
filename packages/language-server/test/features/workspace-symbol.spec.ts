@@ -2,17 +2,17 @@ import { SymbolKind, TextDocument } from "@somesass/language-server-types";
 import { assert, beforeEach, describe, test } from "vitest";
 import { useContext } from "../../src/context-provider";
 import { searchWorkspaceSymbol } from "../../src/features/workspace-symbols/workspace-symbol";
-import { INode, ScssDocument } from "../../src/parser";
+import { ScssDocument } from "../../src/parser";
 import { getLanguageService } from "../../src/parser/language-service";
 import * as helpers from "../helpers";
 
-describe("Providers/WorkspaceSymbol", () => {
+describe("workspace/symbol", () => {
 	beforeEach(() => {
 		helpers.createTestContext();
 
 		const document = TextDocument.create("./one.scss", "scss", 1, "");
 		const ls = getLanguageService();
-		const ast = ls.parseStylesheet(document) as INode;
+		const ast = ls.parseStylesheet(document);
 
 		const { fs, storage } = useContext();
 

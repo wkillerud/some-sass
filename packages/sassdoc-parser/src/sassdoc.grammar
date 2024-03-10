@@ -4,7 +4,8 @@
 
 sassdoc {
 	Description |
-	Access
+	Access |
+	Example
 }
 
 Access {
@@ -12,6 +13,8 @@ Access {
 }
 
 @external tokens descriptions from "./tokens" { Description[isolate] }
+
+@external tokens examples from "./tokens" { Example, ExampleLanguage, ExampleCode }
 
 @tokens {
 	whitespace { @whitespace+ }

@@ -31,22 +31,6 @@ Sassdoc(Description)
 
 Sassdoc(Description, Description)
 
-# Access private
-
-/// @access private
-
-==>
-
-Sassdoc(Access(Visibility))
-
-# Access public
-
-/// @access public
-
-==>
-
-Sassdoc(Access(Visibility))
-
 # Description annotation sandwich
 
 /// This is a description

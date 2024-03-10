@@ -1,7 +1,7 @@
 {
 	"name": "@somesass/parser",
 	"version": "1.0.0",
-	"description": "Lezer-based Sass and SCSS grammar that includes SassDoc comments",
+	"description": "Lezer-based Sass and SCSS grammar that includes SassDoc comments as a nested parser",
 	"homepage": "https://github.com/wkillerud/some-sass/blob/main/packages/parser#readme",
 	"repository": {
 		"type": "git",

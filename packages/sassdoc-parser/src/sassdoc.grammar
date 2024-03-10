@@ -1,0 +1,22 @@
+@top Sassdoc { (sassdoc)* }
+
+@skip { whitespace | TrippleSlash }
+
+sassdoc {
+	Description |
+	Access
+}
+
+Access {
+	@specialize<Annotation, "@access"> Visibility AnnotationDescription*
+}
+
+@external tokens descriptions from "./tokens" { Description[isolate] }
+
+@tokens {
+	whitespace { @whitespace+ }
+	TrippleSlash { "///" }
+	Annotation { "@" @asciiLetter+ }
+	AnnotationDescription { "-" @whitespace ![\n]+ }
+	Visibility { "public" | "private"}
+}

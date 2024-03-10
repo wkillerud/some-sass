@@ -1,0 +1,58 @@
+# Empty
+
+==>
+
+Sassdoc
+
+# Description
+
+/// This is a description
+
+==>
+
+Sassdoc(Description)
+
+# Multiline description
+
+/// This is a description
+/// that spans multiple lines
+
+==>
+
+Sassdoc(Description)
+
+# Two descriptions
+
+/// This is a description
+
+/// This is another description
+
+==>
+
+Sassdoc(Description, Description)
+
+# Access private
+
+/// @access private
+
+==>
+
+Sassdoc(Access(Visibility))
+
+# Access public
+
+/// @access public
+
+==>
+
+Sassdoc(Access(Visibility))
+
+# Description annotation sandwich
+
+/// This is a description
+/// @access public
+/// This is another description
+
+==>
+
+Sassdoc(Description, Access(Visibility), Description)

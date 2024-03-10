@@ -1,0 +1,8 @@
+# Differentiates from LineComment
+
+// This is ignored
+/// This is not ignored
+
+==>
+
+StyleSheet(LineComment,Sassdoc)

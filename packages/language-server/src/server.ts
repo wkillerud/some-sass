@@ -16,26 +16,10 @@ import type {
 	InitializeParams,
 	InitializeResult,
 } from "vscode-languageserver/node";
-import {
-	changeConfiguration,
-	createContext,
-	useContext,
-} from "./context-provider";
-import { ExtractProvider } from "./features/code-actions";
-import { doCompletion } from "./features/completion";
-import { findDocumentColors } from "./features/decorators/color-decorators";
-import { doDiagnostics } from "./features/diagnostics/diagnostics";
-import { goDefinition } from "./features/go-definition/go-definition";
-import { doHover } from "./features/hover/hover";
-import { provideReferences } from "./features/references";
-import { doRename, prepareRename } from "./features/rename";
-import { doSignatureHelp } from "./features/signature-help/signature-help";
-import { searchWorkspaceSymbol } from "./features/workspace-symbols/workspace-symbol";
 import type { FileSystemProvider } from "./file-system";
 import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";
 import type { ISettings } from "./settings";
-import StorageService from "./storage";
 import { getSCSSRegionsDocument } from "./utils/embedded";
 import WorkspaceScannerService from "./workspace-scanner";
 

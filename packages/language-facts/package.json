@@ -1,7 +1,7 @@
 {
-	"name": "@somesass/language-server-types",
+	"name": "@somesass/language-facts",
 	"version": "1.0.0",
-	"description": "The features powering some-sass-language-server",
+	"description": "Structured language information for use in the language services",
 	"keywords": [
 		"scss",
 		"sass"
@@ -9,7 +9,7 @@
 	"engines": {
 		"node": ">=20"
 	},
-	"homepage": "https://github.com/wkillerud/some-sass/blob/main/packages/language-server-types#readme",
+	"homepage": "https://github.com/wkillerud/some-sass/blob/main/packages/language-facts#readme",
 	"repository": {
 		"type": "git",
 		"url": "git+ssh://git@github.com/wkillerud/some-sass.git"
@@ -24,8 +24,8 @@
 	"files": [
 		"dist/"
 	],
-	"main": "dist/language-server-types.js",
-	"types": "dist/language-server-types.d.ts",
+	"main": "dist/language-facts.js",
+	"types": "dist/language-facts.d.ts",
 	"author": "William Killerud <william@killerud.com> (https://www.williamkillerud.com/)",
 	"license": "MIT",
 	"scripts": {
@@ -34,10 +34,7 @@
 		"test": "npm run build"
 	},
 	"dependencies": {
-		"@somesass/parser": "1.0.0",
-		"vscode-languageserver-textdocument": "1.0.11",
-		"vscode-languageserver-types": "3.17.5",
-		"vscode-uri": "3.0.8"
+		"@somesass/language-server-types": "1.0.0"
 	},
 	"devDependencies": {
 		"shx": "0.3.4",

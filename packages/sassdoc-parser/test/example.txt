@@ -1,0 +1,30 @@
+# Simple example
+
+/// @example
+///  1 + 1 = 2
+
+==>
+
+Sassdoc(Example(Annotation, ExampleCode))
+
+# Multi-line example
+
+/// @example
+///   @if foo {
+///      @return bar;
+///   }
+
+==>
+
+Sassdoc(Example(Annotation, ExampleCode))
+
+# Multi-line example with language
+
+/// @example scss
+///   @if foo {
+///      @return bar;
+///   }
+
+==>
+
+Sassdoc(Example(Annotation, ExampleCode))

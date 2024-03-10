@@ -26,8 +26,7 @@
 		"build": "lezer-generator src/sassdoc.grammar -o src/parser && tsc",
 		"build-debug": "lezer-generator src/sassdoc.grammar --names -o src/parser && tsc",
 		"prepare": "npm run build",
-		"pretest": "npm run build-debug",
-		"test": "vitest --run"
+		"test": "vitest "
 	},
 	"dependencies": {
 		"@lezer/common": "1.2.1",

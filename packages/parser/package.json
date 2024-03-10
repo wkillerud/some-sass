@@ -1,0 +1,41 @@
+{
+	"name": "@somesass/parser",
+	"version": "1.0.0",
+	"description": "Lezer-based Sass and SCSS grammar that includes SassDoc comments",
+	"homepage": "https://github.com/wkillerud/some-sass/blob/main/packages/parser#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+ssh://git@github.com/wkillerud/some-sass.git"
+	},
+	"bugs": {
+		"url": "https://github.com/wkillerud/some-sass/issues"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org/",
+		"tag": "latest"
+	},
+	"type": "module",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist/"
+	],
+	"author": "William Killerud <william@killerud.com> (https://www.williamkillerud.com/)",
+	"license": "MIT",
+	"scripts": {
+		"build": "lezer-generator src/sass.grammar -o src/parser && tsc",
+		"build-debug": "lezer-generator src/sass.grammar --names -o src/parser && tsc",
+		"prepare": "npm run build",
+		"test": "vitest"
+	},
+	"dependencies": {
+		"@lezer/common": "1.2.1",
+		"@lezer/lr": "1.4.0",
+		"@lezer/highlight": "1.2.0"
+	},
+	"devDependencies": {
+		"@lezer/generator": "1.6.0",
+		"vitest": "1.3.1",
+		"typescript": "5.4.2"
+	}
+}

@@ -4,7 +4,12 @@
 
 sassdoc {
 	Description |
-	Access
+	Access |
+	Example
+}
+
+Example {
+	"///" @specialize<Annotation, "@example"> ExampleLanguage* AnnotationDescription* ExampleCode
 }
 
 Access {
@@ -12,6 +17,7 @@ Access {
 }
 
 @external tokens description from "./tokens" { Description[isolate] }
+@external tokens example from "./tokens" { ExampleCode, ExampleLanguage }
 
 @tokens {
 	whitespace { @whitespace+ }

@@ -41,9 +41,9 @@ function indented(input) {
  * @returns {boolean}
  */
 function readCharacters(input, string) {
-	const characters = string.split();
+	const characters = string.split("");
 	for (const c of characters) {
-		if (input.next !== c) {
+		if (input.next !== c.charCodeAt(0)) {
 			return false;
 		}
 		input.advance();
@@ -118,7 +118,7 @@ export const example = new ExternalTokenizer((input) => {
 		input.advance();
 	}
 
-	if (!readCharacters("@example")) {
+	if (!readCharacters(input, "@example")) {
 		return;
 	}
 	input.acceptToken(Annotation);
@@ -161,10 +161,13 @@ export const example = new ExternalTokenizer((input) => {
 	}
 
 	if (indented(input)) {
+		console.log("In the indent");
 		readExampleCode(input);
+		console.log("Out the read example code");
 		input.acceptToken(ExampleCode);
 	}
 
+	console.log("End");
 	input.acceptToken(Example);
 });
 

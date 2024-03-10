@@ -8,6 +8,7 @@ export function typeToKind(type: SyntaxNodeType): SymbolKind | null {
 		case SyntaxNodeType.MixinStatement:
 			return SymbolKind.Method;
 
+		case SyntaxNodeType.VariableName:
 		case SyntaxNodeType.SassVariableName:
 			return SymbolKind.Variable;
 

@@ -1207,7 +1207,7 @@ exports[`variable - sass 1`] = `
 [
   {
     "children": undefined,
-    "detail": undefined,
+    "detail": "lime",
     "kind": 13,
     "name": "$color",
     "range": {
@@ -1240,7 +1240,7 @@ exports[`variable 1`] = `
 [
   {
     "children": undefined,
-    "detail": undefined,
+    "detail": "lime",
     "kind": 13,
     "name": "$color",
     "range": {

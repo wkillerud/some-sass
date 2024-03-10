@@ -56,7 +56,11 @@ function findTreeSymbols(
 			case SyntaxNodeType.ArgList:
 				// only interested in these as a children of other symbols
 				break;
-			case SyntaxNodeType.VariableName:
+			case SyntaxNodeType.SassVariableName: {
+				const symbol = findSassVariable(document, source, tree);
+				symbols.push(symbol);
+				break;
+			}
 			case SyntaxNodeType.ClassSelector:
 			default: {
 				const symbol = findSymbol(document, source, tree);
@@ -467,6 +471,7 @@ function findCallExpressionChildren(
 
 	return children;
 }
+
 function findCallExpression(
 	document: TextDocument,
 	source: string,
@@ -502,6 +507,53 @@ function findCallExpression(
 
 	const symbol: SassDocumentSymbol = {
 		children,
+		detail,
+		kind,
+		name,
+		range,
+		selectionRange,
+		tags,
+		type,
+	};
+
+	return symbol;
+}
+
+function findSassVariable(
+	document: TextDocument,
+	source: string,
+	tree: TreeCursor,
+) {
+	const type = tree.type.name as SyntaxNodeType;
+	const kind = typeToKind(type) as SymbolKind;
+	const from = tree.from;
+	const to = tree.to;
+	const sassVariable = tree.node;
+	const parent = sassVariable.parent;
+
+	const range = Range.create(
+		document.positionAt(parent ? parent.from : from),
+		document.positionAt(parent ? parent.to : to),
+	);
+
+	const selectionRange = Range.create(
+		document.positionAt(from),
+		document.positionAt(to),
+	);
+
+	const name: string = source.substring(from, to);
+	let detail: string | undefined = undefined;
+	const tags: SymbolTag[] | undefined = undefined;
+
+	if (parent?.node.type.name === SyntaxNodeType.Declaration) {
+		const value = sassVariable.nextSibling?.nextSibling; // ":", then the value
+		if (value) {
+			detail = source.substring(value.from, value.to);
+		}
+	}
+
+	const symbol: SassDocumentSymbol = {
+		children: undefined,
 		detail,
 		kind,
 		name,

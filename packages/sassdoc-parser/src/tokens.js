@@ -9,13 +9,13 @@ import {
 } from "./parser.terms.js";
 
 const space = [
-	9, 10, 11, 12, 13, 32, 133, 160, 5760, 8192, 8193, 8194, 8195, 8196, 8197,
-	8198, 8199, 8200, 8201, 8202, 8232, 8233, 8239, 8287, 12288,
+	9, 11, 12, 32, 133, 160, 5760, 8192, 8193, 8194, 8195, 8196, 8197, 8198, 8199,
+	8200, 8201, 8202, 8232, 8233, 8239, 8287, 12288,
 ];
 
 const newline = 10;
-const slash = 47;
-const at = 97;
+const slash = "/".charCodeAt(0);
+const at = "@".charCodeAt(0);
 
 /**
  * @param {import("@lezer/lr").InputStream} input
@@ -67,11 +67,44 @@ export const description = new ExternalTokenizer((input) => {
 		// Handle attribute descriptions in grammar
 		return;
 	}
-	do {
+	while (input.next !== newline && input.next !== -1) {
 		input.advance();
-	} while (input.next !== newline);
+	}
+
+	if (input.next === newline) {
+		maybeMultilineDescription(input);
+	}
+
 	input.acceptToken(Description);
 });
+
+/**
+ * @param {import("@lezer/lr").InputStream} input
+ * @returns
+ */
+function maybeMultilineDescription(input) {
+	do {
+		input.advance();
+		// go to the next line and get past indentation
+	} while (space.includes(input.next));
+
+	if (!trippleSlash(input)) {
+		return;
+	}
+	if (space.includes(input.peek(3)) && space.includes(input.peek(4))) {
+		// This is likely an indented example block
+		return;
+	}
+	if (input.peek(3) === at || input.peek(4) === at) {
+		// Annotation on next line, not a continued description
+		return;
+	}
+
+	// treat this line as the same description
+	while (input.next !== newline && input.next !== -1) {
+		input.advance();
+	}
+}
 
 /**
  * @see http://sassdoc.com/annotations/#example
@@ -95,13 +128,17 @@ export const example = new ExternalTokenizer((input) => {
 		// the first word after @example is the example language
 		do {
 			input.advance();
-		} while (input.next !== newline && !space.includes(input.next));
+		} while (
+			input.next !== newline &&
+			!space.includes(input.next) &&
+			input.next !== -1
+		);
 		input.acceptToken(ExampleLanguage);
 
 		if (input.next !== newline) {
 			do {
 				input.advance();
-			} while (input.next !== newline);
+			} while (input.next !== newline && input.next !== -1);
 			input.acceptToken(AnnotationDescription);
 		}
 	}
@@ -142,7 +179,7 @@ export const example = new ExternalTokenizer((input) => {
 function readExampleCode(input) {
 	do {
 		input.advance();
-	} while (input.next !== newline);
+	} while (input.next !== newline && input.next !== -1);
 
 	do {
 		input.advance();

@@ -35,7 +35,6 @@ for (const file of fs.readdirSync(testcasesDirectory)) {
 
 ${before}${problem}${after}`);
 						}
-						return;
 					}
 
 					assert.fail(`

@@ -1203,6 +1203,194 @@ exports[`multiple selectors for same block, each range starts with the selector 
 ]
 `;
 
+exports[`placeholder selector - sass 1`] = `
+[
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": "%placeholder",
+    "range": {
+      "end": {
+        "character": 0,
+        "line": 3,
+      },
+      "start": {
+        "character": 0,
+        "line": 1,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 12,
+        "line": 1,
+      },
+      "start": {
+        "character": 0,
+        "line": 1,
+      },
+    },
+    "tags": undefined,
+    "type": "PlaceholderSelector",
+  },
+]
+`;
+
+exports[`placeholder selector 1`] = `
+[
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": "%placeholder",
+    "range": {
+      "end": {
+        "character": 29,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 12,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "PlaceholderSelector",
+  },
+]
+`;
+
+exports[`placeholder selector usage - sass 1`] = `
+[
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": ".theme",
+    "range": {
+      "end": {
+        "character": 0,
+        "line": 3,
+      },
+      "start": {
+        "character": 0,
+        "line": 1,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 6,
+        "line": 1,
+      },
+      "start": {
+        "character": 0,
+        "line": 1,
+      },
+    },
+    "tags": undefined,
+    "type": "ClassSelector",
+  },
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": "%theme",
+    "range": {
+      "end": {
+        "character": 0,
+        "line": 3,
+      },
+      "start": {
+        "character": 1,
+        "line": 2,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 15,
+        "line": 2,
+      },
+      "start": {
+        "character": 9,
+        "line": 2,
+      },
+    },
+    "tags": undefined,
+    "type": "PlaceholderSelector",
+  },
+]
+`;
+
+exports[`placeholder selector usage 1`] = `
+[
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": ".theme",
+    "range": {
+      "end": {
+        "character": 26,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 6,
+        "line": 0,
+      },
+      "start": {
+        "character": 0,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "ClassSelector",
+  },
+  {
+    "children": undefined,
+    "detail": undefined,
+    "kind": 5,
+    "name": "%theme",
+    "range": {
+      "end": {
+        "character": 24,
+        "line": 0,
+      },
+      "start": {
+        "character": 9,
+        "line": 0,
+      },
+    },
+    "selectionRange": {
+      "end": {
+        "character": 23,
+        "line": 0,
+      },
+      "start": {
+        "character": 17,
+        "line": 0,
+      },
+    },
+    "tags": undefined,
+    "type": "PlaceholderSelector",
+  },
+]
+`;
+
 exports[`variable - sass 1`] = `
 [
   {

@@ -34,6 +34,7 @@ export function typeToKind(type: SyntaxNodeType): SymbolKind | null {
 		case SyntaxNodeType.ChildSelector:
 		case SyntaxNodeType.DescendantSelector:
 		case SyntaxNodeType.SiblingSelector:
+		case SyntaxNodeType.PlaceholderSelector:
 		case SyntaxNodeType.AtRule:
 		case SyntaxNodeType.KeyframesStatement:
 			return SymbolKind.Class;

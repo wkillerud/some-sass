@@ -6,10 +6,10 @@ import {
 	SyntaxNode,
 	SyntaxNodeType,
 	TextDocument,
+	SymbolTag,
 	TreeCursor,
 } from "@somesass/language-server-types";
-import { SymbolTag } from "vscode";
-import { typeToKind } from "./find-symbols/type-to-kind";
+import { typeToKind } from "../utils/type-to-kind";
 
 export class SassSymbolFinder {
 	findDocumentSymbols(
@@ -18,7 +18,6 @@ export class SassSymbolFinder {
 	): SassDocumentSymbol[] {
 		const source = document.getText();
 		const symbols = findTreeSymbols(document, source, stylesheet.cursor());
-
 		return symbols;
 	}
 }
@@ -62,6 +61,7 @@ function findTreeSymbols(
 				break;
 			}
 			case SyntaxNodeType.ClassSelector:
+			case SyntaxNodeType.PlaceholderSelector:
 			default: {
 				const symbol = findSymbol(document, source, tree);
 				symbols.push(symbol);

@@ -153,3 +153,41 @@ test("variable - sass", () => {
 	const symbols = getDocumentSymbols(ls, `$color: lime`, "sass");
 	expect(symbols).matchSnapshot();
 });
+
+test("placeholder selector", () => {
+	const ls = getLS();
+	const symbols = getDocumentSymbols(ls, `%placeholder { color: blue; }`);
+	expect(symbols).toMatchSnapshot();
+});
+
+test("placeholder selector - sass", () => {
+	const ls = getLS();
+	const symbols = getDocumentSymbols(
+		ls,
+		`
+%placeholder
+	color: blue
+`,
+		"sass",
+	);
+	expect(symbols).toMatchSnapshot();
+});
+
+test("placeholder selector usage", () => {
+	const ls = getLS();
+	const symbols = getDocumentSymbols(ls, `.theme { @extend %theme; }`);
+	expect(symbols).toMatchSnapshot();
+});
+
+test("placeholder selector usage - sass", () => {
+	const ls = getLS();
+	const symbols = getDocumentSymbols(
+		ls,
+		`
+.theme
+	@extend %theme
+`,
+		"sass",
+	);
+	expect(symbols).toMatchSnapshot();
+});

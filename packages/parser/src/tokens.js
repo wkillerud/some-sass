@@ -24,6 +24,7 @@ import {
 	InterpolationContinue,
 	Sassdoc,
 } from "./parser.terms.js";
+import { readSassdoc } from "./sassdoc.js";
 
 const space = [
 	9, 10, 11, 12, 13, 32, 133, 160, 5760, 8192, 8193, 8194, 8195, 8196, 8197,
@@ -149,43 +150,8 @@ export const comments = new ExternalTokenizer((input, stack) => {
 		const isSassdoc = input.next == slash;
 		if (isSassdoc) {
 			// look for the first new line that does _not_ start with a slash as the first non-whitespace character. That indicates the end of the Sassdoc block.
-			/**
-			 * TODO: test all these after done.
-			 * SassdocAlias |
-					SassdocAuthor |
-					SassdocContent |
-					SassdocDeprecated |
-					SassdocExample |
-					SassdocGroup |
-					SassdocGroupDescription |
-					SassdocIgnore |
-					SassdocLink |
-					SassdocName |
-					SassdocOutput |
-					SassdocParameter |
-					SassdocProperty |
-					SassdocRequire |
-					SassdocReturn |
-					SassdocSee |
-					SassdocSince |
-					SassdocThrow |
-					SassdocTodo |
-					SassdocType
-			 */
 			input.advance();
-			while (input.next >= 0) {
-				let { next } = input;
-				input.advance();
-				if (next == newlineChar && space.includes(input.next)) {
-					do {
-						input.advance();
-					} while (space.includes(input.next));
-
-					if (input.next !== slash) {
-						break;
-					}
-				}
-			}
+			readSassdoc(input);
 			input.acceptToken(Sassdoc);
 		} else {
 			while (input.next != newlineChar && input.next >= 0) input.advance();

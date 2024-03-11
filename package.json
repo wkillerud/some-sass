@@ -4,7 +4,6 @@
 	"private": true,
 	"description": "Workspace management for the somesass monorepo",
 	"workspaces": [
-		"packages/sassdoc-parser",
 		"packages/parser",
 		"packages/language-server-types",
 		"packages/language-facts",

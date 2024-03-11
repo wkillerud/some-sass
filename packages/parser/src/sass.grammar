@@ -245,7 +245,55 @@ semi { ";" | newline | eof }
 
 @external tokens spaces from "./tokens" { newline, blankLineStart, eof, whitespace }
 
-@external tokens comments from "./tokens" { Sassdoc, LineComment[isolate], Comment[isolate] }
+@external tokens comments from "./tokens" {
+	LineComment[isolate],
+	Comment[isolate],
+	Sassdoc,
+	SassdocDescription,
+	SassdocAccessAnnotation,
+	SassdocAccess,
+	SassdocAliasAnnotation,
+	SassdocAlias,
+	SassdocAuthorAnnotation,
+	SassdocAuthor,
+	SassdocContentAnnotation,
+	SassdocContent,
+	SassdocDeprecatedAnnotation,
+	SassdocDeprecated,
+	SassdocExampleAnnotation,
+	SassdocExampleLanguage,
+	SassdocExampleDescription,
+	SassdocExample,
+	SassdocGroupAnnotation,
+	SassdocGroup,
+	SassdocGroupDescription,
+	SassdocIgnoreAnnotation,
+	SassdocIgnore,
+	SassdocLinkAnnotation,
+	SassdocLink,
+	SassdocNameAnnotation,
+	SassdocName,
+	SassdocOutputAnnotation,
+	SassdocOutput,
+	SassdocParameterAnnotation,
+	SassdocParameter,
+	SassdocPropertyAnnotation,
+	SassdocProperty,
+	SassdocRequireAnnotation,
+	SassdocRequire,
+	SassdocReturnAnnotation,
+	SassdocReturn,
+	SassdocSeeAnnotation,
+	SassdocSee,
+	SassdocSinceAnnotation,
+	SassdocSince,
+	SassdocThrowAnnotation,
+	SassdocThrow,
+	SassdocTodoAnnotation,
+	SassdocTodo,
+	SassdocTypeAnnotation,
+	SassdocType
+}
 
 @external tokens indentedMixins from "./tokens" { IndentedMixin, IndentedInclude }
 

@@ -1,9 +1,3 @@
-# Empty
-
-==>
-
-Sassdoc
-
 # Description
 
 /// This is a description
@@ -20,23 +14,3 @@ Sassdoc(Description)
 ==>
 
 Sassdoc(Description)
-
-# Two descriptions
-
-/// This is a description
-
-/// This is another description
-
-==>
-
-Sassdoc(Description, Description)
-
-# Description annotation sandwich
-
-/// This is a description
-/// @access public
-/// This is another description
-
-==>
-
-Sassdoc(Description, Access(Visibility), Description)

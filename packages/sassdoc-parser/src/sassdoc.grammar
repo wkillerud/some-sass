@@ -1,27 +1,13 @@
-@skip { whitespace }
+@top Sassdoc { Description }
 
-@top Sassdoc { (sassdoc)* }
+@skip { whitespace }
 
-sassdoc {
-	Description |
-	Access |
-	Example
+Description {
+	commentLine+
 }
-
-Example {
-	"///" @specialize<Annotation, "@example"> ExampleLanguage* AnnotationDescription* ExampleCode
-}
-
-Access {
-	"///" @specialize<Annotation, "@access"> Visibility AnnotationDescription*
-}
-
-@external tokens description from "./tokens" { Description[isolate] }
-@external tokens example from "./tokens" { ExampleCode, ExampleLanguage }
 
 @tokens {
+	annotation { "@" @asciiLetter+ }
 	whitespace { @whitespace+ }
-	Annotation { "@" @asciiLetter+ }
-	AnnotationDescription { "-" @whitespace ![\n]+ }
-	Visibility { "public" | "private"}
+	commentLine { "///" ![\n]* }
 }

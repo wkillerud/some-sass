@@ -3,7 +3,13 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Tree, TreeCursor, TreeFragment, SyntaxNode } from "@somesass/parser";
+import {
+	Tree,
+	TreeCursor,
+	TreeFragment,
+	SyntaxNode,
+	SyntaxNodeType,
+} from "@somesass/parser";
 import type { ParseResult } from "scss-sassdoc-parser";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
@@ -222,7 +228,6 @@ export interface FileSystemProvider {
 	 */
 	realPath(uri: URI): Promise<URI>;
 }
-
 
 export interface SassTextDocument extends TextDocument {
 	ast: Stylesheet;

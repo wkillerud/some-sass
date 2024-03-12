@@ -1,3 +1,6 @@
+export * from "@lezer/common";
+export * from "@lezer/lr";
+export * from "@lezer/highlight";
 export * from "./parser.js";
 
 /**
@@ -37,6 +40,7 @@ export enum SyntaxNodeType {
 	Whitespace = "whitespace",
 	Comment = "Comment",
 	LineComment = "LineComment",
+	SassdocBlock = "SassdocBlock",
 	BlankLine = "blankLine",
 
 	StyleSheet = "StyleSheet",

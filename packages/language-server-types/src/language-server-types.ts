@@ -110,6 +110,13 @@ export interface SassDocumentSymbol extends DocumentSymbol {
 
 export interface LanguageService {
 	configure(settings?: LanguageSettings): void;
+	/**
+	 * You typically won't call this directly.
+	 *
+	 * @see {@link LanguageServiceOptions.languageModelCache}
+	 *
+	 * @param document
+	 */
 	parseStylesheet(document: TextDocument): Stylesheet;
 	findDocumentLinks(
 		document: TextDocument,
@@ -167,7 +174,34 @@ export namespace ClientCapabilities {
 }
 
 export interface LanguageServiceOptions {
-	clientCapabilities?: ClientCapabilities;
+	clientCapabilities: ClientCapabilities;
+	/**
+	 * This is the main interface between the documents
+	 * coming in to the language server, and the functionality
+	 * in `@somesass/language-services`. Pass this in as an option
+	 * to `getLanguageService()`, then:
+	 *
+	 *  - Call {@link LanguageModelCache.onDocumentChanged} if a document changes
+	 *  - Call {@link LanguageModelCache.onDocumentRemoved} if a document is removed
+	 *
+	 * The different features of the language service use this cache
+	 * to look for a parsed {@link Stylesheet}. The document is parsed
+	 * the first time it is looked up, and whenever {@link LanguageModelCache.onDocumentChanged}
+	 * is called.
+	 *
+	 * @example
+	 * ```js
+	 * const languageModelCache = getLanguageModelCache();
+	 * const ls = getLanguageService({
+	 *   clientCapabilities,
+	 *   languageModelCache,
+	 *   fileSystemProvider,
+	 * });
+	 *
+	 * ls.findDocumentSymbols(document);
+	 * ```
+	 */
+	languageModelCache: LanguageModelCache;
 	/**
 	 * Abstract file system access away from the service to support
 	 * both direct file system access and browser file system access
@@ -175,7 +209,7 @@ export interface LanguageServiceOptions {
 	 *
 	 * Used for dynamic link resolving, path completion, etc.
 	 */
-	fileSystemProvider?: FileSystemProvider;
+	fileSystemProvider: FileSystemProvider;
 }
 
 export enum FileType {
@@ -229,23 +263,22 @@ export interface FileSystemProvider {
 	realPath(uri: URI): Promise<URI>;
 }
 
-export interface SassTextDocument extends TextDocument {
-	ast: Stylesheet;
+export interface LanguageModelCache {
 	/**
-	 * The last part of the URI, including extension.
-	 * For instance, given the URI `file:///home/test.scss`,
-	 * the fileName is `test.scss`.
+	 * Gets the cached AST for the document.
+	 * If it's not parsed, parses it and caches the result.
+	 * @param document
 	 */
-	fileName: string;
-	/** Find and cache the real path (as opposed to symlinked) */
-	getRealPath: () => Promise<string | null>;
-	getLinks: (options?: {
-		forwards?: boolean;
-		uses?: boolean;
-		imports?: boolean;
-	}) => SassDocumentLink[];
-	getSymbolAt: (offset: number) => SassDocumentSymbol;
-	getSymbols: () => SassDocumentSymbol[];
+	get(document: TextDocument): Stylesheet;
+	has(document: TextDocument): boolean;
+	onDocumentChanged(document: TextDocument): void;
+	onDocumentRemoved(document: TextDocument): void;
+	/**
+	 * Gets all the entries from the cache.
+	 * The key is the value from {@link TextDocument.uri}.
+	 */
+	entries(): Array<[string, Stylesheet]>;
+	clear(): void;
 }
 
 export {

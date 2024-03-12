@@ -1,8 +1,14 @@
 # Differentiates from LineComment
 
-// This is ignored
-/// This is not ignored
+// This is a LineComment
+/// This is Sassdoc
+/// and can go over multiple lines
+/// @access public
+/// @type {Color}
+/// @see other-symbol
+/// @deprecated Please use other-symbol
+// This is another LineComment
 
 ==>
 
-StyleSheet(LineComment,Sassdoc)
+StyleSheet(LineComment,Sassdoc,LineComment)

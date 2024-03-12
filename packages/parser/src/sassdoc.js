@@ -1,28 +1,4 @@
-import {
-	Sassdoc,
-	SassdocDescription,
-	SassdocAccess,
-	SassdocAlias,
-	SassdocAuthor,
-	SassdocContent,
-	SassdocDeprecated,
-	SassdocExample,
-	SassdocGroup,
-	SassdocGroupDescription,
-	SassdocIgnore,
-	SassdocLink,
-	SassdocName,
-	SassdocOutput,
-	SassdocParameter,
-	SassdocProperty,
-	SassdocRequire,
-	SassdocReturn,
-	SassdocSee,
-	SassdocSince,
-	SassdocThrow,
-	SassdocTodo,
-	SassdocType,
-} from "./parser.terms.js";
+import { parseSync as parseSassdoc } from "scss-sassdoc-parser";
 
 const spaces = [
 	9, 11, 12, 32, 133, 160, 5760, 8192, 8193, 8194, 8195, 8196, 8197, 8198, 8199,
@@ -35,58 +11,17 @@ const slash = 47;
 /**
  * Starts right after the first /// of the Sassdoc block.
  * @param {import("@lezer/lr").InputStream} input
+ * @return {import("scss-sassdoc-parser").ParseResult}
  */
 export function readSassdoc(input) {
-	/* Looking for:
-	 SassdocDescription |
-	SassdocAccessAnnotation |
-	SassdocAccess |
-	SassdocAliasAnnotation |
-	SassdocAlias |
-	SassdocAuthorAnnotation |
-	SassdocAuthor |
-	SassdocContentAnnotation |
-	SassdocContent |
-	SassdocDeprecatedAnnotation |
-	SassdocDeprecated |
-	SassdocExampleAnnotation |
-	SassdocExampleLanguage |
-	SassdocExampleDescription |
-	SassdocExample |
-	SassdocGroupAnnotation |
-	SassdocGroup |
-	SassdocGroupDescription |
-	SassdocIgnoreAnnotation |
-	SassdocIgnore |
-	SassdocLinkAnnotation |
-	SassdocLink |
-	SassdocNameAnnotation |
-	SassdocName |
-	SassdocOutputAnnotation |
-	SassdocOutput |
-	SassdocParameterAnnotation |
-	SassdocParameter |
-	SassdocPropertyAnnotation |
-	SassdocProperty |
-	SassdocRequireAnnotation |
-	SassdocRequire |
-	SassdocReturnAnnotation |
-	SassdocReturn |
-	SassdocSeeAnnotation |
-	SassdocSee |
-	SassdocSinceAnnotation |
-	SassdocSince |
-	SassdocThrowAnnotation |
-	SassdocThrow |
-	SassdocTodoAnnotation,
-	SassdocTodo |
-	SassdocTypeAnnotation |
-	SassdocType
-	*/
+	const stringBuilder = ["/", "/", "/"];
 	while (input.next >= 0) {
 		let { next } = input;
+		// Consume the line until we hit a newline
 		input.advance();
+
 		if (newlines.includes(next) && spaces.includes(input.next)) {
+			// consume all the indentation space before continuing
 			do {
 				input.advance();
 			} while (spaces.includes(input.next));
@@ -95,5 +30,11 @@ export function readSassdoc(input) {
 				break;
 			}
 		}
+
+		stringBuilder.push(String.fromCharCode(next));
 	}
+
+	const sassdoc = stringBuilder.join();
+	const [parseResult] = parseSassdoc(sassdoc);
+	return parseResult;
 }

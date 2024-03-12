@@ -151,7 +151,7 @@ export const comments = new ExternalTokenizer((input, stack) => {
 		if (isSassdoc) {
 			// look for the first new line that does _not_ start with a slash as the first non-whitespace character. That indicates the end of the Sassdoc block.
 			input.advance();
-			readSassdoc(input);
+			const sassdoc = readSassdoc(input);
 			input.acceptToken(Sassdoc);
 		} else {
 			while (input.next != newlineChar && input.next >= 0) input.advance();

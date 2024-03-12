@@ -33,7 +33,7 @@ item {
   WhileStatement |
   OutputStatement |
   AtRule |
-	Sassdoc
+	SassdocBlock
 }
 
 RuleSet {
@@ -248,7 +248,7 @@ semi { ";" | newline | eof }
 @external tokens comments from "./tokens" {
 	LineComment[isolate],
 	Comment[isolate],
-	Sassdoc
+	SassdocBlock
 }
 
 @external tokens indentedMixins from "./tokens" { IndentedMixin, IndentedInclude }

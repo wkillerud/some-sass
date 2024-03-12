@@ -22,13 +22,12 @@ import {
 	InterpolationStart,
 	InterpolationEnd,
 	InterpolationContinue,
-	Sassdoc,
+	SassdocBlock,
 } from "./parser.terms.js";
-import { readSassdoc } from "./sassdoc.js";
 
-const space = [
-	9, 10, 11, 12, 13, 32, 133, 160, 5760, 8192, 8193, 8194, 8195, 8196, 8197,
-	8198, 8199, 8200, 8201, 8202, 8232, 8233, 8239, 8287, 12288,
+const spaceChars = [
+	9, 11, 12, 32, 133, 160, 5760, 8192, 8193, 8194, 8195, 8196, 8197, 8198, 8199,
+	8200, 8201, 8202, 8232, 8233, 8239, 8287, 12288,
 ];
 
 const colon = 58,
@@ -47,6 +46,8 @@ const colon = 58,
 	equals = 61,
 	plus = 43,
 	and = 38;
+
+const whitespaceChars = [...spaceChars, newlineChar, 13];
 
 function isAlpha(ch) {
 	return (ch >= 65 && ch <= 90) || (ch >= 97 && ch <= 122) || ch >= 161;
@@ -75,7 +76,10 @@ export const spaces = new ExternalTokenizer(
 			) {
 				let spaces = 0,
 					next;
-				while (input.next != newlineChar && space.includes(input.next)) {
+				while (
+					input.next != newlineChar &&
+					whitespaceChars.includes(input.next)
+				) {
 					input.advance();
 					spaces++;
 				}
@@ -84,15 +88,18 @@ export const spaces = new ExternalTokenizer(
 				else if (spaces) input.acceptToken(whitespace);
 			} else if (input.next == newlineChar) {
 				input.acceptToken(newline, 1);
-			} else if (space.includes(input.next)) {
+			} else if (whitespaceChars.includes(input.next)) {
 				input.advance();
-				while (input.next != newlineChar && space.includes(input.next))
+				while (
+					input.next != newlineChar &&
+					whitespaceChars.includes(input.next)
+				)
 					input.advance();
 				input.acceptToken(whitespace);
 			}
 		} else {
 			let length = 0;
-			while (space.includes(input.next)) {
+			while (whitespaceChars.includes(input.next)) {
 				input.advance();
 				length++;
 			}
@@ -112,7 +119,7 @@ export const comments = new ExternalTokenizer((input, stack) => {
 			if (prev == newlineChar || prev < 0) {
 				indentedComment = off + 1;
 				break;
-			} else if (!space.includes(prev)) {
+			} else if (!whitespaceChars.includes(prev)) {
 				break;
 			}
 		}
@@ -125,7 +132,10 @@ export const comments = new ExternalTokenizer((input, stack) => {
 				if (input.next == newlineChar) {
 					input.advance();
 					let indented = 0;
-					while (input.next != newlineChar && space.includes(input.next)) {
+					while (
+						input.next != newlineChar &&
+						whitespaceChars.includes(input.next)
+					) {
 						indented++;
 						input.advance();
 					}
@@ -149,10 +159,29 @@ export const comments = new ExternalTokenizer((input, stack) => {
 		input.advance();
 		const isSassdoc = input.next == slash;
 		if (isSassdoc) {
-			// look for the first new line that does _not_ start with a slash as the first non-whitespace character. That indicates the end of the Sassdoc block.
-			input.advance();
-			const sassdoc = readSassdoc(input);
-			input.acceptToken(Sassdoc);
+			input.advance(); // get past the third slash
+
+			while (input.next >= 0) {
+				if (input.next === newlineChar) {
+					input.advance();
+					// consume all the indentation space before continuing
+					while (spaceChars.includes(input.next)) {
+						input.advance();
+					}
+
+					// check that we're still in a Sassdoc block before continuing
+					const isSassdocLine =
+						input.next === slash &&
+						input.peek(1) === slash &&
+						input.peek(2) === slash;
+					if (!isSassdocLine) {
+						break;
+					}
+				} else {
+					input.advance();
+				}
+			}
+			input.acceptToken(SassdocBlock);
 		} else {
 			while (input.next != newlineChar && input.next >= 0) input.advance();
 			input.acceptToken(LineComment);
@@ -193,7 +222,7 @@ export const indentation = new ExternalTokenizer((input, stack) => {
 		depth;
 	if (prev == newlineChar) {
 		let depth = 0;
-		while (input.next != newlineChar && space.includes(input.next)) {
+		while (input.next != newlineChar && whitespaceChars.includes(input.next)) {
 			input.advance();
 			depth++;
 		}
@@ -254,7 +283,7 @@ export const interpolationEnd = new ExternalTokenizer((input) => {
 });
 
 export const descendant = new ExternalTokenizer((input) => {
-	if (space.includes(input.peek(-1))) {
+	if (whitespaceChars.includes(input.peek(-1))) {
 		let { next } = input;
 		if (
 			isAlpha(next) ||
@@ -271,7 +300,7 @@ export const descendant = new ExternalTokenizer((input) => {
 });
 
 export const unitToken = new ExternalTokenizer((input) => {
-	if (!space.includes(input.peek(-1))) {
+	if (!whitespaceChars.includes(input.peek(-1))) {
 		let { next } = input;
 		if (next == percent) {
 			input.advance();

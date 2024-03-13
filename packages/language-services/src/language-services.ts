@@ -10,7 +10,7 @@ import { parseStylesheet } from "./parser";
 export { getLanguageModelCache };
 
 export function getLanguageService(
-	options: LanguageServiceOptions = {},
+	options: LanguageServiceOptions,
 ): LanguageService {
 	const linkFinder = new SassLinkFinder(options);
 	const symbolFinder = new SassSymbolFinder();

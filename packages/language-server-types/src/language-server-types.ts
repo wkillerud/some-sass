@@ -286,6 +286,7 @@ export {
 	TreeCursor,
 	TreeFragment,
 	SyntaxNode,
+	SyntaxNodeType,
 	URI,
 	Utils,
 	TextDocument,

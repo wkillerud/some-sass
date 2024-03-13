@@ -10,7 +10,6 @@ import {
 	Stylesheet,
 } from "@somesass/language-server-types";
 import { getLanguageService } from "@somesass/language-services";
-import { asDollarlessVariable } from "../utils/string";
 
 export class SassDiagnostics {
 	#languageServerOptions: LanguageServiceOptions;
@@ -35,7 +34,7 @@ export class SassDiagnostics {
 		}
 
 		// Get all symbols in the module import tree
-		const symbols: ScssSymbol[] = [];
+		const symbols: SassDocumentSymbol[] = [];
 		doSymbolHunting(sassDocument, symbols);
 		if (symbols.length === 0) {
 			return diagnostics;

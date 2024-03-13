@@ -1,12 +1,22 @@
 import {
+	ClientCapabilities,
 	LanguageService,
 	SassDocumentSymbol,
 	TextDocument,
 } from "@somesass/language-server-types";
 import { expect, test } from "vitest";
-import { getLanguageService } from "../language-services";
+import {
+	getLanguageModelCache,
+	getLanguageService,
+} from "../language-services";
+import { NodeFileSystemProvider } from "../test/test-file-system-provider";
 
-const getLS = () => getLanguageService();
+const getLS = () =>
+	getLanguageService({
+		clientCapabilities: ClientCapabilities.LATEST,
+		fileSystemProvider: new NodeFileSystemProvider(),
+		languageModelCache: getLanguageModelCache(),
+	});
 
 export function getDocumentSymbols(
 	ls: LanguageService,

@@ -4,6 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 import * as path from "node:path";
 import {
+	ClientCapabilities,
 	LanguageService,
 	LanguageSettings,
 	SassDocumentLink,
@@ -12,13 +13,20 @@ import {
 	URI,
 } from "@somesass/language-server-types";
 import { assert, describe, test } from "vitest";
-import { getLanguageService } from "../language-services";
+import {
+	getLanguageModelCache,
+	getLanguageService,
+} from "../language-services";
 import { getDocumentContext } from "../test/test-document-context";
-import { NodeFileSystem } from "../test/test-fs-provider";
+import { NodeFileSystemProvider } from "../test/test-file-system-provider";
 import { newRange } from "../test/test-resources";
 
 const getLS = () =>
-	getLanguageService({ fileSystemProvider: new NodeFileSystem() });
+	getLanguageService({
+		clientCapabilities: ClientCapabilities.LATEST,
+		fileSystemProvider: new NodeFileSystemProvider(),
+		languageModelCache: getLanguageModelCache(),
+	});
 
 describe("findDocumentLinks", () => {
 	async function assertLinks(

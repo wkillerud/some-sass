@@ -8,7 +8,7 @@ import {
 } from "@somesass/language-server-types";
 import * as fg from "fast-glob";
 
-export class NodeFileSystem implements FileSystemProvider {
+export class NodeFileSystemProvider implements FileSystemProvider {
 	async findFiles(
 		pattern: string,
 		exclude?: string | string[] | null | undefined,

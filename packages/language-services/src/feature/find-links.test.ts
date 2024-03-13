@@ -5,6 +5,7 @@
 import * as path from "node:path";
 import {
 	ClientCapabilities,
+	DocumentContext,
 	LanguageService,
 	LanguageSettings,
 	SassDocumentLink,
@@ -21,11 +22,12 @@ import { getDocumentContext } from "../test/test-document-context";
 import { NodeFileSystemProvider } from "../test/test-file-system-provider";
 import { newRange } from "../test/test-resources";
 
-const getLS = () =>
+const getLS = (documentContext: DocumentContext) =>
 	getLanguageService({
 		clientCapabilities: ClientCapabilities.LATEST,
 		fileSystemProvider: new NodeFileSystemProvider(),
 		languageModelCache: getLanguageModelCache(),
+		documentContext,
 	});
 
 describe("findDocumentLinks", () => {
@@ -43,12 +45,7 @@ describe("findDocumentLinks", () => {
 			0,
 			input,
 		);
-		const stylesheet = ls.parseStylesheet(document);
-		const links = await ls.findDocumentLinks(
-			document,
-			stylesheet,
-			getDocumentContext(workspaceFolder || "test://test"),
-		);
+		const links = await ls.findDocumentLinks(document);
 		assert.deepEqual(links, expected);
 	}
 
@@ -59,11 +56,11 @@ describe("findDocumentLinks", () => {
 		settings?: LanguageSettings,
 		lang: string = "scss",
 	) {
-		const ls = getLS();
+		const document = TextDocument.create(docUri, lang, 0, input);
+		const ls = getLS(getDocumentContext(document.uri));
 		if (settings) {
 			ls.configure(settings);
 		}
-		const document = TextDocument.create(docUri, lang, 0, input);
 		const stylesheet = ls.parseStylesheet(document);
 		const links = await ls.findDocumentLinks(
 			document,

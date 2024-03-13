@@ -10,11 +10,13 @@ import {
 	Stylesheet,
 } from "@somesass/language-server-types";
 import { getLanguageService } from "@somesass/language-services";
+import { WorkspaceFeature } from "./workspace-feature";
 
-export class SassDiagnostics {
+export class SassDiagnostics extends WorkspaceFeature {
 	#languageServerOptions: LanguageServiceOptions;
 
 	constructor(options: LanguageServiceOptions) {
+		super(options);
 		this.#languageServerOptions = options;
 	}
 
@@ -26,7 +28,7 @@ export class SassDiagnostics {
 		const ls = getLanguageService(this.#languageServerOptions);
 
 		const references: SassDocumentSymbol[] = ls
-			.findDocumentSymbols(document, stylesheet)
+			.findDocumentSymbols(document)
 			.filter(isReference(document, stylesheet));
 
 		if (references.length === 0) {
@@ -35,7 +37,7 @@ export class SassDiagnostics {
 
 		// Get all symbols in the module import tree
 		const symbols: SassDocumentSymbol[] = [];
-		doSymbolHunting(sassDocument, symbols);
+		traverseDocuments(() => {}, document);
 		if (symbols.length === 0) {
 			return diagnostics;
 		}

@@ -118,15 +118,8 @@ export interface LanguageService {
 	 * @param document
 	 */
 	parseStylesheet(document: TextDocument): Stylesheet;
-	findDocumentLinks(
-		document: TextDocument,
-		stylesheet: Stylesheet,
-		documentContext: DocumentContext,
-	): Promise<SassDocumentLink[]>;
-	findDocumentSymbols(
-		document: TextDocument,
-		stylesheet: Stylesheet,
-	): SassDocumentSymbol[];
+	findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]>;
+	findDocumentSymbols(document: TextDocument): SassDocumentSymbol[];
 }
 
 export type Rename =
@@ -210,6 +203,10 @@ export interface LanguageServiceOptions {
 	 * Used for dynamic link resolving, path completion, etc.
 	 */
 	fileSystemProvider: FileSystemProvider;
+	/**
+	 * TODO: figure out the actual role of this thing :see_no_evil:
+	 */
+	documentContext: DocumentContext;
 }
 
 export enum FileType {

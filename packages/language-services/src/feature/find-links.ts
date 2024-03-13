@@ -210,7 +210,6 @@ export class SassLinkFinder {
 				const resolvedTarget = await this.resolveReference(
 					target,
 					document.uri,
-					documentContext,
 					isModuleLink,
 				);
 				if (resolvedTarget !== undefined) {
@@ -244,7 +243,6 @@ export class SassLinkFinder {
 	protected async resolveReference(
 		target: string,
 		documentUri: string,
-		documentContext: DocumentContext,
 		isModuleLink = false,
 		settings = this.#aliasSettings,
 	): Promise<string | undefined> {
@@ -259,7 +257,7 @@ export class SassLinkFinder {
 		) {
 			target = target.substring(1);
 			return this.mapReference(
-				await this.resolveModuleReference(target, documentUri, documentContext),
+				await this.resolveModuleReference(target, documentUri),
 				isModuleLink,
 			);
 		}
@@ -268,11 +266,14 @@ export class SassLinkFinder {
 		// look for the `exports` field of the module and any `sass`, `style` or `default` that matches the import.
 		// If it's only `pkg:module`, also look for `sass` and `style` on the root of package.json.
 		if (target.startsWith("pkg:")) {
-			return this.resolvePkgModulePath(target, documentUri, documentContext);
+			return this.resolvePkgModulePath(target, documentUri);
 		}
 
 		const ref = await this.mapReference(
-			documentContext.resolveReference(target, documentUri),
+			this.#languageServerOptions.documentContext.resolveReference(
+				target,
+				documentUri,
+			),
 			isModuleLink,
 		);
 
@@ -285,7 +286,7 @@ export class SassLinkFinder {
 		}
 
 		const moduleReference = await this.mapReference(
-			await this.resolveModuleReference(target, documentUri, documentContext),
+			await this.resolveModuleReference(target, documentUri),
 			isModuleLink,
 		);
 		if (moduleReference) {
@@ -294,7 +295,11 @@ export class SassLinkFinder {
 
 		// Try resolving the reference from the language configuration alias settings
 		if (ref && !(await this.fileExists(ref))) {
-			const rootFolderUri = documentContext.resolveReference("/", documentUri);
+			const rootFolderUri =
+				this.#languageServerOptions.documentContext.resolveReference(
+					"/",
+					documentUri,
+				);
 			if (settings && rootFolderUri) {
 				// Specific file reference
 				if (target in settings) {
@@ -324,15 +329,15 @@ export class SassLinkFinder {
 	protected async resolveModuleReference(
 		ref: string,
 		documentUri: string,
-		documentContext: DocumentContext,
 	): Promise<string | undefined> {
 		if (documentUri.startsWith("file://")) {
 			const moduleName = this.getModuleNameFromPath(ref);
 			if (moduleName && moduleName !== "." && moduleName !== "..") {
-				const rootFolderUri = documentContext.resolveReference(
-					"/",
-					documentUri,
-				);
+				const rootFolderUri =
+					this.#languageServerOptions.documentContext.resolveReference(
+						"/",
+						documentUri,
+					);
 				const documentFolderUri = dirname(documentUri);
 				const modulePath = await this.resolvePathToModule(
 					moduleName,
@@ -398,13 +403,16 @@ export class SassLinkFinder {
 	protected async resolvePkgModulePath(
 		target: string,
 		documentUri: string,
-		documentContext: DocumentContext,
 	): Promise<string | undefined> {
 		const bareTarget = target.replace("pkg:", "");
 		const moduleName = bareTarget.includes("/")
 			? this.getModuleNameFromPath(bareTarget)
 			: bareTarget;
-		const rootFolderUri = documentContext.resolveReference("/", documentUri);
+		const rootFolderUri =
+			this.#languageServerOptions.documentContext.resolveReference(
+				"/",
+				documentUri,
+			);
 		const documentFolderUri = dirname(documentUri);
 		const modulePath = await this.resolvePathToModule(
 			moduleName,

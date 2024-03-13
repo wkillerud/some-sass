@@ -109,7 +109,19 @@ export interface SassDocumentSymbol extends DocumentSymbol {
 }
 
 export interface LanguageService {
-	configure(settings?: LanguageSettings): void;
+	/**
+	 * You may want to use this to set the workspace root.
+	 * @param settings {@link LanguageServiceConfiguration}
+	 *
+	 * @example
+	 * ```js
+	 * languageService.configure({
+	 *   workspaceRoot: URI.parse(this.workspace),
+	 * });
+	 * ```
+	 * @todo look into whether it makes as much sense to take these as constructor options.
+	 */
+	configure(settings: LanguageServiceConfiguration): void;
 	/**
 	 * You typically won't call this directly.
 	 *
@@ -126,12 +138,20 @@ export type Rename =
 	| { range: Range; placeholder: string }
 	| { defaultBehavior: boolean };
 
-export interface DocumentContext {
-	resolveReference(ref: string, baseUrl: string): string | undefined;
-}
-
-export interface LanguageSettings {
+export interface LanguageServiceConfiguration {
+	/**
+	 * Configure custom aliases that the link resolution should resolve.
+	 *
+	 * @example
+	 * ```js
+	 * importAliases: {
+	 *   // \@import "@SassStylesheet" would resolve to /src/assets/style.sass
+	 *   "@SassStylesheet": "/src/assets/styles.sass",
+	 * }
+	 * ```
+	 */
 	importAliases?: AliasSettings;
+	workspaceRoot?: URI;
 }
 
 export interface AliasSettings {
@@ -203,10 +223,6 @@ export interface LanguageServiceOptions {
 	 * Used for dynamic link resolving, path completion, etc.
 	 */
 	fileSystemProvider: FileSystemProvider;
-	/**
-	 * TODO: figure out the actual role of this thing :see_no_evil:
-	 */
-	documentContext: DocumentContext;
 }
 
 export enum FileType {

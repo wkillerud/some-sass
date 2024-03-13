@@ -12,10 +12,7 @@ import {
 import { typeToKind } from "../utils/type-to-kind";
 
 export class SassSymbolFinder {
-	findDocumentSymbols(
-		document: TextDocument,
-		stylesheet: Stylesheet,
-	): SassDocumentSymbol[] {
+	findDocumentSymbols(document: TextDocument): SassDocumentSymbol[] {
 		const source = document.getText();
 		const symbols = findTreeSymbols(document, source, stylesheet.cursor());
 		return symbols;

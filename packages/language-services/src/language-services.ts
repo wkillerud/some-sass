@@ -17,7 +17,7 @@ export function getLanguageService(
 
 	return {
 		configure: (settings) => {
-			linkFinder.configure(settings?.importAliases);
+			linkFinder.configure(settings);
 		},
 		parseStylesheet,
 		findDocumentLinks: linkFinder.findDocumentLinks.bind(linkFinder),

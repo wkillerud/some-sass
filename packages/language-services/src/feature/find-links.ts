@@ -9,7 +9,6 @@ import {
 	LanguageServiceConfiguration,
 	Utils,
 } from "@somesass/language-server-types";
-import { getLanguageService } from "../language-services";
 import { dirname, joinPath } from "../utils/resources";
 import { getNamespaceFromLink } from "./find-links/get-namespace-from-link";
 import {
@@ -78,8 +77,31 @@ export class SassLinkFinder extends LanguageFeature {
 						return folderUri + ref.slice(1);
 					}
 				}
-				const base = documentUri.substr(0, documentUri.lastIndexOf("/") + 1);
-				return Utils.resolvePath(URI.parse(base), ref).toString();
+				try {
+					const base = documentUri.substr(0, documentUri.lastIndexOf("/") + 1);
+					const resolved = Utils.resolvePath(URI.parse(base), ref).toString();
+					console.log({
+						ref,
+						documentUri,
+						resolved,
+					});
+					// const base = documentUri.substr(0, documentUri.lastIndexOf("/") + 1);
+					// return Utils.resolvePath(URI.parse(base), ref).toString();
+					return resolved;
+				} catch (e) {
+					return undefined;
+				}
+				// if (
+				// 	ref.startsWith("/") && // Resolve absolute path against the current workspace folder
+				// 	documentUri.startsWith("file://") // Only support this extra custom resolving in a Node environment
+				// ) {
+				// 	const folderUri = getRootFolder();
+				// 	if (folderUri) {
+				// 		return folderUri + ref.slice(1);
+				// 	}
+				// }
+				// const base = documentUri.substr(0, documentUri.lastIndexOf("/") + 1);
+				// return Utils.resolvePath(URI.parse(base), ref).toString();
 			},
 		};
 	}

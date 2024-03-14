@@ -13,7 +13,7 @@ export function getLanguageService(
 	options: LanguageServiceOptions,
 ): LanguageService {
 	const linkFinder = new SassLinkFinder(options);
-	const symbolFinder = new SassSymbolFinder();
+	const symbolFinder = new SassSymbolFinder(options);
 
 	return {
 		configure: (settings) => {

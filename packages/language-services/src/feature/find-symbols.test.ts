@@ -1,8 +1,10 @@
+import path from "node:path";
 import {
 	ClientCapabilities,
 	LanguageService,
 	SassDocumentSymbol,
 	TextDocument,
+	URI,
 } from "@somesass/language-server-types";
 import { expect, test } from "vitest";
 import {
@@ -31,6 +33,26 @@ export function getDocumentSymbols(
 	);
 	return ls.findDocumentSymbols(document);
 }
+
+function getSymbolsFixture(_path: string) {
+	return URI.file(
+		path.join(__dirname, "../test/fixtures/symbols", _path),
+	).toString(true);
+}
+
+test("all (at least most of) the things", () => {
+	const source = getSymbolsFixture("example.scss");
+	const ls = getLS();
+	const symbols = getDocumentSymbols(ls, source);
+	expect(symbols).toMatchSnapshot();
+});
+
+test("all (at least most of) the things - sass", () => {
+	const source = getSymbolsFixture("example.scss");
+	const ls = getLS();
+	const symbols = getDocumentSymbols(ls, source);
+	expect(symbols).toMatchSnapshot();
+});
 
 test("basic document symbols", () => {
 	const ls = getLS();

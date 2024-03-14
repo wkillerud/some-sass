@@ -1,5 +1,9 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`all (at least most of) the things - sass 1`] = `[]`;
+
+exports[`all (at least most of) the things 1`] = `[]`;
+
 exports[`basic document symbols - sass 1`] = `
 [
   {
@@ -17,6 +21,7 @@ exports[`basic document symbols - sass 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 4,
@@ -50,6 +55,7 @@ exports[`basic document symbols 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 4,
@@ -169,6 +175,7 @@ exports[`complex selector - sass 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 19,
@@ -288,6 +295,7 @@ exports[`complex selector 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 19,
@@ -353,6 +361,7 @@ exports[`function declaration - sass 1`] = `
                 "line": 0,
               },
             },
+            "sassdoc": undefined,
             "selectionRange": {
               "end": {
                 "character": 22,
@@ -407,6 +416,7 @@ exports[`function declaration - sass 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 23,
@@ -467,6 +477,7 @@ exports[`function declaration - sass 1`] = `
                 "line": 0,
               },
             },
+            "sassdoc": undefined,
             "selectionRange": {
               "end": {
                 "character": 22,
@@ -521,6 +532,7 @@ exports[`function declaration - sass 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 23,
@@ -549,6 +561,7 @@ exports[`function declaration - sass 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 22,
@@ -614,6 +627,7 @@ exports[`function declaration 1`] = `
                 "line": 0,
               },
             },
+            "sassdoc": undefined,
             "selectionRange": {
               "end": {
                 "character": 22,
@@ -668,6 +682,7 @@ exports[`function declaration 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 23,
@@ -728,6 +743,7 @@ exports[`function declaration 1`] = `
                 "line": 0,
               },
             },
+            "sassdoc": undefined,
             "selectionRange": {
               "end": {
                 "character": 22,
@@ -782,6 +798,7 @@ exports[`function declaration 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 23,
@@ -810,6 +827,7 @@ exports[`function declaration 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 22,
@@ -844,6 +862,7 @@ exports[`media query - sass 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 0,
@@ -877,6 +896,7 @@ exports[`media query 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 23,
@@ -910,6 +930,7 @@ exports[`mixin - sass 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 10,
@@ -943,6 +964,7 @@ exports[`mixin 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 10,
@@ -976,6 +998,7 @@ exports[`mixin without a name - sass 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 0,
@@ -1009,6 +1032,7 @@ exports[`mixin without a name 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 0,
@@ -1042,6 +1066,7 @@ exports[`multiple selectors for same block, each range starts with the selector 
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 8,
@@ -1070,6 +1095,7 @@ exports[`multiple selectors for same block, each range starts with the selector 
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 4,
@@ -1098,6 +1124,7 @@ exports[`multiple selectors for same block, each range starts with the selector 
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 14,
@@ -1131,6 +1158,7 @@ exports[`multiple selectors for same block, each range starts with the selector 
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 8,
@@ -1159,6 +1187,7 @@ exports[`multiple selectors for same block, each range starts with the selector 
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 4,
@@ -1187,6 +1216,7 @@ exports[`multiple selectors for same block, each range starts with the selector 
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 14,
@@ -1220,6 +1250,7 @@ exports[`placeholder selector - sass 1`] = `
         "line": 1,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 12,
@@ -1253,6 +1284,7 @@ exports[`placeholder selector 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 12,
@@ -1286,6 +1318,7 @@ exports[`placeholder selector usage - sass 1`] = `
         "line": 1,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 6,
@@ -1314,6 +1347,7 @@ exports[`placeholder selector usage - sass 1`] = `
         "line": 2,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 15,
@@ -1347,6 +1381,7 @@ exports[`placeholder selector usage 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 6,
@@ -1375,6 +1410,7 @@ exports[`placeholder selector usage 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 23,
@@ -1408,6 +1444,7 @@ exports[`variable - sass 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 6,
@@ -1441,6 +1478,7 @@ exports[`variable 1`] = `
         "line": 0,
       },
     },
+    "sassdoc": undefined,
     "selectionRange": {
       "end": {
         "character": 6,

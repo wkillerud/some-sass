@@ -12,7 +12,7 @@ import {
 	TextDocument,
 	URI,
 } from "@somesass/language-server-types";
-import { assert, describe, test } from "vitest";
+import { assert, describe, test, afterEach } from "vitest";
 import {
 	getLanguageModelCache,
 	getLanguageService,
@@ -20,11 +20,13 @@ import {
 import { NodeFileSystemProvider } from "../test/test-file-system-provider";
 import { newRange } from "../test/test-resources";
 
+const languageModelCache = getLanguageModelCache();
+
 const getLS = () =>
 	getLanguageService({
 		clientCapabilities: ClientCapabilities.LATEST,
 		fileSystemProvider: new NodeFileSystemProvider(),
-		languageModelCache: getLanguageModelCache(),
+		languageModelCache,
 	});
 
 describe("findDocumentLinks", () => {
@@ -36,6 +38,7 @@ describe("findDocumentLinks", () => {
 		testUri?: string,
 		workspaceRoot?: string,
 	) {
+		languageModelCache.clear();
 		const document = TextDocument.create(
 			testUri || `test://test/test.${lang}`,
 			lang,
@@ -58,6 +61,7 @@ describe("findDocumentLinks", () => {
 		settings?: LanguageServiceConfiguration,
 		lang: string = "scss",
 	) {
+		languageModelCache.clear();
 		const document = TextDocument.create(docUri, lang, 0, input);
 		const ls = getLS();
 		if (settings) {
@@ -73,8 +77,9 @@ describe("findDocumentLinks", () => {
 		expectedTarget: string | undefined,
 		lang: string = "scss",
 	) {
-		const ls = getLS();
+		languageModelCache.clear();
 		const document = TextDocument.create(docUri, lang, 0, input);
+		const ls = getLS();
 		const links = await ls.findDocumentLinks(document);
 		if (expectedTarget) {
 			assert.deepEqual(
@@ -102,6 +107,10 @@ describe("findDocumentLinks", () => {
 		).toString(true);
 	}
 
+	afterEach(() => {
+		languageModelCache.clear();
+	});
+
 	test("invalid partial file links returns no link", async () => {
 		await assertNoDynamicLinks(
 			getLinksFixture("./non-existent/index.scss"),
@@ -113,6 +122,7 @@ describe("findDocumentLinks", () => {
 			getLinksFixture("./non-existent/index.sass"),
 			`@import 'foo'`,
 			getLinksFixture("./non-existent/foo"),
+			"sass",
 		);
 
 		await assertNoDynamicLinks(
@@ -125,6 +135,7 @@ describe("findDocumentLinks", () => {
 			getLinksFixture("./non-existent/index.sass"),
 			`@import './foo'`,
 			getLinksFixture("./non-existent/foo"),
+			"sass",
 		);
 
 		await assertNoDynamicLinks(
@@ -137,6 +148,7 @@ describe("findDocumentLinks", () => {
 			getLinksFixture("./non-existent/index.sass"),
 			`@import './_foo'`,
 			getLinksFixture("./non-existent/_foo"),
+			"sass",
 		);
 
 		await assertNoDynamicLinks(
@@ -149,6 +161,7 @@ describe("findDocumentLinks", () => {
 			getLinksFixture("./non-existent/index.sass"),
 			`@import './foo-baz'`,
 			getLinksFixture("./non-existent/foo-baz"),
+			"sass",
 		);
 	});
 
@@ -381,22 +394,17 @@ describe("findDocumentLinks", () => {
 	test("straight links", async () => {
 		const ls = getLS();
 
-		await assertLinks(
-			ls,
-			`@import 'foo.css'`,
-			[
-				{
-					range: newRange(8, 17),
-					target: "test://test/foo.css",
-					type: SyntaxNodeType.ImportStatement,
-					namespace: undefined,
-					as: undefined,
-					show: undefined,
-					hide: undefined,
-				},
-			],
-			"scss",
-		);
+		await assertLinks(ls, `@import 'foo.css'`, [
+			{
+				range: newRange(8, 17),
+				target: "test://test/foo.css",
+				type: SyntaxNodeType.ImportStatement,
+				namespace: undefined,
+				as: undefined,
+				show: undefined,
+				hide: undefined,
+			},
+		]);
 
 		await assertLinks(ls, `@import 'foo.scss' print;`, [
 			{
@@ -422,23 +430,6 @@ describe("findDocumentLinks", () => {
 			},
 		]);
 
-		await assertLinks(
-			ls,
-			`@import 'http://foo.com/foo.css'`,
-			[
-				{
-					range: newRange(8, 32),
-					target: "http://foo.com/foo.css",
-					type: SyntaxNodeType.ImportStatement,
-					namespace: undefined,
-					as: undefined,
-					show: undefined,
-					hide: undefined,
-				},
-			],
-			"scss",
-		);
-
 		await assertLinks(ls, `@import url("foo.css") print;`, [
 			{
 				range: newRange(12, 21),
@@ -453,6 +444,21 @@ describe("findDocumentLinks", () => {
 				range: newRange(12, 21),
 				target: "test://test/foo.css",
 			}, // todo: potential improvement, but it's fine...
+		]);
+	});
+
+	test("link to external domain", async () => {
+		const ls = getLS();
+		await assertLinks(ls, `@import 'http://foo.com/foo.css'`, [
+			{
+				range: newRange(8, 32),
+				target: "http://foo.com/foo.css",
+				type: SyntaxNodeType.ImportStatement,
+				namespace: undefined,
+				as: undefined,
+				show: undefined,
+				hide: undefined,
+			},
 		]);
 	});
 

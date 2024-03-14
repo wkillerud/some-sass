@@ -9,6 +9,7 @@ import {
 	LanguageServiceConfiguration,
 	Utils,
 } from "@somesass/language-server-types";
+import { resolve } from "url";
 import { dirname, joinPath } from "../utils/resources";
 import { getNamespaceFromLink } from "./find-links/get-namespace-from-link";
 import {
@@ -44,64 +45,21 @@ export class SassLinkFinder extends LanguageFeature {
 		this.#workspaceRoot = settings.workspaceRoot;
 	}
 
-	#getDocumentContext(documentUri: string) {
-		const getRootFolder = () => {
-			if (!this.#workspaceRoot) {
-				return undefined;
-			}
-
-			let folderURI = this.#workspaceRoot.toString();
-			if (!folderURI.endsWith("/")) {
-				folderURI += "/";
-			}
-
-			if (documentUri.startsWith(folderURI)) {
-				return folderURI;
-			}
-
-			return undefined;
-		};
-
+	#getDocumentContext() {
 		return {
 			/**
 			 * @param ref Resolve this path from the context of the document
 			 * @returns The resolved path
 			 */
-			resolveReference: (ref: string) => {
-				if (
-					ref.startsWith("/") && // Resolve absolute path against the current workspace folder
-					documentUri.startsWith("file://") // Only support this extra custom resolving in a Node environment
-				) {
-					const folderUri = getRootFolder();
-					if (folderUri) {
-						return folderUri + ref.slice(1);
-					}
+			resolveReference: (ref: string, base: string) => {
+				if (ref.startsWith("/") && this.#workspaceRoot) {
+					return joinPath(this.#workspaceRoot.toString(), ref);
 				}
 				try {
-					const base = documentUri.substr(0, documentUri.lastIndexOf("/") + 1);
-					const resolved = Utils.resolvePath(URI.parse(base), ref).toString();
-					console.log({
-						ref,
-						documentUri,
-						resolved,
-					});
-					// const base = documentUri.substr(0, documentUri.lastIndexOf("/") + 1);
-					// return Utils.resolvePath(URI.parse(base), ref).toString();
-					return resolved;
+					return resolve(base, ref);
 				} catch (e) {
 					return undefined;
 				}
-				// if (
-				// 	ref.startsWith("/") && // Resolve absolute path against the current workspace folder
-				// 	documentUri.startsWith("file://") // Only support this extra custom resolving in a Node environment
-				// ) {
-				// 	const folderUri = getRootFolder();
-				// 	if (folderUri) {
-				// 		return folderUri + ref.slice(1);
-				// 	}
-				// }
-				// const base = documentUri.substr(0, documentUri.lastIndexOf("/") + 1);
-				// return Utils.resolvePath(URI.parse(base), ref).toString();
 			},
 		};
 	}
@@ -169,12 +127,6 @@ export class SassLinkFinder extends LanguageFeature {
 												asCursor.node.from,
 												asCursor.node.to,
 											);
-
-											// if (
-											// 	asCursor.node.type.name === SyntaxNodeType.ForwardPrefix
-											// ) {
-											// 	as = as.replace("*", "");
-											// }
 											break;
 										}
 										case "hide":
@@ -329,7 +281,7 @@ export class SassLinkFinder extends LanguageFeature {
 		}
 
 		const ref = await this.mapReference(
-			this.#getDocumentContext(documentUri).resolveReference(target),
+			this.#getDocumentContext().resolveReference(target, documentUri),
 			isModuleLink,
 		);
 
@@ -351,8 +303,10 @@ export class SassLinkFinder extends LanguageFeature {
 
 		// Try resolving the reference from the language configuration alias settings
 		if (ref && !(await this.fileExists(ref))) {
-			const rootFolderUri =
-				this.#getDocumentContext(documentUri).resolveReference("/");
+			const rootFolderUri = this.#getDocumentContext().resolveReference(
+				"/",
+				documentUri,
+			);
 			if (settings && rootFolderUri) {
 				// Specific file reference
 				if (target in settings) {
@@ -386,8 +340,10 @@ export class SassLinkFinder extends LanguageFeature {
 		if (documentUri.startsWith("file://")) {
 			const moduleName = this.getModuleNameFromPath(ref);
 			if (moduleName && moduleName !== "." && moduleName !== "..") {
-				const rootFolderUri =
-					this.#getDocumentContext(documentUri).resolveReference("/");
+				const rootFolderUri = this.#getDocumentContext().resolveReference(
+					"/",
+					documentUri,
+				);
 				const documentFolderUri = dirname(documentUri);
 				const modulePath = await this.resolvePathToModule(
 					moduleName,
@@ -458,8 +414,10 @@ export class SassLinkFinder extends LanguageFeature {
 		const moduleName = bareTarget.includes("/")
 			? this.getModuleNameFromPath(bareTarget)
 			: bareTarget;
-		const rootFolderUri =
-			this.#getDocumentContext(documentUri).resolveReference("/");
+		const rootFolderUri = this.#getDocumentContext().resolveReference(
+			"/",
+			documentUri,
+		);
 		const documentFolderUri = dirname(documentUri);
 		const modulePath = await this.resolvePathToModule(
 			moduleName,

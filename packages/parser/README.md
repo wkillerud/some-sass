@@ -8,3 +8,8 @@ It's a fork of [`@lezer/sass`](https://github.com/lezer-parser/sass) which does 
 - Enable the "indented" dialect to support [indented](https://sass-lang.com/documentation/syntax#the-indented-syntax) syntax.
 
 The code is licensed under an MIT license.
+
+<!-- TODO:
+- [ ] Upstream placeholder selectors
+- [ ] Upstream maps declarations
+-->

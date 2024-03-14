@@ -1,6 +1,32 @@
-import type { ScssSymbol } from "../parser";
+import {
+	SassDocumentSymbol,
+	SyntaxNode,
+	SyntaxNodeType,
+} from "@somesass/language-server-types";
+import { ParseResult, parseSync } from "scss-sassdoc-parser";
 
-export function applySassDoc(symbol: ScssSymbol): string {
+export function applySassdoc(
+	symbol: SyntaxNode,
+	source: string,
+): ParseResult | undefined {
+	// Look for a Sassdoc node associated with symbol.
+	const prevSibling = symbol.prevSibling;
+	if (prevSibling?.type.name !== SyntaxNodeType.SassdocBlock) {
+		return;
+	}
+
+	// Get the substring of source of from - to for Sassdoc node.
+	const sassdocBlock = source.substring(prevSibling.from, prevSibling.to);
+
+	// Parse said substring and return the result.
+	const [result] = parseSync(sassdocBlock);
+	return result;
+}
+
+/**
+ * User friendly representation of the Sassdoc. Typically for hover information.
+ */
+export function sassdocToString(symbol: SassDocumentSymbol): string {
 	if (!symbol.sassdoc) {
 		return "";
 	}

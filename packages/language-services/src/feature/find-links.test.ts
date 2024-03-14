@@ -5,9 +5,8 @@
 import * as path from "node:path";
 import {
 	ClientCapabilities,
-	DocumentContext,
 	LanguageService,
-	LanguageSettings,
+	LanguageServiceConfiguration,
 	SassDocumentLink,
 	SyntaxNodeType,
 	TextDocument,
@@ -18,16 +17,14 @@ import {
 	getLanguageModelCache,
 	getLanguageService,
 } from "../language-services";
-import { getDocumentContext } from "../test/test-document-context";
 import { NodeFileSystemProvider } from "../test/test-file-system-provider";
 import { newRange } from "../test/test-resources";
 
-const getLS = (documentContext: DocumentContext) =>
+const getLS = () =>
 	getLanguageService({
 		clientCapabilities: ClientCapabilities.LATEST,
 		fileSystemProvider: new NodeFileSystemProvider(),
 		languageModelCache: getLanguageModelCache(),
-		documentContext,
 	});
 
 describe("findDocumentLinks", () => {
@@ -37,7 +34,7 @@ describe("findDocumentLinks", () => {
 		expected: SassDocumentLink[],
 		lang: string = "css",
 		testUri?: string,
-		workspaceFolder?: string,
+		workspaceRoot?: string,
 	) {
 		const document = TextDocument.create(
 			testUri || `test://test/test.${lang}`,
@@ -45,6 +42,11 @@ describe("findDocumentLinks", () => {
 			0,
 			input,
 		);
+		if (workspaceRoot) {
+			ls.configure({
+				workspaceRoot: URI.parse(workspaceRoot),
+			});
+		}
 		const links = await ls.findDocumentLinks(document);
 		assert.deepEqual(links, expected);
 	}
@@ -53,20 +55,15 @@ describe("findDocumentLinks", () => {
 		docUri: string,
 		input: string,
 		expected: SassDocumentLink[],
-		settings?: LanguageSettings,
+		settings?: LanguageServiceConfiguration,
 		lang: string = "scss",
 	) {
 		const document = TextDocument.create(docUri, lang, 0, input);
-		const ls = getLS(getDocumentContext(document.uri));
+		const ls = getLS();
 		if (settings) {
 			ls.configure(settings);
 		}
-		const stylesheet = ls.parseStylesheet(document);
-		const links = await ls.findDocumentLinks(
-			document,
-			stylesheet,
-			getDocumentContext(document.uri),
-		);
+		const links = await ls.findDocumentLinks(document);
 		assert.deepEqual(links, expected);
 	}
 
@@ -78,12 +75,7 @@ describe("findDocumentLinks", () => {
 	) {
 		const ls = getLS();
 		const document = TextDocument.create(docUri, lang, 0, input);
-		const stylesheet = ls.parseStylesheet(document);
-		const links = await ls.findDocumentLinks(
-			document,
-			stylesheet,
-			getDocumentContext(document.uri),
-		);
+		const links = await ls.findDocumentLinks(document);
 		if (expectedTarget) {
 			assert.deepEqual(
 				links.length,
@@ -465,7 +457,7 @@ describe("findDocumentLinks", () => {
 	});
 
 	test("aliased links", async function () {
-		const settings: LanguageSettings = {
+		const settings: LanguageServiceConfiguration = {
 			importAliases: {
 				"@SassStylesheet": "/src/assets/styles.scss",
 				"@NoUnderscoreDir/": "/noUnderscore/",
@@ -559,7 +551,7 @@ describe("findDocumentLinks", () => {
 	});
 
 	test("aliased links - Sass", async function () {
-		const settings: LanguageSettings = {
+		const settings: LanguageServiceConfiguration = {
 			importAliases: {
 				"@SassStylesheet": "/src/assets/styles.sass",
 				"@NoUnderscoreDir/": "/noUnderscore/",

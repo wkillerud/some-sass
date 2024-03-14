@@ -1,20 +1,24 @@
 import {
 	LanguageServiceOptions,
+	Stylesheet,
 	SyntaxNodeType,
 	TextDocument,
 } from "@somesass/language-server-types";
 import { getLanguageService } from "../language-services";
 
 /**
- * Base class for features that need to traverse documents
- * in their dependency tree. Provides helpers to do the navigation
+ * Base class for features. Provides helpers to do the navigation
  * between modules.
  */
-export abstract class WorkspaceFeature {
+export abstract class LanguageFeature {
 	#options;
 
 	constructor(options: LanguageServiceOptions) {
 		this.#options = options;
+	}
+
+	getStylesheet(document: TextDocument): Stylesheet {
+		return this.#options.languageModelCache.get(document);
 	}
 
 	/**
@@ -27,7 +31,7 @@ export abstract class WorkspaceFeature {
 	 * @param depth
 	 * @returns The aggregated results of {@link callback}
 	 */
-	async traverseDocuments<T extends []>(
+	async traverseDocuments<T>(
 		callback: (document: TextDocument, prefix?: string) => T[],
 		initialDocument: TextDocument,
 		currentDocument: TextDocument = initialDocument,

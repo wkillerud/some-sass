@@ -16,6 +16,7 @@ import {
 	getSubpathEntry,
 	toPathVariations,
 } from "./find-links/module-resolution";
+import { LanguageFeature } from "./workspace-feature";
 
 type UnresolvedLink = {
 	link: SassDocumentLink;
@@ -29,12 +30,13 @@ const startsWithSchemeRegex = /^\w+:\/\//;
 const startsWithData = /^data:/;
 const sassLangFile = /\.(sass|scss)$/;
 
-export class SassLinkFinder {
+export class SassLinkFinder extends LanguageFeature {
 	#aliasSettings: AliasSettings | undefined = undefined;
 	#workspaceRoot: URI | undefined;
 	#options: LanguageServiceOptions;
 
 	constructor(options: LanguageServiceOptions) {
+		super(options);
 		this.#options = options;
 	}
 
@@ -84,9 +86,7 @@ export class SassLinkFinder {
 
 	async findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]> {
 		const source = document.getText();
-		const stylesheet = getLanguageService(this.#options).parseStylesheet(
-			document,
-		);
+		const stylesheet = this.getStylesheet(document);
 		const cursor = stylesheet.cursor();
 
 		const unresolved: UnresolvedLink[] = [];

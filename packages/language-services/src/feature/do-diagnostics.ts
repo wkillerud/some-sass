@@ -10,9 +10,10 @@ import {
 	Stylesheet,
 } from "@somesass/language-server-types";
 import { getLanguageService } from "@somesass/language-services";
-import { WorkspaceFeature } from "./workspace-feature";
+import { asDollarlessVariable } from "../utils/string";
+import { LanguageFeature } from "./workspace-feature";
 
-export class SassDiagnostics extends WorkspaceFeature {
+export class SassDiagnostics extends LanguageFeature {
 	#languageServerOptions: LanguageServiceOptions;
 
 	constructor(options: LanguageServiceOptions) {
@@ -36,23 +37,46 @@ export class SassDiagnostics extends WorkspaceFeature {
 		}
 
 		// Get all symbols in the module import tree
-		const symbols: SassDocumentSymbol[] = [];
-		traverseDocuments(() => {}, document);
+		const symbols = await this.traverseDocuments<SassDocumentSymbol>(
+			(document, prefix) => {
+				const symbols = ls.findDocumentSymbols(document);
+				const result: SassDocumentSymbol[] = [];
+				for (const symbol of symbols) {
+					if (symbol.kind === SymbolKind.Class) {
+						// Placeholders are not namespaced the same way other symbols are
+						result.push(symbol);
+						continue;
+					}
+
+					// The symbol may have a prefix in the open document, so we need to add it here
+					// so we can compare apples to apples later on.
+					let symbolName = `${prefix}${asDollarlessVariable(symbol.name)}`;
+					if (symbol.kind === SymbolKind.Variable) {
+						symbolName = `$${symbolName}`;
+					}
+
+					result.push({
+						...symbol,
+						name: symbolName,
+					});
+				}
+				return result;
+			},
+			document,
+		);
+
 		if (symbols.length === 0) {
 			return diagnostics;
 		}
 
 		// For each symbol referenced in the current document
-		for (const sassDocumentSymbol of references) {
+		for (const reference of references) {
 			// Look through the symbols in our import tree and match it to the
 			// reference we found in the open document. Look for data on
 			// the declaration such as a deprecation notice.
-			for (const scssSymbol of symbols) {
-				if (
-					scssSymbol.kind === sassDocumentSymbol.kind &&
-					scssSymbol.name === sassDocumentSymbol.name
-				) {
-					const diagnostic = createDiagnostic(sassDocumentSymbol, scssSymbol);
+			for (const symbol of symbols) {
+				if (symbol.kind === reference.kind && symbol.name === reference.name) {
+					const diagnostic = createDiagnostic(reference);
 					if (diagnostic) {
 						diagnostics.push(diagnostic);
 					}
@@ -117,14 +141,12 @@ function isReference(
 	};
 }
 
-function createDiagnostic(
-	node: SassDocumentSymbol,
-	symbol: ScssSymbol,
-): Diagnostic | null {
+function createDiagnostic(symbol: SassDocumentSymbol): Diagnostic | null {
+	// TODO: actually parse sassdoc somewhere. findDocumentSymbols?
 	if (typeof symbol.sassdoc?.deprecated !== "undefined") {
 		return {
 			message: symbol.sassdoc.deprecated || `${symbol.name} is deprecated`,
-			range: node.range,
+			range: symbol.range,
 			source: "Some Sass",
 			tags: [DiagnosticTag.Deprecated],
 			severity: DiagnosticSeverity.Hint,

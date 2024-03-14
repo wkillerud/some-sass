@@ -29,9 +29,7 @@ export function getDocumentSymbols(
 		0,
 		input,
 	);
-
-	const stylesheet = ls.parseStylesheet(document);
-	return ls.findDocumentSymbols(document, stylesheet);
+	return ls.findDocumentSymbols(document);
 }
 
 test("basic document symbols", () => {

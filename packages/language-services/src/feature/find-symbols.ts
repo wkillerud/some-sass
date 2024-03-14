@@ -1,7 +1,6 @@
 import {
 	Range,
 	SassDocumentSymbol,
-	Stylesheet,
 	SymbolKind,
 	SyntaxNode,
 	SyntaxNodeType,
@@ -9,11 +8,14 @@ import {
 	SymbolTag,
 	TreeCursor,
 } from "@somesass/language-server-types";
+import { applySassdoc } from "../utils/sassdoc";
 import { typeToKind } from "../utils/type-to-kind";
+import { LanguageFeature } from "./workspace-feature";
 
-export class SassSymbolFinder {
+export class SassSymbolFinder extends LanguageFeature {
 	findDocumentSymbols(document: TextDocument): SassDocumentSymbol[] {
 		const source = document.getText();
+		const stylesheet = this.getStylesheet(document);
 		const symbols = findTreeSymbols(document, source, stylesheet.cursor());
 		return symbols;
 	}
@@ -79,7 +81,8 @@ function findSymbol(
 	const kind = typeToKind(type) as SymbolKind;
 	const from = tree.from;
 	const to = tree.to;
-	const parent = tree.node.parent;
+	const node = tree.node;
+	const parent = node.parent;
 
 	const range = Range.create(
 		document.positionAt(parent ? parent.from : from),
@@ -101,6 +104,7 @@ function findSymbol(
 		kind,
 		name,
 		range,
+		sassdoc: applySassdoc(node, source),
 		selectionRange,
 		tags,
 		type,
@@ -148,6 +152,7 @@ function findPseudoClassSelector(
 		kind,
 		name,
 		range,
+		sassdoc: applySassdoc(pseudoRoot, source),
 		selectionRange,
 		tags,
 		type,
@@ -357,6 +362,7 @@ function findMixinStatement(
 		kind,
 		name,
 		range,
+		sassdoc: applySassdoc(node, source),
 		selectionRange,
 		tags,
 		type,
@@ -508,6 +514,7 @@ function findCallExpression(
 		kind,
 		name,
 		range,
+		sassdoc: applySassdoc(pseudoRoot, source),
 		selectionRange,
 		tags,
 		type,
@@ -555,6 +562,7 @@ function findSassVariable(
 		kind,
 		name,
 		range,
+		sassdoc: applySassdoc(sassVariable, source),
 		selectionRange,
 		tags,
 		type,

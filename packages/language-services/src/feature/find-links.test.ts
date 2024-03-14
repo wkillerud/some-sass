@@ -36,7 +36,7 @@ describe("findDocumentLinks", () => {
 		expected: SassDocumentLink[],
 		lang: string = "css",
 		testUri?: string,
-		workspaceRoot?: string,
+		configuration: LanguageServiceConfiguration = {},
 	) {
 		languageModelCache.clear();
 		const document = TextDocument.create(
@@ -45,11 +45,10 @@ describe("findDocumentLinks", () => {
 			0,
 			input,
 		);
-		if (workspaceRoot) {
-			ls.configure({
-				workspaceRoot: URI.parse(workspaceRoot),
-			});
-		}
+		ls.configure({
+			...configuration,
+			workspaceRoot: configuration.workspaceRoot || URI.parse("test://test"),
+		});
 		const links = await ls.findDocumentLinks(document);
 		assert.deepEqual(links, expected);
 	}
@@ -65,7 +64,10 @@ describe("findDocumentLinks", () => {
 		const document = TextDocument.create(docUri, lang, 0, input);
 		const ls = getLS();
 		if (settings) {
-			ls.configure(settings);
+			ls.configure({
+				...settings,
+				workspaceRoot: URI.parse(document.uri),
+			});
 		}
 		const links = await ls.findDocumentLinks(document);
 		assert.deepEqual(links, expected);
@@ -473,19 +475,24 @@ describe("findDocumentLinks", () => {
 		};
 
 		const ls = getLS();
-		ls.configure(settings);
-
-		await assertLinks(ls, '@import "@SassStylesheet"', [
-			{
-				range: newRange(8, 25),
-				target: "test://test/src/assets/styles.scss",
-				type: SyntaxNodeType.ImportStatement,
-				namespace: undefined,
-				as: undefined,
-				show: undefined,
-				hide: undefined,
-			},
-		]);
+		await assertLinks(
+			ls,
+			'@import "@SassStylesheet"',
+			[
+				{
+					range: newRange(8, 25),
+					target: "test://test/src/assets/styles.scss",
+					type: SyntaxNodeType.ImportStatement,
+					namespace: undefined,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
+			undefined,
+			undefined,
+			settings,
+		);
 
 		await assertDynamicLinks(
 			getLinksFixture("./"),
@@ -567,19 +574,25 @@ describe("findDocumentLinks", () => {
 		};
 
 		const ls = getLS();
-		ls.configure(settings);
 
-		await assertLinks(ls, '@import "@SassStylesheet"', [
-			{
-				range: newRange(8, 25),
-				target: "test://test/src/assets/styles.sass",
-				type: SyntaxNodeType.ImportStatement,
-				namespace: undefined,
-				as: undefined,
-				show: undefined,
-				hide: undefined,
-			},
-		]);
+		await assertLinks(
+			ls,
+			'@import "@SassStylesheet"',
+			[
+				{
+					range: newRange(8, 25),
+					target: "test://test/src/assets/styles.sass",
+					type: SyntaxNodeType.ImportStatement,
+					namespace: undefined,
+					as: undefined,
+					show: undefined,
+					hide: undefined,
+				},
+			],
+			undefined,
+			undefined,
+			settings,
+		);
 
 		await assertDynamicLinks(
 			getLinksFixture("./"),
@@ -910,7 +923,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -923,7 +936,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -941,7 +954,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -959,7 +972,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -977,7 +990,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -995,7 +1008,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1013,7 +1026,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1031,7 +1044,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1049,7 +1062,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1067,7 +1080,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1085,7 +1098,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1103,7 +1116,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 	});
 
@@ -1127,7 +1140,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1145,7 +1158,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1163,7 +1176,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1181,7 +1194,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1199,7 +1212,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1217,7 +1230,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1235,7 +1248,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1253,7 +1266,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1271,7 +1284,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1289,7 +1302,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1309,7 +1322,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1329,7 +1342,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1349,7 +1362,7 @@ describe("findDocumentLinks", () => {
 			],
 			"scss",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 	});
 
@@ -1373,7 +1386,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1391,7 +1404,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1409,7 +1422,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 
 		await assertLinks(
@@ -1428,7 +1441,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1446,7 +1459,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1464,7 +1477,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1482,7 +1495,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1500,7 +1513,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1518,7 +1531,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1538,7 +1551,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1558,7 +1571,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1578,7 +1591,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 		await assertLinks(
 			ls,
@@ -1598,7 +1611,7 @@ describe("findDocumentLinks", () => {
 			],
 			"sass",
 			testUri,
-			workspaceFolder,
+			{ workspaceRoot: URI.parse(workspaceFolder) },
 		);
 	});
 });

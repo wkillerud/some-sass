@@ -33,7 +33,7 @@ for (const file of fs.readdirSync(testcasesDirectory)) {
 
 							assert.fail(`Parse error when reading ${problem} at position ${errorAt[1]}:
 
-${before}<<<<<<${problem}>>>>>>${after}
+${before}👉👉👉👉${problem}👈👈👈👈${after}
 
 ${e.toString()}`);
 						}

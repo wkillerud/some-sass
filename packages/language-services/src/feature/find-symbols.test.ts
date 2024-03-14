@@ -44,6 +44,7 @@ test("all (at least most of) the things", () => {
 	const source = getSymbolsFixture("example.scss");
 	const ls = getLS();
 	const symbols = getDocumentSymbols(ls, source);
+	expect(symbols, "Expected parser not to fail").not.toHaveLength(0);
 	expect(symbols).toMatchSnapshot();
 });
 
@@ -51,6 +52,7 @@ test("all (at least most of) the things - sass", () => {
 	const source = getSymbolsFixture("example.scss");
 	const ls = getLS();
 	const symbols = getDocumentSymbols(ls, source);
+	expect(symbols, "Expected parser not to fail").not.toHaveLength(0);
 	expect(symbols).toMatchSnapshot();
 });
 

@@ -100,7 +100,7 @@ SupportsStatement {
 }
 
 IfStatement {
-  ctrlKw<"@if"> value Block (ctrlKw<"@else"> ckw<"if"> value Block)* (ctrlKw<"@else"> Block)?
+  ctrlKw<"@if"> "not"? value Block (ctrlKw<"@else"> ckw<"if"> "not"? value Block)* (ctrlKw<"@else"> Block)?
 }
 
 ForStatement {
@@ -162,7 +162,11 @@ PropertyName { identifier ~item }
 
 Declaration {
   (PropertyName | Interpolation ~item | VariableName | SassVariableName)
-  ":" (Block | value (","? value)* (Important | Global | Default)?)
+  ":" (Block | Map | value (","? value)* (Important | Global | Default)?)
+}
+
+Map {
+	"(" (StringLiteral ":" value","?)* ")"
 }
 
 query {

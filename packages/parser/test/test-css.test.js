@@ -7,7 +7,7 @@ import { parser } from "../dist/parser.js";
 
 const testcasesDirectory = path.dirname(fileURLToPath(import.meta.url));
 
-const reParseError = /No parse at (\d)+/;
+const reParseError = /No parse at (\d+)/;
 
 for (const file of fs.readdirSync(testcasesDirectory)) {
 	if (!/\.txt$/.test(file)) continue;
@@ -33,7 +33,9 @@ for (const file of fs.readdirSync(testcasesDirectory)) {
 
 							assert.fail(`Parse error when reading ${problem} at position ${errorAt[1]}:
 
-${before}${problem}${after}`);
+${before}<<<<<<${problem}>>>>>>${after}
+
+${e.toString()}`);
 						}
 					}
 

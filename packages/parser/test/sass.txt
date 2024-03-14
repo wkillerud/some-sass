@@ -287,3 +287,16 @@ StyleSheet(
   UseStatement(use,StringLiteral,Keyword,ArgList(
     SassVariableName, ColorLiteral,
     SassVariableName,NumberLiteral(Unit))))
+
+# Map declaration
+
+$units: (
+  "px": 1px,
+  "rem": 1rem,
+  "%": 1%,
+  "em": 1em,
+);
+
+==>
+
+StyleSheet(Declaration(SassVariableName,":",Map("(",StringLiteral,":",NumberLiteral(Unit),",",StringLiteral,":",NumberLiteral(Unit),",",StringLiteral,":",NumberLiteral(Unit),",",StringLiteral,":",NumberLiteral(Unit),",",")")),";")

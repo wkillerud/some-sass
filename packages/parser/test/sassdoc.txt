@@ -12,3 +12,32 @@
 ==>
 
 StyleSheet(LineComment,SassdocBlock,LineComment)
+
+# In relation to a variable
+
+/// Document this variable, please
+/// @type {Color}
+$_my-variable: red;
+
+==>
+
+StyleSheet(SassdocBlock,Declaration(SassVariableName,":",ValueName),";")
+
+# In relation to a function
+
+/// Example trying to max out the number of annotations so we don't need so many test cases
+/// @param {Number} $value - Value to add unit to
+/// @param {String} $unit - String representation of the unit
+/// @return {Number} - $value expressed in $unit
+/// @deprecated Prefer other-item
+/// @alias other-item
+/// @see yet-another-item
+/// @author Just Testing
+/// @group helpers
+/// @since 1.0.0
+/// @example Add unit
+///   to-length($number, "%")
+
+==>
+
+StyleSheet(SassdocBlock)

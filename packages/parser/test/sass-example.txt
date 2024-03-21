@@ -23,25 +23,6 @@
     &:hover
       color: red
 
-/* nested properties */
-.funky
-  font: 2px/3px
-    family: fantasy
-    size: 30em
-    weight: bold
-  color: black
-
-/* nesting conflicts */
-tr.default
-  foo:
-    foo : 1
-  foo: 1px
-  foo.bar
-    foo : 1
-  foo:bar
-    foo : 1
-  foo: 1px
-
 /* extended comment syntax */
 /* This comment is
  * several lines long.

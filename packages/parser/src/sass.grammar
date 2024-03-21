@@ -166,7 +166,7 @@ Declaration {
 }
 
 Map {
-	"(" (StringLiteral ":" value","?)* ")"
+	"(" (StringLiteral ":" (value | Map)","?)* ")"
 }
 
 query {

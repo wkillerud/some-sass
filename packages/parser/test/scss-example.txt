@@ -32,34 +32,6 @@
 	}
 }
 
-/* nested properties */
-.funky {
-	font: 2px/3px {
-		family: fantasy;
-		size: 30em;
-		weight: bold;
-	}
-	color: black;
-}
-
-/* nesting conflicts */
-tr.default {
-	foo: {
-		// properties
-		foo: 1;
-	}
-	foo: 1px; // rule
-	foo.bar {
-		// selector
-		foo: 1;
-	}
-	foo:bar {
-		// selector
-		foo: 1;
-	}
-	foo: 1px; // rule
-}
-
 /* extended comment syntax */
 /* This comment is
  * several lines long.

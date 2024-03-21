@@ -1,4 +1,4 @@
-# Full document example
+# Full document example {"dialect": "indented"}
 // snippets from the scss documentation at http://sass-lang.com/
 
 /* css stuff */

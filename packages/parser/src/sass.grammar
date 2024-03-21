@@ -162,7 +162,10 @@ PropertyName { identifier ~item }
 
 Declaration {
   (PropertyName | Interpolation ~item | VariableName | SassVariableName)
-  ":" (Block | Map | value (","? value)* (Important | Global | Default | nestedProperties)?)
+  ":" (
+		(Block | Map | value (","? value)* (Important | Global | Default)?) semi |
+		value? !attribute nestedProperties newline
+	)
 }
 
 Map {
@@ -201,7 +204,7 @@ ValueName { identifier }
 
 nestedProperties {
 	"{" (PropertyName ":" (value (","? value)* (Important | Global | Default)?) semi)+ "}" |
-	!structure newline indent (PropertyName ":" (value (","? value)* (Important | Global | Default)?) semi)+
+	newline indent (PropertyName ":" (value (","? value)* (Important | Global | Default)?) semi)+ dedent
 }
 
 CallLiteral {

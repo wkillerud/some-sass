@@ -162,7 +162,7 @@ PropertyName { identifier ~item }
 
 Declaration {
   (PropertyName | Interpolation ~item | VariableName | SassVariableName)
-  ":" (Block | Map | value (","? value)* (Important | Global | Default)? | value !structure Block)
+  ":" (Block | Map | value (","? value)* (Important | Global | Default)?)
 }
 
 Map {

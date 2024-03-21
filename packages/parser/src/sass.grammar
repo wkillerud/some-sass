@@ -1,7 +1,7 @@
 @dialects { indented }
 
 @precedence {
-	attribute @left,
+  attribute @left,
   structure @left,
   namespaceDot @left,
   valueOp @left
@@ -162,10 +162,7 @@ PropertyName { identifier ~item }
 
 Declaration {
   (PropertyName | Interpolation ~item | VariableName | SassVariableName)
-  ":" (
-		(Block | Map | value (","? value)* (Important | Global | Default)?) semi |
-		value? !attribute nestedProperties newline
-	)
+  ":" (Block | Map | value (","? value)* (Important | Global | Default)? | value !structure Block)
 }
 
 Map {
@@ -202,11 +199,6 @@ value {
 
 ValueName { identifier }
 
-nestedProperties {
-	"{" (PropertyName ":" (value (","? value)* (Important | Global | Default)?) semi)+ "}" |
-	newline indent (PropertyName ":" (value (","? value)* (Important | Global | Default)?) semi)+ dedent
-}
-
 CallLiteral {
   @specialize[@name=CallTag]<callee, "url" | "url-prefix" | "domain" | "regexp">
   "(" (ParenthesizedContent | StringLiteral) ")"
@@ -224,7 +216,7 @@ ckw<term> { @extend[@name=Keyword]<identifier, term> }
 
 ctrlKw<term> { @specialize[@name=ControlKeyword]<AtKeyword, term> }
 
-Interpolation { InterpolationStart value ~semi (InterpolationContinue value ~semi)* InterpolationEnd }
+Interpolation { InterpolationStart value (InterpolationContinue value)* InterpolationEnd }
 
 semi { ";" | newline | eof }
 

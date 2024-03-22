@@ -1,21 +1,22 @@
-import { parse, type ParseResult } from "scss-sassdoc-parser";
 import {
+	INode,
+	NodeType,
+	TextDocument,
+	URI,
 	Position,
 	Range,
 	SymbolKind,
 	DocumentLink,
+	FileSystemProvider,
 	LanguageService,
-} from "vscode-css-languageservice";
-import type { TextDocument } from "vscode-languageserver-textdocument";
-import { URI } from "vscode-uri";
+} from "@somesass/language-server-types";
+import { getLanguageService } from "@somesass/language-services";
+import { parse, type ParseResult } from "scss-sassdoc-parser";
 import { useContext } from "../context-provider";
 import { sassBuiltInModuleNames } from "../features/sass-built-in-modules";
-import type { FileSystemProvider } from "../file-system";
 import { asDollarlessVariable, getLinesFromText } from "../utils/string";
 import { getNodeAtOffset, getParentNodeByType } from "./ast";
 import { buildDocumentContext } from "./document";
-import { getLanguageService } from "./language-service";
-import { INode, NodeType } from "./node";
 import { ScssDocument } from "./scss-document";
 import type { IScssSymbols } from "./scss-symbol";
 
@@ -33,9 +34,12 @@ export async function parseDocument(
 	document: TextDocument,
 	workspaceRoot: URI,
 ): Promise<ScssDocument> {
-	const { fs } = useContext();
-	const ls = getLanguageService();
-	const ast = ls.parseStylesheet(document) as INode;
+	const { fs, clientCapabilities } = useContext();
+	const ls = getLanguageService({
+		fileSystemProvider: fs,
+		clientCapabilities,
+	});
+	const ast = ls.parseStylesheet(document);
 	const symbols = await findDocumentSymbols(
 		document,
 		ast,
@@ -64,11 +68,7 @@ async function findDocumentSymbols(
 		placeholderUsages: new Map(),
 	};
 
-	const links = await ls.findDocumentLinks2(
-		document,
-		ast,
-		buildDocumentContext(document.uri, workspaceRoot),
-	);
+	const links = await ls.findDocumentLinks(document);
 
 	const text = document.getText();
 	const lines = getLinesFromText(text);
@@ -216,65 +216,39 @@ async function findDocumentSymbols(
 		}
 	}
 
-	let sassdoc: ParseResult[] = [];
-	try {
-		sassdoc = await parse(text);
-	} catch (error) {
-		console.error((error as Error).message);
-	}
-
-	const symbols = ls.findDocumentSymbols2(document, ast);
-
+	const symbols = await ls.findDocumentSymbols(document);
 	for (const symbol of symbols) {
 		const position = symbol.range.start;
 		const offset = document.offsetAt(symbol.range.start);
 		switch (symbol.kind) {
 			case SymbolKind.Variable: {
-				const dollarlessName = symbol.name.replace("$", "");
-				const docs = sassdoc.find(
-					(v) =>
-						v.context.name === dollarlessName && v.context.type === "variable",
-				);
 				result.variables.set(symbol.name, {
-					name: symbol.name,
-					kind: SymbolKind.Variable,
+					...symbol,
 					offset,
 					position,
 					value: getVariableValue(ast, offset),
-					sassdoc: docs,
 				});
 
 				break;
 			}
 
 			case SymbolKind.Method: {
-				const docs = sassdoc.find(
-					(v) => v.context.name === symbol.name && v.context.type === "mixin",
-				);
 				result.mixins.set(symbol.name, {
-					name: symbol.name,
-					kind: SymbolKind.Method,
+					...symbol,
 					offset,
 					position,
-					parameters: getMethodParameters(ast, offset, docs),
-					sassdoc: docs,
+					parameters: getMethodParameters(ast, offset),
 				});
 
 				break;
 			}
 
 			case SymbolKind.Function: {
-				const docs = sassdoc.find(
-					(v) =>
-						v.context.name === symbol.name && v.context.type === "function",
-				);
 				result.functions.set(symbol.name, {
-					name: symbol.name,
-					kind: SymbolKind.Function,
+					...symbol,
 					offset,
 					position,
-					parameters: getMethodParameters(ast, offset, docs),
-					sassdoc: docs,
+					parameters: getMethodParameters(ast, offset),
 				});
 
 				break;
@@ -282,23 +256,14 @@ async function findDocumentSymbols(
 
 			case SymbolKind.Class: {
 				if (symbol.name.startsWith("%")) {
-					const sansPercent = symbol.name.substring(1);
-					const docs = sassdoc.find(
-						(v) =>
-							v.context.name === sansPercent &&
-							v.context.type === "placeholder",
-					);
 					result.placeholders.set(symbol.name, {
-						name: symbol.name,
-						kind: SymbolKind.Class,
+						...symbol,
 						offset,
 						position,
-						sassdoc: docs,
 					});
 				}
 				break;
 			}
-			// No default
 		}
 	}
 
@@ -401,11 +366,7 @@ function getVariableValue(ast: INode, offset: number): string | null {
 	return parent?.getValue()?.getText() || null;
 }
 
-function getMethodParameters(
-	ast: INode,
-	offset: number,
-	sassDoc: ParseResult | undefined,
-) {
+function getMethodParameters(ast: INode, offset: number) {
 	const node = getNodeAtOffset(ast, offset);
 
 	if (node === null) {
@@ -422,17 +383,18 @@ function getMethodParameters(
 				defaultValueNode === undefined ? null : defaultValueNode.getText();
 			const name = child.getName();
 
-			const dollarlessName = asDollarlessVariable(name);
-			const docs = sassDoc
-				? sassDoc.parameter?.find((p) => p.name === dollarlessName)
-				: undefined;
+			// TODO: get this (all of this) into documentsymbols
+			// const dollarlessName = asDollarlessVariable(name);
+			// const docs = sassDoc
+			// 	? sassDoc.parameter?.find((p) => p.name === dollarlessName)
+			// 	: undefined;
 
 			return {
 				name,
 				offset: child.offset,
 				value,
 				kind: SymbolKind.Variable,
-				sassdoc: docs,
+				// sassdoc: docs,
 			};
 		});
 }

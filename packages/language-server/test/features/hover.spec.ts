@@ -1,11 +1,15 @@
 import { deepStrictEqual } from "assert";
-import { MarkupKind, SymbolKind } from "vscode-languageserver";
-import type { Hover } from "vscode-languageserver";
-import { TextDocument } from "vscode-languageserver-textdocument";
+import {
+	INode,
+	MarkupKind,
+	Hover,
+	SymbolKind,
+	TextDocument,
+} from "@somesass/language-server-types";
+import { getLanguageService } from "@somesass/language-services";
 import { useContext } from "../../src/context-provider";
 import { doHover } from "../../src/features/hover/hover";
-import { INode, ScssDocument } from "../../src/parser";
-import { getLanguageService } from "../../src/parser/language-service";
+import { ScssDocument } from "../../src/parser";
 import * as helpers from "../helpers";
 
 async function getHover(lines: string[]): Promise<Hover | null> {
@@ -23,8 +27,9 @@ describe("Providers/Hover", () => {
 		helpers.createTestContext();
 
 		const document = TextDocument.create("./one.scss", "scss", 1, "");
-		const ls = getLanguageService();
+		const ls = getLanguageService(helpers.createTestLsOptions());
 		const ast = ls.parseStylesheet(document) as INode;
+		ls.clearCache(); // The service is a singleton with a shared cache that needs clearing between tests
 
 		const { fs, storage } = useContext();
 

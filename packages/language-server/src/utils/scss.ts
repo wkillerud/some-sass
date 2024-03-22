@@ -1,5 +1,6 @@
+import { NodeType } from "@somesass/language-server-types";
 import { getDefinition } from "../features/go-definition";
-import { IScssDocument, NodeType, ScssVariable } from "../parser";
+import { IScssDocument, ScssVariable } from "../parser";
 import { getParentNodeByType } from "../parser/ast";
 
 export function isReferencingVariable(variable: ScssVariable): boolean {

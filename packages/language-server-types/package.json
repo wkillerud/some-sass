@@ -1,0 +1,48 @@
+{
+	"name": "@somesass/language-server-types",
+	"version": "1.0.0",
+	"description": "Types for features powering some-sass-language-server",
+	"keywords": [
+		"scss",
+		"sass"
+	],
+	"engines": {
+		"node": ">=20"
+	},
+	"homepage": "https://github.com/wkillerud/some-sass/blob/main/packages/language-server-types#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+ssh://git@github.com/wkillerud/some-sass.git"
+	},
+	"bugs": {
+		"url": "https://github.com/wkillerud/some-sass/issues"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org/",
+		"tag": "latest"
+	},
+	"files": [
+		"dist/"
+	],
+	"main": "dist/language-server-types.js",
+	"types": "dist/language-server-types.d.ts",
+	"author": "William Killerud <william@killerud.com> (https://www.williamkillerud.com/)",
+	"license": "MIT",
+	"scripts": {
+		"prepublishOnly": "npm run build",
+		"build": "shx rm -rf dist && tsc",
+		"test": "vitest"
+	},
+	"dependencies": {
+		"scss-sassdoc-parser": "3.1.0",
+		"vscode-languageserver-textdocument": "1.0.11",
+		"vscode-languageserver-types": "3.17.5",
+		"vscode-uri": "3.0.8"
+	},
+	"devDependencies": {
+		"shx": "0.3.4",
+		"typescript": "5.3.3",
+		"vitest": "1.3.1",
+		"vscode-css-languageservice": "6.2.13"
+	}
+}

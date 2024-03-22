@@ -1,10 +1,13 @@
 import { strictEqual } from "assert";
-import { SymbolKind } from "vscode-languageserver";
-import { TextDocument } from "vscode-languageserver-textdocument";
+import {
+	INode,
+	SymbolKind,
+	TextDocument,
+} from "@somesass/language-server-types";
+import { getLanguageService } from "@somesass/language-services";
 import { useContext } from "../../src/context-provider";
 import { searchWorkspaceSymbol } from "../../src/features/workspace-symbols/workspace-symbol";
-import { INode, ScssDocument } from "../../src/parser";
-import { getLanguageService } from "../../src/parser/language-service";
+import { ScssDocument } from "../../src/parser";
 import * as helpers from "../helpers";
 
 describe("Providers/WorkspaceSymbol", () => {
@@ -12,7 +15,9 @@ describe("Providers/WorkspaceSymbol", () => {
 		helpers.createTestContext();
 
 		const document = TextDocument.create("./one.scss", "scss", 1, "");
-		const ls = getLanguageService();
+		const ls = getLanguageService(helpers.createTestLsOptions());
+		ls.clearCache(); // The service is a singleton with a shared cache that needs clearing between tests
+
 		const ast = ls.parseStylesheet(document) as INode;
 
 		const { fs, storage } = useContext();

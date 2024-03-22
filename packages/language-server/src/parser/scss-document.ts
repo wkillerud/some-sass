@@ -1,10 +1,13 @@
-import type { TextDocument } from "vscode-languageserver-textdocument";
-import { Position, Range } from "vscode-languageserver-types";
-import { URI } from "vscode-uri";
-import type { FileSystemProvider } from "../file-system";
+import {
+	INode,
+	TextDocument,
+	Position,
+	Range,
+	URI,
+	FileSystemProvider,
+} from "@somesass/language-server-types";
 import { getLinesFromText } from "../utils/string";
 import { getNodeAtOffset } from "./ast";
-import type { INode } from "./node";
 import type {
 	IScssDocument,
 	IScssSymbols,

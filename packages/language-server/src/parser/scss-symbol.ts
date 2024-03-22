@@ -1,12 +1,12 @@
-import type { Parameter, ParseResult } from "scss-sassdoc-parser";
-import type { TextDocument } from "vscode-languageserver-textdocument";
-import type {
+import {
+	INode,
 	DocumentLink,
 	Position,
+	TextDocument,
 	SymbolKind,
 	Range,
-} from "vscode-languageserver-types";
-import type { INode } from "./node";
+} from "@somesass/language-server-types";
+import type { Parameter, ParseResult } from "scss-sassdoc-parser";
 
 export interface ScssSymbol {
 	kind: SymbolKind;

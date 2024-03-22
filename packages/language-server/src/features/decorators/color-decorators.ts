@@ -1,8 +1,12 @@
+import {
+	NodeType,
+	TextDocument,
+	SymbolKind,
+	ColorInformation,
+} from "@somesass/language-server-types";
 import ColorDotJS from "colorjs.io";
-import { TextDocument } from "vscode-languageserver-textdocument";
-import { ColorInformation, SymbolKind } from "vscode-languageserver-types";
 import { useContext } from "../../context-provider";
-import { NodeType, ScssVariable } from "../../parser";
+import { ScssVariable } from "../../parser";
 import { getBaseValueFrom, isReferencingVariable } from "../../utils/scss";
 import { isColor } from "../completion/color-completion";
 import { getDefinitionSymbol } from "../go-definition";

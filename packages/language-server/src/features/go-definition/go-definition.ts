@@ -1,16 +1,13 @@
-import { Location, SymbolKind } from "vscode-languageserver";
-import type {
+import {
+	NodeType,
+	INode,
+	Location,
+	SymbolKind,
 	TextDocument,
 	Position,
-} from "vscode-languageserver-textdocument";
+} from "@somesass/language-server-types";
 import { useContext } from "../../context-provider";
-import { NodeType } from "../../parser";
-import type {
-	INode,
-	IScssDocument,
-	ScssForward,
-	ScssSymbol,
-} from "../../parser";
+import type { IScssDocument, ScssForward, ScssSymbol } from "../../parser";
 import type StorageService from "../../storage";
 import { asDollarlessVariable } from "../../utils/string";
 

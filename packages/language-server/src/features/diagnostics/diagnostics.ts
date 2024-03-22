@@ -1,21 +1,15 @@
 import {
+	NodeType,
+	INode,
 	DiagnosticSeverity,
 	DiagnosticTag,
 	SymbolKind,
-} from "vscode-languageserver-types";
-import type {
 	Diagnostic,
 	VersionedTextDocumentIdentifier,
-} from "vscode-languageserver-types";
+} from "@somesass/language-server-types";
 import { EXTENSION_NAME } from "../../constants";
 import { useContext } from "../../context-provider";
-import { NodeType } from "../../parser";
-import type {
-	INode,
-	IScssDocument,
-	ScssForward,
-	ScssSymbol,
-} from "../../parser";
+import type { IScssDocument, ScssForward, ScssSymbol } from "../../parser";
 import { asDollarlessVariable } from "../../utils/string";
 
 export async function doDiagnostics(

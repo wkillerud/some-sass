@@ -1,9 +1,13 @@
-import { MarkupKind, SymbolKind } from "vscode-languageserver";
-import type { Hover, MarkupContent } from "vscode-languageserver";
-import type { TextDocument } from "vscode-languageserver-textdocument";
-import { useContext } from "../../context-provider";
 import {
 	NodeType,
+	MarkupKind,
+	SymbolKind,
+	Hover,
+	MarkupContent,
+	TextDocument,
+} from "@somesass/language-server-types";
+import { useContext } from "../../context-provider";
+import {
 	IScssDocument,
 	ScssSymbol,
 	ScssVariable,

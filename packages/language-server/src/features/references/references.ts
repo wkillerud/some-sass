@@ -1,9 +1,16 @@
-import type { TextDocument } from "vscode-languageserver-textdocument";
-import type { Position, ReferenceContext } from "vscode-languageserver-types";
-import { Location, Range, SymbolKind } from "vscode-languageserver-types";
+import {
+	NodeType,
+	INode,
+	TextDocument,
+	Position,
+	ReferenceContext,
+	Location,
+	Range,
+	SymbolKind,
+} from "@somesass/language-server-types";
 import { useContext } from "../../context-provider";
-import type { INode, IScssDocument, ScssSymbol } from "../../parser";
-import { NodeType, tokenizer } from "../../parser";
+import type { IScssDocument, ScssSymbol } from "../../parser";
+import { tokenizer } from "../../parser";
 import type StorageService from "../../storage";
 import {
 	asDollarlessVariable,

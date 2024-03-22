@@ -1,10 +1,10 @@
-import * as assert from "assert";
+import { assert, describe, test } from "vitest";
 // @ts-expect-error Not exported as enum type
 import { NodeType as CSSNodeType } from "vscode-css-languageservice/lib/umd/parser/cssNodes";
-import { NodeType } from "../../src/parser";
+import { NodeType } from "./language-server-types";
 
 describe("NodeType", () => {
-	it("type definition is in sync with vscode-css-languageservices", () => {
+	test("type definition is in sync with vscode-css-languageservices", () => {
 		const types = Object.entries(NodeType);
 		assert.ok(types.length);
 

@@ -1,11 +1,14 @@
 import { resolve, join } from "path";
-import { Position, Range } from "vscode-css-languageservice";
-import { TextDocument } from "vscode-languageserver-textdocument";
-import { URI } from "vscode-uri";
+import {
+	LanguageServiceOptions,
+	Position,
+	Range,
+	TextDocument,
+	FileSystemProvider,
+	URI,
+} from "@somesass/language-server-types";
 import { createContext, useContext } from "../src/context-provider";
-import { FileSystemProvider } from "../src/file-system";
-import { parseDocument, type INode } from "../src/parser";
-import { getLanguageService } from "../src/parser/language-service";
+import { parseDocument } from "../src/parser";
 import type { ISettings } from "../src/settings";
 import StorageService from "../src/storage";
 import { TestFileSystem } from "./test-file-system";
@@ -37,12 +40,6 @@ export async function makeDocument(
 	return document;
 }
 
-export async function makeAst(lines: string[]): Promise<INode> {
-	const document = await makeDocument(lines);
-	const ls = getLanguageService();
-	return ls.parseStylesheet(document) as INode;
-}
-
 export function makeSameLineRange(line = 1, start = 1, end = 1): Range {
 	return Range.create(Position.create(line, start), Position.create(line, end));
 }
@@ -59,6 +56,25 @@ export function makeSettings(options?: Partial<ISettings>): ISettings {
 		...options,
 	};
 }
+
+export const createTestLsOptions = (): LanguageServiceOptions => {
+	const storage = new StorageService();
+	const fileSystemProvider = new TestFileSystem(storage);
+
+	return {
+		fileSystemProvider,
+		clientCapabilities: {
+			textDocument: {
+				completion: {
+					completionItem: { documentationFormat: ["markdown", "plaintext"] },
+				},
+				hover: {
+					contentFormat: ["markdown", "plaintext"],
+				},
+			},
+		},
+	};
+};
 
 export const createTestContext = (fsProvider?: FileSystemProvider): void => {
 	const storage = new StorageService();

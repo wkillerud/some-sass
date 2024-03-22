@@ -1,12 +1,15 @@
 import { strictEqual, ok } from "assert";
-import { SymbolKind } from "vscode-languageserver";
-import type { SignatureHelp } from "vscode-languageserver";
-import { TextDocument } from "vscode-languageserver-textdocument";
+import {
+	INode,
+	SignatureHelp,
+	SymbolKind,
+	TextDocument,
+} from "@somesass/language-server-types";
+import { getLanguageService } from "@somesass/language-services";
 import { useContext } from "../../src/context-provider";
 import { hasInFacts } from "../../src/features/signature-help/facts";
 import { doSignatureHelp } from "../../src/features/signature-help/signature-help";
-import { INode, ScssDocument } from "../../src/parser";
-import { getLanguageService } from "../../src/parser/language-service";
+import { ScssDocument } from "../../src/parser";
 import * as helpers from "../helpers";
 
 async function getSignatureHelp(lines: string[]): Promise<SignatureHelp> {
@@ -23,7 +26,9 @@ describe("Providers/SignatureHelp", () => {
 		helpers.createTestContext();
 
 		const document = TextDocument.create("./one.scss", "scss", 1, "");
-		const ls = getLanguageService();
+		const ls = getLanguageService(helpers.createTestLsOptions());
+		ls.clearCache(); // The service is a singleton with a shared cache that needs clearing between tests
+
 		const ast = ls.parseStylesheet(document) as INode;
 
 		const { fs, storage } = useContext();

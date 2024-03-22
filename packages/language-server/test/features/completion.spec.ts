@@ -1,21 +1,23 @@
 import { strictEqual, ok } from "assert";
 import {
+	INode,
+	CompletionList,
 	CompletionItem,
 	CompletionItemKind,
 	SymbolKind,
-} from "vscode-languageserver";
-import type { CompletionList } from "vscode-languageserver";
-import { TextDocument } from "vscode-languageserver-textdocument";
+	TextDocument,
+} from "@somesass/language-server-types";
+import { getLanguageService } from "@somesass/language-services";
 import { changeConfiguration, useContext } from "../../src/context-provider";
 import { doCompletion } from "../../src/features/completion";
 import { parseStringLiteralChoices } from "../../src/features/completion/completion-utils";
 import { rePartialUse } from "../../src/features/completion/import-completion";
 import { sassBuiltInModules } from "../../src/features/sass-built-in-modules";
 import { sassDocAnnotations } from "../../src/features/sassdoc-annotations";
-import { INode, ScssDocument } from "../../src/parser";
-import { getLanguageService } from "../../src/parser/language-service";
+import { ScssDocument } from "../../src/parser";
 import { ISettings } from "../../src/settings";
 import * as helpers from "../helpers";
+import { createTestLsOptions } from "../helpers";
 
 async function getCompletionList(
 	lines: string[],
@@ -38,7 +40,9 @@ describe("Providers/Completion", () => {
 
 		const document = TextDocument.create("./one.scss", "scss", 1, "");
 
-		const ls = getLanguageService();
+		const ls = getLanguageService(createTestLsOptions());
+		ls.clearCache(); // The service is a singleton with a shared cache that needs clearing between tests
+
 		const ast = ls.parseStylesheet(document) as INode;
 
 		const { fs, storage } = useContext();

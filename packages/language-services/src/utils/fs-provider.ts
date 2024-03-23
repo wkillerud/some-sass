@@ -8,7 +8,7 @@ import type { FileSystemProvider as CSSFileSystemProvider } from "vscode-css-lan
 export function mapFsProviders(
 	ours: FileSystemProvider,
 ): CSSFileSystemProvider {
-	const theirs = {
+	const theirs: CSSFileSystemProvider = {
 		async stat(uri: string) {
 			try {
 				return await ours.stat(URI.parse(uri));
@@ -24,8 +24,9 @@ export function mapFsProviders(
 				};
 			}
 		},
-		readDirectory(uri: string) {
-			return ours.readDirectory(uri);
+		async readDirectory(uri: string) {
+			const dir = await ours.readDirectory(URI.parse(uri));
+			return dir.map(([uri, info]) => [uri.toString(), info]);
 		},
 	};
 	return theirs;

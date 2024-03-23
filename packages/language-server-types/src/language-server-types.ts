@@ -34,6 +34,7 @@ import {
 	DocumentSymbol,
 	Location,
 	Hover,
+	HoverSetting,
 	MarkedString,
 	CodeActionContext,
 	Command,
@@ -141,21 +142,67 @@ export enum NodeType {
 }
 
 export interface INode {
+	parent: INode | null;
 	type: NodeType;
 	offset: number;
 	length: number;
 	end: number;
-	accept: (node: (node: INode) => boolean) => boolean;
+	options: { [name: string]: any } | undefined;
+	accept: (node: (node: INode) => boolean) => void;
+	acceptVisitor: (visitor: { visitNode: (node: INode) => boolean }) => void;
 	getName: () => string;
 	getValue: () => INode;
 	getDefaultValue: () => INode;
 	getText: () => string;
 	getParameters: () => INode;
 	getIdentifier: () => INode;
-	getParent: () => INode;
-	getChildren: () => INode[];
-	getChild: (index: number) => INode;
 	getSelectors: () => INode;
+	matches(str: string): boolean;
+	startsWith(str: string): boolean;
+	endsWith(str: string): boolean;
+	adoptChild(INode: INode, index?: number): INode;
+	attachTo(parent: INode, index?: number): INode;
+	collectIssues(results: any[]): void;
+	addIssue(issue: IMarker): void;
+	hasIssue(rule: IRule): boolean;
+	/**
+	 * @param [recursive] - default false
+	 */
+	isErroneous(recursive?: boolean): boolean;
+	setNode(field: keyof this, INode: INode | null, index?: number): boolean;
+	addChild(INode: INode | null): INode is INode;
+	hasChildren(): boolean;
+	getChildren(): INode[];
+	getChild(index: number): INode | null;
+	addChildren(nodes: INode[]): void;
+	findFirstChildBeforeOffset(offset: number): INode | null;
+	findChildAtOffset(offset: number, goDeep: boolean): INode | null;
+	encloses(candidate: INode): boolean;
+	getParent(): INode | null;
+	findParent(type: NodeType): INode | null;
+	findAParent(...types: NodeType[]): INode | null;
+	setData(key: string, value: any): void;
+	getData(key: string): any;
+}
+
+export interface IMarker {
+	getNode(): INode;
+	getMessage(): string;
+	getOffset(): number;
+	getLength(): number;
+	getRule(): IRule;
+	getLevel(): Level;
+}
+
+export interface IRule {
+	id: string;
+	message: string;
+}
+
+export enum Level {
+	Ignore = 1,
+	Warning = 2,
+	Error = 4,
 }
 
 export interface SassDocumentLink extends DocumentLink {
@@ -194,7 +241,7 @@ export interface SassDocumentLink extends DocumentLink {
 	 * @see https://sass-lang.com/documentation/at-rules/forward/#controlling-visibility
 	 */
 	show?: string[];
-	kind?: NodeType.Import | NodeType.Use | NodeType.Forward;
+	type?: NodeType;
 }
 
 /**
@@ -399,6 +446,7 @@ export {
 	DocumentSymbol,
 	Location,
 	Hover,
+	HoverSetting,
 	MarkedString,
 	SignatureHelp,
 	CodeActionContext,

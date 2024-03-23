@@ -26,13 +26,13 @@ test("should return links", async () => {
 	const links = await ls.findDocumentLinks(document);
 
 	// Uses
-	const uses = links.filter((link) => link.kind === NodeType.Use);
+	const uses = links.filter((link) => link.type === NodeType.Use);
 	assert.strictEqual(uses.length, 2, "expected to find two uses");
 	assert.strictEqual(uses[0]?.namespace, "vars");
 	assert.strictEqual(uses[1]?.namespace, "*");
 
 	// Forward
-	const forwards = links.filter((link) => link.kind === NodeType.Forward);
+	const forwards = links.filter((link) => link.type === NodeType.Forward);
 	assert.strictEqual(forwards.length, 1, "expected to find one forward");
 	assert.strictEqual(forwards[0]?.as, "color-");
 	assert.deepStrictEqual(forwards[0]?.hide, [

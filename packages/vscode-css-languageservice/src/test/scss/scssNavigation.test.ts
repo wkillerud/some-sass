@@ -362,14 +362,22 @@ suite("SCSS - Navigation", () => {
 			};
 
 			await assertDynamicLinks(getDocumentUri("./index.scss"), `@use './foo' as f`, [
-				{ range: newRange(5, 12), target: getDocumentUri("./foo.scss"), type: nodes.NodeType.Use },
+				{
+					range: newRange(5, 12),
+					target: getDocumentUri("./foo.scss"),
+					type: nodes.NodeType.Use,
+					as: "f",
+					namespace: "f",
+				},
 			]);
 
 			await assertDynamicLinks(getDocumentUri("./index.scss"), `@forward './foo' hide $private`, [
 				{ range: newRange(9, 16), target: getDocumentUri("./foo.scss"), type: nodes.NodeType.Forward },
 			]);
 
-			await assertNoDynamicLinks(getDocumentUri("./index.scss"), `@use 'sass:math'`, undefined);
+			await assertDynamicLinks(getDocumentUri("./index.scss"), `@use 'sass:math'`, [
+				{ range: newRange(5, 16), type: nodes.NodeType.Use, namespace: "math" },
+			]);
 			await assertNoDynamicLinks(
 				getDocumentUri("./index.scss"),
 				`@use './non-existent'`,
@@ -421,6 +429,7 @@ suite("SCSS - Navigation", () => {
 						range: newRange(5, 19),
 						target: getTestResource("node_modules/@foo/bar/_baz.scss"),
 						type: nodes.NodeType.Use,
+						namespace: "baz",
 					},
 				],
 				"scss",
@@ -435,6 +444,7 @@ suite("SCSS - Navigation", () => {
 						range: newRange(5, 15),
 						target: getTestResource("node_modules/@foo/bar/_index.scss"),
 						type: nodes.NodeType.Use,
+						namespace: "bar",
 					},
 				],
 				"scss",

@@ -11,7 +11,6 @@ import {
 	ColorPresentation,
 	DocumentHighlight,
 	DocumentHighlightKind,
-	DocumentLink,
 	Location,
 	Position,
 	Range,
@@ -45,6 +44,7 @@ type DocumentSymbolCollector = (
 
 const startsWithSchemeRegex = /^\w+:\/\//;
 const startsWithData = /^data:/;
+const startsWithSass = /^sass:/;
 
 export class CSSNavigation {
 	protected defaultSettings?: AliasSettings;
@@ -160,6 +160,8 @@ export class CSSNavigation {
 				// no links for data:
 			} else if (startsWithSchemeRegex.test(target)) {
 				resolvedLinks.push(link);
+			} else if (startsWithSass.test(target)) {
+				resolvedLinks.push(link);
 			} else {
 				const resolved = documentContext.resolveReference(target, document.uri);
 				if (resolved) {
@@ -185,6 +187,10 @@ export class CSSNavigation {
 				// no links for data:
 			} else if (startsWithSchemeRegex.test(target)) {
 				resolvedLinks.push(link);
+			} else if (startsWithSass.test(target)) {
+				const targetless = link;
+				delete targetless["target"];
+				resolvedLinks.push(targetless);
 			} else {
 				const resolvedTarget = await this.resolveReference(target, document.uri, documentContext, data.isRawLink);
 				if (resolvedTarget !== undefined) {
@@ -221,9 +227,20 @@ export class CSSNavigation {
 			const unresolved: UnresolvedLinkData = { link: { target: rawUri, range }, isRawLink };
 			if (isRawLink) {
 				unresolved.link.type = linkStatement.type;
+
 				if (linkStatement.type === nodes.NodeType.Use) {
+					const alias: nodes.Node | undefined = linkStatement
+						.getChildren()
+						.find((c) => c.type === nodes.NodeType.Identifier);
+
 					// TODO: as with identifier and with *
-					// TODO: namespace calculation from rawUri
+					const as = alias ? alias.getText() : undefined;
+					if (as) {
+						unresolved.link.as = as;
+					}
+
+					const namespace = linkStatement.type === nodes.NodeType.Use ? as || getNamespaceFromLink(rawUri) : undefined;
+					unresolved.link.namespace = namespace;
 				} else if (linkStatement.type === nodes.NodeType.Forward) {
 					// TODO: as with identifier without -
 					// TODO: show
@@ -645,4 +662,30 @@ function getModuleNameFromPath(path: string) {
 	}
 	// Otherwise get until first instance of '/'
 	return path.substring(0, firstSlash);
+}
+
+function getNamespaceFromLink(target: string): string {
+	if (target.startsWith("sass")) {
+		return target.split(":")[1];
+	}
+
+	const bareTarget = target.replace("pkg:", "").replace("./", "");
+	let from = 0;
+	let to = bareTarget.length;
+	if (bareTarget.includes("/")) {
+		from = bareTarget.lastIndexOf("/") + 1;
+	}
+	if (bareTarget.includes(".")) {
+		to = bareTarget.lastIndexOf(".");
+	}
+	let namespace = bareTarget.substring(from, to);
+	namespace = namespace.startsWith("_") ? namespace.slice(1) : namespace;
+	if (namespace === "index") {
+		// The link points to an index file. Use the folder name above as a namespace.
+		const linkOmitIndex = bareTarget.slice(0, Math.max(0, bareTarget.lastIndexOf("/")));
+		const newLastSlash = linkOmitIndex.lastIndexOf("/");
+		namespace = linkOmitIndex.slice(Math.max(0, newLastSlash + 1));
+	}
+
+	return namespace;
 }

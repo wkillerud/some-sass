@@ -11,12 +11,10 @@ import {
 	LanguageService,
 } from "@somesass/language-server-types";
 import { getLanguageService } from "@somesass/language-services";
-import { parse, type ParseResult } from "scss-sassdoc-parser";
 import { useContext } from "../context-provider";
 import { sassBuiltInModuleNames } from "../features/sass-built-in-modules";
-import { asDollarlessVariable, getLinesFromText } from "../utils/string";
+import { getLinesFromText } from "../utils/string";
 import { getNodeAtOffset, getParentNodeByType } from "./ast";
-import { buildDocumentContext } from "./document";
 import { ScssDocument } from "./scss-document";
 import type { IScssSymbols } from "./scss-symbol";
 
@@ -57,6 +55,7 @@ async function findDocumentSymbols(
 	fs: FileSystemProvider,
 	ls: LanguageService,
 ): Promise<IScssSymbols> {
+	// Placeholder usages should probably be a find-method in LS?
 	const result: IScssSymbols = {
 		functions: new Map(),
 		mixins: new Map(),

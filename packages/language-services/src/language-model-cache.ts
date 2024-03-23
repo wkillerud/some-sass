@@ -4,14 +4,14 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {
+	LanguageService,
 	TextDocument,
 	Stylesheet,
 	LanguageServiceOptions,
-	LanguageServiceConfiguration,
 	LanguageModelCacheOptions,
 	INode,
 } from "@somesass/language-server-types";
-import { LanguageService as VSCodeLanguageService } from "vscode-css-languageservice";
+import { LanguageFeature, LanguageFeatureInternal } from "./language-feature";
 
 type LanguageModels = {
 	[uri: string]: {
@@ -22,15 +22,19 @@ type LanguageModels = {
 	};
 };
 
-export class LanguageModelCache {
-	#ls: VSCodeLanguageService;
+export class LanguageModelCache extends LanguageFeature {
 	#languageModels: LanguageModels = {};
 	#nModels = 0;
 	#options: LanguageModelCacheOptions;
 	#cleanupInterval: NodeJS.Timeout | undefined = undefined;
 
-	constructor(ls: VSCodeLanguageService, options: LanguageServiceOptions) {
-		this.#ls = ls;
+	constructor(
+		ls: LanguageService,
+		options: LanguageServiceOptions,
+		_internal: LanguageFeatureInternal,
+	) {
+		super(ls, options, _internal);
+
 		this.#options = {
 			maxEntries: Number.MAX_SAFE_INTEGER,
 			cleanupIntervalTimeInSeconds: 0,
@@ -53,10 +57,6 @@ export class LanguageModelCache {
 		}
 	}
 
-	configure(configuration: LanguageServiceConfiguration) {
-		this.#ls.configure(configuration);
-	}
-
 	get(document: TextDocument): Stylesheet {
 		const version = document.version;
 		const languageId = document.languageId;
@@ -69,7 +69,9 @@ export class LanguageModelCache {
 			languageModelInfo.cTime = Date.now();
 			return languageModelInfo.languageModel;
 		}
-		const languageModel = this.#ls.parseStylesheet(document) as INode;
+		const languageModel = this._internal.scssLs.parseStylesheet(
+			document,
+		) as INode;
 		this.#languageModels[document.uri] = {
 			languageModel,
 			version,
@@ -105,7 +107,9 @@ export class LanguageModelCache {
 	onDocumentChanged(document: TextDocument) {
 		const version = document.version;
 		const languageId = document.languageId;
-		const languageModel = this.#ls.parseStylesheet(document) as INode;
+		const languageModel = this._internal.scssLs.parseStylesheet(
+			document,
+		) as INode;
 		this.#languageModels[document.uri] = {
 			languageModel,
 			version,

@@ -36,8 +36,8 @@ export class FindLinks extends LanguageFeature {
 		};
 	}
 
-	findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]> {
-		const stylesheet = this.ls.parseStylesheet(document);
+	async findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]> {
+		const stylesheet = await this.ls.parseStylesheet(document);
 		// TODO: extend with AST traversal to find stuff like "as", "show", and "hide"
 		return this._internal.scssLs.findDocumentLinks2(
 			document,

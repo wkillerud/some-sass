@@ -226,7 +226,7 @@ export interface LanguageService {
 	 * Called internally by the other functions to get a cached AST of the document, or parse it if none exists.
 	 * You typically won't use this directly, but you can if you need access to the raw AST for the document.
 	 */
-	parseStylesheet(document: TextDocument): Stylesheet;
+	parseStylesheet(document: TextDocument): Promise<Stylesheet>;
 	/**
 	 * You may want to use this to set the workspace root.
 	 * @param settings {@link LanguageServiceConfiguration}
@@ -359,7 +359,7 @@ export interface FileSystemProvider {
 		exclude?: string | string[] | null,
 	): Promise<URI[]>;
 	readFile(uri: URI, encoding?: BufferEncoding): Promise<string>;
-	readDirectory(uri: string): Promise<[string, FileType][]>;
+	readDirectory(uri: URI): Promise<[URI, FileType][]>;
 	stat(uri: URI): Promise<FileStat>;
 	/**
 	 * For monorepos, resolve the actual location on disk rather than the URL to the symlink.

@@ -40,15 +40,15 @@ export class NodeFileSystem implements FileSystemProvider {
 		return promises.readFile(uri.fsPath, encoding);
 	}
 
-	async readDirectory(uri: string): Promise<[string, FileType][]> {
-		const dir = await promises.readdir(uri);
-		const result: [string, FileType][] = [];
+	async readDirectory(uri: URI): Promise<[URI, FileType][]> {
+		const dir = await promises.readdir(uri.fsPath);
+		const result: [URI, FileType][] = [];
 		for (const file of dir) {
 			try {
-				const stats = await this.stat(Utils.joinPath(URI.parse(uri), file));
-				result.push([file, stats.type]);
+				const stats = await this.stat(Utils.joinPath(uri, file));
+				result.push([URI.parse(file), stats.type]);
 			} catch (e) {
-				result.push([file, FileType.Unknown]);
+				result.push([URI.parse(file), FileType.Unknown]);
 			}
 		}
 		return result;

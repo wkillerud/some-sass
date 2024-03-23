@@ -58,10 +58,8 @@ export async function doImportCompletion(
 					URI.parse(modulePath),
 					pathWithinModule,
 				);
-				const filesInModulePath = await fs.readDirectory(
-					pathInsideModule.fsPath,
-				);
-				for (const [file, fileType] of filesInModulePath) {
+				const filesInModulePath = await fs.readDirectory(pathInsideModule);
+				for (const [{ fsPath: file }, fileType] of filesInModulePath) {
 					if (fileType === FileType.File && file.endsWith(".scss")) {
 						let insertText = file.slice(0, -5);
 						if (insertText.startsWith("_")) {

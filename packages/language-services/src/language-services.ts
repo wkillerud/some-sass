@@ -42,11 +42,11 @@ class LanguageService implements ILanguageService {
 		this.#findLinks.configure(configuration);
 	}
 
-	parseStylesheet(document: TextDocument) {
+	async parseStylesheet(document: TextDocument) {
 		return this.#cache.get(document);
 	}
 
-	findDocumentLinks(document: TextDocument) {
+	async findDocumentLinks(document: TextDocument) {
 		return this.#findLinks.findDocumentLinks(document);
 	}
 

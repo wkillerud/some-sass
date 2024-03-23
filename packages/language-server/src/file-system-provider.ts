@@ -73,7 +73,7 @@ export function getFileSystemProvider(
 			});
 			return res;
 		},
-		async readDirectory(uri: string) {
+		async readDirectory(uri: URI) {
 			const handler = runtime.file;
 			if (handler) {
 				return await handler.readDirectory(uri);
@@ -82,7 +82,7 @@ export function getFileSystemProvider(
 				FsReadDirectoryRequest.type,
 				uri.toString(),
 			);
-			return res;
+			return res.map(([uri, type]) => [URI.parse(uri), type]);
 		},
 		async findFiles(pattern, exclude) {
 			const handler = runtime.file;

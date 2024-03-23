@@ -4,6 +4,7 @@
 	"private": true,
 	"description": "Workspace management for the somesass monorepo",
 	"workspaces": [
+		"packages/vscode-css-languageservice",
 		"packages/language-server-types",
 		"packages/language-services",
 		"packages/language-server",

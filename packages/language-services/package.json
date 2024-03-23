@@ -51,9 +51,9 @@
 		"test": "vitest"
 	},
 	"dependencies": {
+		"@somesass/vscode-css-languageservice": "1.0.0",
 		"@somesass/language-server-types": "1.0.0",
-		"scss-sassdoc-parser": "3.1.0",
-		"vscode-css-languageservice": "6.2.13"
+		"scss-sassdoc-parser": "3.1.0"
 	},
 	"devDependencies": {
 		"shx": "0.3.4",

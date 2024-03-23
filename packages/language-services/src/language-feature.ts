@@ -64,11 +64,11 @@ export abstract class LanguageFeature {
 
 		// Filter out links we want to follow
 		const links = allLinks.filter((link) => {
-			if (link.kind === NodeType.Use) {
+			if (link.type === NodeType.Use) {
 				// Don't follow uses beyond the first, since symbols from those aren't available to us anyway
 				return depth === 0;
 			}
-			if (link.kind === NodeType.Import) {
+			if (link.type === NodeType.Import) {
 				// Don't follow imports, since the whole point here is to use the new module system
 				return false;
 			}

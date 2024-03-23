@@ -58,6 +58,8 @@ import { SCSSNavigation } from "./services/scssNavigation";
 import { cssData } from "./data/webCustomData";
 
 export type Stylesheet = {};
+
+export * from "./parser/cssNodes";
 export * from "./cssLanguageTypes";
 
 export interface LanguageService {

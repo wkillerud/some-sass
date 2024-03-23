@@ -1,11 +1,11 @@
+import { LanguageService as VSCodeLanguageService } from "@somesass/vscode-css-languageservice";
 import {
 	LanguageServiceOptions,
 	TextDocument,
 	LanguageService,
 	LanguageServiceConfiguration,
 	NodeType,
-} from "@somesass/language-server-types";
-import { LanguageService as VSCodeLanguageService } from "vscode-css-languageservice";
+} from "./language-services-types";
 
 export type LanguageFeatureInternal = {
 	scssLs: VSCodeLanguageService;

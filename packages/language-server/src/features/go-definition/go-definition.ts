@@ -5,7 +5,7 @@ import {
 	SymbolKind,
 	TextDocument,
 	Position,
-} from "@somesass/language-server-types";
+} from "@somesass/language-services";
 import { useContext } from "../../context-provider";
 import type { IScssDocument, ScssForward, ScssSymbol } from "../../parser";
 import type StorageService from "../../storage";

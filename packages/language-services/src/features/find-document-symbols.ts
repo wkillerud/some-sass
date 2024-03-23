@@ -1,12 +1,12 @@
+import { ParseResult, parse } from "scss-sassdoc-parser";
+import { LanguageFeature, LanguageFeatureInternal } from "../language-feature";
 import {
 	LanguageServiceOptions,
 	LanguageService,
 	TextDocument,
 	SassDocumentSymbol,
 	SymbolKind,
-} from "@somesass/language-server-types";
-import { ParseResult, parse } from "scss-sassdoc-parser";
-import { LanguageFeature, LanguageFeatureInternal } from "../language-feature";
+} from "../language-services-types";
 
 export class FindSymbols extends LanguageFeature {
 	constructor(

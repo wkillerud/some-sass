@@ -3,7 +3,7 @@ import {
 	TextDocument,
 	SymbolKind,
 	ColorInformation,
-} from "@somesass/language-server-types";
+} from "@somesass/language-services";
 import ColorDotJS from "colorjs.io";
 import { useContext } from "../../context-provider";
 import { ScssVariable } from "../../parser";

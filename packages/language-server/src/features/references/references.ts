@@ -7,7 +7,7 @@ import {
 	Location,
 	Range,
 	SymbolKind,
-} from "@somesass/language-server-types";
+} from "@somesass/language-services";
 import { useContext } from "../../context-provider";
 import type { IScssDocument, ScssSymbol } from "../../parser";
 import { tokenizer } from "../../parser";

@@ -6,7 +6,7 @@ import {
 	SymbolKind,
 	Diagnostic,
 	VersionedTextDocumentIdentifier,
-} from "@somesass/language-server-types";
+} from "@somesass/language-services";
 import { EXTENSION_NAME } from "../../constants";
 import { useContext } from "../../context-provider";
 import type { IScssDocument, ScssForward, ScssSymbol } from "../../parser";

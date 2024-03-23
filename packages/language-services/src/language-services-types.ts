@@ -1,8 +1,4 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
+import { Node, NodeType } from "@somesass/vscode-css-languageservice";
 import type { ParseResult } from "scss-sassdoc-parser";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
@@ -49,161 +45,6 @@ import {
 } from "vscode-languageserver-types";
 import { URI, Utils } from "vscode-uri";
 
-export enum NodeType {
-	Undefined,
-	Identifier,
-	Stylesheet,
-	Ruleset,
-	Selector,
-	SimpleSelector,
-	SelectorInterpolation,
-	SelectorCombinator,
-	SelectorCombinatorParent,
-	SelectorCombinatorSibling,
-	SelectorCombinatorAllSiblings,
-	SelectorCombinatorShadowPiercingDescendant,
-	Page,
-	PageBoxMarginBox,
-	ClassSelector,
-	IdentifierSelector,
-	ElementNameSelector,
-	PseudoSelector,
-	AttributeSelector,
-	Declaration,
-	Declarations,
-	Property,
-	Expression,
-	BinaryExpression,
-	Term,
-	Operator,
-	Value,
-	StringLiteral,
-	URILiteral,
-	EscapedValue,
-	Function,
-	NumericValue,
-	HexColorValue,
-	RatioValue,
-	MixinDeclaration,
-	MixinReference,
-	VariableName,
-	VariableDeclaration,
-	Prio,
-	Interpolation,
-	NestedProperties,
-	ExtendsReference,
-	SelectorPlaceholder,
-	Debug,
-	If,
-	Else,
-	For,
-	Each,
-	While,
-	MixinContentReference,
-	MixinContentDeclaration,
-	Media,
-	Keyframe,
-	FontFace,
-	Import,
-	Namespace,
-	Invocation,
-	FunctionDeclaration,
-	ReturnStatement,
-	MediaQuery,
-	MediaCondition,
-	MediaFeature,
-	FunctionParameter,
-	FunctionArgument,
-	KeyframeSelector,
-	ViewPort,
-	Document,
-	AtApplyRule,
-	CustomPropertyDeclaration,
-	CustomPropertySet,
-	ListEntry,
-	Supports,
-	SupportsCondition,
-	NamespacePrefix,
-	GridLine,
-	Plugin,
-	UnknownAtRule,
-	Use,
-	ModuleConfiguration,
-	Forward,
-	ForwardVisibility,
-	Module,
-	UnicodeRange,
-	Layer,
-	LayerNameList,
-	LayerName,
-	PropertyAtRule,
-	Container,
-}
-
-export interface INode {
-	parent: INode | null;
-	type: NodeType;
-	offset: number;
-	length: number;
-	end: number;
-	options: { [name: string]: any } | undefined;
-	accept: (node: (node: INode) => boolean) => void;
-	acceptVisitor: (visitor: { visitNode: (node: INode) => boolean }) => void;
-	getName: () => string;
-	getValue: () => INode;
-	getDefaultValue: () => INode;
-	getText: () => string;
-	getParameters: () => INode;
-	getIdentifier: () => INode;
-	getSelectors: () => INode;
-	matches(str: string): boolean;
-	startsWith(str: string): boolean;
-	endsWith(str: string): boolean;
-	adoptChild(INode: INode, index?: number): INode;
-	attachTo(parent: INode, index?: number): INode;
-	collectIssues(results: any[]): void;
-	addIssue(issue: IMarker): void;
-	hasIssue(rule: IRule): boolean;
-	/**
-	 * @param [recursive] - default false
-	 */
-	isErroneous(recursive?: boolean): boolean;
-	setNode(field: keyof this, INode: INode | null, index?: number): boolean;
-	addChild(INode: INode | null): INode is INode;
-	hasChildren(): boolean;
-	getChildren(): INode[];
-	getChild(index: number): INode | null;
-	addChildren(nodes: INode[]): void;
-	findFirstChildBeforeOffset(offset: number): INode | null;
-	findChildAtOffset(offset: number, goDeep: boolean): INode | null;
-	encloses(candidate: INode): boolean;
-	getParent(): INode | null;
-	findParent(type: NodeType): INode | null;
-	findAParent(...types: NodeType[]): INode | null;
-	setData(key: string, value: any): void;
-	getData(key: string): any;
-}
-
-export interface IMarker {
-	getNode(): INode;
-	getMessage(): string;
-	getOffset(): number;
-	getLength(): number;
-	getRule(): IRule;
-	getLevel(): Level;
-}
-
-export interface IRule {
-	id: string;
-	message: string;
-}
-
-export enum Level {
-	Ignore = 1,
-	Warning = 2,
-	Error = 4,
-}
-
 export interface SassDocumentLink extends DocumentLink {
 	/**
 	 * The namespace of the module. Either equal to {@link as} or derived from {@link target}.
@@ -246,7 +87,7 @@ export interface SassDocumentLink extends DocumentLink {
 /**
  * The root of the abstract syntax tree.
  */
-export type Stylesheet = INode;
+export type Stylesheet = Node;
 
 export interface SassDocumentSymbol extends DocumentSymbol {
 	sassdoc?: ParseResult;
@@ -458,4 +299,6 @@ export {
 	TextDocumentEdit,
 	VersionedTextDocumentIdentifier,
 	DocumentHighlightKind,
+	Node,
+	NodeType,
 };

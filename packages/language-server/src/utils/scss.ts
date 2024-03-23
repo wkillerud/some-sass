@@ -1,4 +1,4 @@
-import { NodeType } from "@somesass/language-server-types";
+import { NodeType } from "@somesass/language-services";
 import { getDefinition } from "../features/go-definition";
 import { IScssDocument, ScssVariable } from "../parser";
 import { getParentNodeByType } from "../parser/ast";

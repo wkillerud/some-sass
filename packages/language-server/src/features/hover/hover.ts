@@ -5,7 +5,7 @@ import {
 	Hover,
 	MarkupContent,
 	TextDocument,
-} from "@somesass/language-server-types";
+} from "@somesass/language-services";
 import { useContext } from "../../context-provider";
 import {
 	IScssDocument,

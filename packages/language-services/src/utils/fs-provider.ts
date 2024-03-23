@@ -1,9 +1,5 @@
-import {
-	FileType,
-	FileSystemProvider,
-	URI,
-} from "@somesass/language-server-types";
 import type { FileSystemProvider as CSSFileSystemProvider } from "vscode-css-languageservice";
+import { FileType, FileSystemProvider, URI } from "../language-services-types";
 
 export function mapFsProviders(
 	ours: FileSystemProvider,

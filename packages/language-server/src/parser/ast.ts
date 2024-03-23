@@ -1,4 +1,4 @@
-import { INode, NodeType } from "@somesass/language-server-types";
+import { INode, NodeType } from "@somesass/language-services";
 
 /**
  * Get Node by offset position.

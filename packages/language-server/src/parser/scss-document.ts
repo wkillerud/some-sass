@@ -5,7 +5,7 @@ import {
 	Range,
 	URI,
 	FileSystemProvider,
-} from "@somesass/language-server-types";
+} from "@somesass/language-services";
 import { getLinesFromText } from "../utils/string";
 import { getNodeAtOffset } from "./ast";
 import type {

@@ -5,7 +5,7 @@ import {
 	TextDocument,
 	SymbolKind,
 	Range,
-} from "@somesass/language-server-types";
+} from "@somesass/language-services";
 import type { Parameter, ParseResult } from "scss-sassdoc-parser";
 
 export interface ScssSymbol {

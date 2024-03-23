@@ -1,15 +1,17 @@
+import { getSCSSLanguageService } from "@somesass/vscode-css-languageservice";
+import { FindLinks } from "./features/find-document-links";
+import { FindSymbols } from "./features/find-document-symbols";
+import { LanguageModelCache } from "./language-model-cache";
 import {
 	LanguageService as ILanguageService,
 	LanguageServiceConfiguration,
 	LanguageServiceOptions,
 	SassDocumentSymbol,
 	TextDocument,
-} from "@somesass/language-server-types";
-import { getSCSSLanguageService } from "vscode-css-languageservice";
-import { FindLinks } from "./features/find-document-links";
-import { FindSymbols } from "./features/find-document-symbols";
-import { LanguageModelCache } from "./language-model-cache";
+} from "./language-services-types";
 import { mapFsProviders } from "./utils/fs-provider";
+
+export * from "./language-services-types";
 
 let singleton: LanguageService | null = null;
 
@@ -40,6 +42,7 @@ class LanguageService implements ILanguageService {
 	configure(configuration: LanguageServiceConfiguration): void {
 		this.#cache.configure(configuration);
 		this.#findLinks.configure(configuration);
+		this.#findSymbols.configure(configuration);
 	}
 
 	async parseStylesheet(document: TextDocument) {

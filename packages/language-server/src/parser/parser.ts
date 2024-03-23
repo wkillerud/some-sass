@@ -9,8 +9,8 @@ import {
 	DocumentLink,
 	FileSystemProvider,
 	LanguageService,
-} from "@somesass/language-server-types";
-import { getLanguageService } from "@somesass/language-services";
+	getLanguageService,
+} from "@somesass/language-services";
 import { useContext } from "../context-provider";
 import { sassBuiltInModuleNames } from "../features/sass-built-in-modules";
 import { getLinesFromText } from "../utils/string";

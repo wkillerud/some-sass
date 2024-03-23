@@ -6,7 +6,7 @@ import {
 	FileStat,
 	FileType,
 	TextDocument,
-} from "@somesass/language-server-types";
+} from "../language-services-types";
 
 class MemoryFileSystem implements FileSystemProvider {
 	storage: Map<string, TextDocument>;

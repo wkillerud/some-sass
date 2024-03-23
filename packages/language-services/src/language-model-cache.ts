@@ -3,15 +3,15 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { LanguageFeature, LanguageFeatureInternal } from "./language-feature";
 import {
 	LanguageService,
 	TextDocument,
 	Stylesheet,
 	LanguageServiceOptions,
 	LanguageModelCacheOptions,
-	INode,
-} from "@somesass/language-server-types";
-import { LanguageFeature, LanguageFeatureInternal } from "./language-feature";
+	Node,
+} from "./language-services-types";
 
 type LanguageModels = {
 	[uri: string]: {
@@ -71,7 +71,7 @@ export class LanguageModelCache extends LanguageFeature {
 		}
 		const languageModel = this._internal.scssLs.parseStylesheet(
 			document,
-		) as INode;
+		) as Node;
 		this.#languageModels[document.uri] = {
 			languageModel,
 			version,
@@ -109,7 +109,7 @@ export class LanguageModelCache extends LanguageFeature {
 		const languageId = document.languageId;
 		const languageModel = this._internal.scssLs.parseStylesheet(
 			document,
-		) as INode;
+		) as Node;
 		this.#languageModels[document.uri] = {
 			languageModel,
 			version,

@@ -17,10 +17,10 @@ import {
 } from "../css/navigation.test";
 import {
 	getSCSSLanguageService,
-	DocumentLink,
 	TextDocument,
 	SymbolKind,
 	LanguageSettings,
+	StylesheetDocumentLink,
 } from "../../cssLanguageService";
 import * as assert from "assert";
 import * as path from "path";
@@ -46,7 +46,7 @@ function aliasSettings(): LanguageSettings {
 async function assertDynamicLinks(
 	docUri: string,
 	input: string,
-	expected: DocumentLink[],
+	expected: StylesheetDocumentLink[],
 	settings?: LanguageSettings,
 ) {
 	const ls = getSCSSLS();
@@ -259,44 +259,51 @@ suite("SCSS - Navigation", () => {
 			};
 
 			await assertDynamicLinks(getDocumentUri("./noUnderscore/index.scss"), `@import 'foo'`, [
-				{ range: newRange(8, 13), target: getDocumentUri("./noUnderscore/foo.scss") },
+				{ range: newRange(8, 13), target: getDocumentUri("./noUnderscore/foo.scss"), type: nodes.NodeType.Import },
 			]);
 
 			await assertDynamicLinks(getDocumentUri("./underscore/index.scss"), `@import 'foo'`, [
-				{ range: newRange(8, 13), target: getDocumentUri("./underscore/_foo.scss") },
+				{ range: newRange(8, 13), target: getDocumentUri("./underscore/_foo.scss"), type: nodes.NodeType.Import },
 			]);
 
 			await assertDynamicLinks(getDocumentUri("./underscore/index.scss"), `@import 'foo.scss'`, [
-				{ range: newRange(8, 18), target: getDocumentUri("./underscore/_foo.scss") },
+				{ range: newRange(8, 18), target: getDocumentUri("./underscore/_foo.scss"), type: nodes.NodeType.Import },
 			]);
 
 			await assertDynamicLinks(getDocumentUri("./both/index.scss"), `@import 'foo'`, [
-				{ range: newRange(8, 13), target: getDocumentUri("./both/foo.scss") },
+				{ range: newRange(8, 13), target: getDocumentUri("./both/foo.scss"), type: nodes.NodeType.Import },
 			]);
 
 			await assertDynamicLinks(getDocumentUri("./both/index.scss"), `@import '_foo'`, [
-				{ range: newRange(8, 14), target: getDocumentUri("./both/_foo.scss") },
+				{ range: newRange(8, 14), target: getDocumentUri("./both/_foo.scss"), type: nodes.NodeType.Import },
 			]);
 
 			await assertDynamicLinks(getDocumentUri("./index/index.scss"), `@import 'foo'`, [
-				{ range: newRange(8, 13), target: getDocumentUri("./index/foo/index.scss") },
+				{ range: newRange(8, 13), target: getDocumentUri("./index/foo/index.scss"), type: nodes.NodeType.Import },
 			]);
 
 			await assertDynamicLinks(getDocumentUri("./index/index.scss"), `@import 'bar'`, [
-				{ range: newRange(8, 13), target: getDocumentUri("./index/bar/_index.scss") },
+				{ range: newRange(8, 13), target: getDocumentUri("./index/bar/_index.scss"), type: nodes.NodeType.Import },
 			]);
 		});
 
 		test("SCSS straight links", async () => {
 			const ls = getSCSSLS();
 
-			await assertLinks(ls, `@import 'foo.css'`, [{ range: newRange(8, 17), target: "test://test/foo.css" }], "scss");
+			await assertLinks(
+				ls,
+				`@import 'foo.css'`,
+				[{ range: newRange(8, 17), target: "test://test/foo.css", type: nodes.NodeType.Import }],
+				"scss",
+			);
 
-			await assertLinks(ls, `@import 'foo.scss' print;`, [{ range: newRange(8, 18), target: "test://test/foo.scss" }]);
+			await assertLinks(ls, `@import 'foo.scss' print;`, [
+				{ range: newRange(8, 18), target: "test://test/foo.scss", type: nodes.NodeType.Import },
+			]);
 			await assertLinks(
 				ls,
 				`@import 'http://foo.com/foo.css'`,
-				[{ range: newRange(8, 32), target: "http://foo.com/foo.css" }],
+				[{ range: newRange(8, 32), target: "http://foo.com/foo.css", type: nodes.NodeType.Import }],
 				"scss",
 			);
 
@@ -316,34 +323,34 @@ suite("SCSS - Navigation", () => {
 			ls.configure(settings);
 
 			await assertLinks(ls, '@import "@SassStylesheet"', [
-				{ range: newRange(8, 25), target: "test://test/src/assets/styles.scss" },
+				{ range: newRange(8, 25), target: "test://test/src/assets/styles.scss", type: nodes.NodeType.Import },
 			]);
 
 			await assertDynamicLinks(
 				getDocumentUri("./"),
 				`@import '@NoUnderscoreDir/foo'`,
-				[{ range: newRange(8, 30), target: getDocumentUri("./noUnderscore/foo.scss") }],
+				[{ range: newRange(8, 30), target: getDocumentUri("./noUnderscore/foo.scss"), type: nodes.NodeType.Import }],
 				settings,
 			);
 
 			await assertDynamicLinks(
 				getDocumentUri("./"),
 				`@import '@UnderscoreDir/foo'`,
-				[{ range: newRange(8, 28), target: getDocumentUri("./underscore/_foo.scss") }],
+				[{ range: newRange(8, 28), target: getDocumentUri("./underscore/_foo.scss"), type: nodes.NodeType.Import }],
 				settings,
 			);
 
 			await assertDynamicLinks(
 				getDocumentUri("./"),
 				`@import '@BothDir/foo'`,
-				[{ range: newRange(8, 22), target: getDocumentUri("./both/foo.scss") }],
+				[{ range: newRange(8, 22), target: getDocumentUri("./both/foo.scss"), type: nodes.NodeType.Import }],
 				settings,
 			);
 
 			await assertDynamicLinks(
 				getDocumentUri("./"),
 				`@import '@BothDir/_foo'`,
-				[{ range: newRange(8, 23), target: getDocumentUri("./both/_foo.scss") }],
+				[{ range: newRange(8, 23), target: getDocumentUri("./both/_foo.scss"), type: nodes.NodeType.Import }],
 				settings,
 			);
 		});
@@ -355,11 +362,11 @@ suite("SCSS - Navigation", () => {
 			};
 
 			await assertDynamicLinks(getDocumentUri("./index.scss"), `@use './foo' as f`, [
-				{ range: newRange(5, 12), target: getDocumentUri("./foo.scss") },
+				{ range: newRange(5, 12), target: getDocumentUri("./foo.scss"), type: nodes.NodeType.Use },
 			]);
 
 			await assertDynamicLinks(getDocumentUri("./index.scss"), `@forward './foo' hide $private`, [
-				{ range: newRange(9, 16), target: getDocumentUri("./foo.scss") },
+				{ range: newRange(9, 16), target: getDocumentUri("./foo.scss"), type: nodes.NodeType.Forward },
 			]);
 
 			await assertNoDynamicLinks(getDocumentUri("./index.scss"), `@use 'sass:math'`, undefined);
@@ -409,7 +416,13 @@ suite("SCSS - Navigation", () => {
 			await assertLinks(
 				ls,
 				`@use '@foo/bar/baz'`,
-				[{ range: newRange(5, 19), target: getTestResource("node_modules/@foo/bar/_baz.scss") }],
+				[
+					{
+						range: newRange(5, 19),
+						target: getTestResource("node_modules/@foo/bar/_baz.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
 				"scss",
 				testUri,
 				workspaceFolder,
@@ -417,7 +430,13 @@ suite("SCSS - Navigation", () => {
 			await assertLinks(
 				ls,
 				`@use '@foo/bar'`,
-				[{ range: newRange(5, 15), target: getTestResource("node_modules/@foo/bar/_index.scss") }],
+				[
+					{
+						range: newRange(5, 15),
+						target: getTestResource("node_modules/@foo/bar/_index.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
 				"scss",
 				testUri,
 				workspaceFolder,
@@ -425,7 +444,7 @@ suite("SCSS - Navigation", () => {
 			await assertLinks(
 				ls,
 				'@import "green/d"',
-				[{ range: newRange(8, 17), target: getTestResource("green/d.scss") }],
+				[{ range: newRange(8, 17), target: getTestResource("green/d.scss"), type: nodes.NodeType.Import }],
 				"scss",
 				testUri,
 				workspaceFolder,
@@ -433,7 +452,7 @@ suite("SCSS - Navigation", () => {
 			await assertLinks(
 				ls,
 				'@import "./green/d"',
-				[{ range: newRange(8, 19), target: getTestResource("green/d.scss") }],
+				[{ range: newRange(8, 19), target: getTestResource("green/d.scss"), type: nodes.NodeType.Import }],
 				"scss",
 				testUri,
 				workspaceFolder,
@@ -441,7 +460,13 @@ suite("SCSS - Navigation", () => {
 			await assertLinks(
 				ls,
 				'@import "green/e"',
-				[{ range: newRange(8, 17), target: getTestResource("node_modules/green/_e.scss") }],
+				[
+					{
+						range: newRange(8, 17),
+						target: getTestResource("node_modules/green/_e.scss"),
+						type: nodes.NodeType.Import,
+					},
+				],
 				"scss",
 				testUri,
 				workspaceFolder,

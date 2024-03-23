@@ -24,6 +24,7 @@ import {
 	FileSystemProvider,
 	FileType,
 	DocumentSymbol,
+	StylesheetDocumentLink,
 } from "../cssLanguageTypes";
 import * as l10n from "@vscode/l10n";
 import * as nodes from "../parser/cssNodes";
@@ -32,7 +33,7 @@ import { getColorValue, hslFromColor, hwbFromColor } from "../languageFacts/fact
 import { startsWith } from "../utils/strings";
 import { dirname, joinPath } from "../utils/resources";
 
-type UnresolvedLinkData = { link: DocumentLink; isRawLink: boolean };
+type UnresolvedLinkData = { link: StylesheetDocumentLink; isRawLink: boolean };
 
 type DocumentSymbolCollector = (
 	name: string,
@@ -149,9 +150,9 @@ export class CSSNavigation {
 		document: TextDocument,
 		stylesheet: nodes.Stylesheet,
 		documentContext: DocumentContext,
-	): DocumentLink[] {
+	): StylesheetDocumentLink[] {
 		const linkData = this.findUnresolvedLinks(document, stylesheet);
-		const resolvedLinks: DocumentLink[] = [];
+		const resolvedLinks: StylesheetDocumentLink[] = [];
 		for (let data of linkData) {
 			const link = data.link;
 			const target = link.target;
@@ -174,9 +175,9 @@ export class CSSNavigation {
 		document: TextDocument,
 		stylesheet: nodes.Stylesheet,
 		documentContext: DocumentContext,
-	): Promise<DocumentLink[]> {
+	): Promise<StylesheetDocumentLink[]> {
 		const linkData = this.findUnresolvedLinks(document, stylesheet);
-		const resolvedLinks: DocumentLink[] = [];
+		const resolvedLinks: StylesheetDocumentLink[] = [];
 		for (let data of linkData) {
 			const link = data.link;
 			const target = link.target;
@@ -199,6 +200,12 @@ export class CSSNavigation {
 		const result: UnresolvedLinkData[] = [];
 
 		const collect = (uriStringNode: nodes.Node) => {
+			const linkStatement = uriStringNode.parent;
+			// There should always be a parent link statement
+			if (!linkStatement) {
+				return;
+			}
+
 			let rawUri = uriStringNode.getText();
 			const range = getRange(uriStringNode, document);
 			// Make sure the range is not empty
@@ -210,8 +217,20 @@ export class CSSNavigation {
 				rawUri = rawUri.slice(1, -1);
 			}
 
-			const isRawLink = uriStringNode.parent ? this.isRawStringDocumentLinkNode(uriStringNode.parent) : false;
-			result.push({ link: { target: rawUri, range }, isRawLink });
+			const isRawLink = this.isRawStringDocumentLinkNode(linkStatement);
+			const unresolved: UnresolvedLinkData = { link: { target: rawUri, range }, isRawLink };
+			if (isRawLink) {
+				unresolved.link.type = linkStatement.type;
+				if (linkStatement.type === nodes.NodeType.Use) {
+					// TODO: as with identifier and with *
+					// TODO: namespace calculation from rawUri
+				} else if (linkStatement.type === nodes.NodeType.Forward) {
+					// TODO: as with identifier without -
+					// TODO: show
+					// TODO: hide
+				}
+			}
+			result.push(unresolved);
 		};
 
 		stylesheet.accept((candidate) => {

@@ -49,6 +49,7 @@ import {
 	TextEdit,
 	CSSFormatConfiguration,
 	DocumentSymbol,
+	StylesheetDocumentLink,
 } from "./cssLanguageTypes";
 
 import { CSSDataManager } from "./languageFacts/dataManager";
@@ -85,7 +86,11 @@ export interface LanguageService {
 	findDefinition(document: TextDocument, position: Position, stylesheet: Stylesheet): Location | null;
 	findReferences(document: TextDocument, position: Position, stylesheet: Stylesheet): Location[];
 	findDocumentHighlights(document: TextDocument, position: Position, stylesheet: Stylesheet): DocumentHighlight[];
-	findDocumentLinks(document: TextDocument, stylesheet: Stylesheet, documentContext: DocumentContext): DocumentLink[];
+	findDocumentLinks(
+		document: TextDocument,
+		stylesheet: Stylesheet,
+		documentContext: DocumentContext,
+	): StylesheetDocumentLink[];
 	/**
 	 * Return statically resolved links, and dynamically resolved links if `fsProvider` is proved.
 	 */
@@ -93,7 +98,7 @@ export interface LanguageService {
 		document: TextDocument,
 		stylesheet: Stylesheet,
 		documentContext: DocumentContext,
-	): Promise<DocumentLink[]>;
+	): Promise<StylesheetDocumentLink[]>;
 	findDocumentSymbols(document: TextDocument, stylesheet: Stylesheet): SymbolInformation[];
 	findDocumentSymbols2(document: TextDocument, stylesheet: Stylesheet): DocumentSymbol[];
 	doCodeActions(document: TextDocument, range: Range, context: CodeActionContext, stylesheet: Stylesheet): Command[];

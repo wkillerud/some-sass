@@ -18,7 +18,6 @@ import {
 	TextEdit,
 	Color,
 	ColorInformation,
-	DocumentLink,
 	SymbolKind,
 	SymbolInformation,
 	Location,
@@ -27,6 +26,7 @@ import {
 	getCSSLanguageService,
 	DocumentSymbol,
 	LanguageSettings,
+	StylesheetDocumentLink,
 } from "../../cssLanguageService";
 
 import { URI } from "vscode-uri";
@@ -73,7 +73,7 @@ export function assertHighlights(
 export async function assertLinks(
 	ls: LanguageService,
 	input: string,
-	expected: DocumentLink[],
+	expected: StylesheetDocumentLink[],
 	lang: string = "css",
 	testUri?: string,
 	workspaceFolder?: string,
@@ -469,11 +469,17 @@ suite("CSS - Navigation", () => {
 	suite("Links", () => {
 		test("basic @import links", async () => {
 			const ls = getCSSLS();
-			await assertLinks(ls, `@import 'foo.css';`, [{ range: newRange(8, 17), target: "test://test/foo.css" }]);
+			await assertLinks(ls, `@import 'foo.css';`, [
+				{ range: newRange(8, 17), target: "test://test/foo.css", type: nodes.NodeType.Import },
+			]);
 
-			await assertLinks(ls, `@import './foo.css';`, [{ range: newRange(8, 19), target: "test://test/foo.css" }]);
+			await assertLinks(ls, `@import './foo.css';`, [
+				{ range: newRange(8, 19), target: "test://test/foo.css", type: nodes.NodeType.Import },
+			]);
 
-			await assertLinks(ls, `@import '../foo.css';`, [{ range: newRange(8, 20), target: "test://foo.css" }]);
+			await assertLinks(ls, `@import '../foo.css';`, [
+				{ range: newRange(8, 20), target: "test://foo.css", type: nodes.NodeType.Import },
+			]);
 		});
 
 		test("complex @import links", async () => {
@@ -497,11 +503,11 @@ suite("CSS - Navigation", () => {
 			ls.configure(settings);
 
 			await assertLinks(ls, '@import "@SingleStylesheet"', [
-				{ range: newRange(8, 27), target: "test://test/src/assets/styles.css" },
+				{ range: newRange(8, 27), target: "test://test/src/assets/styles.css", type: nodes.NodeType.Import },
 			]);
 
 			await assertLinks(ls, '@import "@AssetsDir/styles.css"', [
-				{ range: newRange(8, 31), target: "test://test/src/assets/styles.css" },
+				{ range: newRange(8, 31), target: "test://test/src/assets/styles.css", type: nodes.NodeType.Import },
 			]);
 		});
 
@@ -548,7 +554,7 @@ suite("CSS - Navigation", () => {
 			await assertLinks(
 				ls,
 				'@import "a.css"',
-				[{ range: newRange(8, 15), target: getTestResource("a.css") }],
+				[{ range: newRange(8, 15), target: getTestResource("a.css"), type: nodes.NodeType.Import }],
 				"css",
 				testUri,
 				workspaceFolder,
@@ -556,7 +562,7 @@ suite("CSS - Navigation", () => {
 			await assertLinks(
 				ls,
 				'@import "green/c.css"',
-				[{ range: newRange(8, 21), target: getTestResource("green/c.css") }],
+				[{ range: newRange(8, 21), target: getTestResource("green/c.css"), type: nodes.NodeType.Import }],
 				"css",
 				testUri,
 				workspaceFolder,
@@ -564,7 +570,7 @@ suite("CSS - Navigation", () => {
 			await assertLinks(
 				ls,
 				'@import "./green/c.css"',
-				[{ range: newRange(8, 23), target: getTestResource("green/c.css") }],
+				[{ range: newRange(8, 23), target: getTestResource("green/c.css"), type: nodes.NodeType.Import }],
 				"css",
 				testUri,
 				workspaceFolder,
@@ -587,7 +593,7 @@ suite("CSS - Navigation", () => {
 			await assertLinks(
 				ls,
 				'@import "~green/c.css"',
-				[{ range: newRange(8, 22), target: getTestResource("node_modules/green/c.css") }],
+				[{ range: newRange(8, 22), target: getTestResource("node_modules/green/c.css"), type: nodes.NodeType.Import }],
 				"css",
 				testUri,
 				workspaceFolder,
@@ -610,7 +616,7 @@ suite("CSS - Navigation", () => {
 			await assertLinks(
 				ls,
 				'@import "../green/c.css"',
-				[{ range: newRange(8, 24), target: getTestResource("green/c.css") }],
+				[{ range: newRange(8, 24), target: getTestResource("green/c.css"), type: nodes.NodeType.Import }],
 				"css",
 				testUri,
 				workspaceFolder,

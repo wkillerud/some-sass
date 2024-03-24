@@ -12,10 +12,9 @@ describe("Services/Scanner", () => {
 	});
 
 	it("should follow links", async () => {
-		const workspaceUri = getUri("scanner/follow-links/");
 		const docUri = getUri("scanner/follow-links/styles.scss");
 		const scanner = new ScannerService();
-		await scanner.scan([docUri], workspaceUri);
+		await scanner.scan([docUri]);
 
 		const { storage } = useContext();
 		const documents = [...storage.values()];
@@ -30,10 +29,9 @@ describe("Services/Scanner", () => {
 	it("should not get stuck in loops if the author links a document to itself", async () => {
 		// Yes, I've had this happen to me during a refactor :D
 
-		const workspaceUri = getUri("scanner/self-reference/");
 		const docUri = getUri("scanner/self-reference/styles.scss");
 		const scanner = new ScannerService();
-		await scanner.scan([docUri], workspaceUri);
+		await scanner.scan([docUri]);
 
 		const { storage } = useContext();
 		const documents = [...storage.values()];

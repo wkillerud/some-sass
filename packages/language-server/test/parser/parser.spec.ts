@@ -1,5 +1,4 @@
 import { strictEqual, deepStrictEqual } from "assert";
-import { URI } from "vscode-uri";
 import { parseDocument, rePlaceholderUsage } from "../../src/parser";
 import * as helpers from "../helpers";
 
@@ -15,7 +14,7 @@ describe("Services/Parser", () => {
 				"%placeholder { color: blue; }",
 			]);
 
-			const symbols = await parseDocument(document, URI.parse(""));
+			const symbols = await parseDocument(document);
 
 			// Variables
 			const variables = [...symbols.variables.values()];
@@ -64,7 +63,7 @@ describe("Services/Parser", () => {
 				"}",
 			]);
 
-			const symbols = await parseDocument(document, URI.parse(""));
+			const symbols = await parseDocument(document);
 			const usages = [...symbols.placeholderUsages.values()];
 			strictEqual(usages.length, 1);
 
@@ -89,7 +88,7 @@ describe("Services/Parser", () => {
 				"%alert { color: blue; }",
 			]);
 
-			const symbols = await parseDocument(document, URI.parse(""));
+			const symbols = await parseDocument(document);
 
 			// Uses
 			const uses = [...symbols.uses.values()];
@@ -132,27 +131,11 @@ describe("Services/Parser", () => {
 				{ uri: "middle/main.scss" },
 			);
 
-			const symbols = await parseDocument(document, URI.parse(""));
+			const symbols = await parseDocument(document);
 			const uses = [...symbols.uses.values()];
 
 			strictEqual(uses.length, 3, "expected to find three uses");
 		});
-
-		// it("should not crash on link to the same document", async () => {
-		// 	const document = await helpers.makeDocument(
-		// 		['@use "./self";', "$var: 1px;"],
-
-		// 		{
-		// 			uri: "self.scss",
-		// 		},
-		// 	);
-		// 	const symbols = await parseDocument(document, URI.parse(""));
-		// 	const uses = [...symbols.uses.values()];
-		// 	const variables = [...symbols.variables.values()];
-
-		// 	strictEqual(variables.length, 1, "expected to find one variable");
-		// 	strictEqual(uses.length, 0, "expected to find no use link to self");
-		// });
 	});
 
 	describe("regular expressions", () => {

@@ -1,4 +1,4 @@
-import { resolve, join } from "path";
+import { join } from "path";
 import {
 	LanguageServiceOptions,
 	Position,
@@ -24,8 +24,6 @@ export async function makeDocument(
 	options: MakeDocumentOptions = {},
 ): Promise<TextDocument> {
 	const text = Array.isArray(lines) ? lines.join("\n") : lines;
-	const workspaceRootPath = resolve("");
-	const workspaceRootUri = URI.file(workspaceRootPath);
 	const uri = URI.file(join(process.cwd(), options.uri || "index.scss"));
 	const document = TextDocument.create(
 		uri.toString(),
@@ -34,7 +32,7 @@ export async function makeDocument(
 		text,
 	);
 
-	const scssDocument = await parseDocument(document, workspaceRootUri);
+	const scssDocument = await parseDocument(document);
 	const { storage } = useContext();
 	storage.set(uri, scssDocument);
 	return document;

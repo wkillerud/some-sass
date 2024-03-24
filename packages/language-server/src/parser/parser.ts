@@ -2,11 +2,8 @@ import {
 	Node,
 	NodeType,
 	TextDocument,
-	URI,
 	Position,
 	SymbolKind,
-	FileSystemProvider,
-	LanguageService,
 	getLanguageService,
 	VariableDeclaration,
 	MixinDeclaration,
@@ -26,7 +23,6 @@ const reDynamicPath = /[#*{}]/;
 
 export async function parseDocument(
 	document: TextDocument,
-	workspaceRoot: URI,
 ): Promise<ScssDocument> {
 	const { fs, clientCapabilities } = useContext();
 	const ls = getLanguageService({
@@ -34,23 +30,7 @@ export async function parseDocument(
 		clientCapabilities,
 	});
 	const ast = await ls.parseStylesheet(document);
-	const symbols = await findDocumentSymbols(
-		document,
-		ast,
-		workspaceRoot,
-		fs,
-		ls,
-	);
-	return new ScssDocument(fs, document, symbols, ast);
-}
 
-async function findDocumentSymbols(
-	document: TextDocument,
-	ast: Node,
-	workspaceRoot: URI,
-	fs: FileSystemProvider,
-	ls: LanguageService,
-): Promise<IScssSymbols> {
 	// Placeholder usages should probably be a find-method in LS?
 	const result: IScssSymbols = {
 		functions: new Map(),
@@ -174,7 +154,7 @@ async function findDocumentSymbols(
 		}
 	}
 
-	return result;
+	return new ScssDocument(fs, document, result, ast);
 }
 
 function getVariableValue(ast: Node, offset: number): string | null {

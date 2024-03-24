@@ -6,7 +6,7 @@ import { parseDocument } from "./parser";
 import { getSCSSRegionsDocument } from "./utils/embedded";
 
 export default class ScannerService {
-	public async scan(files: URI[], workspaceRoot: URI): Promise<void> {
+	public async scan(files: URI[]): Promise<void> {
 		const { settings } = useContext();
 		await Promise.all(
 			files.map((uri) => {
@@ -20,33 +20,23 @@ export default class ScannerService {
 					// partials which may or may not have been forwarded with a prefix.
 					return;
 				}
-				return this.parse(uri, workspaceRoot, 0);
+				return this.parse(uri, 0);
 			}),
 		);
 	}
 
-	public async update(
-		document: TextDocument,
-		workspaceRoot: URI,
-	): Promise<void> {
+	public async update(document: TextDocument): Promise<void> {
 		const scssRegions = getSCSSRegionsDocument(document);
 		if (!scssRegions.document) {
 			return;
 		}
 
-		const scssDocument = await parseDocument(
-			scssRegions.document,
-			workspaceRoot,
-		);
+		const scssDocument = await parseDocument(scssRegions.document);
 		const { storage } = useContext();
 		storage.set(scssDocument.uri, scssDocument);
 	}
 
-	protected async parse(
-		uri: URI,
-		workspaceRoot: URI,
-		depth: number,
-	): Promise<void> {
+	protected async parse(uri: URI, depth: number): Promise<void> {
 		const { settings, storage, fs } = useContext();
 		const isExistFile = await fs.exists(uri);
 		if (!isExistFile) {
@@ -70,10 +60,7 @@ export default class ScannerService {
 				return;
 			}
 
-			const scssDocument = await parseDocument(
-				scssRegions.document,
-				workspaceRoot,
-			);
+			const scssDocument = await parseDocument(scssRegions.document);
 			storage.set(scssDocument.uri, scssDocument);
 
 			const maxDepth = settings.scannerDepth ?? 30;
@@ -91,11 +78,7 @@ export default class ScannerService {
 				}
 
 				try {
-					await this.parse(
-						URI.parse(symbol.link.target),
-						workspaceRoot,
-						depth + 1,
-					);
+					await this.parse(URI.parse(symbol.link.target), depth + 1);
 				} catch (error) {
 					console.error((error as Error).message);
 				}

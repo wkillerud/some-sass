@@ -152,7 +152,7 @@ export class SomeSassServer {
 			);
 
 			try {
-				await scannerService.scan(files, workspaceRoot);
+				await scannerService.scan(files);
 			} catch (error) {
 				this.connection.console.log(String(error));
 			}
@@ -164,7 +164,7 @@ export class SomeSassServer {
 			}
 
 			try {
-				await scannerService.update(change.document, workspaceRoot);
+				await scannerService.update(change.document);
 			} catch (error) {
 				// Something went wrong trying to parse the changed document.
 				this.connection.console.error((error as Error).message);
@@ -210,7 +210,7 @@ export class SomeSassServer {
 				} else if (change.type === FileChangeType.Changed) {
 					const document = storage.get(uri);
 					if (document) {
-						await scannerService.update(document, workspaceRoot);
+						await scannerService.update(document);
 					} else {
 						// New to us anyway
 						newFiles.push(uri);
@@ -219,7 +219,7 @@ export class SomeSassServer {
 					newFiles.push(uri);
 				}
 			}
-			return scannerService.scan(newFiles, workspaceRoot);
+			return scannerService.scan(newFiles);
 		});
 
 		this.connection.onCompletion(async (textDocumentPosition) => {
@@ -421,7 +421,7 @@ export class SomeSassServer {
 				// hasn't finished before the documentColor request is sent from the client.
 				// In these cases, initiate a scan for the document and wait for it to finish,
 				// to ensure we get color decorators without having to edit the file first.
-				await scannerService.scan([URI.parse(document.uri)], workspaceRoot);
+				await scannerService.scan([URI.parse(document.uri)]);
 			}
 
 			const information = findDocumentColors(document);

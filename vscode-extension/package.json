@@ -118,10 +118,9 @@
 		"shx": "0.3.4"
 	},
 	"scripts": {
-		"vscode:prepublish": "npm install && npm run build",
+		"vscode:prepublish": "npm install && npm run clean && webpack --mode production",
 		"clean": "shx rm -rf dist",
-		"build": "npm run clean && webpack --mode production",
-		"dev": "npm run clean && webpack --mode development",
+		"build": "npm run clean && webpack --mode development",
 		"start:web": "vscode-test-web --browserType=chromium",
 		"start:test-web": "vscode-test-web --browserType=chromium  --extensionDevelopmentPath=. ./test/fixtures",
 		"lint": "eslint \"**/*.ts\" --cache",

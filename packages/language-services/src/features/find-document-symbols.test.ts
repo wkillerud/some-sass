@@ -29,7 +29,6 @@ test("should return variables", async () => {
 				line: 0,
 			},
 		},
-		sassdoc: undefined,
 		selectionRange: {
 			end: {
 				character: 5,
@@ -54,7 +53,6 @@ test("should return variables", async () => {
 				line: 1,
 			},
 		},
-		sassdoc: undefined,
 		selectionRange: {
 			end: {
 				character: 12,
@@ -79,7 +77,6 @@ test("should return variables", async () => {
 				line: 2,
 			},
 		},
-		sassdoc: undefined,
 		selectionRange: {
 			end: {
 				character: 18,
@@ -104,7 +101,6 @@ test("should return variables", async () => {
 				line: 3,
 			},
 		},
-		sassdoc: undefined,
 		selectionRange: {
 			end: {
 				character: 12,

@@ -20,9 +20,10 @@ export class FindSymbols extends LanguageFeature {
 	async findDocumentSymbols(
 		document: TextDocument,
 	): Promise<SassDocumentSymbol[]> {
+		const stylesheet = await this.ls.parseStylesheet(document);
 		const symbols = this._internal.scssLs.findDocumentSymbols2(
 			document,
-			this.ls.parseStylesheet(document),
+			stylesheet,
 		) as SassDocumentSymbol[];
 
 		if (symbols.length === 0) {
@@ -36,6 +37,11 @@ export class FindSymbols extends LanguageFeature {
 		} catch {
 			// do nothing
 		}
+
+		if (sassdoc.length === 0) {
+			return symbols;
+		}
+
 		for (const symbol of symbols) {
 			switch (symbol.kind) {
 				case SymbolKind.Variable: {

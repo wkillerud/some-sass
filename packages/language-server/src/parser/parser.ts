@@ -4,9 +4,7 @@ import {
 	TextDocument,
 	URI,
 	Position,
-	Range,
 	SymbolKind,
-	DocumentLink,
 	FileSystemProvider,
 	LanguageService,
 	getLanguageService,
@@ -16,17 +14,11 @@ import {
 	FunctionParameter,
 } from "@somesass/language-services";
 import { useContext } from "../context-provider";
-import { sassBuiltInModuleNames } from "../features/sass-built-in-modules";
 import { getLinesFromText } from "../utils/string";
 import { getNodeAtOffset, getParentNodeByType } from "./ast";
 import { ScssDocument } from "./scss-document";
 import type { IScssSymbols, ScssParameter } from "./scss-symbol";
 
-export const reModuleAtRule = /@(?:use|forward|import)/;
-export const reUse = /@use ["'|](?<url>.+)["'|](?: as (?<namespace>\*|\w+))?;/;
-export const reForward =
-	/@forward ["'|](?<url>.+)["'|](?: as (?<prefix>\w+-)\*)?(?: hide (?<hide>.+))?(?: show (?<show>.+))?;/;
-export const reImport = /@import ["'|](?<url>.+)["'|]/;
 export const rePlaceholder = /^\s*%(?<name>\w+)/;
 export const rePlaceholderUsage = /\s*@extend\s+(?<name>%[\w\d-_]+)/;
 
@@ -41,6 +33,7 @@ export async function parseDocument(
 		fileSystemProvider: fs,
 		clientCapabilities,
 	});
+	ls.clearCache(); // tmp for test, because of course...
 	const ast = await ls.parseStylesheet(document);
 	const symbols = await findDocumentSymbols(
 		document,
@@ -72,133 +65,48 @@ async function findDocumentSymbols(
 	};
 
 	const links = await ls.findDocumentLinks(document);
-
-	const text = document.getText();
-	const lines = getLinesFromText(text);
-
-	for (let lineNumber = 0; lineNumber < lines.length; lineNumber++) {
-		const line = lines.at(lineNumber);
-		if (typeof line === "undefined") {
+	for (const link of links) {
+		if (!link.target || link.target.endsWith(".css")) {
 			continue;
 		}
 
-		for (const link of links) {
-			if (
-				!link.target ||
-				link.target.endsWith(".css") ||
-				!reModuleAtRule.test(line)
-			) {
-				continue;
+		switch (link.type) {
+			case NodeType.Use: {
+				link.target = await toRealPath(link.target, fs);
+				result.uses.set(link.target, {
+					link,
+					namespace: link.namespace || link.as, // Legacy since ScssUse does not have `as`, refactor in progress
+					isAliased: Boolean(link.as),
+				});
+				break;
 			}
-
-			link.target = ensureScssExtension(link.target);
-
-			const targetUri = URI.parse(link.target);
-			const targetExists = await fs.exists(targetUri);
-			if (!targetExists) {
-				// The target string may be a partial without its _ prefix,
-				// so try looking for it by that name.
-				const partial = ensurePartial(link.target);
-				const partialUri = URI.parse(partial);
-				const partialExists = await fs.exists(partialUri);
-				if (!partialExists) {
-					// We tried to resolve the file as a partial, but it doesn't exist.
-					// The target string may be a folder with an index file
-					// so try looking for it by that name.
-					const index = ensureIndex(link.target);
-					const indexUri = URI.parse(index);
-					const indexExists = await fs.exists(indexUri);
-					if (!indexExists) {
-						const partialIndex = ensurePartial(ensureIndex(link.target));
-						const partialIndexUri = URI.parse(partialIndex);
-						const partialIndexExists = await fs.exists(partialIndexUri);
-						if (!partialIndexExists) {
-							// We tried, this file doesn't exist
-							continue;
-						} else {
-							link.target = partialIndexUri.toString();
-						}
-					} else {
-						link.target = indexUri.toString();
-					}
-				} else {
-					link.target = partialUri.toString();
-				}
-			} else {
-				link.target = targetUri.toString();
+			case NodeType.Forward: {
+				link.target = await toRealPath(link.target, fs);
+				result.forwards.set(link.target, {
+					link,
+					prefix: link.as,
+					hide: link.hide || [],
+					show: link.show || [],
+				});
+				break;
 			}
-
-			const matchUse = reUse.exec(line);
-			if (matchUse) {
-				const url = matchUse.groups?.["url"];
-				if (urlMatches(url as string, link.target)) {
-					const namespace = matchUse.groups?.["namespace"];
-					link.target = await toRealPath(link.target, fs);
-					result.uses.set(link.target, {
-						link,
-						namespace: namespace || getNamespaceFromLink(link),
-						isAliased: Boolean(namespace),
-					});
-				}
-
-				continue;
-			}
-
-			const matchForward = reForward.exec(line);
-			if (matchForward) {
-				const url = matchForward.groups?.["url"];
-				if (urlMatches(url as string, link.target)) {
-					link.target = await toRealPath(link.target, fs);
-					result.forwards.set(link.target, {
-						link,
-						prefix: matchForward.groups?.["prefix"],
-						hide: matchForward.groups?.["hide"]
-							? matchForward.groups["hide"].split(",").map((s) => s.trim())
-							: [],
-						show: matchForward.groups?.["show"]
-							? matchForward.groups["show"].split(",").map((s) => s.trim())
-							: [],
-					});
-				}
-
-				continue;
-			}
-
-			const matchImport = reImport.exec(line);
-			if (matchImport) {
-				const url = matchImport.groups?.["url"];
-				if (urlMatches(url as string, link.target)) {
-					link.target = await toRealPath(link.target, fs);
-					result.imports.set(link.target, {
-						link,
-						dynamic: reDynamicPath.test(link.target),
-						css: link.target.endsWith(".css"),
-					});
-				}
+			case NodeType.Import: {
+				link.target = await toRealPath(link.target, fs);
+				result.imports.set(link.target, {
+					link,
+					dynamic: reDynamicPath.test(link.target),
+					css: link.target.endsWith(".css"),
+				});
+				break;
 			}
 		}
+	}
 
-		// Look for any usage of built-in modules like @use "sass:math";
-		const matchUse = reUse.exec(line);
-		if (matchUse) {
-			const url = matchUse.groups?.["url"];
-			if (!url) {
-				continue;
-			}
-			const isBuiltIn = sassBuiltInModuleNames.has(url);
-			if (isBuiltIn) {
-				const namespace = matchUse.groups?.["namespace"];
-				result.uses.set(url, {
-					// Fake link with builtin as target
-					link: DocumentLink.create(
-						Range.create(Position.create(1, 1), Position.create(1, 1)),
-						url,
-					),
-					namespace: namespace || url.split(":")[1],
-					isAliased: Boolean(namespace),
-				});
-			}
-
+	const text = document.getText();
+	const lines = getLinesFromText(text);
+	for (let lineNumber = 0; lineNumber < lines.length; lineNumber++) {
+		const line = lines.at(lineNumber);
+		if (typeof line === "undefined") {
 			continue;
 		}
 
@@ -271,81 +179,6 @@ async function findDocumentSymbols(
 	}
 
 	return result;
-}
-
-function getNamespaceFromLink(link: DocumentLink): string | undefined {
-	if (!link.target) {
-		return undefined;
-	}
-
-	const lastSlash = link.target.lastIndexOf("/");
-	const extension = link.target.lastIndexOf(".");
-	let candidate = link.target.substring(lastSlash + 1, extension);
-
-	candidate = candidate.startsWith("_") ? candidate.slice(1) : candidate;
-
-	if (candidate === "index") {
-		// The link points to an index file. Use the folder name above as a namespace.
-		const linkOmitIndex = link.target.slice(0, Math.max(0, lastSlash));
-		const newLastSlash = linkOmitIndex.lastIndexOf("/");
-		candidate = linkOmitIndex.slice(Math.max(0, newLastSlash + 1));
-	}
-
-	return candidate;
-}
-
-function ensureScssExtension(target: string): string {
-	if (target.endsWith(".scss")) {
-		return target;
-	}
-
-	return `${target}.scss`;
-}
-
-function ensurePartial(target: string): string {
-	const lastSlash = target.lastIndexOf("/");
-	const lastDot = target.lastIndexOf(".");
-	const fileName = target.substring(lastSlash + 1, lastDot);
-
-	if (fileName.startsWith("_")) {
-		return target;
-	}
-
-	const path = target.slice(0, Math.max(0, lastSlash + 1));
-	const extension = target.slice(Math.max(0, lastDot));
-	return `${path}_${fileName}${extension}`;
-}
-
-function ensureIndex(target: string): string {
-	const lastSlash = target.lastIndexOf("/");
-	const lastDot = target.lastIndexOf(".");
-	const fileName = target.substring(lastSlash + 1, lastDot);
-
-	if (fileName.includes("index")) {
-		return target;
-	}
-
-	const path = target.slice(0, Math.max(0, lastSlash + 1));
-	const extension = target.slice(Math.max(0, lastDot));
-	return `${path}/${fileName}/index${extension}`;
-}
-
-function urlMatches(url: string, linkTarget: string): boolean {
-	let safeUrl = url;
-	while (/^[./@~]/.exec(safeUrl)) {
-		safeUrl = safeUrl.slice(1);
-	}
-
-	let match = linkTarget.includes(safeUrl);
-	if (!match) {
-		const lastSlash = safeUrl.lastIndexOf("/");
-		const toLastSlash = safeUrl.slice(0, Math.max(0, lastSlash));
-		const restOfUrl = safeUrl.slice(Math.max(0, lastSlash + 1));
-		const partial = `${toLastSlash}/_${restOfUrl}`;
-		match = linkTarget.includes(partial);
-	}
-
-	return match;
 }
 
 async function toRealPath(

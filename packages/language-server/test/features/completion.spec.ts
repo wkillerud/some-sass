@@ -1,13 +1,12 @@
 import { strictEqual, ok } from "assert";
 import {
-	INode,
 	CompletionList,
 	CompletionItem,
 	CompletionItemKind,
 	SymbolKind,
 	TextDocument,
-} from "@somesass/language-server-types";
-import { getLanguageService } from "@somesass/language-services";
+	getLanguageService,
+} from "@somesass/language-services";
 import { changeConfiguration, useContext } from "../../src/context-provider";
 import { doCompletion } from "../../src/features/completion";
 import { parseStringLiteralChoices } from "../../src/features/completion/completion-utils";
@@ -35,7 +34,7 @@ async function getCompletionList(
 }
 
 describe("Providers/Completion", () => {
-	beforeEach(() => {
+	beforeEach(async () => {
 		helpers.createTestContext();
 
 		const document = TextDocument.create("./one.scss", "scss", 1, "");
@@ -43,7 +42,7 @@ describe("Providers/Completion", () => {
 		const ls = getLanguageService(createTestLsOptions());
 		ls.clearCache(); // The service is a singleton with a shared cache that needs clearing between tests
 
-		const ast = ls.parseStylesheet(document) as INode;
+		const ast = await ls.parseStylesheet(document);
 
 		const { fs, storage } = useContext();
 

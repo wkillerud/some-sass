@@ -1,12 +1,15 @@
 import {
 	NodeType,
-	INode,
+	Node,
 	TextDocument,
 	Position,
 	ReferenceContext,
 	Location,
 	Range,
 	SymbolKind,
+	Variable,
+	MixinReference,
+	Function,
 } from "@somesass/language-services";
 import { useContext } from "../../context-provider";
 import type { IScssDocument, ScssSymbol } from "../../parser";
@@ -232,7 +235,7 @@ function createReference(
 
 function getIdentifier(
 	document: TextDocument,
-	hoverNode: INode,
+	hoverNode: Node,
 	context: ReferenceContext,
 ): Identifier | null {
 	let identifier: Identifier | null = null;
@@ -240,13 +243,13 @@ function getIdentifier(
 	if (hoverNode.type === NodeType.VariableName) {
 		if (!context.includeDeclaration) {
 			const parent = hoverNode.getParent();
-			if (parent.type === NodeType.VariableDeclaration) {
+			if (parent && parent.type === NodeType.VariableDeclaration) {
 				return null;
 			}
 		}
 
 		return {
-			name: hoverNode.getName(),
+			name: (hoverNode as Variable).getName(),
 			position: document.positionAt(hoverNode.offset),
 			kind: SymbolKind.Variable,
 		};
@@ -280,19 +283,21 @@ function getIdentifier(
 		}
 
 		let i = 0;
-		let node = hoverNode;
+		let node: Node | null = hoverNode;
 		let isMixin = false;
 		let isFunction = false;
 
-		while (!isMixin && !isFunction && i !== 2) {
+		while (node && !isMixin && !isFunction && i !== 2) {
 			node = node.getParent();
 
-			isMixin = node.type === NodeType.MixinReference;
-			isFunction = node.type === NodeType.Function;
+			if (node) {
+				isMixin = node.type === NodeType.MixinReference;
+				isFunction = node.type === NodeType.Function;
 
-			if (context.includeDeclaration) {
-				isMixin = isMixin || node.type === NodeType.MixinDeclaration;
-				isFunction = isFunction || node.type === NodeType.FunctionDeclaration;
+				if (context.includeDeclaration) {
+					isMixin = isMixin || node.type === NodeType.MixinDeclaration;
+					isFunction = isFunction || node.type === NodeType.FunctionDeclaration;
+				}
 			}
 
 			i++;
@@ -306,7 +311,7 @@ function getIdentifier(
 			}
 
 			identifier = {
-				name: node.getName(),
+				name: (node as MixinReference | Function).getName(),
 				position: document.positionAt(node.offset),
 				kind,
 			};

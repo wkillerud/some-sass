@@ -1,10 +1,14 @@
 import {
 	NodeType,
-	INode,
+	Node,
 	Location,
 	SymbolKind,
 	TextDocument,
 	Position,
+	FunctionParameter,
+	VariableDeclaration,
+	Function,
+	MixinReference,
 } from "@somesass/language-services";
 import { useContext } from "../../context-provider";
 import type { IScssDocument, ScssForward, ScssSymbol } from "../../parser";
@@ -84,20 +88,23 @@ export function getDefinition(
 
 function getIdentifier(
 	document: TextDocument,
-	hoverNode: INode,
+	hoverNode: Node,
 ): Identifier | null {
 	if (hoverNode.type === NodeType.VariableName) {
 		const parent = hoverNode.getParent();
+		if (parent) {
+			const isFunctionParameter = parent.type === NodeType.FunctionParameter;
+			const isDeclaration = parent.type === NodeType.VariableDeclaration;
 
-		const isFunctionParameter = parent.type === NodeType.FunctionParameter;
-		const isDeclaration = parent.type === NodeType.VariableDeclaration;
-
-		if (!isFunctionParameter && !isDeclaration) {
-			return {
-				name: hoverNode.getName(),
-				position: document.positionAt(hoverNode.offset),
-				kind: SymbolKind.Variable,
-			};
+			if (!isFunctionParameter && !isDeclaration) {
+				return {
+					name: (
+						hoverNode as FunctionParameter | VariableDeclaration
+					).getName(),
+					position: document.positionAt(hoverNode.offset),
+					kind: SymbolKind.Variable,
+				};
+			}
 		}
 	} else if (hoverNode.type === NodeType.Identifier) {
 		if (hoverNode.getParent()?.type === NodeType.ForwardVisibility) {
@@ -129,15 +136,16 @@ function getIdentifier(
 		}
 
 		let i = 0;
-		let node = hoverNode;
+		let node: Node | null = hoverNode;
 		let isMixin = false;
 		let isFunction = false;
 
-		while (!isMixin && !isFunction && i !== 2) {
+		while (node && !isMixin && !isFunction && i !== 2) {
 			node = node.getParent();
-
-			isMixin = node.type === NodeType.MixinReference;
-			isFunction = node.type === NodeType.Function;
+			if (node) {
+				isMixin = node.type === NodeType.MixinReference;
+				isFunction = node.type === NodeType.Function;
+			}
 
 			i++;
 		}
@@ -150,7 +158,7 @@ function getIdentifier(
 			}
 
 			return {
-				name: node.getName(),
+				name: (node as Function | MixinReference).getName(),
 				position: document.positionAt(node.offset),
 				kind,
 			};

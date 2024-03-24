@@ -6,7 +6,7 @@ import {
 	TextDocument,
 	FileSystemProvider,
 	URI,
-} from "@somesass/language-server-types";
+} from "@somesass/language-services";
 import { createContext, useContext } from "../src/context-provider";
 import { parseDocument } from "../src/parser";
 import type { ISettings } from "../src/settings";

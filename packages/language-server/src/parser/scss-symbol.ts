@@ -1,5 +1,5 @@
 import {
-	INode,
+	Node,
 	DocumentLink,
 	Position,
 	TextDocument,
@@ -69,7 +69,7 @@ export interface IScssSymbols {
 
 export interface IScssDocument extends TextDocument, IScssSymbols {
 	textDocument: TextDocument;
-	ast: INode;
+	ast: Node;
 	/**
 	 * The last part of the URI, including extension.
 	 * For instance, given the URI `file:///home/test.scss`,
@@ -84,6 +84,6 @@ export interface IScssDocument extends TextDocument, IScssSymbols {
 		imports?: boolean;
 	}) => ScssLink[];
 	getSymbols: () => ScssSymbol[];
-	getNodeAt: (offset: number) => INode | null;
-	getNodeRange: (node: INode) => Range;
+	getNodeAt: (offset: number) => Node | null;
+	getNodeRange: (node: Node) => Range;
 }

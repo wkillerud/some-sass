@@ -1,4 +1,4 @@
-import { NodeType } from "@somesass/language-services";
+import { NodeType, VariableDeclaration } from "@somesass/language-services";
 import { getDefinition } from "../features/go-definition";
 import { IScssDocument, ScssVariable } from "../parser";
 import { getParentNodeByType } from "../parser/ast";
@@ -30,7 +30,7 @@ export function getBaseValueFrom(
 		return variable;
 	}
 
-	const value = declaration.getValue()?.getText();
+	const value = (declaration as VariableDeclaration).getValue()?.getText();
 	if (!value) {
 		return variable;
 	}

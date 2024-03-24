@@ -1,11 +1,14 @@
 import {
 	NodeType,
-	INode,
+	Node,
 	DiagnosticSeverity,
 	DiagnosticTag,
 	SymbolKind,
 	Diagnostic,
 	VersionedTextDocumentIdentifier,
+	Function,
+	Variable,
+	MixinReference,
 } from "@somesass/language-services";
 import { EXTENSION_NAME } from "../../constants";
 import { useContext } from "../../context-provider";
@@ -25,7 +28,7 @@ export async function doDiagnostics(
 		return diagnostics;
 	}
 
-	const references: INode[] = getReferences(openDocument.ast);
+	const references: Node[] = getReferences(openDocument.ast);
 	if (references.length === 0) {
 		return diagnostics;
 	}
@@ -58,7 +61,9 @@ export async function doDiagnostics(
 			}
 
 			const name =
-				nodeKind === SymbolKind.Class ? node.getText() : node.getName();
+				nodeKind === SymbolKind.Class
+					? node.getText()
+					: (node as Function | MixinReference | Variable).getName();
 			if (symbol.kind === nodeKind && name === symbol.name) {
 				const diagnostic = createDiagnostic(openDocument, node, symbol);
 				if (diagnostic) {
@@ -71,11 +76,12 @@ export async function doDiagnostics(
 	return diagnostics;
 }
 
-function getReferences(fromNode: INode): INode[] {
+function getReferences(fromNode: Node): Node[] {
 	return fromNode.getChildren().flatMap((child) => {
 		if (child.type === NodeType.VariableName) {
 			const parent = child.getParent();
 			if (
+				parent &&
 				parent.type !== NodeType.FunctionParameter &&
 				parent.type !== NodeType.VariableDeclaration
 			) {
@@ -83,8 +89,9 @@ function getReferences(fromNode: INode): INode[] {
 			}
 		} else if (child.type === NodeType.Identifier) {
 			let i = 0;
-			let node = child;
+			let node: Node | null = child;
 			while (
+				node &&
 				node.type !== NodeType.MixinReference &&
 				node.type !== NodeType.Function &&
 				i !== 2
@@ -94,19 +101,20 @@ function getReferences(fromNode: INode): INode[] {
 			}
 
 			if (
-				node.type === NodeType.MixinReference ||
-				node.type === NodeType.Function
+				node &&
+				(node.type === NodeType.MixinReference ||
+					node.type === NodeType.Function)
 			) {
 				return [node];
 			}
 		} else if (child.type === NodeType.SimpleSelector) {
-			let node = child;
+			let node: Node | null = child;
 			let i = 0;
-			while (node.type !== NodeType.ExtendsReference && i !== 2) {
+			while (node && node.type !== NodeType.ExtendsReference && i !== 2) {
 				node = node.getParent();
 				i++;
 			}
-			if (node.type === NodeType.ExtendsReference) {
+			if (node && node.type === NodeType.ExtendsReference) {
 				return [child];
 			}
 		}
@@ -188,7 +196,7 @@ function traverseTree(
 
 function createDiagnostic(
 	openDocument: IScssDocument,
-	node: INode,
+	node: Node,
 	symbol: ScssSymbol,
 ): Diagnostic | null {
 	if (typeof symbol.sassdoc?.deprecated !== "undefined") {

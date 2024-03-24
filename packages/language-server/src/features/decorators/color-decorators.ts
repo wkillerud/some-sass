@@ -3,6 +3,8 @@ import {
 	TextDocument,
 	SymbolKind,
 	ColorInformation,
+	FunctionParameter,
+	VariableDeclaration,
 } from "@somesass/language-services";
 import ColorDotJS from "colorjs.io";
 import { useContext } from "../../context-provider";
@@ -28,11 +30,12 @@ export function findDocumentColors(document: TextDocument): ColorInformation[] {
 
 		const parent = node.getParent();
 		if (
+			parent &&
 			parent.type !== NodeType.VariableDeclaration &&
 			parent.type !== NodeType.FunctionParameter
 		) {
 			const identifier = {
-				name: node.getName(),
+				name: (node as FunctionParameter | VariableDeclaration).getName(),
 				position: document.positionAt(node.offset),
 				kind: SymbolKind.Variable,
 			};
@@ -75,7 +78,11 @@ export function findDocumentColors(document: TextDocument): ColorInformation[] {
 				},
 				range: {
 					start: document.positionAt(node.offset),
-					end: document.positionAt(node.offset + node.getName().length),
+					end: document.positionAt(
+						node.offset +
+							(node as FunctionParameter | VariableDeclaration).getName()
+								.length,
+					),
 				},
 			};
 			colorInformation.push(color);

@@ -1,12 +1,11 @@
 import { deepStrictEqual } from "assert";
 import {
-	INode,
 	MarkupKind,
 	Hover,
 	SymbolKind,
 	TextDocument,
-} from "@somesass/language-server-types";
-import { getLanguageService } from "@somesass/language-services";
+	getLanguageService,
+} from "@somesass/language-services";
 import { useContext } from "../../src/context-provider";
 import { doHover } from "../../src/features/hover/hover";
 import { ScssDocument } from "../../src/parser";
@@ -23,12 +22,12 @@ async function getHover(lines: string[]): Promise<Hover | null> {
 }
 
 describe("Providers/Hover", () => {
-	beforeEach(() => {
+	beforeEach(async () => {
 		helpers.createTestContext();
 
 		const document = TextDocument.create("./one.scss", "scss", 1, "");
 		const ls = getLanguageService(helpers.createTestLsOptions());
-		const ast = ls.parseStylesheet(document) as INode;
+		const ast = await ls.parseStylesheet(document);
 		ls.clearCache(); // The service is a singleton with a shared cache that needs clearing between tests
 
 		const { fs, storage } = useContext();

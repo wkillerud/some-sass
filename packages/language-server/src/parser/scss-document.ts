@@ -1,5 +1,5 @@
 import {
-	INode,
+	Node,
 	TextDocument,
 	Position,
 	Range,
@@ -25,7 +25,7 @@ import type {
 
 export class ScssDocument implements IScssDocument {
 	public textDocument: TextDocument;
-	public ast: INode;
+	public ast: Node;
 	public fileName: string;
 	public uri: string;
 
@@ -45,7 +45,7 @@ export class ScssDocument implements IScssDocument {
 		fs: FileSystemProvider,
 		document: TextDocument,
 		symbols: IScssSymbols,
-		ast: INode,
+		ast: Node,
 	) {
 		this.ast = ast;
 		this.fs = fs;
@@ -95,11 +95,11 @@ export class ScssDocument implements IScssDocument {
 		return this.textDocument.getText(range);
 	}
 
-	public getNodeAt(offset: number): INode | null {
+	public getNodeAt(offset: number): Node | null {
 		return getNodeAtOffset(this.ast, offset);
 	}
 
-	public getNodeRange(node: INode): Range {
+	public getNodeRange(node: Node): Range {
 		return Range.create(
 			this.textDocument.positionAt(node.offset),
 			this.textDocument.positionAt(node.end),

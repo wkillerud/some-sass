@@ -50,15 +50,16 @@ export class TestFileSystem implements FileSystemProvider {
 		return Promise.resolve(doc?.getText() || "");
 	}
 
-	async readDirectory(uri: string): Promise<[string, FileType][]> {
-		const dir = await promises.readdir(uri);
-		const result: [string, FileType][] = [];
+	async readDirectory(uri: URI): Promise<[URI, FileType][]> {
+		const dir = await promises.readdir(uri.toString());
+		const result: [URI, FileType][] = [];
 		for (const file of dir) {
+			const furi = Utils.joinPath(uri, file);
 			try {
-				const stats = await this.stat(Utils.joinPath(URI.parse(uri), file));
-				result.push([file, stats.type]);
+				const stats = await this.stat(furi);
+				result.push([furi, stats.type]);
 			} catch (e) {
-				result.push([file, FileType.Unknown]);
+				result.push([furi, FileType.Unknown]);
 			}
 		}
 		return result;

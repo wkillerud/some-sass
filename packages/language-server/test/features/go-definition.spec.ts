@@ -1,24 +1,23 @@
 import { strictEqual, deepStrictEqual, ok } from "assert";
 import {
-	INode,
 	SymbolKind,
 	TextDocument,
-} from "@somesass/language-server-types";
-import { getLanguageService } from "@somesass/language-services";
+	getLanguageService,
+} from "@somesass/language-services";
 import { useContext } from "../../src/context-provider";
 import { goDefinition } from "../../src/features/go-definition/go-definition";
 import { ScssDocument } from "../../src/parser";
 import * as helpers from "../helpers";
 
 describe("Providers/GoDefinition", () => {
-	beforeEach(() => {
+	beforeEach(async () => {
 		helpers.createTestContext();
 
 		const document = TextDocument.create("./one.scss", "scss", 1, "");
 		const ls = getLanguageService(helpers.createTestLsOptions());
 		ls.clearCache(); // The service is a singleton with a shared cache that needs clearing between tests
 
-		const ast = ls.parseStylesheet(document) as INode;
+		const ast = await ls.parseStylesheet(document);
 
 		const { fs, storage } = useContext();
 

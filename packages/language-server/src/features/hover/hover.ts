@@ -5,6 +5,10 @@ import {
 	Hover,
 	MarkupContent,
 	TextDocument,
+	VariableDeclaration,
+	FunctionParameter,
+	Function,
+	MixinReference,
 } from "@somesass/language-services";
 import { useContext } from "../../context-provider";
 import {
@@ -102,11 +106,14 @@ export function doHover(document: TextDocument, offset: number): Hover | null {
 			const parent = hoverNode.getParent();
 
 			if (
+				parent &&
 				parent.type !== NodeType.VariableDeclaration &&
 				parent.type !== NodeType.FunctionParameter
 			) {
 				identifier = {
-					name: hoverNode.getName(),
+					name: (
+						hoverNode as VariableDeclaration | FunctionParameter
+					).getName(),
 					kind: SymbolKind.Variable,
 				};
 			}
@@ -119,10 +126,10 @@ export function doHover(document: TextDocument, offset: number): Hover | null {
 			let type: SymbolKind | null = null;
 
 			const parent = hoverNode.getParent();
-			if (parent.type === NodeType.Function) {
+			if (parent && parent.type === NodeType.Function) {
 				node = parent;
 				type = SymbolKind.Function;
-			} else if (parent.type === NodeType.MixinReference) {
+			} else if (parent && parent.type === NodeType.MixinReference) {
 				node = parent;
 				type = SymbolKind.Method;
 			}
@@ -133,7 +140,7 @@ export function doHover(document: TextDocument, offset: number): Hover | null {
 
 			if (node) {
 				identifier = {
-					name: node.getName(),
+					name: (node as Function | MixinReference).getName(),
 					kind: type,
 				};
 			}
@@ -143,7 +150,7 @@ export function doHover(document: TextDocument, offset: number): Hover | null {
 
 		case NodeType.MixinReference: {
 			identifier = {
-				name: hoverNode.getName(),
+				name: (hoverNode as MixinReference).getName(),
 				kind: SymbolKind.Method,
 			};
 
@@ -276,8 +283,8 @@ export function doHover(document: TextDocument, offset: number): Hover | null {
 					// Make sure we're not just hovering over a CSS function.
 					// Confirm we are looking at something that is the child of a module.
 					const isModule =
-						hoverNode.getParent().type === NodeType.Module ||
-						hoverNode.getParent().getParent().type === NodeType.Module;
+						hoverNode.getParent()?.type === NodeType.Module ||
+						hoverNode.getParent()?.getParent()?.type === NodeType.Module;
 					if (isModule) {
 						return {
 							contents: {

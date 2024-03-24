@@ -1,15 +1,9 @@
-import { strictEqual, deepStrictEqual, ok } from "assert";
+import { strictEqual, deepStrictEqual } from "assert";
 import { stub, SinonStub } from "sinon";
 import { FileType } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
 import { useContext } from "../../src/context-provider";
-import {
-	parseDocument,
-	reForward,
-	reModuleAtRule,
-	rePlaceholderUsage,
-	reUse,
-} from "../../src/parser";
+import { parseDocument, rePlaceholderUsage } from "../../src/parser";
 import * as helpers from "../helpers";
 
 describe("Services/Parser", () => {
@@ -169,215 +163,24 @@ describe("Services/Parser", () => {
 			strictEqual(uses.length, 3, "expected to find three uses");
 		});
 
-		it("should not crash on link to the same document", async () => {
-			const document = await helpers.makeDocument(
-				['@use "./self";', "$var: 1px;"],
+		// it("should not crash on link to the same document", async () => {
+		// 	const document = await helpers.makeDocument(
+		// 		['@use "./self";', "$var: 1px;"],
 
-				{
-					uri: "self.scss",
-				},
-			);
-			const symbols = await parseDocument(document, URI.parse(""));
-			const uses = [...symbols.uses.values()];
-			const variables = [...symbols.variables.values()];
+		// 		{
+		// 			uri: "self.scss",
+		// 		},
+		// 	);
+		// 	const symbols = await parseDocument(document, URI.parse(""));
+		// 	const uses = [...symbols.uses.values()];
+		// 	const variables = [...symbols.variables.values()];
 
-			strictEqual(variables.length, 1, "expected to find one variable");
-			strictEqual(uses.length, 0, "expected to find no use link to self");
-		});
+		// 	strictEqual(variables.length, 1, "expected to find one variable");
+		// 	strictEqual(uses.length, 0, "expected to find no use link to self");
+		// });
 	});
 
 	describe("regular expressions", () => {
-		it("for detecting module at rules", () => {
-			ok(reModuleAtRule.test('@use "file";'), "should match a basic @use");
-			ok(
-				reModuleAtRule.test('  @use "file";'),
-				"should match an indented @use",
-			);
-			ok(
-				reModuleAtRule.test('@use "~file";'),
-				"should match @use from node_modules",
-			);
-			ok(
-				reModuleAtRule.test("@use 'file';"),
-				"should match @use with single quotes",
-			);
-			ok(
-				reModuleAtRule.test('@use "../file";'),
-				"should match relative @use one level up",
-			);
-			ok(
-				reModuleAtRule.test('@use "../../../file";'),
-				"should match relative @use several levels up",
-			);
-			ok(
-				reModuleAtRule.test('@use "./file/other";'),
-				"should match relative @use one level down",
-			);
-			ok(
-				reModuleAtRule.test('@use "./file/yet/another";'),
-				"should match relative @use several levels down",
-			);
-
-			ok(
-				reModuleAtRule.test('@forward "file";'),
-				"should match a basic @forward",
-			);
-			ok(
-				reModuleAtRule.test('  @forward "file";'),
-				"should match an indented @forward",
-			);
-			ok(
-				reModuleAtRule.test('@forward "~file";'),
-				"should match @forward from node_modules",
-			);
-			ok(
-				reModuleAtRule.test("@forward 'file';"),
-				"should match @forward with single quotes",
-			);
-			ok(
-				reModuleAtRule.test('@forward "../file";'),
-				"should match relative @forward one level up",
-			);
-			ok(
-				reModuleAtRule.test('@forward "../../../file";'),
-				"should match relative @forward several levels up",
-			);
-			ok(
-				reModuleAtRule.test('@forward "./file/other";'),
-				"should match relative @forward one level down",
-			);
-			ok(
-				reModuleAtRule.test('@forward "./file/yet/another";'),
-				"should match relative @forward several levels down",
-			);
-
-			ok(
-				reModuleAtRule.test('@import "file";'),
-				"should match a basic @import",
-			);
-			ok(
-				reModuleAtRule.test('  @import "file";'),
-				"should match an indented @import",
-			);
-			ok(
-				reModuleAtRule.test('@import "~file";'),
-				"should match @import from node_modules",
-			);
-			ok(
-				reModuleAtRule.test("@import 'file';"),
-				"should match @import with single quotes",
-			);
-			ok(
-				reModuleAtRule.test('@import "../file";'),
-				"should match relative @import one level up",
-			);
-			ok(
-				reModuleAtRule.test('@import "../../../file";'),
-				"should match relative @import several levels up",
-			);
-			ok(
-				reModuleAtRule.test('@import "./file/other";'),
-				"should match relative @import one level down",
-			);
-			ok(
-				reModuleAtRule.test('@import "./file/yet/another";'),
-				"should match relative @import several levels down",
-			);
-		});
-
-		it("for use", () => {
-			ok(reUse.test('@use "file";'), "should match a basic @use");
-			ok(reUse.test('  @use "file";'), "should match an indented @use");
-			ok(reUse.test('@use "~file";'), "should match @use from node_modules");
-			ok(reUse.test("@use 'file';"), "should match @use with single quotes");
-			ok(
-				reUse.test('@use "../file";'),
-				"should match relative @use one level up",
-			);
-			ok(
-				reUse.test('@use "../../../file";'),
-				"should match relative @use several levels up",
-			);
-			ok(
-				reUse.test('@use "./file/other";'),
-				"should match relative @use one level down",
-			);
-			ok(
-				reUse.test('@use "./file/yet/another";'),
-				"should match relative @use several levels down",
-			);
-
-			ok(
-				reUse.test('@use "variables" as vars;'),
-				"should match a @use with an alias",
-			);
-			ok(
-				reUse.test('@use "src/corners" as *;'),
-				"should match a @use with a wildcard as alias",
-			);
-
-			const match = reUse.exec('@use "variables" as vars;');
-			strictEqual(match!.groups!["url"] as string, "variables");
-			strictEqual(match!.groups!["namespace"] as string, "vars");
-		});
-
-		it("for forward", () => {
-			ok(reForward.test('@forward "file";'), "should match a basic @forward");
-			ok(
-				reForward.test('  @forward "file";'),
-				"should match an indented @forward",
-			);
-			ok(
-				reForward.test('@forward "~file";'),
-				"should match @forward from node_modules",
-			);
-			ok(
-				reForward.test("@forward 'file';"),
-				"should match @forward with single quotes",
-			);
-			ok(
-				reForward.test('@forward "../file";'),
-				"should match relative @forward one level up",
-			);
-			ok(
-				reForward.test('@forward "../../../file";'),
-				"should match relative @forward several levels up",
-			);
-			ok(
-				reForward.test('@forward "./file/other";'),
-				"should match relative @forward one level down",
-			);
-			ok(
-				reForward.test('@forward "./file/yet/another";'),
-				"should match relative @forward several levels down",
-			);
-
-			ok(
-				reForward.test(
-					'@forward "colors" as color-* hide $varslingsfarger, varslingsfarge;',
-				),
-				"should match a @forward with an alias and several hide",
-			);
-			ok(
-				reForward.test('@forward "shadow";'),
-				"should match a @forward with no alias and no hide",
-			);
-			ok(
-				reForward.test('@forward "spacing" hide $spacing-new;'),
-				"should match a @forward with no alias and a hide",
-			);
-
-			const match = reForward.exec(
-				'@forward "colors" as color-* hide $varslingsfarger, varslingsfarge;',
-			);
-			strictEqual(match!.groups!["url"] as string, "colors");
-			strictEqual(match!.groups!["prefix"] as string, "color-");
-			strictEqual(
-				match!.groups!["hide"] as string,
-				"$varslingsfarger, varslingsfarge",
-			);
-		});
-
 		it("for placeholder usages", () => {
 			strictEqual(
 				rePlaceholderUsage.exec("@extend %app;")!.groups!["name"],

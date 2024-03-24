@@ -1,13 +1,13 @@
-import { INode, NodeType } from "@somesass/language-services";
+import { Node, NodeType } from "@somesass/language-services";
 
 /**
  * Get Node by offset position.
  */
-export function getNodeAtOffset(
-	parsedDocument: INode,
+export function getNodeAtOffset<T extends Node>(
+	parsedDocument: Node,
 	posOffset: number | null,
-): INode | null {
-	let candidate: INode | null = null;
+): T | null {
+	let candidate: Node | null = null;
 
 	parsedDocument.accept((node) => {
 		if (node.offset === -1 && node.length === -1) {
@@ -35,19 +35,19 @@ export function getNodeAtOffset(
 }
 
 /**
- * Returns the parent Node of the specified type.
+ * Returns the parent Node of the specified type, excluding NodeType.Stylesheet
  */
-export function getParentNodeByType(
-	node: INode | null,
+export function getParentNodeByType<T extends Node>(
+	node: Node | null,
 	type: NodeType,
-): INode | null {
+): T | null {
 	if (node === null) {
 		return null;
 	}
 
 	node = node.getParent();
 
-	while (node.type !== type) {
+	while (node && node.type !== type) {
 		if (node.type === NodeType.Stylesheet) {
 			return null;
 		}
@@ -55,5 +55,5 @@ export function getParentNodeByType(
 		node = node.getParent();
 	}
 
-	return node;
+	return node as T;
 }

@@ -5,6 +5,7 @@ import {
 	TextDocument,
 	LanguageService,
 	SassDocumentLink,
+	URI,
 } from "../language-services-types";
 import { joinPath } from "../utils/resources";
 
@@ -38,10 +39,21 @@ export class FindLinks extends LanguageFeature {
 
 	async findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]> {
 		const stylesheet = await this.ls.parseStylesheet(document);
-		return this._internal.scssLs.findDocumentLinks2(
+		const links = await this._internal.scssLs.findDocumentLinks2(
 			document,
 			stylesheet,
 			this.#getDocumentContext(),
 		);
+		for (const link of links) {
+			if (link.target && !link.target.includes("sass:")) {
+				// For monorepos, resolve the real path behind a symlink, since multiple links in `node_modules/` can point to the same file.
+				// Take this initial performance hit to maximise cache hits and provide better results for projects using symlinks.
+				const realpath = await this.options.fileSystemProvider.realPath(
+					URI.parse(link.target),
+				);
+				link.target = realpath.toString();
+			}
+		}
+		return links;
 	}
 }

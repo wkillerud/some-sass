@@ -71,9 +71,6 @@ async function findDocumentSymbols(
 
 		switch (link.type) {
 			case NodeType.Use: {
-				if (!link.target?.includes("sass:")) {
-					link.target = await toRealPath(link.target, fs);
-				}
 				result.uses.set(link.target, {
 					link,
 					namespace: link.namespace || link.as, // Legacy since ScssUse does not have `as`, refactor in progress
@@ -82,7 +79,6 @@ async function findDocumentSymbols(
 				break;
 			}
 			case NodeType.Forward: {
-				link.target = await toRealPath(link.target, fs);
 				result.forwards.set(link.target, {
 					link,
 					prefix: link.as,
@@ -92,7 +88,6 @@ async function findDocumentSymbols(
 				break;
 			}
 			case NodeType.Import: {
-				link.target = await toRealPath(link.target, fs);
 				result.imports.set(link.target, {
 					link,
 					dynamic: reDynamicPath.test(link.target),
@@ -180,15 +175,6 @@ async function findDocumentSymbols(
 	}
 
 	return result;
-}
-
-async function toRealPath(
-	target: string,
-	fs: FileSystemProvider,
-): Promise<string> {
-	const linkUri = URI.parse(target);
-	const realPathUri = await fs.realPath(linkUri);
-	return realPathUri.toString();
 }
 
 function getVariableValue(ast: Node, offset: number): string | null {

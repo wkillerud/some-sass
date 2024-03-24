@@ -18,9 +18,10 @@ test("should return links", async () => {
 	});
 
 	const document = fileSystemProvider.createDocument([
-		'@use "variables" as vars;',
 		'@use "corners" as *;',
+		'@use "variables" as vars;',
 		'@forward "colors" as color-* hide $varslingsfarger, varslingsfarge;',
+		'@forward "./foo" as foo-* hide $private;',
 	]);
 
 	const links = await ls.findDocumentLinks(document);
@@ -28,17 +29,20 @@ test("should return links", async () => {
 	// Uses
 	const uses = links.filter((link) => link.type === NodeType.Use);
 	assert.strictEqual(uses.length, 2, "expected to find two uses");
-	assert.strictEqual(uses[0]?.namespace, "vars");
-	assert.strictEqual(uses[1]?.namespace, "*");
+	assert.strictEqual(uses[0]?.namespace, undefined);
+	assert.strictEqual(uses[0]?.as, "*");
+	assert.strictEqual(uses[1]?.namespace, "vars");
 
 	// Forward
 	const forwards = links.filter((link) => link.type === NodeType.Forward);
-	assert.strictEqual(forwards.length, 1, "expected to find one forward");
+	assert.strictEqual(forwards.length, 2, "expected to find two forward");
 	assert.strictEqual(forwards[0]?.as, "color-");
 	assert.deepStrictEqual(forwards[0]?.hide, [
 		"$varslingsfarger",
 		"varslingsfarge",
 	]);
+	assert.strictEqual(forwards[1]?.as, "foo-");
+	assert.deepStrictEqual(forwards[1]?.hide, ["$private"]);
 });
 
 test("should return relative links", async () => {

@@ -13,15 +13,10 @@ import { mapFsProviders } from "./utils/fs-provider";
 
 export * from "./language-services-types";
 
-let singleton: LanguageService | null = null;
-
 export function getLanguageService(
 	options: LanguageServiceOptions,
 ): LanguageService {
-	if (!singleton) {
-		singleton = new LanguageService(options);
-	}
-	return singleton;
+	return new LanguageService(options);
 }
 
 class LanguageService implements ILanguageService {

@@ -33,7 +33,6 @@ export async function parseDocument(
 		fileSystemProvider: fs,
 		clientCapabilities,
 	});
-	// ls.clearCache(); // tmp for test, because of course...
 	const ast = await ls.parseStylesheet(document);
 	const symbols = await findDocumentSymbols(
 		document,

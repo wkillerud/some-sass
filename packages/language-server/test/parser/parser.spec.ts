@@ -1,32 +1,11 @@
 import { strictEqual, deepStrictEqual } from "assert";
-import { stub, SinonStub } from "sinon";
-import { FileType } from "vscode-css-languageservice";
 import { URI } from "vscode-uri";
-import { useContext } from "../../src/context-provider";
 import { parseDocument, rePlaceholderUsage } from "../../src/parser";
 import * as helpers from "../helpers";
 
 describe("Services/Parser", () => {
 	describe(".parseDocument", () => {
-		let statStub: SinonStub;
-		let fileExistsStub: SinonStub;
-
-		beforeEach(() => {
-			helpers.createTestContext();
-			const { fs } = useContext();
-			fileExistsStub = stub(fs, "exists");
-			statStub = stub(fs, "stat").yields(null, {
-				type: FileType.Unknown,
-				ctime: -1,
-				mtime: -1,
-				size: -1,
-			});
-		});
-
-		afterEach(() => {
-			fileExistsStub.restore();
-			statStub.restore();
-		});
+		beforeEach(() => helpers.createTestContext());
 
 		it("should return symbols", async () => {
 			const document = await helpers.makeDocument([
@@ -93,8 +72,6 @@ describe("Services/Parser", () => {
 		});
 
 		it("should return links", async () => {
-			fileExistsStub.resolves(true);
-
 			await helpers.makeDocument(["$var: 1px;"], {
 				uri: "variables.scss",
 			});
@@ -139,8 +116,6 @@ describe("Services/Parser", () => {
 		});
 
 		it("should return relative links", async () => {
-			fileExistsStub.resolves(true);
-
 			await helpers.makeDocument(["$var: 1px;"], {
 				uri: "upper.scss",
 			});

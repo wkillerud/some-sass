@@ -7,7 +7,8 @@ export function mapFsProviders(
 	const theirs: CSSFileSystemProvider = {
 		async stat(uri: string) {
 			try {
-				return await ours.stat(URI.parse(uri));
+				const result = await ours.stat(URI.parse(uri));
+				return result;
 			} catch (error) {
 				if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
 					throw error;
@@ -22,7 +23,11 @@ export function mapFsProviders(
 		},
 		async readDirectory(uri: string) {
 			const dir = await ours.readDirectory(URI.parse(uri));
-			return dir.map(([uri, info]) => [uri.toString(), info]);
+			const result: [string, FileType][] = dir.map(([uri, info]) => [
+				uri.toString(),
+				info,
+			]);
+			return result;
 		},
 	};
 	return theirs;

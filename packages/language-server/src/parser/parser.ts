@@ -72,7 +72,9 @@ async function findDocumentSymbols(
 
 		switch (link.type) {
 			case NodeType.Use: {
-				link.target = await toRealPath(link.target, fs);
+				if (!link.target?.includes("sass:")) {
+					link.target = await toRealPath(link.target, fs);
+				}
 				result.uses.set(link.target, {
 					link,
 					namespace: link.namespace || link.as, // Legacy since ScssUse does not have `as`, refactor in progress

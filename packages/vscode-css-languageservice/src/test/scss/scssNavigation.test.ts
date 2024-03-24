@@ -372,7 +372,7 @@ suite("SCSS - Navigation", () => {
 			]);
 
 			await assertDynamicLinks(getDocumentUri("./index.scss"), `@use 'sass:math' as *;`, [
-				{ range: newRange(5, 16), type: nodes.NodeType.Use, as: "*" },
+				{ range: newRange(5, 16), type: nodes.NodeType.Use, as: "*", target: "sass:math" },
 			]);
 
 			await assertDynamicLinks(getDocumentUri("./index.scss"), `@forward './foo' hide $private;`, [
@@ -413,7 +413,7 @@ suite("SCSS - Navigation", () => {
 			]);
 
 			await assertDynamicLinks(getDocumentUri("./index.scss"), `@use 'sass:math';`, [
-				{ range: newRange(5, 16), type: nodes.NodeType.Use, namespace: "math" },
+				{ range: newRange(5, 16), type: nodes.NodeType.Use, namespace: "math", target: "sass:math" },
 			]);
 			await assertNoDynamicLinks(
 				getDocumentUri("./index.scss"),

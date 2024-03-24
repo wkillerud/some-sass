@@ -189,7 +189,6 @@ export class CSSNavigation {
 				resolvedLinks.push(link);
 			} else if (startsWithSass.test(target)) {
 				const targetless = link;
-				delete targetless["target"];
 				resolvedLinks.push(targetless);
 			} else {
 				const resolvedTarget = await this.resolveReference(target, document.uri, documentContext, data.isRawLink);

@@ -842,12 +842,18 @@ export class SCSSParser extends cssParser.Parser {
 				return this.finish(node, ParseError.UnknownKeyword);
 			}
 
-			if (
-				this.acceptIdent("as") &&
-				!node.setIdentifier(this._parseIdent([nodes.ReferenceType.Module])) &&
-				!this.acceptDelim("*")
-			) {
-				return this.finish(node, ParseError.IdentifierOrWildcardExpected);
+			if (this.acceptIdent("as")) {
+				if (!node.setIdentifier(this._parseIdent([nodes.ReferenceType.Module]))) {
+					const hasWildcard = this.peekDelim("*");
+					if (hasWildcard) {
+						const mnode = this.create(nodes.Identifier);
+						mnode.referenceTypes = [nodes.ReferenceType.Module];
+						this.consumeToken();
+						node.addChild(this.finish(mnode));
+					} else {
+						return this.finish(node, ParseError.IdentifierOrWildcardExpected);
+					}
+				}
 			}
 
 			if (this.acceptIdent("with")) {

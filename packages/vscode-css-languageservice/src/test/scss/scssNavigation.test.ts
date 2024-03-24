@@ -355,6 +355,16 @@ suite("SCSS - Navigation", () => {
 			);
 		});
 
+		test("SCSS use aliasing", async () => {
+			const fixtureRoot = path.resolve(__dirname, "../../../../src/test/scss/linkFixture/module");
+			const getDocumentUri = (relativePath: string) => {
+				return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
+			};
+			await assertDynamicLinks(getDocumentUri("./index.scss"), `@use 'sass:math' as *;`, [
+				{ range: newRange(5, 16), type: nodes.NodeType.Use, as: "*" },
+			]);
+		});
+
 		test("SCSS module file links", async () => {
 			const fixtureRoot = path.resolve(__dirname, "../../../../src/test/scss/linkFixture/module");
 			const getDocumentUri = (relativePath: string) => {

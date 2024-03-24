@@ -231,16 +231,19 @@ export class CSSNavigation {
 				if (linkStatement.type === nodes.NodeType.Use) {
 					const alias: nodes.Node | undefined = linkStatement
 						.getChildren()
-						.find((c) => c.type === nodes.NodeType.Identifier);
+						.find((c) => c.type === nodes.NodeType.Identifier || c.type === nodes.NodeType.Value);
 
-					// TODO: as with identifier and with *
 					const as = alias ? alias.getText() : undefined;
 					if (as) {
 						unresolved.link.as = as;
 					}
 
-					const namespace = linkStatement.type === nodes.NodeType.Use ? as || getNamespaceFromLink(rawUri) : undefined;
-					unresolved.link.namespace = namespace;
+					// Wildcard imports make symbols available in the document without a namespace,
+					// so mirror that by not having a namespace for the link.
+					if (as !== "*") {
+						const namespace = as || getNamespaceFromLink(rawUri);
+						unresolved.link.namespace = namespace;
+					}
 				} else if (linkStatement.type === nodes.NodeType.Forward) {
 					// TODO: as with identifier without -
 					// TODO: show

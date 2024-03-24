@@ -61,20 +61,30 @@ export async function doImportCompletion(
 				const filesInModulePath = await fs.readDirectory(pathInsideModule);
 				for (const [{ fsPath: file }, fileType] of filesInModulePath) {
 					if (fileType === FileType.File && file.endsWith(".scss")) {
-						let insertText = file.slice(0, -5);
+						const filename = file.startsWith("/") ? file.slice(1) : file;
+						// Prefer to insert without file extension
+						let insertText = filename.slice(0, -5);
+						if (insertText.startsWith("/")) {
+							insertText = insertText.slice(1);
+						}
 						if (insertText.startsWith("_")) {
 							insertText = insertText.slice(1);
 						}
 						completions.items.push({
-							label: escapePath(file),
+							label: escapePath(filename),
 							insertText: escapePath(insertText),
 							kind: CompletionItemKind.File,
 						});
 					} else if (fileType === FileType.Directory) {
+						let insertText = escapePath(file);
+						if (insertText.startsWith("/")) {
+							insertText = insertText.slice(1);
+						}
+						insertText = `${insertText}/`;
 						completions.items.push({
-							label: `${escapePath(file)}/`,
+							label: insertText,
 							kind: CompletionItemKind.Folder,
-							insertText: `${escapePath(file)}/`,
+							insertText,
 							command: {
 								title: "Suggest",
 								command: "editor.action.triggerSuggest",

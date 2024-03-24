@@ -355,23 +355,13 @@ suite("SCSS - Navigation", () => {
 			);
 		});
 
-		test("SCSS use aliasing", async () => {
-			const fixtureRoot = path.resolve(__dirname, "../../../../src/test/scss/linkFixture/module");
-			const getDocumentUri = (relativePath: string) => {
-				return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
-			};
-			await assertDynamicLinks(getDocumentUri("./index.scss"), `@use 'sass:math' as *;`, [
-				{ range: newRange(5, 16), type: nodes.NodeType.Use, as: "*" },
-			]);
-		});
-
 		test("SCSS module file links", async () => {
 			const fixtureRoot = path.resolve(__dirname, "../../../../src/test/scss/linkFixture/module");
 			const getDocumentUri = (relativePath: string) => {
 				return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
 			};
 
-			await assertDynamicLinks(getDocumentUri("./index.scss"), `@use './foo' as f`, [
+			await assertDynamicLinks(getDocumentUri("./index.scss"), `@use './foo' as f;`, [
 				{
 					range: newRange(5, 12),
 					target: getDocumentUri("./foo.scss"),
@@ -381,11 +371,48 @@ suite("SCSS - Navigation", () => {
 				},
 			]);
 
-			await assertDynamicLinks(getDocumentUri("./index.scss"), `@forward './foo' hide $private`, [
-				{ range: newRange(9, 16), target: getDocumentUri("./foo.scss"), type: nodes.NodeType.Forward },
+			await assertDynamicLinks(getDocumentUri("./index.scss"), `@use 'sass:math' as *;`, [
+				{ range: newRange(5, 16), type: nodes.NodeType.Use, as: "*" },
 			]);
 
-			await assertDynamicLinks(getDocumentUri("./index.scss"), `@use 'sass:math'`, [
+			await assertDynamicLinks(getDocumentUri("./index.scss"), `@forward './foo' hide $private;`, [
+				{
+					range: newRange(9, 16),
+					target: getDocumentUri("./foo.scss"),
+					type: nodes.NodeType.Forward,
+					hide: ["$private"],
+				},
+			]);
+
+			await assertDynamicLinks(getDocumentUri("./index.scss"), `@forward './foo' show $public;`, [
+				{
+					range: newRange(9, 16),
+					target: getDocumentUri("./foo.scss"),
+					type: nodes.NodeType.Forward,
+					show: ["$public"],
+				},
+			]);
+
+			await assertDynamicLinks(getDocumentUri("./index.scss"), `@forward './foo' as foo-*;`, [
+				{
+					range: newRange(9, 16),
+					target: getDocumentUri("./foo.scss"),
+					type: nodes.NodeType.Forward,
+					as: "foo-",
+				},
+			]);
+
+			await assertDynamicLinks(getDocumentUri("./index.scss"), `@forward './foo' as foo-* hide $private;`, [
+				{
+					range: newRange(9, 16),
+					target: getDocumentUri("./foo.scss"),
+					type: nodes.NodeType.Forward,
+					as: "foo-",
+					hide: ["$private"],
+				},
+			]);
+
+			await assertDynamicLinks(getDocumentUri("./index.scss"), `@use 'sass:math';`, [
 				{ range: newRange(5, 16), type: nodes.NodeType.Use, namespace: "math" },
 			]);
 			await assertNoDynamicLinks(

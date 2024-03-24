@@ -245,9 +245,29 @@ export class CSSNavigation {
 						unresolved.link.namespace = namespace;
 					}
 				} else if (linkStatement.type === nodes.NodeType.Forward) {
-					// TODO: as with identifier without -
-					// TODO: show
-					// TODO: hide
+					const alias: nodes.Node | undefined = linkStatement
+						.getChildren()
+						.find((c) => c.type === nodes.NodeType.Identifier);
+
+					const as = alias ? alias.getText() : undefined;
+					if (as) {
+						unresolved.link.as = as;
+					}
+
+					const visibility = linkStatement
+						.getChildren()
+						.find((c) => c.type === nodes.NodeType.ForwardVisibility)
+						?.getChildren();
+					if (visibility) {
+						const [showOrHide, ...toShowOrHide] = visibility;
+						const keyword = showOrHide.getText();
+						const values = toShowOrHide.map((n) => n.getText());
+						if (keyword === "show") {
+							unresolved.link.show = values;
+						} else if (keyword === "hide") {
+							unresolved.link.hide = values;
+						}
+					}
 				}
 			}
 			result.push(unresolved);

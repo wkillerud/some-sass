@@ -73,6 +73,7 @@
 		"shx": "0.3.4",
 		"sinon": "17.0.1",
 		"util": "0.12.5",
+		"url": "0.11.3",
 		"vscode-css-languageservice": "6.2.12",
 		"vscode-languageserver": "9.0.1",
 		"vscode-languageserver-textdocument": "1.0.11",

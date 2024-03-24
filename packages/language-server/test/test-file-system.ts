@@ -1,4 +1,3 @@
-import { promises } from "fs";
 import { FileStat, FileType } from "vscode-css-languageservice";
 import { URI, Utils } from "vscode-uri";
 import type { FileSystemProvider } from "../src/file-system";
@@ -18,31 +17,21 @@ export class TestFileSystem implements FileSystemProvider {
 	}
 
 	async stat(uri: URI): Promise<FileStat> {
-		try {
-			const stats = await promises.stat(uri.fsPath);
-			let type = FileType.Unknown;
-			if (stats.isFile()) {
-				type = FileType.File;
-			} else if (stats.isDirectory()) {
-				type = FileType.Directory;
-			} else if (stats.isSymbolicLink()) {
-				type = FileType.SymbolicLink;
-			}
-
-			return {
-				type,
-				ctime: stats.ctime.getTime(),
-				mtime: stats.mtime.getTime(),
-				size: stats.size,
-			};
-		} catch (e) {
-			return {
-				type: FileType.Unknown,
-				ctime: -1,
-				mtime: -1,
-				size: -1,
-			};
+		const file = this.storage.get(uri.toString());
+		let type = FileType.Unknown;
+		if (file) {
+			type = FileType.File;
+		} else {
+			type = FileType.Directory;
 		}
+
+		const now = new Date();
+		return {
+			type,
+			ctime: now.getTime(),
+			mtime: now.getTime(),
+			size: file?.getText()?.length || 0,
+		};
 	}
 
 	readFile(uri: URI) {
@@ -51,7 +40,9 @@ export class TestFileSystem implements FileSystemProvider {
 	}
 
 	async readDirectory(uri: URI): Promise<[URI, FileType][]> {
-		const dir = await promises.readdir(uri.toString());
+		const dir = [...this.storage.keys()].filter((furi) =>
+			furi.startsWith(uri.fsPath),
+		);
 		const result: [URI, FileType][] = [];
 		for (const file of dir) {
 			const furi = Utils.joinPath(uri, file);

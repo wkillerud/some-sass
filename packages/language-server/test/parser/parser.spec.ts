@@ -1,5 +1,5 @@
 import { strictEqual, deepStrictEqual } from "assert";
-import { parseDocument, rePlaceholderUsage } from "../../src/parser";
+import { parseDocument } from "../../src/parser";
 import * as helpers from "../helpers";
 
 describe("Services/Parser", () => {
@@ -135,49 +135,6 @@ describe("Services/Parser", () => {
 			const uses = [...symbols.uses.values()];
 
 			strictEqual(uses.length, 3, "expected to find three uses");
-		});
-	});
-
-	describe("regular expressions", () => {
-		it("for placeholder usages", () => {
-			strictEqual(
-				rePlaceholderUsage.exec("@extend %app;")!.groups!["name"],
-				"%app",
-				"should match a basic usage with space",
-			);
-
-			strictEqual(
-				rePlaceholderUsage.exec("@extend	%app-name;")!.groups!["name"],
-				"%app-name",
-				"should match a basic usage with tab",
-			);
-
-			strictEqual(
-				rePlaceholderUsage.exec("@extend %spacing-2;")!.groups!["name"],
-				"%spacing-2",
-				"should match a basic usage with non-breaking space",
-			);
-
-			strictEqual(
-				rePlaceholderUsage.exec("@extend %placeholder !optional;")!.groups![
-					"name"
-				],
-				"%placeholder",
-				"should match optional",
-			);
-
-			strictEqual(
-				rePlaceholderUsage.exec("			@extend %down_low;")!.groups!["name"],
-				"%down_low",
-				"should match with indent",
-			);
-
-			strictEqual(
-				rePlaceholderUsage.exec(".app-asdfqwer1234 { @extend %placeholder;")!
-					.groups!["name"],
-				"%placeholder",
-				"should match on same line as class",
-			);
 		});
 	});
 });

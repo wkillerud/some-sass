@@ -2,21 +2,19 @@ import {
 	Node,
 	NodeType,
 	TextDocument,
-	Position,
 	SymbolKind,
 	getLanguageService,
 	VariableDeclaration,
 	MixinDeclaration,
 	FunctionDeclaration,
 	FunctionParameter,
+	SassDocumentSymbol,
 } from "@somesass/language-services";
 import { useContext } from "../context-provider";
-import { getLinesFromText } from "../utils/string";
 import { getNodeAtOffset, getParentNodeByType } from "./ast";
 import { ScssDocument } from "./scss-document";
 import type { IScssSymbols, ScssParameter } from "./scss-symbol";
 
-export const rePlaceholder = /^\s*%(?<name>\w+)/;
 export const rePlaceholderUsage = /\s*@extend\s+(?<name>%[\w\d-_]+)/;
 
 const reDynamicPath = /[#*{}]/;
@@ -29,6 +27,7 @@ export async function parseDocument(
 		fileSystemProvider: fs,
 		clientCapabilities,
 	});
+
 	const ast = await ls.parseStylesheet(document);
 
 	// Placeholder usages should probably be a find-method in LS?
@@ -78,31 +77,6 @@ export async function parseDocument(
 		}
 	}
 
-	const text = document.getText();
-	const lines = getLinesFromText(text);
-	for (let lineNumber = 0; lineNumber < lines.length; lineNumber++) {
-		const line = lines.at(lineNumber);
-		if (typeof line === "undefined") {
-			continue;
-		}
-
-		if (rePlaceholderUsage.test(line)) {
-			const match = rePlaceholderUsage.exec(line);
-			if (match) {
-				const name = match.groups?.["name"];
-				if (name) {
-					const position = Position.create(lineNumber, line.indexOf(name));
-					result.placeholderUsages.set(name, {
-						name,
-						position,
-						offset: document.offsetAt(position),
-						kind: SymbolKind.Class,
-					});
-				}
-			}
-		}
-	}
-
 	const symbols = await ls.findDocumentSymbols(document);
 	for (const symbol of symbols) {
 		const position = symbol.range.start;
@@ -147,6 +121,15 @@ export async function parseDocument(
 						...symbol,
 						offset,
 						position,
+					});
+				}
+
+				const placeholderUsages = getPlaceholderUsagesInChildren(symbol);
+				for (const usage of placeholderUsages) {
+					result.placeholderUsages.set(usage.name, {
+						...usage,
+						position: usage.range.start,
+						offset: document.offsetAt(symbol.range.start),
 					});
 				}
 				break;
@@ -209,4 +192,23 @@ function getMethodParameters(ast: Node, offset: number) {
 		})
 		.filter((c) => c !== null);
 	return result as ScssParameter[];
+}
+
+function getPlaceholderUsagesInChildren(
+	symbol: SassDocumentSymbol,
+): SassDocumentSymbol[] {
+	if (!symbol.children) {
+		return [];
+	}
+
+	const symbols: SassDocumentSymbol[] = [];
+	for (const child of symbol.children) {
+		if (child.kind === SymbolKind.Class && child.name.startsWith("%")) {
+			symbols.push(child);
+		}
+		if (child.children) {
+			symbols.push(...getPlaceholderUsagesInChildren(child));
+		}
+	}
+	return symbols;
 }

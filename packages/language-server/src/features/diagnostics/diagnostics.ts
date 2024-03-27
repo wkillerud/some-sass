@@ -51,7 +51,7 @@ export async function doDiagnostics(
 				case NodeType.VariableName:
 					nodeKind = SymbolKind.Variable;
 					break;
-				case NodeType.SimpleSelector:
+				case NodeType.SelectorPlaceholder:
 					nodeKind = SymbolKind.Class;
 					break;
 			}
@@ -76,8 +76,8 @@ export async function doDiagnostics(
 	return diagnostics;
 }
 
-function getReferences(fromNode: Node): Node[] {
-	return fromNode.getChildren().flatMap((child) => {
+function getReferences(stylesheet: Node): Node[] {
+	return stylesheet.getChildren().flatMap((child) => {
 		if (child.type === NodeType.VariableName) {
 			const parent = child.getParent();
 			if (
@@ -107,13 +107,9 @@ function getReferences(fromNode: Node): Node[] {
 			) {
 				return [node];
 			}
-		} else if (child.type === NodeType.SimpleSelector) {
+		} else if (child.type === NodeType.SelectorPlaceholder) {
 			let node: Node | null = child;
-			let i = 0;
-			while (node && node.type !== NodeType.ExtendsReference && i !== 2) {
-				node = node.getParent();
-				i++;
-			}
+			node = node.getParent();
 			if (node && node.type === NodeType.ExtendsReference) {
 				return [child];
 			}

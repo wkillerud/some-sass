@@ -397,6 +397,13 @@ export class CSSNavigation {
 					const name = "@media " + mediaList.getText();
 					collect(name, SymbolKind.Module, node, mediaList, node.getDeclarations());
 				}
+			} else if (node.type === nodes.NodeType.SelectorPlaceholder) {
+				const parent = node.getParent();
+				// avoid duplicating when used as a selector
+				if (parent && parent instanceof nodes.ExtendsReference) {
+					const range = Range.create(document.positionAt(node.offset), document.positionAt(node.end));
+					collect(node.getText(), SymbolKind.Class, range, node, undefined);
+				}
 			}
 			return true;
 		});

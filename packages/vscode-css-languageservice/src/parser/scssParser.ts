@@ -328,7 +328,11 @@ export class SCSSParser extends cssParser.Parser {
 		if (this.peekKeyword("@extend")) {
 			const node = <nodes.ExtendsReference>this.create(nodes.ExtendsReference);
 			this.consumeToken();
-			if (!node.getSelectors().addChild(this._parseSimpleSelector())) {
+			if (
+				!node
+					.getSelectors()
+					.addChild(this.peekDelim("%") ? this._parseSelectorPlaceholder() : this._parseSimpleSelector())
+			) {
 				return this.finish(node, ParseError.SelectorExpected);
 			}
 			while (this.accept(TokenType.Comma)) {

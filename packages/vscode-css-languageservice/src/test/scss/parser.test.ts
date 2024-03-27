@@ -589,6 +589,7 @@ suite("SCSS - Parser", () => {
 
 	test("@extend", function () {
 		const parser = new SCSSParser();
+		assertNode(".themable { @extend %theme; }", parser, parser._parseStylesheet.bind(parser));
 		assertNode("foo { @extend .error; border-width: 3px; }", parser, parser._parseStylesheet.bind(parser));
 		assertNode("a.important { @extend .notice !optional; }", parser, parser._parseStylesheet.bind(parser));
 		assertNode(".hoverlink { @extend a:hover; }", parser, parser._parseStylesheet.bind(parser));

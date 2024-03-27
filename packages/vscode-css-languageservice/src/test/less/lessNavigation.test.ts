@@ -80,10 +80,27 @@ suite("LESS - Symbols", () => {
 	test("basic symbols", () => {
 		let ls = getLESSLanguageService();
 		assertSymbolInfos(ls, ".a(@gutter: @gutter-width) { &:extend(.b); }", [
-			{ name: ".a", kind: SymbolKind.Method, location: Location.create("test://test/test.css", newRange(0, 44)) },
+			{
+				name: ".a",
+				kind: SymbolKind.Method,
+				location: Location.create("test://test/test.css", newRange(0, 44)),
+			},
 		]);
 		assertDocumentSymbols(ls, ".a(@gutter: @gutter-width) { &:extend(.b); }", [
-			{ name: ".a", kind: SymbolKind.Method, range: newRange(0, 44), selectionRange: newRange(0, 2) },
+			{
+				name: ".a",
+				kind: SymbolKind.Method,
+				range: newRange(0, 44),
+				selectionRange: newRange(0, 2),
+				children: [
+					{
+						name: "@gutter",
+						kind: SymbolKind.Variable,
+						range: newRange(3, 25),
+						selectionRange: newRange(3, 10),
+					},
+				],
+			},
 		]);
 
 		assertSymbolInfos(ls, ".mixin() { .nested() {} }", [

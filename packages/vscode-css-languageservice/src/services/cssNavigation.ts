@@ -342,6 +342,33 @@ export class CSSNavigation {
 				range,
 				selectionRange,
 			};
+
+			if (
+				symbolNodeOrRange instanceof nodes.MixinDeclaration ||
+				symbolNodeOrRange instanceof nodes.FunctionDeclaration
+			) {
+				const parameters = symbolNodeOrRange.getParameters().getChildren();
+				if (parameters.length > 0) {
+					entry.children = [];
+					for (const parameter of parameters) {
+						if (parameter instanceof nodes.FunctionParameter || parameter instanceof nodes.FunctionArgument) {
+							for (const variable of parameter.getChildren()) {
+								if (variable instanceof nodes.Variable) {
+									const range = getRange(parameter, document);
+									const selectionRange = getRange(variable, document);
+									entry.children.push({
+										name: parameter.getName(),
+										kind: SymbolKind.Variable,
+										range,
+										selectionRange,
+									});
+								}
+							}
+						}
+					}
+				}
+			}
+
 			let top = parents.pop();
 			while (top && !containsRange(top[1], range)) {
 				top = parents.pop();

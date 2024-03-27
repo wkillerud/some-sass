@@ -349,23 +349,19 @@ export class CSSNavigation {
 			) {
 				const parameters = symbolNodeOrRange.getParameters().getChildren();
 				if (parameters.length > 0) {
-					entry.children = [];
+					const signatureParts: string[] = [];
 					for (const parameter of parameters) {
-						if (parameter instanceof nodes.FunctionParameter || parameter instanceof nodes.FunctionArgument) {
-							for (const variable of parameter.getChildren()) {
-								if (variable instanceof nodes.Variable) {
-									const range = getRange(parameter, document);
-									const selectionRange = getRange(variable, document);
-									entry.children.push({
-										name: parameter.getName(),
-										kind: SymbolKind.Variable,
-										range,
-										selectionRange,
-									});
-								}
+						if (parameter instanceof nodes.FunctionParameter) {
+							const name = parameter.getName();
+							const defaultValue = parameter.getDefaultValue();
+							if (defaultValue) {
+								signatureParts.push(`${name}: ${defaultValue.getText()}`);
+							} else {
+								signatureParts.push(name);
 							}
 						}
 					}
+					entry.detail = `(${signatureParts.join(", ")})`;
 				}
 			}
 

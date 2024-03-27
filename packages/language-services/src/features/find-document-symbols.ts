@@ -58,17 +58,6 @@ export class FindSymbols extends LanguageFeature {
 						(v) => v.context.name === symbol.name && v.context.type === "mixin",
 					);
 					symbol.sassdoc = docs;
-					if (symbol.children) {
-						for (const child of symbol.children) {
-							const dollarlessName = child.name.replace("$", "");
-							const paramdocs = docs?.parameter?.find(
-								(v) => v.name === dollarlessName,
-							);
-							if (paramdocs) {
-								child.sassdoc = paramdocs as ParseResult;
-							}
-						}
-					}
 					break;
 				}
 
@@ -78,22 +67,10 @@ export class FindSymbols extends LanguageFeature {
 							v.context.name === symbol.name && v.context.type === "function",
 					);
 					symbol.sassdoc = docs;
-					if (symbol.children) {
-						for (const child of symbol.children) {
-							const dollarlessName = child.name.replace("$", "");
-							const paramdocs = docs?.parameter?.find(
-								(v) => v.name === dollarlessName,
-							);
-							if (paramdocs) {
-								child.sassdoc = paramdocs as ParseResult;
-							}
-						}
-					}
 					break;
 				}
 
 				case SymbolKind.Class: {
-					// TODO: AST traversal as indication whether it's a declaration or a usage, for placeholderUsages replacement
 					if (symbol.name.startsWith("%")) {
 						const sansPercent = symbol.name.substring(1);
 						const docs = sassdoc.find(

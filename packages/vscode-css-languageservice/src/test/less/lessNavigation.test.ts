@@ -92,14 +92,7 @@ suite("LESS - Symbols", () => {
 				kind: SymbolKind.Method,
 				range: newRange(0, 44),
 				selectionRange: newRange(0, 2),
-				children: [
-					{
-						name: "@gutter",
-						kind: SymbolKind.Variable,
-						range: newRange(3, 25),
-						selectionRange: newRange(3, 10),
-					},
-				],
+				detail: `(@gutter: @gutter-width)`,
 			},
 		]);
 

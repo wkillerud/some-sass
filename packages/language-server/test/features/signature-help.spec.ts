@@ -1,14 +1,7 @@
 import { strictEqual, ok } from "assert";
-import {
-	SignatureHelp,
-	SymbolKind,
-	TextDocument,
-	getLanguageService,
-} from "@somesass/language-services";
-import { useContext } from "../../src/context-provider";
+import { SignatureHelp } from "@somesass/language-services";
 import { hasInFacts } from "../../src/features/signature-help/facts";
 import { doSignatureHelp } from "../../src/features/signature-help/signature-help";
-import { ScssDocument } from "../../src/parser";
 import * as helpers from "../helpers";
 
 async function getSignatureHelp(lines: string[]): Promise<SignatureHelp> {
@@ -24,93 +17,15 @@ describe("Providers/SignatureHelp", () => {
 	beforeEach(async () => {
 		helpers.createTestContext();
 
-		const document = TextDocument.create("./one.scss", "scss", 1, "");
-		const ls = getLanguageService(helpers.createTestLsOptions());
-		ls.clearCache(); // The service is a singleton with a shared cache that needs clearing between tests
-
-		const ast = await ls.parseStylesheet(document);
-
-		const { fs, storage } = useContext();
-
-		storage.set(
-			"one.scss",
-			new ScssDocument(
-				fs,
-				TextDocument.create("./one.scss", "scss", 1, ""),
-				{
-					variables: new Map(),
-					mixins: new Map([
-						[
-							"one",
-							{
-								name: "one",
-								kind: SymbolKind.Method,
-								parameters: [],
-								offset: 0,
-								position: { line: 1, character: 1 },
-							},
-						],
-						[
-							"two",
-							{
-								name: "two",
-								kind: SymbolKind.Method,
-								parameters: [
-									{ name: "$a", value: null, offset: 0 },
-									{ name: "$b", value: null, offset: 0 },
-								],
-								offset: 0,
-								position: { line: 1, character: 1 },
-							},
-						],
-					]),
-					functions: new Map([
-						[
-							"make",
-							{
-								name: "make",
-								kind: SymbolKind.Function,
-								parameters: [],
-								offset: 0,
-								position: { line: 1, character: 1 },
-							},
-						],
-						[
-							"one",
-							{
-								name: "one",
-								kind: SymbolKind.Function,
-								parameters: [
-									{ name: "$a", value: null, offset: 0 },
-									{ name: "$b", value: null, offset: 0 },
-									{ name: "$c", value: null, offset: 0 },
-								],
-								offset: 0,
-								position: { line: 1, character: 1 },
-							},
-						],
-						[
-							"two",
-							{
-								name: "two",
-								kind: SymbolKind.Function,
-								parameters: [
-									{ name: "$a", value: null, offset: 0 },
-									{ name: "$b", value: null, offset: 0 },
-								],
-								offset: 0,
-								position: { line: 1, character: 1 },
-							},
-						],
-					]),
-					imports: new Map(),
-					uses: new Map(),
-					forwards: new Map(),
-					placeholders: new Map(),
-					placeholderUsages: new Map(),
-				},
-				ast,
-			),
+		await helpers.makeDocument(
+			[
+				"@mixin one() { @content; }",
+				"@mixin two($a, $b) { @content; }",
+				"@function make() { @return; }",
+				"@function one($a, $b, $c) { @return; }",
+				"@function two($a, $b) { @return; }",
+			],
+			{ uri: "one.scss" },
 		);
 	});
 	describe("Empty", () => {

@@ -1,12 +1,8 @@
+import { ParseResult } from "scss-sassdoc-parser";
 import { MarkupContent, MarkupKind } from "vscode-languageserver";
-import type {
-	IScssDocument,
-	ScssFunction,
-	ScssMixin,
-	ScssParameter,
-} from "../../parser";
+import type { IScssDocument, ScssFunction, ScssMixin } from "../../parser";
 import { applySassDoc } from "../../utils/sassdoc";
-import { asDollarlessVariable } from "../../utils/string";
+import { asDollarlessVariable, stripParentheses } from "../../utils/string";
 
 export const rePrivate = /^\$?[_-].*$/;
 
@@ -14,13 +10,13 @@ export function makeMixinDocumentation(
 	mixin: ScssMixin,
 	sourceDocument: IScssDocument,
 ): MarkupContent {
-	const args = mixin.parameters
-		.map((item) => `${item.name}: ${item.value}`)
-		.join(", ");
-
 	const result = {
 		kind: MarkupKind.Markdown,
-		value: ["```scss", `@mixin ${mixin.name}(${args})`, "```"].join("\n"),
+		value: [
+			"```scss",
+			`@mixin ${mixin.name}${mixin.detail || "()"}`,
+			"```",
+		].join("\n"),
 	};
 
 	const sassdoc = applySassDoc(mixin);
@@ -37,13 +33,13 @@ export function makeFunctionDocumentation(
 	func: ScssFunction,
 	sourceDocument: IScssDocument,
 ): MarkupContent {
-	const args = func.parameters
-		.map((item) => `${item.name}: ${item.value}`)
-		.join(", ");
-
 	const result = {
 		kind: MarkupKind.Markdown,
-		value: ["```scss", `@function ${func.name}(${args})`, "```"].join("\n"),
+		value: [
+			"```scss",
+			`@function ${func.name}${func.detail || "()"}`,
+			"```",
+		].join("\n"),
 	};
 
 	const sassdoc = applySassDoc(func);
@@ -56,12 +52,47 @@ export function makeFunctionDocumentation(
 	return result;
 }
 
+type Parameter = {
+	name: string;
+	defaultValue?: string;
+};
+
+export function getParametersFromDetail(detail?: string): Array<Parameter> {
+	const result: Parameter[] = [];
+	if (!detail) {
+		return result;
+	}
+
+	const parameters = stripParentheses(detail).split(",");
+	for (const param of parameters) {
+		let name = param;
+		let defaultValue: string | undefined = undefined;
+		const defaultValueStart = param.indexOf(":");
+		if (defaultValueStart !== -1) {
+			name = param.substring(0, defaultValueStart);
+			defaultValue = param.substring(defaultValueStart + 1);
+		}
+
+		const parameter: Parameter = {
+			name: name.trim(),
+			defaultValue: defaultValue?.trim(),
+		};
+
+		result.push(parameter);
+	}
+	return result;
+}
+
 /**
  * Use the SnippetString syntax to provide smart completions of parameter names.
  */
-export function mapParameterSnippet(p: ScssParameter, index: number): string {
-	if (p.sassdoc?.type?.length) {
-		const choices = parseStringLiteralChoices(p.sassdoc.type);
+export function mapParameterSnippet(
+	p: Parameter,
+	index: number,
+	sassdoc?: ParseResult,
+): string {
+	if (sassdoc?.type?.length) {
+		const choices = parseStringLiteralChoices(sassdoc.type);
 		if (choices.length > 0) {
 			return `\${${index + 1}|${choices.join(",")}|}`;
 		}
@@ -70,8 +101,8 @@ export function mapParameterSnippet(p: ScssParameter, index: number): string {
 	return `\${${index + 1}:${asDollarlessVariable(p.name)}}`;
 }
 
-export function mapParameterSignature(p: ScssParameter): string {
-	return p.value ? `${p.name}: ${p.value}` : p.name;
+export function mapParameterSignature(p: Parameter): string {
+	return p.defaultValue ? `${p.name}: ${p.defaultValue}` : p.name;
 }
 
 const reStringLiteral = /^["'].+["']$/; // Yes, this will match 'foo", but let the parser deal with yelling about that.

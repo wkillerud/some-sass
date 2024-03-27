@@ -12,6 +12,7 @@ import type { TextDocument } from "vscode-languageserver-textdocument";
 import type { IScssDocument, ScssFunction } from "../../parser";
 import type { CompletionContext } from "./completion-context";
 import {
+	getParametersFromDetail,
 	makeFunctionDocumentation,
 	mapParameterSignature,
 	mapParameterSnippet,
@@ -62,13 +63,13 @@ export function createFunctionCompletionItems(
 		const sortText = isPrivate ? label.replace(/^$[_-]/, "") : undefined;
 
 		const documentation = makeFunctionDocumentation(func, scssDocument);
-
-		const requiredParameters = func.parameters.filter((p) => !p.value);
+		const parameters = getParametersFromDetail(func.detail);
+		const requiredParameters = parameters.filter((p) => !p.defaultValue);
 		const parametersSnippet = requiredParameters
-			.map(mapParameterSnippet)
+			.map((p, i) => mapParameterSnippet(p, i, func.sassdoc))
 			.join(", ");
 		const functionSignature = requiredParameters
-			.map(mapParameterSignature)
+			.map((p) => mapParameterSignature(p))
 			.join(", ");
 		completions.push(
 			makeFunctionCompletion(
@@ -84,12 +85,12 @@ export function createFunctionCompletionItems(
 			),
 		);
 
-		if (requiredParameters.length !== func.parameters.length) {
-			const parametersSnippet = func.parameters
-				.map(mapParameterSnippet)
+		if (requiredParameters.length !== parameters.length) {
+			const parametersSnippet = parameters
+				.map((p, i) => mapParameterSnippet(p, i, func.sassdoc))
 				.join(", ");
-			const functionSignature = func.parameters
-				.map(mapParameterSignature)
+			const functionSignature = parameters
+				.map((p) => mapParameterSignature(p))
 				.join(", ");
 			completions.push(
 				makeFunctionCompletion(

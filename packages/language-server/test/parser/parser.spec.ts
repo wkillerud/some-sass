@@ -28,26 +28,14 @@ describe("Services/Parser", () => {
 			strictEqual(mixins.length, 1);
 
 			strictEqual(mixins[0]?.name, "mixin");
-			strictEqual(mixins[0]?.parameters.length, 2);
-
-			strictEqual(mixins[0]?.parameters[0]?.name, "$a");
-			strictEqual(mixins[0]?.parameters[0]?.value, "1");
-
-			strictEqual(mixins[0]?.parameters[1]?.name, "$b");
-			strictEqual(mixins[0]?.parameters[1]?.value, null);
+			strictEqual(mixins[0]?.detail, "($a: 1, $b)");
 
 			// Functions
 			const functions = [...symbols.functions.values()];
 			strictEqual(functions.length, 1);
 
 			strictEqual(functions[0]?.name, "function");
-			strictEqual(functions[0]?.parameters.length, 2);
-
-			strictEqual(functions[0]?.parameters[0]?.name, "$a");
-			strictEqual(functions[0]?.parameters[0]?.value, "1");
-
-			strictEqual(functions[0]?.parameters[1]?.name, "$b");
-			strictEqual(functions[0]?.parameters[1]?.value, null);
+			strictEqual(functions[0]?.detail, "($a: 1, $b)");
 
 			// Placeholders
 			const placeholders = [...symbols.placeholders.values()];

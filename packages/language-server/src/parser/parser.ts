@@ -5,10 +5,8 @@ import {
 	SymbolKind,
 	getLanguageService,
 	VariableDeclaration,
-	FunctionParameter,
 	SassDocumentSymbol,
 } from "@somesass/language-services";
-import { Parameter } from "scss-sassdoc-parser";
 import { useContext } from "../context-provider";
 import { getNodeAtOffset, getParentNodeByType } from "./ast";
 import { ScssDocument } from "./scss-document";
@@ -95,18 +93,6 @@ export async function parseDocument(
 					...symbol,
 					offset,
 					position,
-					parameters: symbol.children
-						? symbol.children.map((param) => {
-								const paramoffset = document.offsetAt(param.range.start);
-								return {
-									name: param.name,
-									sassdoc: param.sassdoc as Parameter,
-									position: param.range.start,
-									value: getVariableValue(ast, paramoffset),
-									offset: paramoffset,
-								};
-							})
-						: [],
 				});
 
 				break;
@@ -117,18 +103,6 @@ export async function parseDocument(
 					...symbol,
 					offset,
 					position,
-					parameters: symbol.children
-						? symbol.children.map((param) => {
-								const paramoffset = document.offsetAt(param.range.start);
-								return {
-									name: param.name,
-									sassdoc: param.sassdoc as Parameter,
-									position: param.range.start,
-									value: getVariableValue(ast, paramoffset),
-									offset: paramoffset,
-								};
-							})
-						: [],
 				});
 
 				break;
@@ -170,19 +144,7 @@ function getVariableValue(ast: Node, offset: number): string | null {
 		node,
 		NodeType.VariableDeclaration,
 	);
-	if (declaration) {
-		return declaration.getValue()?.getText() || null;
-	}
-
-	const parameter = getParentNodeByType<FunctionParameter>(node, [
-		NodeType.FunctionParameter,
-		NodeType.FunctionArgument,
-	]);
-	if (parameter) {
-		return parameter.getDefaultValue()?.getText() || null;
-	}
-
-	return null;
+	return declaration?.getValue()?.getText() || null;
 }
 
 function getPlaceholderUsagesInChildren(

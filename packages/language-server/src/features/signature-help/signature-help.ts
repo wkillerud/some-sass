@@ -14,6 +14,7 @@ import {
 	asDollarlessVariable,
 	getTextBeforePosition,
 } from "../../utils/string";
+import { getParametersFromDetail } from "../completion/completion-utils";
 import { sassBuiltInModules } from "../sass-built-in-modules";
 import { hasInFacts } from "./facts";
 
@@ -187,6 +188,10 @@ export async function doSignatureHelp(
 		symbolType,
 	);
 
+	console.log({
+		suggestions,
+	});
+
 	if (suggestions.length === 0) {
 		// Look for built-ins
 		for (const { reference, exports } of Object.values(sassBuiltInModules)) {
@@ -231,11 +236,8 @@ export async function doSignatureHelp(
 	}
 
 	for (const symbol of suggestions) {
-		const paramsString = symbol.parameters
-			.map((x) => `${x.name}: ${x.value}`)
-			.join(", ");
 		const signatureInfo = SignatureInformation.create(
-			`${symbol.name} (${paramsString})`,
+			`${symbol.name} ${symbol.detail || "()"}`,
 		);
 
 		const sassdoc = applySassDoc(symbol);
@@ -245,12 +247,26 @@ export async function doSignatureHelp(
 			value: sassdoc,
 		};
 
-		symbol.parameters.forEach((param) => {
-			signatureInfo.parameters?.push({
-				label: param.name,
-				documentation: "",
-			});
-		});
+		if (symbol.detail) {
+			signatureInfo.parameters = [];
+			const parameters = getParametersFromDetail(symbol.detail);
+			for (const { name } of parameters) {
+				let documentation;
+				if (symbol.sassdoc) {
+					const dollarless = asDollarlessVariable(name);
+					const paramDoc = symbol.sassdoc.parameter?.find(
+						(pdoc) => pdoc.name === dollarless,
+					);
+					if (paramDoc) {
+						documentation = paramDoc.description;
+					}
+				}
+				signatureInfo.parameters.push({
+					label: name.trim(),
+					documentation,
+				});
+			}
+		}
 
 		ret.signatures.push(signatureInfo);
 	}
@@ -287,10 +303,15 @@ function doSymbolHunting(
 				entryType === "mixin"
 					? scssDocument.mixins.values()
 					: scssDocument.functions.values();
+
 			for (const symbol of symbols) {
+				console.log({
+					entry,
+					symbol,
+				});
 				if (
 					entry.name === symbol.name &&
-					symbol.parameters.length >= entry.parameters
+					getParametersFromDetail(symbol.detail).length >= entry.parameters
 				) {
 					result.push(symbol);
 				}
@@ -319,13 +340,14 @@ function traverseTree(
 		entryType === "mixin"
 			? scssDocument.mixins.values()
 			: scssDocument.functions.values();
+
 	for (const symbol of symbols) {
 		const symbolName = `${accumulatedPrefix}${asDollarlessVariable(
 			symbol.name,
 		)}`;
 		if (
 			symbolName === entryName &&
-			symbol.parameters.length >= entry.parameters &&
+			getParametersFromDetail(symbol.detail).length >= entry.parameters &&
 			!result.find((x) => x.name === symbol.name)
 		) {
 			result.push(symbol);

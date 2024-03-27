@@ -6,11 +6,12 @@ import {
 	SymbolKind,
 	Range,
 } from "@somesass/language-services";
-import type { Parameter, ParseResult } from "scss-sassdoc-parser";
+import type { ParseResult } from "scss-sassdoc-parser";
 
 export interface ScssSymbol {
 	kind: SymbolKind;
 	name: string;
+	detail?: string;
 	sassdoc?: ParseResult;
 	position: Position;
 	offset: number;
@@ -21,17 +22,8 @@ export interface ScssVariable extends ScssSymbol {
 	value: string | null;
 }
 
-export interface ScssParameter
-	extends Omit<ScssVariable, "kind" | "position" | "sassdoc"> {
-	sassdoc?: Parameter;
-}
-
-export interface ScssMixin extends ScssSymbol {
-	parameters: ScssParameter[];
-}
-
-export type ScssFunction = ScssMixin;
-
+export type ScssMixin = ScssSymbol;
+export type ScssFunction = ScssSymbol;
 export type ScssPlaceholder = ScssSymbol;
 export type ScssPlaceholderUsage = ScssSymbol;
 

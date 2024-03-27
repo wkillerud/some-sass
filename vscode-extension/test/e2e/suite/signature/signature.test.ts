@@ -22,7 +22,7 @@ describe("SCSS Signature Help Test", function () {
 				activeSignature: 0,
 				signatures: [
 					{
-						label: "square ($size: null, $radius: 0)",
+						label: "square ($size, $radius: 0)",
 						parameters: [{ label: "$size" }, { label: "$radius" }],
 					},
 				],
@@ -40,7 +40,7 @@ describe("SCSS Signature Help Test", function () {
 				activeSignature: 0,
 				signatures: [
 					{
-						label: "mix-square ($size: null, $radius: 0)",
+						label: "mix-square ($size, $radius: 0)",
 						parameters: [{ label: "$size" }, { label: "$radius" }],
 					},
 				],
@@ -58,7 +58,7 @@ describe("SCSS Signature Help Test", function () {
 				activeSignature: 0,
 				signatures: [
 					{
-						label: "square ($size: null, $radius: 0)",
+						label: "square ($size, $radius: 0)",
 						parameters: [{ label: "$size" }, { label: "$radius" }],
 					},
 				],
@@ -76,7 +76,7 @@ describe("SCSS Signature Help Test", function () {
 				activeSignature: 0,
 				signatures: [
 					{
-						label: "mix-square ($size: null, $radius: 0)",
+						label: "mix-square ($size, $radius: 0)",
 						parameters: [{ label: "$size" }, { label: "$radius" }],
 					},
 				],
@@ -96,7 +96,7 @@ describe("SCSS Signature Help Test", function () {
 				activeSignature: 0,
 				signatures: [
 					{
-						label: "pow ($base: null, $exponent: null)",
+						label: "pow ($base, $exponent)",
 						parameters: [{ label: "$base" }, { label: "$exponent" }],
 					},
 				],
@@ -114,7 +114,7 @@ describe("SCSS Signature Help Test", function () {
 				activeSignature: 0,
 				signatures: [
 					{
-						label: "fun-pow ($base: null, $exponent: null)",
+						label: "fun-pow ($base, $exponent)",
 						parameters: [{ label: "$base" }, { label: "$exponent" }],
 					},
 				],
@@ -132,7 +132,7 @@ describe("SCSS Signature Help Test", function () {
 				activeSignature: 0,
 				signatures: [
 					{
-						label: "pow ($base: null, $exponent: null)",
+						label: "pow ($base, $exponent)",
 						parameters: [{ label: "$base" }, { label: "$exponent" }],
 					},
 				],
@@ -150,7 +150,7 @@ describe("SCSS Signature Help Test", function () {
 				activeSignature: 0,
 				signatures: [
 					{
-						label: "fun-pow ($base: null, $exponent: null)",
+						label: "fun-pow ($base, $exponent)",
 						parameters: [{ label: "$base" }, { label: "$exponent" }],
 					},
 				],

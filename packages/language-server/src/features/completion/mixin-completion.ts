@@ -13,6 +13,7 @@ import { useContext } from "../../context-provider";
 import type { IScssDocument, ScssMixin } from "../../parser";
 import type { CompletionContext } from "./completion-context";
 import {
+	getParametersFromDetail,
 	makeMixinDocumentation,
 	mapParameterSignature,
 	mapParameterSnippet,
@@ -68,7 +69,8 @@ export function createMixinCompletionItems(
 		// Use the SnippetString syntax to provide smart completions of parameter names
 		const labelDetails: CompletionItemLabelDetails | undefined = undefined;
 
-		const requiredParameters = mixin.parameters.filter((p) => !p.value);
+		const parameters = getParametersFromDetail(mixin.detail);
+		const requiredParameters = parameters.filter((p) => !p.defaultValue);
 		if (requiredParameters.length === 0) {
 			makeMixinCompletion(
 				completions,
@@ -84,10 +86,10 @@ export function createMixinCompletionItems(
 
 		if (requiredParameters.length > 0) {
 			const parametersSnippet = requiredParameters
-				.map(mapParameterSnippet)
+				.map((p, i) => mapParameterSnippet(p, i, mixin.sassdoc))
 				.join(", ");
 			const functionSignature = requiredParameters
-				.map(mapParameterSignature)
+				.map((p) => mapParameterSignature(p))
 				.join(", ");
 			makeMixinCompletion(
 				completions,
@@ -103,12 +105,12 @@ export function createMixinCompletionItems(
 			);
 		}
 
-		if (mixin.parameters.length !== requiredParameters.length) {
-			const parametersSnippet = mixin.parameters
-				.map(mapParameterSnippet)
+		if (parameters.length !== requiredParameters.length) {
+			const parametersSnippet = parameters
+				.map((p, i) => mapParameterSnippet(p, i, mixin.sassdoc))
 				.join(", ");
-			const functionSignature = mixin.parameters
-				.map(mapParameterSignature)
+			const functionSignature = parameters
+				.map((p) => mapParameterSignature(p))
 				.join(", ");
 			makeMixinCompletion(
 				completions,

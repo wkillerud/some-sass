@@ -44,40 +44,34 @@ export function createVariableCompletionItems(
 				"```",
 			].join("\n") ||
 			"";
-		let detail = undefined;
 
 		let label = variable.name;
 		let sortText;
 		let filterText;
 		let insertText;
 
-		if (variable.mixin) {
-			// Add 'argument from MIXIN_NAME' suffix if Variable is Mixin argument
-			detail = `Argument from ${variable.mixin}`;
-		} else {
-			const isPrivate = variable.name.match(rePrivate);
-			const isFromCurrentDocument = scssDocument.uri === currentDocument.uri;
+		const isPrivate = variable.name.match(rePrivate);
+		const isFromCurrentDocument = scssDocument.uri === currentDocument.uri;
 
-			if (isPrivate && !isFromCurrentDocument) {
-				continue;
-			}
+		if (isPrivate && !isFromCurrentDocument) {
+			continue;
+		}
 
-			if (hiddenSymbols.includes(variable.name)) {
-				continue;
-			}
+		if (hiddenSymbols.includes(variable.name)) {
+			continue;
+		}
 
-			if (shownSymbols.length > 0 && !shownSymbols.includes(variable.name)) {
-				continue;
-			}
+		if (shownSymbols.length > 0 && !shownSymbols.includes(variable.name)) {
+			continue;
+		}
 
-			if (isPrivate) {
-				sortText = label.replace(/^$[_-]/, "");
-			}
+		if (isPrivate) {
+			sortText = label.replace(/^$[_-]/, "");
+		}
 
-			const sassdoc = applySassDoc(variable);
-			if (sassdoc) {
-				documentation += `\n____\n${sassdoc}`;
-			}
+		const sassdoc = applySassDoc(variable);
+		if (sassdoc) {
+			documentation += `\n____\n${sassdoc}`;
 		}
 
 		documentation += `\n____\nVariable declared in ${scssDocument.fileName}`;
@@ -113,7 +107,6 @@ export function createVariableCompletionItems(
 			sortText,
 			commitCharacters: [";", ","],
 			kind: completionKind,
-			detail,
 			tags: variable.sassdoc?.deprecated ? [CompletionItemTag.Deprecated] : [],
 			documentation:
 				completionKind === CompletionItemKind.Color

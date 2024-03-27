@@ -39,7 +39,7 @@ export function getNodeAtOffset<T extends Node>(
  */
 export function getParentNodeByType<T extends Node>(
 	node: Node | null,
-	type: NodeType,
+	type: NodeType | NodeType[],
 ): T | null {
 	if (node === null) {
 		return null;
@@ -47,7 +47,8 @@ export function getParentNodeByType<T extends Node>(
 
 	node = node.getParent();
 
-	while (node && node.type !== type) {
+	const types = Array.isArray(type) ? type : [type];
+	while (node && !types.includes(node.type)) {
 		if (node.type === NodeType.Stylesheet) {
 			return null;
 		}

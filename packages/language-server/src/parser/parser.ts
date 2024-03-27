@@ -5,17 +5,14 @@ import {
 	SymbolKind,
 	getLanguageService,
 	VariableDeclaration,
-	MixinDeclaration,
-	FunctionDeclaration,
 	FunctionParameter,
 	SassDocumentSymbol,
 } from "@somesass/language-services";
+import { Parameter } from "scss-sassdoc-parser";
 import { useContext } from "../context-provider";
 import { getNodeAtOffset, getParentNodeByType } from "./ast";
 import { ScssDocument } from "./scss-document";
-import type { IScssSymbols, ScssParameter } from "./scss-symbol";
-
-export const rePlaceholderUsage = /\s*@extend\s+(?<name>%[\w\d-_]+)/;
+import type { IScssSymbols } from "./scss-symbol";
 
 const reDynamicPath = /[#*{}]/;
 
@@ -77,7 +74,7 @@ export async function parseDocument(
 		}
 	}
 
-	const symbols = await ls.findDocumentSymbols(document);
+	const symbols = ls.findDocumentSymbols(document);
 	for (const symbol of symbols) {
 		const position = symbol.range.start;
 		const offset = document.offsetAt(symbol.range.start);
@@ -98,7 +95,18 @@ export async function parseDocument(
 					...symbol,
 					offset,
 					position,
-					parameters: getMethodParameters(ast, offset),
+					parameters: symbol.children
+						? symbol.children.map((param) => {
+								const paramoffset = document.offsetAt(param.range.start);
+								return {
+									name: param.name,
+									sassdoc: param.sassdoc as Parameter,
+									position: param.range.start,
+									value: getVariableValue(ast, paramoffset),
+									offset: paramoffset,
+								};
+							})
+						: [],
 				});
 
 				break;
@@ -109,7 +117,18 @@ export async function parseDocument(
 					...symbol,
 					offset,
 					position,
-					parameters: getMethodParameters(ast, offset),
+					parameters: symbol.children
+						? symbol.children.map((param) => {
+								const paramoffset = document.offsetAt(param.range.start);
+								return {
+									name: param.name,
+									sassdoc: param.sassdoc as Parameter,
+									position: param.range.start,
+									value: getVariableValue(ast, paramoffset),
+									offset: paramoffset,
+								};
+							})
+						: [],
 				});
 
 				break;
@@ -147,51 +166,23 @@ function getVariableValue(ast: Node, offset: number): string | null {
 		return null;
 	}
 
-	const parent = getParentNodeByType<VariableDeclaration>(
+	const declaration = getParentNodeByType<VariableDeclaration>(
 		node,
 		NodeType.VariableDeclaration,
 	);
-	return parent?.getValue()?.getText() || null;
-}
-
-function getMethodParameters(ast: Node, offset: number) {
-	const node = getNodeAtOffset<MixinDeclaration | FunctionDeclaration>(
-		ast,
-		offset,
-	);
-
-	if (node === null || typeof node.getParameters === "undefined") {
-		return [];
+	if (declaration) {
+		return declaration.getValue()?.getText() || null;
 	}
 
-	const result = node
-		.getParameters()
-		.getChildren()
-		.map((child) => {
-			if (child instanceof FunctionParameter) {
-				const defaultValueNode = child.getDefaultValue();
-				const value =
-					defaultValueNode === undefined ? null : defaultValueNode.getText();
-				const name = child.getName();
+	const parameter = getParentNodeByType<FunctionParameter>(node, [
+		NodeType.FunctionParameter,
+		NodeType.FunctionArgument,
+	]);
+	if (parameter) {
+		return parameter.getDefaultValue()?.getText() || null;
+	}
 
-				// TODO: get this (all of this) into documentsymbols
-				// const dollarlessName = asDollarlessVariable(name);
-				// const docs = sassDoc
-				// 	? sassDoc.parameter?.find((p) => p.name === dollarlessName)
-				// 	: undefined;
-				return {
-					name,
-					offset: child.offset,
-					value,
-					kind: SymbolKind.Variable,
-					// sassdoc: docs,
-				};
-			} else {
-				return null;
-			}
-		})
-		.filter((c) => c !== null);
-	return result as ScssParameter[];
+	return null;
 }
 
 function getPlaceholderUsagesInChildren(

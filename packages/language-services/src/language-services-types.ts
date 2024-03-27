@@ -167,7 +167,7 @@ export interface SassDocumentSymbol extends DocumentSymbol {
 
 export interface LanguageService {
 	findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]>;
-	findDocumentSymbols(document: TextDocument): Promise<SassDocumentSymbol[]>;
+	findDocumentSymbols(document: TextDocument): SassDocumentSymbol[];
 	/**
 	 * Utility function to reparse an updated document.
 	 * Like {@link LanguageService.parseStylesheet}, but returns nothing.
@@ -185,7 +185,7 @@ export interface LanguageService {
 	 * Called internally by the other functions to get a cached AST of the document, or parse it if none exists.
 	 * You typically won't use this directly, but you can if you need access to the raw AST for the document.
 	 */
-	parseStylesheet(document: TextDocument): Promise<Stylesheet>;
+	parseStylesheet(document: TextDocument): Stylesheet;
 	/**
 	 * You may want to use this to set the workspace root.
 	 * @param settings {@link LanguageServiceConfiguration}

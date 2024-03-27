@@ -6,7 +6,6 @@ import {
 	LanguageService as ILanguageService,
 	LanguageServiceConfiguration,
 	LanguageServiceOptions,
-	SassDocumentSymbol,
 	TextDocument,
 } from "./language-services-types";
 import { mapFsProviders } from "./utils/fs-provider";
@@ -40,7 +39,7 @@ class LanguageService implements ILanguageService {
 		this.#findSymbols.configure(configuration);
 	}
 
-	async parseStylesheet(document: TextDocument) {
+	parseStylesheet(document: TextDocument) {
 		return this.#cache.get(document);
 	}
 
@@ -48,9 +47,7 @@ class LanguageService implements ILanguageService {
 		return this.#findLinks.findDocumentLinks(document);
 	}
 
-	async findDocumentSymbols(
-		document: TextDocument,
-	): Promise<SassDocumentSymbol[]> {
+	findDocumentSymbols(document: TextDocument) {
 		return this.#findSymbols.findDocumentSymbols(document);
 	}
 

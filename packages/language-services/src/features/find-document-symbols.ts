@@ -1,4 +1,4 @@
-import { ParseResult, parse } from "scss-sassdoc-parser";
+import { ParseResult, parseSync } from "scss-sassdoc-parser";
 import { LanguageFeature, LanguageFeatureInternal } from "../language-feature";
 import {
 	LanguageServiceOptions,
@@ -17,10 +17,8 @@ export class FindSymbols extends LanguageFeature {
 		super(ls, options, _internal);
 	}
 
-	async findDocumentSymbols(
-		document: TextDocument,
-	): Promise<SassDocumentSymbol[]> {
-		const stylesheet = await this.ls.parseStylesheet(document);
+	findDocumentSymbols(document: TextDocument): SassDocumentSymbol[] {
+		const stylesheet = this.ls.parseStylesheet(document);
 		const symbols = this._internal.scssLs.findDocumentSymbols2(
 			document,
 			stylesheet,
@@ -33,7 +31,7 @@ export class FindSymbols extends LanguageFeature {
 		let sassdoc: ParseResult[] = [];
 		try {
 			const text = document.getText();
-			sassdoc = await parse(text);
+			sassdoc = parseSync(text);
 		} catch {
 			// do nothing
 		}

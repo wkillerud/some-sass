@@ -1,9 +1,13 @@
-import { test, assert } from "vitest";
+import { test, assert, beforeEach } from "vitest";
 import { SymbolKind, getLanguageService } from "../language-services";
 import { getOptions } from "../utils/test-helpers";
 
 const { fileSystemProvider, ...rest } = getOptions();
 const ls = getLanguageService({ fileSystemProvider, ...rest });
+
+beforeEach(() => {
+	ls.clearCache();
+});
 
 test("should return variables", async () => {
 	const document = fileSystemProvider.createDocument([
@@ -13,9 +17,9 @@ test("should return variables", async () => {
 		"%placeholder { color: blue; }",
 	]);
 
-	const symbols = await ls.findDocumentSymbols(document);
-	assert.strictEqual(symbols.length, 4);
+	const symbols = ls.findDocumentSymbols(document);
 	const [variable, mixin, func, placeholder] = symbols;
+
 	assert.deepStrictEqual(variable, {
 		kind: SymbolKind.Variable,
 		name: "$name",
@@ -109,6 +113,92 @@ test("should return variables", async () => {
 			start: {
 				character: 0,
 				line: 3,
+			},
+		},
+	});
+});
+
+test("includes placeholder usages in a way that is distinguishable from declarations", () => {
+	const document = fileSystemProvider.createDocument([
+		"%placeholder { color: blue; }",
+		".button { @extend %placeholder; }",
+	]);
+
+	const symbols = ls.findDocumentSymbols(document);
+	const [declaration, buttonWithPlaceholderUsage] = symbols;
+
+	assert.deepStrictEqual(declaration, {
+		kind: SymbolKind.Class,
+		name: "%placeholder",
+		range: {
+			end: {
+				character: 29,
+				line: 0,
+			},
+			start: {
+				character: 0,
+				line: 0,
+			},
+		},
+		selectionRange: {
+			end: {
+				character: 12,
+				line: 0,
+			},
+			start: {
+				character: 0,
+				line: 0,
+			},
+		},
+	});
+
+	assert.deepStrictEqual(buttonWithPlaceholderUsage, {
+		children: [
+			{
+				kind: 5,
+				name: "%placeholder",
+				range: {
+					end: {
+						character: 30,
+						line: 1,
+					},
+					start: {
+						character: 18,
+						line: 1,
+					},
+				},
+				selectionRange: {
+					end: {
+						character: 30,
+						line: 1,
+					},
+					start: {
+						character: 18,
+						line: 1,
+					},
+				},
+			},
+		],
+		kind: 5,
+		name: ".button",
+		range: {
+			end: {
+				character: 33,
+				line: 1,
+			},
+			start: {
+				character: 0,
+				line: 1,
+			},
+		},
+		selectionRange: {
+			end: {
+				character: 7,
+				line: 1,
+			},
+			start: {
+				character: 0,
+				line: 1,
 			},
 		},
 	});

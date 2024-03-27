@@ -163,6 +163,7 @@ export type Stylesheet = Node;
 
 export interface SassDocumentSymbol extends DocumentSymbol {
 	sassdoc?: ParseResult;
+	children?: SassDocumentSymbol[];
 }
 
 export interface LanguageService {

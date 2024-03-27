@@ -54,21 +54,41 @@ export class FindSymbols extends LanguageFeature {
 				}
 
 				case SymbolKind.Method: {
-					// TODO: add AST traversal to add parameters as children if not already there, add sassdoc to parameters
 					const docs = sassdoc.find(
 						(v) => v.context.name === symbol.name && v.context.type === "mixin",
 					);
 					symbol.sassdoc = docs;
+					if (symbol.children) {
+						for (const child of symbol.children) {
+							const dollarlessName = child.name.replace("$", "");
+							const paramdocs = docs?.parameter?.find(
+								(v) => v.name === dollarlessName,
+							);
+							if (paramdocs) {
+								child.sassdoc = paramdocs as ParseResult;
+							}
+						}
+					}
 					break;
 				}
 
 				case SymbolKind.Function: {
-					// TODO: add AST traversal to add parameters as children if not already there, add sassdoc to parameters
 					const docs = sassdoc.find(
 						(v) =>
 							v.context.name === symbol.name && v.context.type === "function",
 					);
 					symbol.sassdoc = docs;
+					if (symbol.children) {
+						for (const child of symbol.children) {
+							const dollarlessName = child.name.replace("$", "");
+							const paramdocs = docs?.parameter?.find(
+								(v) => v.name === dollarlessName,
+							);
+							if (paramdocs) {
+								child.sassdoc = paramdocs as ParseResult;
+							}
+						}
+					}
 					break;
 				}
 

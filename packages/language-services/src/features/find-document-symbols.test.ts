@@ -1,5 +1,9 @@
 import { test, assert, beforeEach } from "vitest";
-import { SymbolKind, getLanguageService } from "../language-services";
+import {
+	SassDocumentSymbol,
+	SymbolKind,
+	getLanguageService,
+} from "../language-services";
 import { getOptions } from "../utils/test-helpers";
 
 const { fileSystemProvider, ...rest } = getOptions();
@@ -67,6 +71,56 @@ test("should return variables", async () => {
 				line: 1,
 			},
 		},
+		children: [
+			{
+				kind: 13,
+				name: "$a",
+				range: {
+					end: {
+						character: 18,
+						line: 1,
+					},
+					start: {
+						character: 13,
+						line: 1,
+					},
+				},
+				selectionRange: {
+					end: {
+						character: 15,
+						line: 1,
+					},
+					start: {
+						character: 13,
+						line: 1,
+					},
+				},
+			},
+			{
+				kind: 13,
+				name: "$b",
+				range: {
+					end: {
+						character: 22,
+						line: 1,
+					},
+					start: {
+						character: 20,
+						line: 1,
+					},
+				},
+				selectionRange: {
+					end: {
+						character: 22,
+						line: 1,
+					},
+					start: {
+						character: 20,
+						line: 1,
+					},
+				},
+			},
+		],
 	});
 	assert.deepStrictEqual(func, {
 		kind: SymbolKind.Function,
@@ -91,6 +145,56 @@ test("should return variables", async () => {
 				line: 2,
 			},
 		},
+		children: [
+			{
+				kind: 13,
+				name: "$a",
+				range: {
+					end: {
+						character: 24,
+						line: 2,
+					},
+					start: {
+						character: 19,
+						line: 2,
+					},
+				},
+				selectionRange: {
+					end: {
+						character: 21,
+						line: 2,
+					},
+					start: {
+						character: 19,
+						line: 2,
+					},
+				},
+			},
+			{
+				kind: 13,
+				name: "$b",
+				range: {
+					end: {
+						character: 28,
+						line: 2,
+					},
+					start: {
+						character: 26,
+						line: 2,
+					},
+				},
+				selectionRange: {
+					end: {
+						character: 28,
+						line: 2,
+					},
+					start: {
+						character: 26,
+						line: 2,
+					},
+				},
+			},
+		],
 	});
 	assert.deepStrictEqual(placeholder, {
 		kind: SymbolKind.Class,
@@ -202,4 +306,20 @@ test("includes placeholder usages in a way that is distinguishable from declarat
 			},
 		},
 	});
+});
+
+test("includes sassdoc for function parameters", () => {
+	const document = fileSystemProvider.createDocument([
+		"/// @param {Number} $value - Value to return",
+		"/// @return {Number} - $value",
+		"@function to-length($value) {",
+		"	@return $value;",
+		"}",
+	]);
+
+	const [func] = ls.findDocumentSymbols(document);
+	assert.ok(func);
+	assert.ok(func.children);
+	const variable: SassDocumentSymbol = func.children![0];
+	assert.ok(variable.sassdoc);
 });

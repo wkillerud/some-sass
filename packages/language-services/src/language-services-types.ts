@@ -70,6 +70,7 @@ import {
 	GuardCondition,
 	Module,
 	Marker,
+	getNodeAtOffset,
 } from "@somesass/vscode-css-languageservice";
 import type { ParseResult } from "scss-sassdoc-parser";
 import { TextDocument } from "vscode-languageserver-textdocument";
@@ -169,6 +170,11 @@ export interface SassDocumentSymbol extends DocumentSymbol {
 export interface LanguageService {
 	findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]>;
 	findDocumentSymbols(document: TextDocument): SassDocumentSymbol[];
+	findWorkspaceSymbols(query?: string): SymbolInformation[];
+	findDefinition(
+		document: TextDocument,
+		position: Position,
+	): Promise<Location | null>;
 	/**
 	 * Utility function to reparse an updated document.
 	 * Like {@link LanguageService.parseStylesheet}, but returns nothing.
@@ -332,6 +338,7 @@ export {
 	URI,
 	Utils,
 	TextDocument,
+	getNodeAtOffset,
 	Range,
 	Position,
 	DocumentUri,

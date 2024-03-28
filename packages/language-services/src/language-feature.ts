@@ -1,4 +1,5 @@
 import { LanguageService as VSCodeLanguageService } from "@somesass/vscode-css-languageservice";
+import { LanguageModelCache } from "./language-model-cache";
 import {
 	LanguageServiceOptions,
 	TextDocument,
@@ -8,6 +9,7 @@ import {
 } from "./language-services-types";
 
 export type LanguageFeatureInternal = {
+	cache: LanguageModelCache;
 	scssLs: VSCodeLanguageService;
 };
 
@@ -21,7 +23,7 @@ export abstract class LanguageFeature {
 	configuration: LanguageServiceConfiguration = {};
 
 	/** @private */
-	_internal: LanguageFeatureInternal;
+	protected _internal: LanguageFeatureInternal;
 
 	constructor(
 		ls: LanguageService,
@@ -39,26 +41,28 @@ export abstract class LanguageFeature {
 	}
 
 	/**
-	 * Helper to do some kind of lookup for the import tree of a document. Usually used to find the declaration of a symbol in the currently open document, but the callback can do whatever it likes.
+	 * Helper to do some kind of lookup for the import tree of a document.
+	 * Usually used to find the declaration of a symbol in the currently open document, but the callback can do whatever it likes.
 	 *
-	 * @param callback Gets called for each node in the import tree (may happen more than once for the same document).
+	 * @param callback Gets called for each node in the import tree (may happen more than once for the same document). Return undefined if the callback should not add to the results.
 	 * @param initialDocument The starting point, typically the document that gets passed to the language feature function.
-	 * @param currentDocument The document that will be passed to the callback.
-	 * @param accumulatedPrefix In case of prefixes in `@forward` statements, this field gathers up all prefixes.
-	 * @param depth
 	 * @returns The aggregated results of {@link callback}
 	 */
-	async traverseDocuments<T>(
-		callback: (document: TextDocument, prefix?: string) => T[],
+	async findInWorkspace<T>(
+		callback: (document: TextDocument, prefix: string) => T | T[] | undefined,
+		initialDocument: TextDocument,
+	): Promise<T[]> {
+		return this.internalFindInWorkspace(callback, initialDocument);
+	}
+
+	private async internalFindInWorkspace<T>(
+		callback: (document: TextDocument, prefix: string) => T | T[] | undefined,
 		initialDocument: TextDocument,
 		currentDocument: TextDocument = initialDocument,
 		accumulatedPrefix = "",
 		depth = 0,
 	): Promise<T[]> {
-		const currentDocumentResult = callback(
-			currentDocument,
-			accumulatedPrefix ? accumulatedPrefix : undefined,
-		);
+		const callbackResult = callback(currentDocument, accumulatedPrefix);
 
 		const allLinks = await this.ls.findDocumentLinks(currentDocument);
 
@@ -76,30 +80,37 @@ export abstract class LanguageFeature {
 		});
 
 		if (links.length === 0) {
-			return currentDocumentResult;
+			if (typeof callbackResult === "undefined") {
+				return [];
+			}
+			return Array.isArray(callbackResult) ? callbackResult : [callbackResult];
 		}
 
-		const result = await Promise.all(
-			links.map((link): Promise<T[]> => {
-				if (!link.target || link.target === currentDocument.uri) {
-					return Promise.resolve([]);
-				}
+		const result: T[] = [];
+		for (const link of links) {
+			if (!link.target || link.target === currentDocument.uri) {
+				continue;
+			}
 
-				let prefix = accumulatedPrefix;
-				if (link.as) {
-					prefix += link.as;
-				}
+			const next = this._internal.cache.document(link.target!);
+			if (!next) {
+				continue;
+			}
 
-				return this.traverseDocuments(
-					callback,
-					initialDocument,
-					currentDocument,
-					prefix,
-					depth + 1,
-				);
-			}),
-		);
+			let prefix = accumulatedPrefix;
+			if (link.as) {
+				prefix += link.as;
+			}
 
-		return result.flat();
+			return this.internalFindInWorkspace(
+				callback,
+				initialDocument,
+				next,
+				prefix,
+				depth + 1,
+			);
+		}
+
+		return result;
 	}
 }

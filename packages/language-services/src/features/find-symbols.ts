@@ -6,6 +6,8 @@ import {
 	TextDocument,
 	SassDocumentSymbol,
 	SymbolKind,
+	SymbolInformation,
+	Location,
 } from "../language-services-types";
 
 export class FindSymbols extends LanguageFeature {
@@ -86,5 +88,24 @@ export class FindSymbols extends LanguageFeature {
 		}
 
 		return symbols;
+	}
+
+	findWorkspaceSymbols(query?: string): SymbolInformation[] {
+		const documents = this._internal.cache.documents();
+		const result: SymbolInformation[] = [];
+		for (const document of documents) {
+			const symbols = this.findDocumentSymbols(document);
+			for (const symbol of symbols) {
+				if (query && !symbol.name.includes(query)) {
+					continue;
+				}
+				result.push({
+					name: symbol.name,
+					kind: symbol.kind,
+					location: Location.create(document.uri, symbol.selectionRange),
+				});
+			}
+		}
+		return result;
 	}
 }

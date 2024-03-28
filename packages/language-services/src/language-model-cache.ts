@@ -3,12 +3,10 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { LanguageFeature, LanguageFeatureInternal } from "./language-feature";
+import { LanguageService as VSCodeLanguageService } from "@somesass/vscode-css-languageservice";
 import {
-	LanguageService,
 	TextDocument,
 	Stylesheet,
-	LanguageServiceOptions,
 	LanguageModelCacheOptions,
 	Node,
 } from "./language-services-types";
@@ -19,26 +17,23 @@ type LanguageModels = {
 		languageId: string;
 		cTime: number;
 		languageModel: Stylesheet;
+		document: TextDocument;
 	};
 };
 
-export class LanguageModelCache extends LanguageFeature {
+export class LanguageModelCache {
 	#languageModels: LanguageModels = {};
 	#nModels = 0;
-	#options: LanguageModelCacheOptions;
+	#options: LanguageModelCacheOptions & { scssLs: VSCodeLanguageService };
 	#cleanupInterval: NodeJS.Timeout | undefined = undefined;
 
 	constructor(
-		ls: LanguageService,
-		options: LanguageServiceOptions,
-		_internal: LanguageFeatureInternal,
+		options: LanguageModelCacheOptions & { scssLs: VSCodeLanguageService },
 	) {
-		super(ls, options, _internal);
-
 		this.#options = {
 			maxEntries: Number.MAX_SAFE_INTEGER,
 			cleanupIntervalTimeInSeconds: 0,
-			...options.languageModelCache,
+			...options,
 		};
 
 		const intervalTime = this.#options.cleanupIntervalTimeInSeconds || 0;
@@ -69,7 +64,7 @@ export class LanguageModelCache extends LanguageFeature {
 			languageModelInfo.cTime = Date.now();
 			return languageModelInfo.languageModel;
 		}
-		const languageModel = this._internal.scssLs.parseStylesheet(
+		const languageModel = this.#options.scssLs.parseStylesheet(
 			document,
 		) as Node;
 		this.#languageModels[document.uri] = {
@@ -77,6 +72,7 @@ export class LanguageModelCache extends LanguageFeature {
 			version,
 			languageId,
 			cTime: Date.now(),
+			document,
 		};
 		if (!languageModelInfo) {
 			this.#nModels++;
@@ -100,6 +96,14 @@ export class LanguageModelCache extends LanguageFeature {
 		return languageModel;
 	}
 
+	document(uri: string): TextDocument | undefined {
+		return this.#languageModels[uri]?.document;
+	}
+
+	documents(): TextDocument[] {
+		return Object.values(this.#languageModels).map((cached) => cached.document);
+	}
+
 	has(document: TextDocument) {
 		return typeof this.#languageModels[document.uri] !== "undefined";
 	}
@@ -107,7 +111,7 @@ export class LanguageModelCache extends LanguageFeature {
 	onDocumentChanged(document: TextDocument) {
 		const version = document.version;
 		const languageId = document.languageId;
-		const languageModel = this._internal.scssLs.parseStylesheet(
+		const languageModel = this.#options.scssLs.parseStylesheet(
 			document,
 		) as Node;
 		this.#languageModels[document.uri] = {
@@ -115,6 +119,7 @@ export class LanguageModelCache extends LanguageFeature {
 			version,
 			languageId,
 			cTime: Date.now(),
+			document,
 		};
 	}
 

@@ -1,7 +1,11 @@
-import { getSCSSLanguageService } from "@somesass/vscode-css-languageservice";
+import {
+	Position,
+	getSCSSLanguageService,
+} from "@somesass/vscode-css-languageservice";
+import { FindDefinition } from "./features/find-definition";
 import { FindLinks } from "./features/find-document-links";
-import { FindSymbols } from "./features/find-document-symbols";
-import { LanguageModelCache } from "./language-model-cache";
+import { FindSymbols } from "./features/find-symbols";
+import { LanguageModelCache as LanguageServerCache } from "./language-model-cache";
 import {
 	LanguageService as ILanguageService,
 	LanguageServiceConfiguration,
@@ -19,24 +23,30 @@ export function getLanguageService(
 }
 
 class LanguageService implements ILanguageService {
-	#cache: LanguageModelCache;
+	#cache: LanguageServerCache;
 	#findLinks: FindLinks;
 	#findSymbols: FindSymbols;
+	#findDefinition: FindDefinition;
 
 	constructor(options: LanguageServiceOptions) {
 		const scssLs = getSCSSLanguageService({
 			clientCapabilities: options.clientCapabilities,
 			fileSystemProvider: mapFsProviders(options.fileSystemProvider),
 		});
-		this.#cache = new LanguageModelCache(this, options, { scssLs });
-		this.#findLinks = new FindLinks(this, options, { scssLs });
-		this.#findSymbols = new FindSymbols(this, options, { scssLs });
+		const cache = new LanguageServerCache({
+			scssLs,
+			...options.languageModelCache,
+		});
+		this.#cache = cache;
+		this.#findLinks = new FindLinks(this, options, { scssLs, cache });
+		this.#findSymbols = new FindSymbols(this, options, { scssLs, cache });
+		this.#findDefinition = new FindDefinition(this, options, { scssLs, cache });
 	}
 
 	configure(configuration: LanguageServiceConfiguration): void {
-		this.#cache.configure(configuration);
 		this.#findLinks.configure(configuration);
 		this.#findSymbols.configure(configuration);
+		this.#findDefinition.configure(configuration);
 	}
 
 	parseStylesheet(document: TextDocument) {
@@ -49,6 +59,14 @@ class LanguageService implements ILanguageService {
 
 	findDocumentSymbols(document: TextDocument) {
 		return this.#findSymbols.findDocumentSymbols(document);
+	}
+
+	findDefinition(document: TextDocument, position: Position) {
+		return this.#findDefinition.findDefinition(document, position);
+	}
+
+	findWorkspaceSymbols(query?: string) {
+		return this.#findSymbols.findWorkspaceSymbols(query);
 	}
 
 	onDocumentChanged(document: TextDocument) {

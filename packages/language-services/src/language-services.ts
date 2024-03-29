@@ -73,7 +73,7 @@ class LanguageService implements ILanguageService {
 		return this.#cache.onDocumentChanged(document);
 	}
 
-	onDocumentRemoved(document: TextDocument) {
+	onDocumentRemoved(document: TextDocument | string) {
 		this.#cache.onDocumentRemoved(document);
 	}
 

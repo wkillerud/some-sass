@@ -1,4 +1,8 @@
 import {
+	LanguageService,
+	getLanguageService,
+} from "@somesass/language-services";
+import {
 	ClientCapabilities,
 	CodeAction,
 	CodeActionKind,
@@ -26,7 +30,6 @@ import { ExtractProvider } from "./features/code-actions";
 import { doCompletion } from "./features/completion";
 import { findDocumentColors } from "./features/decorators/color-decorators";
 import { doDiagnostics } from "./features/diagnostics/diagnostics";
-import { goDefinition } from "./features/go-definition/go-definition";
 import { doHover } from "./features/hover/hover";
 import { provideReferences } from "./features/references";
 import { doRename, prepareRename } from "./features/rename";
@@ -55,6 +58,7 @@ export class SomeSassServer {
 	}
 
 	public listen(): void {
+		let ls: LanguageService;
 		let workspaceRoot: URI;
 		let scannerService: ScannerService;
 		let fileSystemProvider: FileSystemProvider;
@@ -81,6 +85,11 @@ export class SomeSassServer {
 					this.connection,
 					this.runtime,
 				);
+
+				ls = getLanguageService({
+					clientCapabilities,
+					fileSystemProvider,
+				});
 
 				workspaceRoot = URI.parse(options.workspace);
 
@@ -152,6 +161,30 @@ export class SomeSassServer {
 			);
 
 			try {
+				// TODO: test-web paths includes /static/extensions/fs/ instead of just / as the links expect
+				// Populate the cache for the new language services
+				for (const file of files) {
+					const content = await fileSystemProvider.readFile(file);
+					const document = TextDocument.create(
+						file.toString(),
+						"scss",
+						1,
+						content,
+					);
+					// Is this where I drop support for these, and ask them to file bugs with their template language extensions?
+					// Offset might need to be calculated in server handler functions at the very least. No polluting the rest of the
+					// codebase with this stuff.
+					const scssRegions = getSCSSRegionsDocument(document);
+					if (!scssRegions.document) {
+						continue;
+					}
+					ls.parseStylesheet(document);
+				}
+			} catch (error) {
+				this.connection.console.log(String(error));
+			}
+
+			try {
 				await scannerService.scan(files);
 			} catch (error) {
 				this.connection.console.log(String(error));
@@ -164,6 +197,7 @@ export class SomeSassServer {
 			}
 
 			try {
+				ls.onDocumentChanged(change.document);
 				await scannerService.update(change.document);
 			} catch (error) {
 				// Something went wrong trying to parse the changed document.
@@ -207,6 +241,7 @@ export class SomeSassServer {
 				const uri = URI.parse(change.uri);
 				if (change.type === FileChangeType.Deleted) {
 					storage.delete(uri);
+					ls.onDocumentRemoved(uri.toString());
 				} else if (change.type === FileChangeType.Changed) {
 					const document = storage.get(uri);
 					if (document) {
@@ -219,6 +254,22 @@ export class SomeSassServer {
 					newFiles.push(uri);
 				}
 			}
+
+			for (const file of newFiles) {
+				const content = await fileSystemProvider.readFile(file);
+				const document = TextDocument.create(
+					file.toString(),
+					"scss",
+					1,
+					content,
+				);
+				const scssRegions = getSCSSRegionsDocument(document);
+				if (!scssRegions.document) {
+					continue;
+				}
+				ls.parseStylesheet(document);
+			}
+
 			return scannerService.scan(newFiles);
 		});
 
@@ -280,7 +331,6 @@ export class SomeSassServer {
 			if (uri === undefined) {
 				return;
 			}
-
 			const { document, offset } = getSCSSRegionsDocument(
 				uri,
 				textDocumentPosition.position,
@@ -288,8 +338,8 @@ export class SomeSassServer {
 			if (!document) {
 				return null;
 			}
-
-			return goDefinition(document, offset);
+			const position = document.positionAt(offset);
+			return ls.findDefinition(document, position);
 		});
 
 		this.connection.onReferences(async (referenceParams) => {

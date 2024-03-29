@@ -31,7 +31,7 @@ export class FindDefinition extends LanguageFeature {
 		position: Position,
 	): Promise<Location | null> {
 		const stylesheet = this.ls.parseStylesheet(document);
-		let location = this._internal.scssLs.findDefinition(
+		const location = this._internal.scssLs.findDefinition(
 			document,
 			position,
 			stylesheet,
@@ -92,6 +92,9 @@ export class FindDefinition extends LanguageFeature {
 					kinds = [kind];
 				}
 			}
+		} else if (node.type === NodeType.SelectorPlaceholder) {
+			name = node.getText();
+			kinds = [SymbolKind.Class];
 		}
 
 		if (!name || !kinds) {
@@ -118,7 +121,7 @@ export class FindDefinition extends LanguageFeature {
 		}, document);
 
 		if (result.length !== 0) {
-			location = result[0];
+			return result[0];
 		}
 
 		// If not found, go through the old fashioned way and assume everything is in scope via @import

@@ -123,8 +123,9 @@ export class LanguageModelCache {
 		};
 	}
 
-	onDocumentRemoved(document: TextDocument) {
-		const uri = document.uri;
+	onDocumentRemoved(document: TextDocument | string) {
+		// @ts-expect-error That's what I'm counting on
+		const uri = document.uri || document;
 		if (this.#languageModels[uri]) {
 			delete this.#languageModels[uri];
 			this.#nModels--;

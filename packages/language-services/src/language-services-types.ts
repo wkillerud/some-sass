@@ -182,8 +182,9 @@ export interface LanguageService {
 	onDocumentChanged(document: TextDocument): void;
 	/**
 	 * Cleans up the document from the internal cache.
+	 * @param {TextDocument | string} document Either the document itself or {@link TextDocument.uri}
 	 */
-	onDocumentRemoved(document: TextDocument): void;
+	onDocumentRemoved(document: TextDocument | string): void;
 	/**
 	 * Clears all cached documents, forcing everything to be reparsed the next time a feature is used.
 	 */

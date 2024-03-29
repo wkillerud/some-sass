@@ -113,7 +113,7 @@ You have two options when to debug the browser version:
    - Open `vscode-extension/dist/browser-server.js`, search for a function name close to where you want to debug, and place breakpoints where you would like.
 
 2. Run in Chromium:
-   - In a terminal, run `npm run start:web`
+   - In a terminal, run `npm run start:test-web`
    - Open the Chromium developer tools and set breakpoints in the Sources pane.
 
 ### Debugging unit tests

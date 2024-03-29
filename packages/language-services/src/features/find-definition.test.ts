@@ -185,3 +185,100 @@ test("should find function definition via the module link", async () => {
 		},
 	});
 });
+
+test("should find placeholder definition", async () => {
+	const one = fileSystemProvider.createDocument(
+		"%alert { background-color: red }",
+		{ uri: "one.scss" },
+	);
+	const two = fileSystemProvider.createDocument(".a { @extend %alert; }");
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const placeholderPosition = Position.create(0, 16);
+	const location = await ls.findDefinition(two, placeholderPosition);
+
+	assert.isNotNull(location);
+	assert.match(location!.uri, /one\.scss$/);
+	assert.deepStrictEqual(location!.range, {
+		end: {
+			character: 6,
+			line: 0,
+		},
+		start: {
+			character: 0,
+			line: 0,
+		},
+	});
+});
+
+test("should find prefixed symbols", async () => {
+	const one = fileSystemProvider.createDocument(
+		["$a: 1;", "@mixin mixin() { @content; }", "@function make() { @return; }"],
+		{ uri: "one.scss" },
+	);
+	const two = fileSystemProvider.createDocument('@forward "./one" as foo-*;', {
+		uri: "two.scss",
+	});
+	const three = fileSystemProvider.createDocument([
+		'@use "./two";',
+		".a { content: two.foo-make(1); }",
+		".a { @include two.foo-mixin(); }",
+		".a { content: two.$foo-a; }",
+	]);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(three);
+
+	let position = Position.create(1, 20);
+	let location = await ls.findDefinition(three, position);
+
+	assert.isNotNull(location);
+	assert.match(location!.uri, /one\.scss$/);
+	assert.deepStrictEqual(location!.range, {
+		end: {
+			character: 14,
+			line: 2,
+		},
+		start: {
+			character: 10,
+			line: 2,
+		},
+	});
+
+	position = Position.create(2, 20);
+	location = await ls.findDefinition(three, position);
+
+	assert.isNotNull(location);
+	assert.match(location!.uri, /one\.scss$/);
+	assert.deepStrictEqual(location!.range, {
+		end: {
+			character: 12,
+			line: 1,
+		},
+		start: {
+			character: 7,
+			line: 1,
+		},
+	});
+
+	position = Position.create(3, 21);
+	location = await ls.findDefinition(three, position);
+
+	assert.isNotNull(location);
+	assert.match(location!.uri, /one\.scss$/);
+	assert.deepStrictEqual(location!.range, {
+		end: {
+			character: 2,
+			line: 0,
+		},
+		start: {
+			character: 0,
+			line: 0,
+		},
+	});
+});

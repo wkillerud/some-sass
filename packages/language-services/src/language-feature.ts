@@ -86,7 +86,7 @@ export abstract class LanguageFeature {
 			return Array.isArray(callbackResult) ? callbackResult : [callbackResult];
 		}
 
-		const result: T[] = [];
+		let result: T[] = [];
 		for (const link of links) {
 			if (!link.target || link.target === currentDocument.uri) {
 				continue;
@@ -98,17 +98,18 @@ export abstract class LanguageFeature {
 			}
 
 			let prefix = accumulatedPrefix;
-			if (link.as) {
+			if (link.type === NodeType.Forward && link.as) {
 				prefix += link.as;
 			}
 
-			return this.internalFindInWorkspace(
+			const linkResult = await this.internalFindInWorkspace(
 				callback,
 				initialDocument,
 				next,
 				prefix,
 				depth + 1,
 			);
+			result = result.concat(linkResult);
 		}
 
 		return result;

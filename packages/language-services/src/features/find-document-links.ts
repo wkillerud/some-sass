@@ -9,7 +9,7 @@ import {
 } from "../language-services-types";
 import { joinPath } from "../utils/resources";
 
-export class FindLinks extends LanguageFeature {
+export class FindDocumentLinks extends LanguageFeature {
 	constructor(
 		ls: LanguageService,
 		options: LanguageServiceOptions,

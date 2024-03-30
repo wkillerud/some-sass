@@ -3,7 +3,8 @@ import {
 	getSCSSLanguageService,
 } from "@somesass/vscode-css-languageservice";
 import { FindDefinition } from "./features/find-definition";
-import { FindLinks } from "./features/find-document-links";
+import { FindDocumentHighlights } from "./features/find-document-highlights";
+import { FindDocumentLinks } from "./features/find-document-links";
 import { FindSymbols } from "./features/find-symbols";
 import { LanguageModelCache as LanguageServerCache } from "./language-model-cache";
 import {
@@ -24,9 +25,10 @@ export function getLanguageService(
 
 class LanguageService implements ILanguageService {
 	#cache: LanguageServerCache;
-	#findLinks: FindLinks;
-	#findSymbols: FindSymbols;
 	#findDefinition: FindDefinition;
+	#findDocumentHighlights: FindDocumentHighlights;
+	#findDocumentLinks: FindDocumentLinks;
+	#findSymbols: FindSymbols;
 
 	constructor(options: LanguageServiceOptions) {
 		const scssLs = getSCSSLanguageService({
@@ -38,13 +40,21 @@ class LanguageService implements ILanguageService {
 			...options.languageModelCache,
 		});
 		this.#cache = cache;
-		this.#findLinks = new FindLinks(this, options, { scssLs, cache });
-		this.#findSymbols = new FindSymbols(this, options, { scssLs, cache });
 		this.#findDefinition = new FindDefinition(this, options, { scssLs, cache });
+		this.#findDocumentHighlights = new FindDocumentHighlights(this, options, {
+			scssLs,
+			cache,
+		});
+		this.#findDocumentLinks = new FindDocumentLinks(this, options, {
+			scssLs,
+			cache,
+		});
+		this.#findSymbols = new FindSymbols(this, options, { scssLs, cache });
 	}
 
 	configure(configuration: LanguageServiceConfiguration): void {
-		this.#findLinks.configure(configuration);
+		this.#findDocumentHighlights.configure(configuration);
+		this.#findDocumentLinks.configure(configuration);
 		this.#findSymbols.configure(configuration);
 		this.#findDefinition.configure(configuration);
 	}
@@ -53,20 +63,23 @@ class LanguageService implements ILanguageService {
 		return this.#cache.get(document);
 	}
 
-	async findDocumentLinks(document: TextDocument) {
-		return this.#findLinks.findDocumentLinks(document);
-	}
-
-	findDocumentSymbols(document: TextDocument) {
-		return this.#findSymbols.findDocumentSymbols(document);
-	}
-
 	findDefinition(document: TextDocument, position: Position) {
 		return this.#findDefinition.findDefinition(document, position);
 	}
 
 	findDocumentHighlights(document: TextDocument, position: Position) {
-		return this.#findDefinition.findDocumentHighlights(document, position);
+		return this.#findDocumentHighlights.findDocumentHighlights(
+			document,
+			position,
+		);
+	}
+
+	async findDocumentLinks(document: TextDocument) {
+		return this.#findDocumentLinks.findDocumentLinks(document);
+	}
+
+	findDocumentSymbols(document: TextDocument) {
+		return this.#findSymbols.findDocumentSymbols(document);
 	}
 
 	findWorkspaceSymbols(query?: string) {

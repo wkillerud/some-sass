@@ -1,7 +1,5 @@
-import { LanguageFeature, LanguageFeatureInternal } from "../language-feature";
+import { LanguageFeature } from "../language-feature";
 import {
-	LanguageServiceOptions,
-	LanguageService,
 	TextDocument,
 	Location,
 	Position,
@@ -14,19 +12,10 @@ import {
 	VariableDeclaration,
 	getNodeAtOffset,
 	Variable,
-	DocumentHighlight,
 } from "../language-services-types";
 import { asDollarlessVariable } from "../utils/sass";
 
 export class FindDefinition extends LanguageFeature {
-	constructor(
-		ls: LanguageService,
-		options: LanguageServiceOptions,
-		_internal: LanguageFeatureInternal,
-	) {
-		super(ls, options, _internal);
-	}
-
 	async findDefinition(
 		document: TextDocument,
 		position: Position,
@@ -134,17 +123,5 @@ export class FindDefinition extends LanguageFeature {
 		}
 
 		return location;
-	}
-
-	findDocumentHighlights(
-		document: TextDocument,
-		position: Position,
-	): DocumentHighlight[] {
-		const stylesheet = this.ls.parseStylesheet(document);
-		return this._internal.scssLs.findDocumentHighlights(
-			document,
-			position,
-			stylesheet,
-		);
 	}
 }

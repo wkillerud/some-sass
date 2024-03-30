@@ -1,8 +1,6 @@
 import { ParseResult, parseSync } from "scss-sassdoc-parser";
-import { LanguageFeature, LanguageFeatureInternal } from "../language-feature";
+import { LanguageFeature } from "../language-feature";
 import {
-	LanguageServiceOptions,
-	LanguageService,
 	TextDocument,
 	SassDocumentSymbol,
 	SymbolKind,
@@ -11,14 +9,6 @@ import {
 } from "../language-services-types";
 
 export class FindSymbols extends LanguageFeature {
-	constructor(
-		ls: LanguageService,
-		options: LanguageServiceOptions,
-		_internal: LanguageFeatureInternal,
-	) {
-		super(ls, options, _internal);
-	}
-
 	findDocumentSymbols(document: TextDocument): SassDocumentSymbol[] {
 		const stylesheet = this.ls.parseStylesheet(document);
 		const symbols = this._internal.scssLs.findDocumentSymbols2(

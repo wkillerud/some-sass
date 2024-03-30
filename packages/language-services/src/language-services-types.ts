@@ -168,6 +168,7 @@ export interface SassDocumentSymbol extends DocumentSymbol {
 }
 
 export interface LanguageService {
+	doHover(document: TextDocument, position: Position): Promise<Hover | null>;
 	findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]>;
 	findDocumentSymbols(document: TextDocument): SassDocumentSymbol[];
 	findWorkspaceSymbols(query?: string): SymbolInformation[];

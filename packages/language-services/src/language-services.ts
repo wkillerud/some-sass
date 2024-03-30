@@ -1,4 +1,5 @@
 import { getSCSSLanguageService } from "@somesass/vscode-css-languageservice";
+import { DoHover } from "./features/do-hover";
 import { FindDefinition } from "./features/find-definition";
 import { FindDocumentHighlights } from "./features/find-document-highlights";
 import { FindDocumentLinks } from "./features/find-document-links";
@@ -24,6 +25,7 @@ export function getLanguageService(
 
 class LanguageService implements ILanguageService {
 	#cache: LanguageServerCache;
+	#doHover: DoHover;
 	#findDefinition: FindDefinition;
 	#findDocumentHighlights: FindDocumentHighlights;
 	#findDocumentLinks: FindDocumentLinks;
@@ -35,11 +37,13 @@ class LanguageService implements ILanguageService {
 			clientCapabilities: options.clientCapabilities,
 			fileSystemProvider: mapFsProviders(options.fileSystemProvider),
 		});
+
 		const cache = new LanguageServerCache({
 			scssLs,
 			...options.languageModelCache,
 		});
 		this.#cache = cache;
+		this.#doHover = new DoHover(this, options, { scssLs, cache });
 		this.#findDefinition = new FindDefinition(this, options, { scssLs, cache });
 		this.#findDocumentHighlights = new FindDocumentHighlights(this, options, {
 			scssLs,
@@ -62,6 +66,10 @@ class LanguageService implements ILanguageService {
 
 	parseStylesheet(document: TextDocument) {
 		return this.#cache.get(document);
+	}
+
+	doHover(document: TextDocument, position: Position) {
+		return this.#doHover.doHover(document, position);
 	}
 
 	findDefinition(document: TextDocument, position: Position) {

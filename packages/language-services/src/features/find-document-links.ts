@@ -39,6 +39,7 @@ export class FindDocumentLinks extends LanguageFeature {
 
 	async findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]> {
 		const stylesheet = this.ls.parseStylesheet(document);
+		// TODO: this IO stuff really ought to be cached similarly to the parsed stylesheet
 		const links = await this._internal.scssLs.findDocumentLinks2(
 			document,
 			stylesheet,

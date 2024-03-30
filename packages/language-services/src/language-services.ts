@@ -1,16 +1,15 @@
-import {
-	Position,
-	getSCSSLanguageService,
-} from "@somesass/vscode-css-languageservice";
+import { getSCSSLanguageService } from "@somesass/vscode-css-languageservice";
 import { FindDefinition } from "./features/find-definition";
 import { FindDocumentHighlights } from "./features/find-document-highlights";
 import { FindDocumentLinks } from "./features/find-document-links";
 import { FindSymbols } from "./features/find-symbols";
+import { FindValue } from "./features/find-value";
 import { LanguageModelCache as LanguageServerCache } from "./language-model-cache";
 import {
 	LanguageService as ILanguageService,
 	LanguageServiceConfiguration,
 	LanguageServiceOptions,
+	Position,
 	TextDocument,
 } from "./language-services-types";
 import { mapFsProviders } from "./utils/fs-provider";
@@ -29,6 +28,7 @@ class LanguageService implements ILanguageService {
 	#findDocumentHighlights: FindDocumentHighlights;
 	#findDocumentLinks: FindDocumentLinks;
 	#findSymbols: FindSymbols;
+	#findValue: FindValue;
 
 	constructor(options: LanguageServiceOptions) {
 		const scssLs = getSCSSLanguageService({
@@ -50,6 +50,7 @@ class LanguageService implements ILanguageService {
 			cache,
 		});
 		this.#findSymbols = new FindSymbols(this, options, { scssLs, cache });
+		this.#findValue = new FindValue(this, options, { scssLs, cache });
 	}
 
 	configure(configuration: LanguageServiceConfiguration): void {
@@ -80,6 +81,10 @@ class LanguageService implements ILanguageService {
 
 	findDocumentSymbols(document: TextDocument) {
 		return this.#findSymbols.findDocumentSymbols(document);
+	}
+
+	findValue(document: TextDocument, position: Position) {
+		return this.#findValue.findValue(document, position);
 	}
 
 	findWorkspaceSymbols(query?: string) {

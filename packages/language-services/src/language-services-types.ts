@@ -175,6 +175,13 @@ export interface LanguageService {
 		document: TextDocument,
 		position: Position,
 	): Promise<Location | null>;
+	/**
+	 * Looks at {@link position} for a {@link VariableDeclaration} and returns its value as a string (or null if no value was found).
+	 * If the value is a reference to another variable this method will find that variable's definition and look for the value there instead.
+	 *
+	 * If the value is not found in 20 lookups, assumes a circular reference and returns null.
+	 */
+	findValue(document: TextDocument, position: Position): Promise<string | null>;
 	findDocumentHighlights(
 		document: TextDocument,
 		position: Position,

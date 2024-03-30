@@ -37,12 +37,15 @@ interface Identifier {
 	name: string;
 }
 
-function formatVariableMarkupContent(
+async function formatVariableMarkupContent(
 	variable: ScssVariable,
 	sourceDocument: IScssDocument,
 ): MarkupContent {
 	let value = variable.value;
 	if (isReferencingVariable(variable)) {
+		// todo: we need access to this.ls.findValue here, preferably.
+		// in other words, move hover to class-based in language-services
+		// along with other users of getBaseValueFrom
 		value = getBaseValueFrom(variable, sourceDocument).value;
 	}
 
@@ -88,7 +91,10 @@ function formatPlaceholderMarkupContent(
 	return result;
 }
 
-export function doHover(document: TextDocument, offset: number): Hover | null {
+export async function doHover(
+	document: TextDocument,
+	offset: number,
+): Promise<Hover | null> {
 	const { storage } = useContext();
 	const scssDocument = storage.get(document.uri);
 	if (!scssDocument) {
@@ -242,7 +248,7 @@ export function doHover(document: TextDocument, offset: number): Hover | null {
 	if (symbol && sourceDocument) {
 		switch (identifier.kind) {
 			case SymbolKind.Variable: {
-				contents = formatVariableMarkupContent(
+				contents = await formatVariableMarkupContent(
 					symbol as ScssVariable,
 					sourceDocument,
 				);

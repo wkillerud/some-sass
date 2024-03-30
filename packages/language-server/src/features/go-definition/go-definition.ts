@@ -1,7 +1,6 @@
 import {
 	NodeType,
 	Node,
-	Location,
 	SymbolKind,
 	TextDocument,
 	Position,
@@ -27,31 +26,6 @@ function samePosition(a: Position | undefined, b: Position): boolean {
 	}
 
 	return a.line === b.line && a.character === b.character;
-}
-
-export function goDefinition(
-	document: TextDocument,
-	offset: number,
-): Location | null {
-	const result = getDefinition(document, offset);
-	if (!result) {
-		return null;
-	}
-
-	const [definition, sourceDocument] = result;
-	if (!definition || !sourceDocument) {
-		return null;
-	}
-
-	const symbol = Location.create(sourceDocument.uri, {
-		start: definition.position,
-		end: {
-			line: definition.position.line,
-			character: definition.position.character + definition.name.length,
-		},
-	});
-
-	return symbol;
 }
 
 export function getDefinition(

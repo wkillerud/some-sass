@@ -65,6 +65,10 @@ class LanguageService implements ILanguageService {
 		return this.#findDefinition.findDefinition(document, position);
 	}
 
+	findDocumentHighlights(document: TextDocument, position: Position) {
+		return this.#findDefinition.findDocumentHighlights(document, position);
+	}
+
 	findWorkspaceSymbols(query?: string) {
 		return this.#findSymbols.findWorkspaceSymbols(query);
 	}

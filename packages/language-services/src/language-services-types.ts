@@ -175,6 +175,10 @@ export interface LanguageService {
 		document: TextDocument,
 		position: Position,
 	): Promise<Location | null>;
+	findDocumentHighlights(
+		document: TextDocument,
+		position: Position,
+	): DocumentHighlight[];
 	/**
 	 * Utility function to reparse an updated document.
 	 * Like {@link LanguageService.parseStylesheet}, but returns nothing.

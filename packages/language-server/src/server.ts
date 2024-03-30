@@ -121,6 +121,7 @@ export class SomeSassServer {
 						},
 						hoverProvider: true,
 						definitionProvider: true,
+						documentHighlightProvider: true,
 						workspaceSymbolProvider: true,
 						codeActionProvider: {
 							codeActionKinds: [
@@ -348,6 +349,14 @@ export class SomeSassServer {
 			}
 			const position = document.positionAt(offset);
 			return ls.findDefinition(document, position);
+		});
+
+		this.connection.onDocumentHighlight((params) => {
+			const document = documents.get(params.textDocument.uri);
+			if (!document) {
+				return;
+			}
+			return ls.findDocumentHighlights(document, params.position);
 		});
 
 		this.connection.onReferences(async (referenceParams) => {

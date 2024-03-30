@@ -161,12 +161,20 @@ export class SomeSassServer {
 			);
 
 			try {
-				// TODO: test-web paths includes /static/extensions/fs/ instead of just / as the links expect
 				// Populate the cache for the new language services
 				for (const file of files) {
-					const content = await fileSystemProvider.readFile(file);
+					let uri = file;
+					if (file.scheme === "vscode-test-web") {
+						// TODO: test-web paths includes /static/extensions/fs which causes issues.
+						// The URI ends up being vscode-test-web://mount/static/extensions/fs/file.scss when it should only be vscode-test-web://mount/file.scss.
+						// This should probably be landed as a bugfix somewhere upstream.
+						uri = URI.parse(
+							file.toString().replace("/static/extensions/fs", ""),
+						);
+					}
+					const content = await fileSystemProvider.readFile(uri);
 					const document = TextDocument.create(
-						file.toString(),
+						uri.toString(),
 						"scss",
 						1,
 						content,

@@ -1,6 +1,7 @@
 import {
 	IToken,
 	MarkupKind,
+	Range,
 	SCSSScanner,
 	TokenType,
 	VariableDeclaration,
@@ -37,6 +38,7 @@ export class DoHover extends LanguageFeature {
 
 		let kind: SymbolKind | undefined;
 		let name: string | undefined;
+		let range: Range | undefined = undefined;
 		switch (hoverNode.type) {
 			case NodeType.VariableName: {
 				const parent = hoverNode.getParent();
@@ -145,6 +147,11 @@ export class DoHover extends LanguageFeature {
 		}
 
 		if (name && kind) {
+			range = Range.create(
+				document.positionAt(hoverNode.offset),
+				document.positionAt(hoverNode.offset + name.length),
+			);
+
 			// Traverse the workspace looking for a symbol of kinds.includes(symbol.kind) && name === symbol.name
 			const result = await this.findInWorkspace<
 				[TextDocument, SassDocumentSymbol]
@@ -155,26 +162,67 @@ export class DoHover extends LanguageFeature {
 						const prefixedSymbol = `${prefix}${asDollarlessVariable(symbol.name)}`;
 						const prefixedName = asDollarlessVariable(name!);
 						if (prefixedSymbol === prefixedName) {
-							return [document, symbol];
+							return [[document, symbol]];
 						}
 					}
 				}
 			}, document);
 
+			let symbolDocument: TextDocument | null = null;
+			let symbol: SassDocumentSymbol | null = null;
 			if (result.length !== 0) {
-				const [document, symbol] = result[0];
+				[symbolDocument, symbol] = result[0];
+			} else {
+				// Fall back to looking through all the things, assuming folks use @import
+				const documents = this._internal.cache.documents();
+				for (const document of documents) {
+					const symbols = this.ls.findDocumentSymbols(document);
+					for (const sym of symbols) {
+						if (sym.kind === kind && sym.name === name) {
+							symbolDocument = document;
+							symbol = sym;
+							break;
+						}
+					}
+				}
+			}
+
+			if (symbol && symbolDocument) {
 				switch (symbol.kind) {
 					case SymbolKind.Variable: {
-						return await this.getVariableHoverContent(document, symbol);
+						const hover = await this.getVariableHoverContent(
+							symbolDocument,
+							symbol,
+							name,
+						);
+						hover.range = range;
+						return hover;
 					}
 					case SymbolKind.Method: {
-						return this.getMixinHoverContent(document, symbol);
+						const hover = this.getMixinHoverContent(
+							symbolDocument,
+							symbol,
+							name,
+						);
+						hover.range = range;
+						return hover;
 					}
 					case SymbolKind.Function: {
-						return this.getFunctionHoverContent(document, symbol);
+						const hover = this.getFunctionHoverContent(
+							symbolDocument,
+							symbol,
+							name,
+						);
+						hover.range = range;
+						return hover;
 					}
 					case SymbolKind.Class: {
-						return this.getPlaceholderHoverContent(document, symbol);
+						const hover = this.getPlaceholderHoverContent(
+							symbolDocument,
+							symbol,
+						);
+						hover.range = range;
+						return hover;
 					}
 				}
 			}
@@ -213,12 +261,13 @@ export class DoHover extends LanguageFeature {
 	getFunctionHoverContent(
 		document: TextDocument,
 		symbol: SassDocumentSymbol,
-	): Hover | PromiseLike<Hover | null> | null {
+		maybePrefixedName: string,
+	): Hover {
 		const result = {
 			kind: MarkupKind.Markdown,
 			value: [
 				"```scss",
-				`@function ${symbol.name}${symbol.detail || "()"}`,
+				`@function ${maybePrefixedName}${symbol.detail || "()"}`,
 				"```",
 			].join("\n"),
 		};
@@ -228,10 +277,11 @@ export class DoHover extends LanguageFeature {
 			result.value += `\n____\n${sassdoc}`;
 		}
 
-		result.value += `\n____\nFunction declared in ${this.getFileName(document)}`;
+		const prefixInfo =
+			maybePrefixedName !== symbol.name ? ` as ${symbol.name}` : "";
+		result.value += `\n____\nFunction declared${prefixInfo} in ${this.getFileName(document)}`;
 
 		return {
-			range: symbol.selectionRange,
 			contents: result,
 		};
 	}
@@ -239,12 +289,13 @@ export class DoHover extends LanguageFeature {
 	getMixinHoverContent(
 		document: TextDocument,
 		symbol: SassDocumentSymbol,
+		maybePrefixedName: string,
 	): Hover {
 		const result = {
 			kind: MarkupKind.Markdown,
 			value: [
 				"```scss",
-				`@mixin ${symbol.name}${symbol.detail || "()"}`,
+				`@mixin ${maybePrefixedName}${symbol.detail || "()"}`,
 				"```",
 			].join("\n"),
 		};
@@ -254,10 +305,11 @@ export class DoHover extends LanguageFeature {
 			result.value += `\n____\n${sassdoc}`;
 		}
 
-		result.value += `\n____\nMixin declared in ${this.getFileName(document)}`;
+		const prefixInfo =
+			maybePrefixedName !== symbol.name ? ` as ${symbol.name}` : "";
+		result.value += `\n____\nMixin declared${prefixInfo} in ${this.getFileName(document)}`;
 
 		return {
-			range: symbol.selectionRange,
 			contents: result,
 		};
 	}
@@ -279,7 +331,6 @@ export class DoHover extends LanguageFeature {
 		result.value += `\n____\nPlaceholder declared in ${this.getFileName(document)}`;
 
 		return {
-			range: symbol.selectionRange,
 			contents: result,
 		};
 	}
@@ -287,6 +338,7 @@ export class DoHover extends LanguageFeature {
 	private async getVariableHoverContent(
 		document: TextDocument,
 		symbol: SassDocumentSymbol,
+		maybePrefixedName: string,
 	): Promise<Hover> {
 		const rawValue = this.getVariableValue(document, symbol) || "";
 		let value = await this.ls.findValue(document, symbol.selectionRange.start);
@@ -296,7 +348,7 @@ export class DoHover extends LanguageFeature {
 			kind: MarkupKind.Markdown,
 			value: [
 				"```scss",
-				`${symbol.name}: ${value};${
+				`${maybePrefixedName}: ${value};${
 					value !== rawValue ? ` // via ${rawValue}` : ""
 				}`,
 				"```",
@@ -308,10 +360,11 @@ export class DoHover extends LanguageFeature {
 			result.value += `\n____\n${sassdoc}`;
 		}
 
-		result.value += `\n____\nVariable declared in ${this.getFileName(document)}`;
+		const prefixInfo =
+			maybePrefixedName !== symbol.name ? ` as ${symbol.name}` : "";
+		result.value += `\n____\nVariable declared${prefixInfo} in ${this.getFileName(document)}`;
 
 		return {
-			range: symbol.selectionRange,
 			contents: result,
 		};
 	}

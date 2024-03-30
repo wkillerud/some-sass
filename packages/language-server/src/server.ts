@@ -30,11 +30,9 @@ import { ExtractProvider } from "./features/code-actions";
 import { doCompletion } from "./features/completion";
 import { findDocumentColors } from "./features/decorators/color-decorators";
 import { doDiagnostics } from "./features/diagnostics/diagnostics";
-import { doHover } from "./features/hover/hover";
 import { provideReferences } from "./features/references";
 import { doRename, prepareRename } from "./features/rename";
 import { doSignatureHelp } from "./features/signature-help/signature-help";
-import { searchWorkspaceSymbol } from "./features/workspace-symbols/workspace-symbol";
 import type { FileSystemProvider } from "./file-system";
 import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";
@@ -180,9 +178,6 @@ export class SomeSassServer {
 						1,
 						content,
 					);
-					// Is this where I drop support for these, and ask them to file bugs with their template language extensions?
-					// Offset might need to be calculated in server handler functions at the very least. No polluting the rest of the
-					// codebase with this stuff.
 					const scssRegions = getSCSSRegionsDocument(document);
 					if (!scssRegions.document) {
 						continue;
@@ -279,7 +274,7 @@ export class SomeSassServer {
 				ls.parseStylesheet(document);
 			}
 
-			return scannerService.scan(newFiles);
+			await scannerService.scan(newFiles);
 		});
 
 		this.connection.onCompletion(async (textDocumentPosition) => {
@@ -296,26 +291,23 @@ export class SomeSassServer {
 				return null;
 			}
 
-			const completions = await doCompletion(document, offset);
-
-			return completions;
+			const result = await doCompletion(document, offset);
+			return result;
 		});
 
-		this.connection.onHover((textDocumentPosition) => {
-			const uri = documents.get(textDocumentPosition.textDocument.uri);
+		this.connection.onHover((params) => {
+			const uri = documents.get(params.textDocument.uri);
 			if (uri === undefined) {
 				return;
 			}
 
-			const { document, offset } = getSCSSRegionsDocument(
-				uri,
-				textDocumentPosition.position,
-			);
+			const { document } = getSCSSRegionsDocument(uri, params.position);
 			if (!document) {
 				return null;
 			}
 
-			return doHover(document, offset);
+			const result = ls.doHover(document, params.position);
+			return result;
 		});
 
 		this.connection.onSignatureHelp((textDocumentPosition) => {
@@ -332,23 +324,21 @@ export class SomeSassServer {
 				return null;
 			}
 
-			return doSignatureHelp(document, offset);
+			const result = doSignatureHelp(document, offset);
+			return result;
 		});
 
-		this.connection.onDefinition((textDocumentPosition) => {
-			const uri = documents.get(textDocumentPosition.textDocument.uri);
+		this.connection.onDefinition((params) => {
+			const uri = documents.get(params.textDocument.uri);
 			if (uri === undefined) {
 				return;
 			}
-			const { document, offset } = getSCSSRegionsDocument(
-				uri,
-				textDocumentPosition.position,
-			);
+			const { document } = getSCSSRegionsDocument(uri, params.position);
 			if (!document) {
 				return null;
 			}
-			const position = document.positionAt(offset);
-			return ls.findDefinition(document, position);
+			const result = ls.findDefinition(document, params.position);
+			return result;
 		});
 
 		this.connection.onDocumentHighlight((params) => {
@@ -356,7 +346,8 @@ export class SomeSassServer {
 			if (!document) {
 				return;
 			}
-			return ls.findDocumentHighlights(document, params.position);
+			const result = ls.findDocumentHighlights(document, params.position);
+			return result;
 		});
 
 		this.connection.onReferences(async (referenceParams) => {
@@ -383,11 +374,9 @@ export class SomeSassServer {
 			return references.references.map((r) => r.location);
 		});
 
-		this.connection.onWorkspaceSymbol((workspaceSymbolParams) => {
-			return searchWorkspaceSymbol(
-				workspaceSymbolParams.query,
-				workspaceRoot.toString(),
-			);
+		this.connection.onWorkspaceSymbol((params) => {
+			const result = ls.findWorkspaceSymbols(params.query);
+			return result;
 		});
 
 		this.connection.onCodeAction(async (params) => {

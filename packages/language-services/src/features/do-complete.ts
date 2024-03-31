@@ -8,18 +8,26 @@ import {
 	InsertTextFormat,
 	FunctionParameter,
 	CompletionItemKind,
+	Use,
+	Forward,
+	Node,
 } from "@somesass/vscode-css-languageservice";
 import { sassDocAnnotations } from "../facts/sassdoc";
 import { LanguageFeature } from "../language-feature";
 import {
 	CompletionList,
+	FileType,
 	Position,
 	TextDocument,
+	URI,
+	Utils,
 	getNodeAtOffset,
 } from "../language-services-types";
+import { getName } from "../utils/uri";
 
 const reNewSassdocBlock = /\/\/\/\s?$/;
 const reSassdocLine = /\/\/\/\s/;
+const reSassExt = /\.s(a|c)ss$/;
 
 export class DoComplete extends LanguageFeature {
 	async doComplete(
@@ -104,14 +112,150 @@ export class DoComplete extends LanguageFeature {
 			return result;
 		}
 
-		// TODO: isImportContext, doImportComplete
+		if (
+			node &&
+			node.parent &&
+			(node.parent instanceof Use || node.parent instanceof Forward)
+		) {
+			// Upstream includes thing like suggestions based on relative paths
+			// and imports of built-in sass modules like sass:color and sass:math
+			const upstreamResult = await this._internal.scssLs.doComplete2(
+				document,
+				position,
+				stylesheet,
+				this.getDocumentContext(),
+				// TODO: pass on CompletionSettings
+			);
+			if (upstreamResult.items.length > 0) {
+				result.items.push(...upstreamResult.items);
+			}
+			const items = await this.doModuleImportCompletion(document, node);
+			if (items.length > 0) {
+				result.items.push(...items);
+			}
+			return result;
+		}
+
 		// TODO: isNamespaceContext, doNamespacedComplete
 		// TODO: isPlaceholderDeclarationContext, doPlaceholderDeclarationComplete
 		// TODO: hasWildcardNamespace, this.findInWorkspace (extended with a "links" parameter limited to wildcard links) completionItems
-		// TODO: look up extension settings re suggestfromuseonly && not placeholder context (needs same global style lookup as for @import), return if true
-		// TODO: placeholder complete and @import-style fallback complete
 
+		// TODO: placeholder complete
+		const suggestFromUseOnly = false; // TODO: get CompletionSettings via configure and read here
+		if (!suggestFromUseOnly) {
+			// TODO: @import-style fallback complete
+		}
+		// TODO: isImportContext, doImportComplete for node_modules stuff
+
+		const upstreamResult = await this._internal.scssLs.doComplete2(
+			document,
+			position,
+			stylesheet,
+			this.getDocumentContext(),
+			// TODO: pass on CompletionSettings
+		);
+		if (upstreamResult.items.length > 0) {
+			result.items.push(...upstreamResult.items);
+		}
 		return result;
+	}
+
+	async doModuleImportCompletion(
+		document: TextDocument,
+		node: Node,
+	): Promise<CompletionItem[]> {
+		const items: CompletionItem[] = [];
+		const url = node.getText().replace(/["']/g, "");
+
+		const moduleName = getModuleNameFromPath(url);
+		if (moduleName && moduleName !== "." && moduleName !== "..") {
+			const rootFolderUri = this.configuration.workspaceRoot
+				? Utils.joinPath(this.configuration.workspaceRoot, "/").toString(true)
+				: "";
+			const documentFolderUri = Utils.dirname(URI.parse(document.uri)).toString(
+				true,
+			);
+
+			const modulePath = await this.resolvePathToModule(
+				moduleName,
+				documentFolderUri,
+				rootFolderUri,
+			);
+			if (modulePath) {
+				const pathWithinModule = url.substring(moduleName.length + 1);
+				const pathInsideModule = Utils.joinPath(
+					URI.parse(modulePath),
+					pathWithinModule,
+				);
+				const filesInModulePath =
+					await this.options.fileSystemProvider.readDirectory(pathInsideModule);
+				for (const [uri, fileType] of filesInModulePath) {
+					const file = getName(uri);
+					if (fileType === FileType.File && file.match(reSassExt)) {
+						const filename = file.startsWith("/") ? file.slice(1) : file;
+						// Prefer to insert without file extension
+						let insertText = filename.slice(0, -5);
+						if (insertText.startsWith("/")) {
+							insertText = insertText.slice(1);
+						}
+						if (insertText.startsWith("_")) {
+							insertText = insertText.slice(1);
+						}
+						items.push({
+							label: escapePath(filename),
+							insertText: escapePath(insertText),
+							kind: CompletionItemKind.File,
+						});
+					} else if (fileType === FileType.Directory) {
+						let insertText = escapePath(file);
+						if (insertText.startsWith("/")) {
+							insertText = insertText.slice(1);
+						}
+						insertText = `${insertText}/`;
+						items.push({
+							label: insertText,
+							kind: CompletionItemKind.Folder,
+							insertText,
+							command: {
+								title: "Suggest",
+								command: "editor.action.triggerSuggest",
+							},
+						});
+					}
+				}
+			}
+		}
+
+		return items;
+	}
+
+	async resolvePathToModule(
+		_moduleName: string,
+		documentFolderUri: string,
+		rootFolderUri: string | undefined,
+	): Promise<string | undefined> {
+		// resolve the module relative to the document. We can't use `require` here as the code is webpacked.
+
+		const packPath = Utils.joinPath(
+			URI.parse(documentFolderUri),
+			"node_modules",
+			_moduleName,
+			"package.json",
+		);
+		if (await this.options.fileSystemProvider.exists(packPath)) {
+			return Utils.dirname(packPath).toString(true);
+		} else if (
+			rootFolderUri &&
+			documentFolderUri.startsWith(rootFolderUri) &&
+			documentFolderUri.length !== rootFolderUri.length
+		) {
+			return this.resolvePathToModule(
+				_moduleName,
+				Utils.dirname(URI.parse(documentFolderUri)).toString(true),
+				rootFolderUri,
+			);
+		}
+		return undefined;
 	}
 
 	doSassdocAnnotationCompletion(beforeCursor: string): CompletionItem[] {
@@ -240,4 +384,34 @@ export class DoComplete extends LanguageFeature {
 			sortText: "-", // Give highest priority
 		};
 	}
+}
+
+function getModuleNameFromPath(modulePath: string) {
+	let path = modulePath;
+
+	// Slice away deprecated tilde import
+	if (path.startsWith("~")) {
+		path = path.slice(1);
+	}
+
+	const firstSlash = path.indexOf("/");
+	if (firstSlash === -1) {
+		return "";
+	}
+
+	// If a scoped module (starts with @) then get up until second instance of '/', or to the end of the string for root-level imports.
+	if (path[0] === "@") {
+		const secondSlash = path.indexOf("/", firstSlash + 1);
+		if (secondSlash === -1) {
+			return path;
+		}
+		return path.substring(0, secondSlash);
+	}
+	// Otherwise get until first instance of '/'
+	return path.substring(0, firstSlash);
+}
+
+// Escape https://www.w3.org/TR/CSS1/#url
+function escapePath(p: string) {
+	return p.replace(/(\s|\(|\)|,|"|')/g, "\\$1");
 }

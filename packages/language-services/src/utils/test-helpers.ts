@@ -68,18 +68,34 @@ class MemoryFileSystem implements FileSystemProvider {
 	}
 
 	async readDirectory(uri: URI): Promise<[URI, FileType][]> {
-		const dir = [...this.storage.keys()].filter((furi) =>
-			furi.startsWith(uri.fsPath),
-		);
+		const toMatch = uri.toString();
 		const result: [URI, FileType][] = [];
-		for (const file of dir) {
-			const furi = URI.parse(file);
-			try {
-				const stats = await this.stat(furi);
-				result.push([furi, stats.type]);
-			} catch (e) {
-				result.push([furi, FileType.Unknown]);
+		for (const file of this.storage.keys()) {
+			if (!file.startsWith(toMatch)) {
+				continue;
 			}
+
+			const directoryIndex = file.indexOf(toMatch);
+			if (directoryIndex === -1) {
+				continue;
+			}
+
+			let fileType = FileType.File;
+			let uri = URI.parse(file);
+			const subdirectoryIndex = file.indexOf("/", toMatch.length + 1);
+			if (subdirectoryIndex !== -1) {
+				const subdirectory = file.substring(0, subdirectoryIndex);
+				const subsub = file.indexOf("/", subdirectory.length + 1);
+				if (subsub !== -1) {
+					// Files or folders in subdirectories should not be included
+					continue;
+				}
+
+				uri = URI.parse(subdirectory);
+				fileType = FileType.Directory;
+			}
+
+			result.push([uri, fileType]);
 		}
 		return result;
 	}

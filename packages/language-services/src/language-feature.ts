@@ -1,3 +1,4 @@
+import { resolve } from "url";
 import {
 	SCSSScanner,
 	Scanner,
@@ -12,6 +13,7 @@ import {
 	NodeType,
 	Range,
 } from "./language-services-types";
+import { joinPath } from "./utils/resources";
 
 export type LanguageFeatureInternal = {
 	cache: LanguageModelCache;
@@ -43,6 +45,25 @@ export abstract class LanguageFeature {
 	configure(configuration: LanguageServiceConfiguration): void {
 		this.configuration = configuration;
 		this._internal.scssLs.configure(configuration);
+	}
+
+	protected getDocumentContext() {
+		return {
+			/**
+			 * @param ref Resolve this path from the context of the document
+			 * @returns The resolved path
+			 */
+			resolveReference: (ref: string, base: string) => {
+				if (ref.startsWith("/") && this.configuration.workspaceRoot) {
+					return joinPath(this.configuration.workspaceRoot.toString(), ref);
+				}
+				try {
+					return resolve(base, ref);
+				} catch (e) {
+					return undefined;
+				}
+			},
+		};
 	}
 
 	/**

@@ -28,7 +28,6 @@ import {
 } from "./context-provider";
 import { ExtractProvider } from "./features/code-actions";
 import { doCompletion } from "./features/completion";
-import { findDocumentColors } from "./features/decorators/color-decorators";
 import { doDiagnostics } from "./features/diagnostics/diagnostics";
 import { provideReferences } from "./features/references";
 import { doRename, prepareRename } from "./features/rename";
@@ -56,11 +55,11 @@ export class SomeSassServer {
 	}
 
 	public listen(): void {
-		let ls: LanguageService;
-		let workspaceRoot: URI;
-		let scannerService: ScannerService;
-		let fileSystemProvider: FileSystemProvider;
-		let clientCapabilities: ClientCapabilities;
+		let ls: LanguageService | undefined = undefined;
+		let workspaceRoot: URI | undefined = undefined;
+		let scannerService: ScannerService | undefined = undefined;
+		let fileSystemProvider: FileSystemProvider | undefined = undefined;
+		let clientCapabilities: ClientCapabilities | undefined = undefined;
 
 		// Create a simple text document manager. The text document manager
 		// _supports full document sync only
@@ -74,8 +73,13 @@ export class SomeSassServer {
 		// After the server has started the client sends an initilize request. The server receives
 		// _in the passed params the rootPath of the workspace plus the client capabilites
 		this.connection.onInitialize(
-			async (params: InitializeParams): Promise<InitializeResult> => {
+			(params: InitializeParams): InitializeResult => {
 				const options = params.initializationOptions as InitializationOption;
+				workspaceRoot = URI.parse(options.workspace);
+
+				this.connection.console.debug(
+					`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialize> received`,
+				);
 
 				clientCapabilities = params.capabilities;
 
@@ -89,10 +93,8 @@ export class SomeSassServer {
 					fileSystemProvider,
 				});
 
-				workspaceRoot = URI.parse(options.workspace);
-
 				this.connection.console.debug(
-					`[Server(${process.pid}) ${workspaceRoot}] Initialize received`,
+					`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialize> returning server capabilities`,
 				);
 
 				return {
@@ -137,29 +139,52 @@ export class SomeSassServer {
 		);
 
 		this.connection.onInitialized(async () => {
-			const settings =
-				await this.connection.workspace.getConfiguration("somesass");
-			const editorSettings =
-				await this.connection.workspace.getConfiguration("editor");
-			const storageService = new StorageService();
-
-			createContext({
-				clientCapabilities,
-				fs: fileSystemProvider,
-				settings,
-				editorSettings,
-				workspaceRoot,
-				storage: storageService,
-			});
-
-			scannerService = new ScannerService();
-
-			const files = await fileSystemProvider.findFiles(
-				"**/*.{scss,svelte,astro,vue}",
-				settings.scannerExclude,
-			);
-
 			try {
+				this.connection.console.debug(
+					`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> received`,
+				);
+
+				const settings =
+					await this.connection.workspace.getConfiguration("somesass");
+				const editorSettings =
+					await this.connection.workspace.getConfiguration("editor");
+				const storageService = new StorageService();
+
+				if (
+					!ls ||
+					!clientCapabilities ||
+					!workspaceRoot ||
+					!fileSystemProvider
+				) {
+					throw new Error(
+						"Got onInitialized without onInitialize readying up all required globals",
+					);
+				}
+
+				createContext({
+					clientCapabilities: clientCapabilities!,
+					fs: fileSystemProvider!,
+					settings,
+					editorSettings,
+					workspaceRoot: workspaceRoot!,
+					storage: storageService,
+				});
+
+				scannerService = new ScannerService();
+
+				this.connection.console.debug(
+					`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> scanning workspace for files`,
+				);
+
+				const files = await fileSystemProvider.findFiles(
+					"**/*.{scss,svelte,astro,vue}",
+					settings.scannerExclude,
+				);
+
+				this.connection.console.debug(
+					`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> found ${files.length} files, starting parse`,
+				);
+
 				// Populate the cache for the new language services
 				for (const file of files) {
 					let uri = file;
@@ -184,21 +209,19 @@ export class SomeSassServer {
 					}
 					ls.parseStylesheet(document);
 				}
-			} catch (error) {
-				this.connection.console.log(String(error));
-			}
 
-			try {
 				await scannerService.scan(files);
+
+				this.connection.console.debug(
+					`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> parsed ${files.length} files`,
+				);
 			} catch (error) {
 				this.connection.console.log(String(error));
 			}
 		});
 
 		documents.onDidChangeContent(async (change) => {
-			if (!scannerService) {
-				return null;
-			}
+			if (!scannerService || !ls) return;
 
 			try {
 				ls.onDocumentChanged(change.document);
@@ -230,14 +253,10 @@ export class SomeSassServer {
 		});
 
 		this.connection.onDidChangeWatchedFiles(async (event) => {
-			if (!scannerService) {
-				return null;
-			}
+			if (!scannerService || !fileSystemProvider || !ls) return;
 
 			const context = useContext();
-			if (!context) {
-				return;
-			}
+			if (!context) return;
 
 			const { storage } = context;
 			const newFiles: URI[] = [];
@@ -279,32 +298,26 @@ export class SomeSassServer {
 
 		this.connection.onCompletion(async (textDocumentPosition) => {
 			const uri = documents.get(textDocumentPosition.textDocument.uri);
-			if (uri === undefined) {
-				return;
-			}
+			if (!uri) return null;
 
 			const { document, offset } = getSCSSRegionsDocument(
 				uri,
 				textDocumentPosition.position,
 			);
-			if (!document) {
-				return null;
-			}
+			if (!document) return null;
 
 			const result = await doCompletion(document, offset);
 			return result;
 		});
 
 		this.connection.onHover((params) => {
+			if (!ls) return null;
+
 			const uri = documents.get(params.textDocument.uri);
-			if (uri === undefined) {
-				return;
-			}
+			if (!uri) return null;
 
 			const { document } = getSCSSRegionsDocument(uri, params.position);
-			if (!document) {
-				return null;
-			}
+			if (!document) return null;
 
 			const result = ls.doHover(document, params.position);
 			return result;
@@ -312,86 +325,74 @@ export class SomeSassServer {
 
 		this.connection.onSignatureHelp((textDocumentPosition) => {
 			const uri = documents.get(textDocumentPosition.textDocument.uri);
-			if (uri === undefined) {
-				return;
-			}
+			if (!uri) return null;
 
 			const { document, offset } = getSCSSRegionsDocument(
 				uri,
 				textDocumentPosition.position,
 			);
-			if (!document) {
-				return null;
-			}
+			if (!document) return null;
 
 			const result = doSignatureHelp(document, offset);
 			return result;
 		});
 
 		this.connection.onDefinition((params) => {
+			if (!ls) return null;
+
 			const uri = documents.get(params.textDocument.uri);
-			if (uri === undefined) {
-				return;
-			}
+			if (!uri) return null;
+
 			const { document } = getSCSSRegionsDocument(uri, params.position);
-			if (!document) {
-				return null;
-			}
+			if (!document) return null;
+
 			const result = ls.findDefinition(document, params.position);
 			return result;
 		});
 
 		this.connection.onDocumentHighlight((params) => {
+			if (!ls) return null;
+
 			const document = documents.get(params.textDocument.uri);
-			if (!document) {
-				return;
-			}
+			if (!document) return null;
+
 			const result = ls.findDocumentHighlights(document, params.position);
 			return result;
 		});
 
 		this.connection.onReferences(async (referenceParams) => {
 			const uri = documents.get(referenceParams.textDocument.uri);
-			if (uri === undefined) {
-				return undefined;
-			}
+			if (uri === undefined) return null;
 
 			const { document, offset } = getSCSSRegionsDocument(
 				uri,
 				referenceParams.position,
 			);
-			if (!document) {
-				return null;
-			}
+			if (!document) return null;
 
 			const options = referenceParams.context;
 			const references = await provideReferences(document, offset, options);
-
-			if (!references) {
-				return null;
-			}
+			if (!references) return null;
 
 			return references.references.map((r) => r.location);
 		});
 
 		this.connection.onWorkspaceSymbol((params) => {
+			if (!ls) return null;
+
 			const result = ls.findWorkspaceSymbols(params.query);
 			return result;
 		});
 
 		this.connection.onCodeAction(async (params) => {
 			const context = useContext();
-			if (!context) {
-				return;
-			}
+			if (!context) return null;
 
 			const { editorSettings } = context;
 			const codeActionProviders = [new ExtractProvider(editorSettings)];
 
 			const document = documents.get(params.textDocument.uri);
-			if (document === undefined) {
-				return undefined;
-			}
+			if (document === undefined) return null;
 
 			const allActions: (Command | CodeAction)[] = [];
 
@@ -426,14 +427,10 @@ export class SomeSassServer {
 
 		this.connection.onPrepareRename(async (params) => {
 			const uri = documents.get(params.textDocument.uri);
-			if (uri === undefined) {
-				return null;
-			}
+			if (uri === undefined) return null;
 
 			const { document, offset } = getSCSSRegionsDocument(uri, params.position);
-			if (!document) {
-				return null;
-			}
+			if (!document) return null;
 
 			const preparations = await prepareRename(document, offset);
 			return preparations;
@@ -441,34 +438,29 @@ export class SomeSassServer {
 
 		this.connection.onRenameRequest(async (params) => {
 			const uri = documents.get(params.textDocument.uri);
-			if (uri === undefined) {
-				return null;
-			}
+			if (uri === undefined) return null;
 
 			const { document, offset } = getSCSSRegionsDocument(uri, params.position);
-			if (!document) {
-				return null;
-			}
+			if (!document) return null;
 
 			const edits = await doRename(document, offset, params.newName);
 			return edits;
 		});
 
 		this.connection.onDocumentColor(async (params) => {
+			this.connection.console.debug(
+				`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <textDocument/color> received`,
+			);
+			if (!ls || !scannerService) return null;
+
 			const uri = documents.get(params.textDocument.uri);
-			if (uri === undefined) {
-				return null;
-			}
+			if (uri === undefined) return null;
 
 			const { document } = getSCSSRegionsDocument(uri);
-			if (!document) {
-				return null;
-			}
+			if (!document) return null;
 
 			const context = useContext();
-			if (!context) {
-				return null;
-			}
+			if (!context) return null;
 
 			const { storage } = context;
 			const scssDocument = storage.get(document.uri);
@@ -480,23 +472,25 @@ export class SomeSassServer {
 				await scannerService.scan([URI.parse(document.uri)]);
 			}
 
-			const information = findDocumentColors(document);
+			const information = await ls.findColors(document);
 			return information;
 		});
 
-		this.connection.onColorPresentation(() => {
-			// const uri = documents.get(params.textDocument.uri);
-			// if (uri === undefined) {
-			// 	return null;
-			// }
-			// const { document } = getSCSSRegionsDocument(uri);
-			// if (!document) {
-			// 	return null;
-			// }
-			// const presentations = getColorPresentations(document, params.color, params.range);
-			// return presentations;
+		this.connection.onColorPresentation((params) => {
+			if (!ls) return null;
 
-			return []; // Don't replace the variable reference with raw color values...
+			const uri = documents.get(params.textDocument.uri);
+			if (uri === undefined) return null;
+
+			const { document } = getSCSSRegionsDocument(uri);
+			if (!document) return null;
+
+			const result = ls.getColorPresentations(
+				document,
+				params.color,
+				params.range,
+			);
+			return result;
 		});
 
 		this.connection.onShutdown(() => {

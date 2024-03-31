@@ -169,6 +169,7 @@ export interface SassDocumentSymbol extends DocumentSymbol {
 
 export interface LanguageService {
 	doHover(document: TextDocument, position: Position): Promise<Hover | null>;
+	findColors(document: TextDocument): Promise<ColorInformation[]>;
 	findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]>;
 	findDocumentSymbols(document: TextDocument): SassDocumentSymbol[];
 	findWorkspaceSymbols(query?: string): SymbolInformation[];
@@ -187,6 +188,11 @@ export interface LanguageService {
 		document: TextDocument,
 		position: Position,
 	): DocumentHighlight[];
+	getColorPresentations(
+		document: TextDocument,
+		color: Color,
+		range: Range,
+	): ColorPresentation[];
 	/**
 	 * Utility function to reparse an updated document.
 	 * Like {@link LanguageService.parseStylesheet}, but returns nothing.

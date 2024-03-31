@@ -18,9 +18,9 @@ export type LanguageFeatureInternal = {
  * between modules.
  */
 export abstract class LanguageFeature {
-	ls;
-	options;
-	configuration: LanguageServiceConfiguration = {};
+	protected ls;
+	protected options;
+	protected configuration: LanguageServiceConfiguration = {};
 
 	/** @private */
 	protected _internal: LanguageFeatureInternal;
@@ -48,7 +48,7 @@ export abstract class LanguageFeature {
 	 * @param initialDocument The starting point, typically the document that gets passed to the language feature function.
 	 * @returns The aggregated results of {@link callback}
 	 */
-	async findInWorkspace<T>(
+	protected async findInWorkspace<T>(
 		callback: (document: TextDocument, prefix: string) => T | T[] | undefined,
 		initialDocument: TextDocument,
 	): Promise<T[]> {

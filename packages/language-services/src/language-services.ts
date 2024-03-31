@@ -1,5 +1,6 @@
 import { getSCSSLanguageService } from "@somesass/vscode-css-languageservice";
 import { DoHover } from "./features/do-hover";
+import { FindColors } from "./features/find-colors";
 import { FindDefinition } from "./features/find-definition";
 import { FindDocumentHighlights } from "./features/find-document-highlights";
 import { FindDocumentLinks } from "./features/find-document-links";
@@ -12,6 +13,10 @@ import {
 	LanguageServiceOptions,
 	Position,
 	TextDocument,
+	Color,
+	ColorInformation,
+	ColorPresentation,
+	Range,
 } from "./language-services-types";
 import { mapFsProviders } from "./utils/fs-provider";
 
@@ -26,6 +31,7 @@ export function getLanguageService(
 class LanguageService implements ILanguageService {
 	#cache: LanguageServerCache;
 	#doHover: DoHover;
+	#findColors: FindColors;
 	#findDefinition: FindDefinition;
 	#findDocumentHighlights: FindDocumentHighlights;
 	#findDocumentLinks: FindDocumentLinks;
@@ -44,6 +50,7 @@ class LanguageService implements ILanguageService {
 		});
 		this.#cache = cache;
 		this.#doHover = new DoHover(this, options, { scssLs, cache });
+		this.#findColors = new FindColors(this, options, { scssLs, cache });
 		this.#findDefinition = new FindDefinition(this, options, { scssLs, cache });
 		this.#findDocumentHighlights = new FindDocumentHighlights(this, options, {
 			scssLs,
@@ -58,10 +65,11 @@ class LanguageService implements ILanguageService {
 	}
 
 	configure(configuration: LanguageServiceConfiguration): void {
+		this.#findColors.configure(configuration);
+		this.#findDefinition.configure(configuration);
 		this.#findDocumentHighlights.configure(configuration);
 		this.#findDocumentLinks.configure(configuration);
 		this.#findSymbols.configure(configuration);
-		this.#findDefinition.configure(configuration);
 	}
 
 	parseStylesheet(document: TextDocument) {
@@ -70,6 +78,10 @@ class LanguageService implements ILanguageService {
 
 	doHover(document: TextDocument, position: Position) {
 		return this.#doHover.doHover(document, position);
+	}
+
+	findColors(document: TextDocument): Promise<ColorInformation[]> {
+		return this.#findColors.findColors(document);
 	}
 
 	findDefinition(document: TextDocument, position: Position) {
@@ -97,6 +109,14 @@ class LanguageService implements ILanguageService {
 
 	findWorkspaceSymbols(query?: string) {
 		return this.#findSymbols.findWorkspaceSymbols(query);
+	}
+
+	getColorPresentations(
+		document: TextDocument,
+		color: Color,
+		range: Range,
+	): ColorPresentation[] {
+		return this.#findColors.getColorPresentations(document, color, range);
 	}
 
 	onDocumentChanged(document: TextDocument) {

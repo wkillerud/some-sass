@@ -188,10 +188,6 @@ export async function doSignatureHelp(
 		symbolType,
 	);
 
-	console.log({
-		suggestions,
-	});
-
 	if (suggestions.length === 0) {
 		// Look for built-ins
 		for (const { reference, exports } of Object.values(sassBuiltInModules)) {
@@ -305,10 +301,6 @@ function doSymbolHunting(
 					: scssDocument.functions.values();
 
 			for (const symbol of symbols) {
-				console.log({
-					entry,
-					symbol,
-				});
 				if (
 					entry.name === symbol.name &&
 					getParametersFromDetail(symbol.detail).length >= entry.parameters

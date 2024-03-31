@@ -83,7 +83,7 @@ describe("SCSS Hover Test", function () {
 		// Prefixed symbols are shown with their original names
 		const expectedContents = {
 			contents: [
-				"```scss\n@mixin mix-mixin()\n```\n____\nMixin declared in _mixins.scss",
+				"```scss\n@mixin mix-mix-mixin()\n```\n____\nMixin declared as mix-mixin in _mixins.scss",
 			],
 		};
 

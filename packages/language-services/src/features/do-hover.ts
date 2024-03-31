@@ -31,17 +31,24 @@ export class DoHover extends LanguageFeature {
 	): Promise<Hover | null> {
 		const stylesheet = this.ls.parseStylesheet(document);
 		const offset = document.offsetAt(position);
+
+		let nodeType: NodeType;
 		const hoverNode = getNodeAtOffset(stylesheet, offset);
-		if (!hoverNode) {
-			return null;
+		if (hoverNode) {
+			nodeType = hoverNode.type;
+		} else {
+			// If the document begins with a SassDoc comment the Stylesheet node does not begin at offset 0,
+			// instead starting where the SassDoc block ends. To ensure we get down to the switch below to
+			// look for Sassdoc annotations, set nodeType to Stylesheet here.
+			nodeType = NodeType.Stylesheet;
 		}
 
 		let kind: SymbolKind | undefined;
 		let name: string | undefined;
 		let range: Range | undefined = undefined;
-		switch (hoverNode.type) {
+		switch (nodeType) {
 			case NodeType.VariableName: {
-				const parent = hoverNode.getParent();
+				const parent = hoverNode?.getParent();
 				if (
 					parent &&
 					parent.type !== NodeType.VariableDeclaration &&
@@ -55,7 +62,7 @@ export class DoHover extends LanguageFeature {
 			case NodeType.Identifier: {
 				let node;
 				let type: SymbolKind | null = null;
-				const parent = hoverNode.getParent();
+				const parent = hoverNode?.getParent();
 				if (parent && parent.type === NodeType.Function) {
 					node = parent;
 					type = SymbolKind.Function;
@@ -74,7 +81,7 @@ export class DoHover extends LanguageFeature {
 			}
 
 			case NodeType.MixinReference: {
-				name = (hoverNode as MixinReference).getName();
+				name = (hoverNode as MixinReference)?.getName();
 				kind = SymbolKind.Method;
 				break;
 			}
@@ -89,7 +96,8 @@ export class DoHover extends LanguageFeature {
 				scanner.setSource(document.getText());
 				let token: IToken = scanner.scan();
 				while (token.type !== TokenType.EOF) {
-					if (token.offset < offset) {
+					if (token.offset + token.len < offset) {
+						token = scanner.scan();
 						continue;
 					}
 
@@ -110,7 +118,7 @@ export class DoHover extends LanguageFeature {
 						}
 
 						const annotationStart =
-							token.offset + commentText.indexOf(candidate.annotation);
+							token.offset + commentText.indexOf(candidate.annotation) - 1;
 						const annotationEnd =
 							annotationStart + candidate.annotation.length + 1;
 
@@ -140,13 +148,13 @@ export class DoHover extends LanguageFeature {
 			}
 
 			case NodeType.SelectorPlaceholder: {
-				name = hoverNode.getText();
+				name = hoverNode?.getText();
 				kind = SymbolKind.Class;
 				break;
 			}
 		}
 
-		if (name && kind) {
+		if (hoverNode && name && kind) {
 			range = Range.create(
 				document.positionAt(hoverNode.offset),
 				document.positionAt(hoverNode.offset + name.length),
@@ -228,27 +236,29 @@ export class DoHover extends LanguageFeature {
 			}
 		}
 
-		// Look to see if this is a built-in, but only if we have no other content.
-		// Folks may use the same names as built-ins in their modules.
-		for (const { reference, exports } of Object.values(sassBuiltInModules)) {
-			for (const [builtinName, { description }] of Object.entries(exports)) {
-				if (builtinName === name) {
-					// Make sure we're not just hovering over a CSS function.
-					// Confirm we are looking at something that is the child of a module.
-					const isModule =
-						hoverNode.getParent()?.type === NodeType.Module ||
-						hoverNode.getParent()?.getParent()?.type === NodeType.Module;
-					if (isModule) {
-						return {
-							contents: {
-								kind: MarkupKind.Markdown,
-								value: [
-									description,
-									"",
-									`[Sass reference](${reference}#${builtinName})`,
-								].join("\n"),
-							},
-						};
+		if (hoverNode) {
+			// Look to see if this is a built-in, but only if we have no other content.
+			// Folks may use the same names as built-ins in their modules.
+			for (const { reference, exports } of Object.values(sassBuiltInModules)) {
+				for (const [builtinName, { description }] of Object.entries(exports)) {
+					if (builtinName === name) {
+						// Make sure we're not just hovering over a CSS function.
+						// Confirm we are looking at something that is the child of a module.
+						const isModule =
+							hoverNode.getParent()?.type === NodeType.Module ||
+							hoverNode.getParent()?.getParent()?.type === NodeType.Module;
+						if (isModule) {
+							return {
+								contents: {
+									kind: MarkupKind.Markdown,
+									value: [
+										description,
+										"",
+										`[Sass reference](${reference}#${builtinName})`,
+									].join("\n"),
+								},
+							};
+						}
 					}
 				}
 			}

@@ -2,7 +2,6 @@ import {
 	IToken,
 	MarkupKind,
 	Range,
-	SCSSScanner,
 	TokenType,
 	VariableDeclaration,
 } from "@somesass/vscode-css-languageservice";
@@ -91,9 +90,7 @@ export class DoHover extends LanguageFeature {
 				// SassDoc is considered a comment, which are skipped by the regular parser (so we hit the Stylesheet node).
 				// Use the base scanner to retokenize the document including comments,
 				// and look a comment token at the hover position.
-				const scanner = new SCSSScanner();
-				scanner.ignoreComment = false;
-				scanner.setSource(document.getText());
+				const scanner = this.getScanner(document);
 				let token: IToken = scanner.scan();
 				while (token.type !== TokenType.EOF) {
 					if (token.offset + token.len < offset) {

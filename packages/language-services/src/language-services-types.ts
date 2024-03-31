@@ -168,6 +168,10 @@ export interface SassDocumentSymbol extends DocumentSymbol {
 }
 
 export interface LanguageService {
+	doComplete(
+		document: TextDocument,
+		position: Position,
+	): Promise<CompletionList>;
 	doHover(document: TextDocument, position: Position): Promise<Hover | null>;
 	findColors(document: TextDocument): Promise<ColorInformation[]>;
 	findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]>;

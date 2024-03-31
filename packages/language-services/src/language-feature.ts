@@ -1,4 +1,8 @@
-import { LanguageService as VSCodeLanguageService } from "@somesass/vscode-css-languageservice";
+import {
+	SCSSScanner,
+	Scanner,
+	LanguageService as VSCodeLanguageService,
+} from "@somesass/vscode-css-languageservice";
 import { LanguageModelCache } from "./language-model-cache";
 import {
 	LanguageServiceOptions,
@@ -6,6 +10,7 @@ import {
 	LanguageService,
 	LanguageServiceConfiguration,
 	NodeType,
+	Range,
 } from "./language-services-types";
 
 export type LanguageFeatureInternal = {
@@ -38,6 +43,18 @@ export abstract class LanguageFeature {
 	configure(configuration: LanguageServiceConfiguration): void {
 		this.configuration = configuration;
 		this._internal.scssLs.configure(configuration);
+	}
+
+	/**
+	 * Get the scanner implementation for the document's syntax.
+	 * @param document This document's text will be set as the scanner source
+	 * @param range Optional range passed to {@link TextDocument.getText}
+	 */
+	protected getScanner(document: TextDocument, range?: Range): Scanner {
+		const scanner = new SCSSScanner();
+		scanner.ignoreComment = false;
+		scanner.setSource(document.getText(range));
+		return scanner;
 	}
 
 	/**

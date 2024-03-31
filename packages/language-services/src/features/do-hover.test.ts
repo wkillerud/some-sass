@@ -179,3 +179,16 @@ test("should show hover information for Sassdoc annotation at the start of the d
 	assert.isNotNull(result, "Expected to find a hover result for @type");
 	assert.match(JSON.stringify(result), /@type/);
 });
+
+test("should show expected hover information for Sassdoc in the case of more than one", async () => {
+	const document = fileSystemProvider.createDocument([
+		"/// Some wise words",
+		"/// @type String",
+		"/// @author wkillerud",
+		'$documented-variable: "value";',
+	]);
+
+	const result = await ls.doHover(document, Position.create(2, 8));
+	assert.isNotNull(result, "Expected to find a hover result for @author");
+	assert.match(JSON.stringify(result), /@author/);
+});

@@ -103,7 +103,6 @@ export class DoHover extends LanguageFeature {
 
 					if (token.type === TokenType.Comment) {
 						const commentText = token.text;
-						// TODO: test that we get a comment token per line, otherwise this needs to be a filter not a find
 						const candidate = sassDocAnnotations.find(
 							({ annotation, aliases }) => {
 								return (

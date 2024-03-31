@@ -32,26 +32,28 @@ export class DoComplete extends LanguageFeature {
 		const offset = document.offsetAt(position);
 		const node = getNodeAtOffset(stylesheet, offset);
 
-		if (
+		// If the document begins with a comment, the Stylesheet node does not begin at offset 0,
+		// instead starting where the comment block ends. In that case node may be null. Otherwise
+		// if we get NodeType.Stylesheet, it's likely we're in a comment context and want to check
+		// if it's Sassdoc.
+		const isMaybeSassdocContext =
 			(!node && stylesheet.offset !== 0) ||
-			(node && node.type === NodeType.Stylesheet)
-		) {
-			// If the document begins with a comment the Stylesheet node does not begin at offset 0,
-			// instead starting where the comment block ends. We need to check the document text for
-			// comments in case it is a sassdoc context where we want to provide completions.
-			// In the case of hitting Stylesheet, likely we're looking at a comment block. Either way
-			// get the scanner and look through tokens more granularly when dealing with comments.
+			(node && node.type === NodeType.Stylesheet);
+		if (isMaybeSassdocContext) {
 			const scanner = this.getScanner(document);
 			let token: IToken = scanner.scan();
 			let prevToken: IToken | null = null;
 			while (token.type !== TokenType.EOF) {
-				// Lookback only one token from position. Needed to figure out sassdoc block completion
-				// which should happen if we hit a function or mixin declaration with `///`
-				// (and an optional space) as the previous token.
+				// Lookback is needed to figure out if we should do Sassdoc block completion.
+				// It should happen if we hit a function or mixin declaration with `///`
+				// (and an optional space) as the previous token. If we overshoot offset
+				// and that has not happened we don't really care about the rest of the
+				// document and break out of the loop.
 				if (prevToken && prevToken.offset + prevToken.len > offset) {
 					break;
 				}
 
+				// Don't start processing the token until we've reached the token under the cursor
 				if (token.offset + token.len < offset) {
 					prevToken = token;
 					token = scanner.scan();
@@ -89,10 +91,19 @@ export class DoComplete extends LanguageFeature {
 				prevToken = token;
 				token = scanner.scan();
 			}
+
+			if (result.items.length > 0) {
+				return result;
+			}
 		}
 
-		// TODO: isSassdocContext, doSassdocComplete
-		// TODO: isNonSassdocCommentContext, then just return empty list
+		// Same as for Sassdoc, but if we reach this point we can assume it's a regular comment block
+		// where we don't want to provide any suggestions.
+		const isCommentContext = !node || node.type === NodeType.Stylesheet;
+		if (isCommentContext) {
+			return result;
+		}
+
 		// TODO: isImportContext, doImportComplete
 		// TODO: isNamespaceContext, doNamespacedComplete
 		// TODO: isPlaceholderDeclarationContext, doPlaceholderDeclarationComplete

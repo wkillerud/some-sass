@@ -342,7 +342,7 @@ export class DoHover extends LanguageFeature {
 	): Promise<Hover> {
 		const rawValue = this.getVariableValue(document, symbol) || "";
 		let value = await this.ls.findValue(document, symbol.selectionRange.start);
-		value = value || "";
+		value = value || rawValue;
 
 		const result = {
 			kind: MarkupKind.Markdown,

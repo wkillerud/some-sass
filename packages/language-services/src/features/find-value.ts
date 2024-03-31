@@ -4,6 +4,7 @@ import {
 	Position,
 	VariableDeclaration,
 	getNodeAtOffset,
+	Variable,
 } from "../language-services-types";
 
 // To avoid infinite loop for circular references
@@ -28,26 +29,23 @@ export class FindValue extends LanguageFeature {
 		const offset = document.offsetAt(position);
 		const stylesheet = this.ls.parseStylesheet(document);
 
-		const node = getNodeAtOffset(stylesheet, offset);
-		if (!node) {
-			return null;
-		}
-		if (!(node instanceof VariableDeclaration)) {
-			return null;
-		}
-		const value = node.getValue();
-		if (typeof value === "undefined") {
+		const variable = getNodeAtOffset(stylesheet, offset);
+		if (!(variable instanceof Variable)) {
 			return null;
 		}
 
-		const valueString = value.getText();
+		const parent = variable.getParent();
+		if (parent instanceof VariableDeclaration) {
+			return parent.getValue()?.getText() || null;
+		}
+
+		const valueString = variable.getText();
 		const dollarIndex = valueString.indexOf("$");
 		if (dollarIndex !== -1) {
 			// If the variable at position references another variable,
 			// find that variable's definition and look for the real value
 			// there instead.
-			const newPosition = document.positionAt(value.offset + dollarIndex + 1);
-			const definition = await this.ls.findDefinition(document, newPosition);
+			const definition = await this.ls.findDefinition(document, position);
 			if (definition) {
 				const newDocument = this._internal.cache.document(definition.uri);
 				if (!newDocument) {
@@ -55,7 +53,7 @@ export class FindValue extends LanguageFeature {
 				}
 				return await this.internalFindValue(
 					newDocument,
-					newPosition,
+					definition.range.start,
 					depth + 1,
 				);
 			} else {

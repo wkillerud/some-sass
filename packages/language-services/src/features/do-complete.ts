@@ -384,6 +384,78 @@ export class DoComplete extends LanguageFeature {
 							break;
 						}
 						case SymbolKind.Function: {
+							const label = `${prefix}${symbol.name}`;
+							let insertText = namespace !== "*" ? `.${label}` : label;
+							const filterText =
+								namespace !== "*" ? `${namespace}.${label}` : label;
+							const sortText = isPrivate
+								? label.replace(/^$[_]/, "")
+								: undefined;
+
+							const documentation = {
+								kind: MarkupKind.Markdown,
+								value: `\`\`\`scss\n@function ${symbol.name}${symbol.detail || "()"}\n\`\`\``,
+							};
+							const sassdoc = applySassDoc(symbol);
+							if (sassdoc) {
+								documentation.value += `\n____\n${sassdoc}`;
+							}
+							documentation.value += `\n____\nFunction declared in ${this.getFileName(currentDocument)}`;
+
+							// If there are required parameters, add a suggestion with only them.
+							// If there are optional parameters, add a suggestion with all parameters.
+							const parameters = getParametersFromDetail(symbol.detail);
+							const requiredParameters = parameters.filter(
+								(p) => !p.defaultValue,
+							);
+							if (requiredParameters.length > 0) {
+								const parametersSnippet = requiredParameters
+									.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
+									.join(", ");
+								insertText += `(${parametersSnippet})`;
+
+								const detail = requiredParameters
+									.map((p) => mapParameterSignature(p))
+									.join(", ");
+
+								const item: CompletionItem = {
+									detail,
+									documentation,
+									filterText,
+									kind: CompletionItemKind.Function,
+									label,
+									insertText,
+									sortText,
+									tags: symbol.sassdoc?.deprecated
+										? [CompletionItemTag.Deprecated]
+										: [],
+								};
+								items.push(item);
+							}
+							if (requiredParameters.length !== parameters.length) {
+								const parametersSnippet = parameters
+									.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
+									.join(", ");
+								insertText += `(${parametersSnippet})`;
+
+								const detail = parameters
+									.map((p) => mapParameterSignature(p))
+									.join(", ");
+
+								const item: CompletionItem = {
+									detail,
+									documentation,
+									filterText,
+									kind: CompletionItemKind.Function,
+									label,
+									insertText,
+									sortText,
+									tags: symbol.sassdoc?.deprecated
+										? [CompletionItemTag.Deprecated]
+										: [],
+								};
+								items.push(item);
+							}
 							break;
 						}
 						case SymbolKind.Class: {

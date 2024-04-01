@@ -3,7 +3,6 @@ import {
 	MarkupKind,
 	Range,
 	TokenType,
-	VariableDeclaration,
 } from "@somesass/vscode-css-languageservice";
 import { sassBuiltInModules } from "../facts/sass";
 import { sassDocAnnotations } from "../facts/sassdoc";
@@ -373,31 +372,5 @@ export class DoHover extends LanguageFeature {
 		return {
 			contents: result,
 		};
-	}
-
-	private getVariableValue(
-		document: TextDocument,
-		variable: SassDocumentSymbol,
-	): string | null {
-		const offset = document.offsetAt(variable.selectionRange.start);
-		const stylesheet = this.ls.parseStylesheet(document);
-		const node = getNodeAtOffset(stylesheet, offset);
-		if (node === null) {
-			return null;
-		}
-		const parent = node.getParent();
-		if (!parent) {
-			return null;
-		}
-		if (parent instanceof VariableDeclaration) {
-			return parent.getValue()?.getText() || null;
-		}
-		return null;
-	}
-
-	private getFileName(document: TextDocument): string {
-		const uri = document.uri;
-		const lastSlash = uri.lastIndexOf("/");
-		return lastSlash === -1 ? uri : uri.slice(Math.max(0, lastSlash + 1));
 	}
 }

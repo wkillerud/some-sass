@@ -13,7 +13,11 @@ import {
 	Node,
 	Module,
 	MarkupKind,
+	SymbolKind,
+	CompletionItemTag,
 } from "@somesass/vscode-css-languageservice";
+import ColorDotJS from "colorjs.io";
+import { SassBuiltInModule, sassBuiltInModules } from "../facts/sass";
 import { sassDocAnnotations } from "../facts/sassdoc";
 import { LanguageFeature } from "../language-feature";
 import {
@@ -25,12 +29,14 @@ import {
 	Utils,
 	getNodeAtOffset,
 } from "../language-services-types";
+import { asDollarlessVariable } from "../utils/sass";
+import { applySassDoc } from "../utils/sassdoc";
 import { getName } from "../utils/uri";
-import { SassBuiltInModule, sassBuiltInModules } from "../facts/sass";
 
 const reNewSassdocBlock = /\/\/\/\s?$/;
 const reSassdocLine = /\/\/\/\s/;
 const reSassExt = /\.s(a|c)ss$/;
+const rePrivate = /^\$?[_].*$/;
 
 export class DoComplete extends LanguageFeature {
 	async doComplete(
@@ -207,24 +213,128 @@ export class DoComplete extends LanguageFeature {
 			return items;
 		}
 
-		// TODO: find out if node is a variable, placeholder, function or mixin reference
-		let isVariable = false;
-		let isMixin = false;
-		let isFunction = false;
-		let isPlaceholder = false;
 		const result = await this.findInWorkspace<CompletionItem>(
-			(document, prefix, hide, show) => {
+			async (currentDocument, prefix, hide, show) => {
 				const items: CompletionItem[] = [];
-				const symbols = this.ls.findDocumentSymbols(document);
+				const symbols = this.ls.findDocumentSymbols(currentDocument);
 				for (const symbol of symbols) {
-					// continue if symbol !== the context we're in
+					if (show.length > 0 && !show.includes(symbol.name)) {
+						continue;
+					}
+					if (hide.includes(symbol.name)) {
+						continue;
+					}
+					const isPrivate = symbol.name.match(rePrivate);
+					if (isPrivate && currentDocument.uri !== document.uri) {
+						continue;
+					}
+
+					switch (symbol.kind) {
+						case SymbolKind.Variable: {
+							// Avoid ending up with namespace.prefix-$variable
+							const label = `$${prefix}${asDollarlessVariable(symbol.name)}`;
+							const rawValue = this.getVariableValue(document, symbol);
+							const value = await this.ls.findValue(
+								document,
+								symbol.selectionRange.start,
+							);
+							const color = value ? getColorValue(value) : null;
+							const completionKind = color
+								? CompletionItemKind.Color
+								: CompletionItemKind.Variable;
+
+							let documentation =
+								color ||
+								[
+									"```scss",
+									`${label}: ${value};${
+										value !== rawValue ? ` // via ${rawValue}` : ""
+									}`,
+									"```",
+								].join("\n") ||
+								"";
+							const sassdoc = applySassDoc(symbol);
+							if (sassdoc) {
+								documentation += `\n____\n${sassdoc}`;
+							}
+							documentation += `\n____\nVariable declared in ${this.getFileName(currentDocument)}`;
+
+							const sortText = isPrivate
+								? label.replace(/^$[_]/, "")
+								: undefined;
+
+							let filterText: string | undefined;
+							let insertText: string | undefined;
+
+							// TODO: regression-test the replacement issues with . and $ in SCSS and Astro/Vue/Svelte
+							// const isEmbedded = !currentDocument.languageId.match(reSassExt);
+
+							const item: CompletionItem = {
+								commitCharacters: [";", ","],
+								documentation:
+									completionKind === CompletionItemKind.Color
+										? documentation
+										: {
+												kind: MarkupKind.Markdown,
+												value: documentation,
+											},
+								filterText,
+								kind: completionKind,
+								label,
+								insertText,
+								sortText,
+								tags: symbol.sassdoc?.deprecated
+									? [CompletionItemTag.Deprecated]
+									: [],
+							};
+							items.push(item);
+							break;
+						}
+						case SymbolKind.Method: {
+							break;
+						}
+						case SymbolKind.Function: {
+							break;
+						}
+						case SymbolKind.Class: {
+							// TODO: these completions shouldn't be _here_ though, should they?
+							if (!symbol.name.startsWith("%")) {
+								break;
+							}
+
+							let documentation = symbol.name;
+							const sassdoc = applySassDoc(symbol);
+							if (sassdoc) {
+								documentation += `\n____\n${sassdoc}`;
+							}
+
+							const filterText = symbol.name.substring(1);
+
+							const item: CompletionItem = {
+								detail: `Placeholder declared in ${this.getFileName(currentDocument)}`,
+								documentation: {
+									kind: "markdown",
+									value: documentation,
+								},
+								filterText,
+								insertText: filterText,
+								insertTextFormat: InsertTextFormat.Snippet,
+								kind: CompletionItemKind.Class,
+								label: symbol.name,
+								tags: symbol.sassdoc?.deprecated
+									? [CompletionItemTag.Deprecated]
+									: undefined,
+							};
+							items.push(item);
+							break;
+						}
+					}
 				}
 				return items;
 			},
 			start,
 		);
-
-		return items;
+		return result;
 	}
 
 	doSassBuiltInCompletion(
@@ -523,4 +633,13 @@ function getModuleNameFromPath(modulePath: string) {
 // Escape https://www.w3.org/TR/CSS1/#url
 function escapePath(p: string) {
 	return p.replace(/(\s|\(|\)|,|"|')/g, "\\$1");
+}
+
+function getColorValue(from: string): string | null {
+	try {
+		ColorDotJS.parse(from);
+		return from;
+	} catch {
+		return null;
+	}
 }

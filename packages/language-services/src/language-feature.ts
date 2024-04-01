@@ -3,6 +3,8 @@ import {
 	SCSSScanner,
 	Scanner,
 	LanguageService as VSCodeLanguageService,
+	VariableDeclaration,
+	getNodeAtOffset,
 } from "@somesass/vscode-css-languageservice";
 import { LanguageModelCache } from "./language-model-cache";
 import {
@@ -12,6 +14,7 @@ import {
 	LanguageServiceConfiguration,
 	NodeType,
 	Range,
+	SassDocumentSymbol,
 } from "./language-services-types";
 import { joinPath } from "./utils/resources";
 
@@ -92,7 +95,7 @@ export abstract class LanguageFeature {
 			prefix: string,
 			hide: string[],
 			show: string[],
-		) => T | T[] | undefined,
+		) => T | T[] | undefined | Promise<T | T[] | undefined>,
 		initialDocument: TextDocument,
 	): Promise<T[]> {
 		// TODO: keep track of visits and skip processing the same document multiple times
@@ -106,7 +109,7 @@ export abstract class LanguageFeature {
 			prefix: string,
 			hide: string[],
 			show: string[],
-		) => T | T[] | undefined,
+		) => T | T[] | undefined | Promise<T | T[] | undefined>,
 		initialDocument: TextDocument,
 		currentDocument: TextDocument = initialDocument,
 		accumulatedPrefix = "",
@@ -114,7 +117,7 @@ export abstract class LanguageFeature {
 		show: string[] = [],
 		depth = 0,
 	): Promise<T[]> {
-		const callbackResult = callback(
+		const callbackResult = await callback(
 			currentDocument,
 			accumulatedPrefix,
 			hide,
@@ -178,5 +181,31 @@ export abstract class LanguageFeature {
 		}
 
 		return result;
+	}
+
+	protected getVariableValue(
+		document: TextDocument,
+		variable: SassDocumentSymbol,
+	): string | null {
+		const offset = document.offsetAt(variable.selectionRange.start);
+		const stylesheet = this.ls.parseStylesheet(document);
+		const node = getNodeAtOffset(stylesheet, offset);
+		if (node === null) {
+			return null;
+		}
+		const parent = node.getParent();
+		if (!parent) {
+			return null;
+		}
+		if (parent instanceof VariableDeclaration) {
+			return parent.getValue()?.getText() || null;
+		}
+		return null;
+	}
+
+	protected getFileName(document: TextDocument): string {
+		const uri = document.uri;
+		const lastSlash = uri.lastIndexOf("/");
+		return lastSlash === -1 ? uri : uri.slice(Math.max(0, lastSlash + 1));
 	}
 }

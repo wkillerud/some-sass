@@ -155,7 +155,7 @@ test("should not include hidden symbol", async () => {
 	);
 });
 
-test("should not include priavet symbol", async () => {
+test("should not include private symbol", async () => {
 	const one = fileSystemProvider.createDocument(
 		["$primary: limegreen;", "$_private: red;"],
 		{
@@ -221,5 +221,162 @@ test("should only include shown symbol", async () => {
 	assert.notExists(
 		items.find((item) => item.label === "$secondary"),
 		"Expected not to find hidden symbol $secondary",
+	);
+});
+
+test("should suggest mixin with no parameter", async () => {
+	const one = fileSystemProvider.createDocument(
+		["@mixin primary() { color: $primary; }"],
+		{ uri: "one.scss" },
+	);
+	const two = fileSystemProvider.createDocument([
+		'@use "./one";',
+		".a { @include one.",
+	]);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	assert.deepStrictEqual(
+		items.find((item) => item.label === "primary"),
+		{
+			documentation: {
+				kind: "markdown",
+				value:
+					"```scss\n@mixin primary()\n```\n____\nMixin declared in one.scss",
+			},
+			filterText: "one.primary",
+			insertText: ".primary",
+			kind: CompletionItemKind.Method,
+			label: "primary",
+			sortText: undefined,
+			tags: [],
+		},
+	);
+});
+
+test("should suggest mixin with optional parameter", async () => {
+	const one = fileSystemProvider.createDocument(
+		["@mixin primary($color: red) { color: $color; }"],
+		{ uri: "one.scss" },
+	);
+	const two = fileSystemProvider.createDocument([
+		'@use "./one";',
+		".a { @include one.",
+	]);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	assert.deepStrictEqual(
+		items.filter((item) => item.label === "primary"),
+		[
+			{
+				detail: "($color: red)",
+				documentation: {
+					kind: "markdown",
+					value:
+						"```scss\n@mixin primary($color: red)\n```\n____\nMixin declared in one.scss",
+				},
+				filterText: "one.primary",
+				insertText: ".primary(${1:color})",
+				kind: CompletionItemKind.Method,
+				label: "primary",
+				sortText: undefined,
+				tags: [],
+			},
+		],
+	);
+});
+
+test("should suggest mixin with required parameter", async () => {
+	const one = fileSystemProvider.createDocument(
+		["@mixin primary($color) { color: $color; }"],
+		{ uri: "one.scss" },
+	);
+	const two = fileSystemProvider.createDocument([
+		'@use "./one";',
+		".a { @include one.",
+	]);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	assert.deepStrictEqual(
+		items.filter((item) => item.label === "primary"),
+		[
+			{
+				detail: "($color)",
+				documentation: {
+					kind: "markdown",
+					value:
+						"```scss\n@mixin primary($color)\n```\n____\nMixin declared in one.scss",
+				},
+				filterText: "one.primary",
+				insertText: ".primary(${1:color})",
+				kind: CompletionItemKind.Method,
+				label: "primary",
+				sortText: undefined,
+				tags: [],
+			},
+		],
+	);
+});
+
+test("given both required and optional parameters should suggest two variants - one with all parameters and one with only required", async () => {
+	const one = fileSystemProvider.createDocument(
+		[
+			"@mixin primary($background, $color: red) { color: $color; background-color: $background; }",
+		],
+		{ uri: "one.scss" },
+	);
+	const two = fileSystemProvider.createDocument([
+		'@use "./one";',
+		".a { @include one.",
+	]);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	assert.deepStrictEqual(
+		items.filter((item) => item.label === "primary"),
+		[
+			{
+				detail: "($background)",
+				documentation: {
+					kind: "markdown",
+					value:
+						"```scss\n@mixin primary($background, $color: red)\n```\n____\nMixin declared in one.scss",
+				},
+				filterText: "one.primary",
+				insertText: ".primary(${1:background})",
+				kind: 2,
+				label: "primary",
+				sortText: undefined,
+				tags: [],
+			},
+			{
+				detail: "($background, $color: red)",
+				documentation: {
+					kind: "markdown",
+					value:
+						"```scss\n@mixin primary($background, $color: red)\n```\n____\nMixin declared in one.scss",
+				},
+				filterText: "one.primary",
+				insertText: ".primary(${1:background}, ${2:color})",
+				kind: 2,
+				label: "primary",
+				sortText: undefined,
+				tags: [],
+			},
+		],
 	);
 });

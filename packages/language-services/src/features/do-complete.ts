@@ -17,6 +17,7 @@ import {
 	CompletionItemTag,
 } from "@somesass/vscode-css-languageservice";
 import ColorDotJS from "colorjs.io";
+import { ParseResult } from "scss-sassdoc-parser";
 import { SassBuiltInModule, sassBuiltInModules } from "../facts/sass";
 import { sassDocAnnotations } from "../facts/sassdoc";
 import { LanguageFeature } from "../language-feature";
@@ -267,7 +268,7 @@ export class DoComplete extends LanguageFeature {
 							let filterText: string | undefined;
 							let insertText: string | undefined;
 
-							// TODO: regression-test the replacement issues with . and $ in SCSS and Astro/Vue/Svelte
+							// TODO: regression-test the replacement issues with . and in SCSS and Astro/Vue/Svelte
 							// const isEmbedded = !currentDocument.languageId.match(reSassExt);
 
 							const item: CompletionItem = {
@@ -292,6 +293,94 @@ export class DoComplete extends LanguageFeature {
 							break;
 						}
 						case SymbolKind.Method: {
+							const label = `${prefix}${symbol.name}`;
+							let insertText = namespace !== "*" ? `.${label}` : label;
+							const filterText =
+								namespace !== "*" ? `${namespace}.${label}` : label;
+							const sortText = isPrivate
+								? label.replace(/^$[_]/, "")
+								: undefined;
+
+							const documentation = {
+								kind: MarkupKind.Markdown,
+								value: `\`\`\`scss\n@mixin ${symbol.name}${symbol.detail || "()"}\n\`\`\``,
+							};
+							const sassdoc = applySassDoc(symbol);
+							if (sassdoc) {
+								documentation.value += `\n____\n${sassdoc}`;
+							}
+							documentation.value += `\n____\nMixin declared in ${this.getFileName(currentDocument)}`;
+
+							// In the case of no required parameters, skip details.
+							// If there are required parameters, add a suggestion with only them.
+							// If there are optional parameters, add a suggestion with all parameters.
+							if (symbol.detail) {
+								const parameters = getParametersFromDetail(symbol.detail);
+								const requiredParameters = parameters.filter(
+									(p) => !p.defaultValue,
+								);
+								if (requiredParameters.length > 0) {
+									const parametersSnippet = requiredParameters
+										.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
+										.join(", ");
+									insertText += `(${parametersSnippet})`;
+
+									const detail = requiredParameters
+										.map((p) => mapParameterSignature(p))
+										.join(", ");
+
+									const item: CompletionItem = {
+										detail,
+										documentation,
+										filterText,
+										kind: CompletionItemKind.Method,
+										label,
+										insertText,
+										sortText,
+										tags: symbol.sassdoc?.deprecated
+											? [CompletionItemTag.Deprecated]
+											: [],
+									};
+									items.push(item);
+								}
+								if (requiredParameters.length !== parameters.length) {
+									const parametersSnippet = parameters
+										.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
+										.join(", ");
+									insertText += `(${parametersSnippet})`;
+
+									const detail = parameters
+										.map((p) => mapParameterSignature(p))
+										.join(", ");
+
+									const item: CompletionItem = {
+										detail,
+										documentation,
+										filterText,
+										kind: CompletionItemKind.Method,
+										label,
+										insertText,
+										sortText,
+										tags: symbol.sassdoc?.deprecated
+											? [CompletionItemTag.Deprecated]
+											: [],
+									};
+									items.push(item);
+								}
+							} else {
+								const item: CompletionItem = {
+									documentation,
+									filterText,
+									kind: CompletionItemKind.Method,
+									label,
+									insertText,
+									sortText,
+									tags: symbol.sassdoc?.deprecated
+										? [CompletionItemTag.Deprecated]
+										: [],
+								};
+								items.push(item);
+							}
 							break;
 						}
 						case SymbolKind.Function: {
@@ -647,4 +736,87 @@ function getColorValue(from: string): string | null {
 	} catch {
 		return null;
 	}
+}
+
+type Parameter = {
+	name: string;
+	defaultValue?: string;
+};
+
+function getParametersFromDetail(detail?: string): Array<Parameter> {
+	const result: Parameter[] = [];
+	if (!detail) {
+		return result;
+	}
+
+	const parameters = detail.replace(/[()]/g, "").split(",");
+	for (const param of parameters) {
+		let name = param;
+		let defaultValue: string | undefined = undefined;
+		const defaultValueStart = param.indexOf(":");
+		if (defaultValueStart !== -1) {
+			name = param.substring(0, defaultValueStart);
+			defaultValue = param.substring(defaultValueStart + 1);
+		}
+
+		const parameter: Parameter = {
+			name: name.trim(),
+			defaultValue: defaultValue?.trim(),
+		};
+
+		result.push(parameter);
+	}
+	return result;
+}
+
+/**
+ * Use the SnippetString syntax to provide smart completions of parameter names.
+ */
+function mapParameterSnippet(
+	p: Parameter,
+	index: number,
+	sassdoc?: ParseResult,
+): string {
+	if (sassdoc?.type?.length) {
+		const choices = parseStringLiteralChoices(sassdoc.type);
+		if (choices.length > 0) {
+			return `\${${index + 1}|${choices.join(",")}|}`;
+		}
+	}
+
+	return `\${${index + 1}:${asDollarlessVariable(p.name)}}`;
+}
+
+function mapParameterSignature(p: Parameter): string {
+	return p.defaultValue ? `${p.name}: ${p.defaultValue}` : p.name;
+}
+
+const reStringLiteral = /^["'].+["']$/; // Yes, this will match 'foo", but let the parser deal with yelling about that.
+
+/**
+ * @param docstring A TypeScript-like string of accepted string literal values, for example `"standard" | "entrance" | "exit"`.
+ */
+function parseStringLiteralChoices(docstring: string[] | string): string[] {
+	const docstrings = typeof docstring === "string" ? [docstring] : docstring;
+	const result: string[] = [];
+
+	for (const doc of docstrings) {
+		const parts = doc.split("|");
+		if (parts.length === 1) {
+			// This may be a docstring to indicate only a single valid string literal option.
+			const trimmed = doc.trim();
+			if (reStringLiteral.test(trimmed)) {
+				result.push(trimmed);
+			}
+		} else {
+			for (const part of parts) {
+				const trimmed = part.trim();
+				if (reStringLiteral.test(trimmed)) {
+					result.push(trimmed);
+				}
+			}
+		}
+	}
+
+	return result;
 }

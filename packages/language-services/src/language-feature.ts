@@ -87,20 +87,39 @@ export abstract class LanguageFeature {
 	 * @returns The aggregated results of {@link callback}
 	 */
 	protected async findInWorkspace<T>(
-		callback: (document: TextDocument, prefix: string) => T | T[] | undefined,
+		callback: (
+			document: TextDocument,
+			prefix: string,
+			hide: string[],
+			show: string[],
+		) => T | T[] | undefined,
 		initialDocument: TextDocument,
 	): Promise<T[]> {
+		// TODO: keep track of visits and skip processing the same document multiple times
+		// one, it's good sense. two, it avoids duplicate suggestions in do-complete.
 		return this.internalFindInWorkspace(callback, initialDocument);
 	}
 
 	private async internalFindInWorkspace<T>(
-		callback: (document: TextDocument, prefix: string) => T | T[] | undefined,
+		callback: (
+			document: TextDocument,
+			prefix: string,
+			hide: string[],
+			show: string[],
+		) => T | T[] | undefined,
 		initialDocument: TextDocument,
 		currentDocument: TextDocument = initialDocument,
 		accumulatedPrefix = "",
+		hide: string[] = [],
+		show: string[] = [],
 		depth = 0,
 	): Promise<T[]> {
-		const callbackResult = callback(currentDocument, accumulatedPrefix);
+		const callbackResult = callback(
+			currentDocument,
+			accumulatedPrefix,
+			hide,
+			show,
+		);
 
 		const allLinks = await this.ls.findDocumentLinks(currentDocument);
 
@@ -138,6 +157,12 @@ export abstract class LanguageFeature {
 			let prefix = accumulatedPrefix;
 			if (link.type === NodeType.Forward && link.as) {
 				prefix += link.as;
+				if (link.hide) {
+					hide.push(...link.hide);
+				}
+				if (link.show) {
+					show.push(...link.show);
+				}
 			}
 
 			const linkResult = await this.internalFindInWorkspace(
@@ -145,6 +170,8 @@ export abstract class LanguageFeature {
 				initialDocument,
 				next,
 				prefix,
+				hide,
+				show,
 				depth + 1,
 			);
 			result = result.concat(linkResult);

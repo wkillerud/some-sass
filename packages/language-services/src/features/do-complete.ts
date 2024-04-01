@@ -11,6 +11,8 @@ import {
 	Use,
 	Forward,
 	Node,
+	Module,
+	MarkupKind,
 } from "@somesass/vscode-css-languageservice";
 import { sassDocAnnotations } from "../facts/sassdoc";
 import { LanguageFeature } from "../language-feature";
@@ -24,6 +26,7 @@ import {
 	getNodeAtOffset,
 } from "../language-services-types";
 import { getName } from "../utils/uri";
+import { SassBuiltInModule, sassBuiltInModules } from "../facts/sass";
 
 const reNewSassdocBlock = /\/\/\/\s?$/;
 const reSassdocLine = /\/\/\/\s/;
@@ -136,7 +139,13 @@ export class DoComplete extends LanguageFeature {
 			return result;
 		}
 
-		// TODO: isNamespaceContext, doNamespacedComplete
+		if (node instanceof Module) {
+			const items = await this.doNamespaceCompletion(document, node);
+			if (items.length > 0) {
+				result.items.push(...items);
+			}
+		}
+
 		// TODO: isPlaceholderDeclarationContext, doPlaceholderDeclarationComplete
 		// TODO: hasWildcardNamespace, this.findInWorkspace (extended with a "links" parameter limited to wildcard links) completionItems
 
@@ -158,6 +167,106 @@ export class DoComplete extends LanguageFeature {
 			result.items.push(...upstreamResult.items);
 		}
 		return result;
+	}
+
+	async doNamespaceCompletion(
+		document: TextDocument,
+		node: Module,
+	): Promise<CompletionItem[]> {
+		const items: CompletionItem[] = [];
+
+		const namespace: string | undefined = node.getIdentifier()?.getText();
+		if (!namespace) {
+			return items;
+		}
+
+		const links = await this.ls.findDocumentLinks(document);
+		let start: TextDocument | undefined = undefined;
+		for (const link of links) {
+			if (
+				link.target &&
+				link.type === NodeType.Use &&
+				link.namespace === namespace
+			) {
+				if (link.target.includes("sass:")) {
+					// Look for matches in built-in namespaces, which do not appear in storage
+					for (const [builtIn, docs] of Object.entries(sassBuiltInModules)) {
+						if (builtIn === link.target) {
+							const items = this.doSassBuiltInCompletion(document, node, docs);
+							return items;
+						}
+					}
+				} else {
+					start = this._internal.cache.document(link.target);
+				}
+				break;
+			}
+		}
+
+		if (!start) {
+			return items;
+		}
+
+		// TODO: find out if node is a variable, placeholder, function or mixin reference
+		let isVariable = false;
+		let isMixin = false;
+		let isFunction = false;
+		let isPlaceholder = false;
+		const result = await this.findInWorkspace<CompletionItem>(
+			(document, prefix, hide, show) => {
+				const items: CompletionItem[] = [];
+				const symbols = this.ls.findDocumentSymbols(document);
+				for (const symbol of symbols) {
+					// continue if symbol !== the context we're in
+				}
+				return items;
+			},
+			start,
+		);
+
+		return items;
+	}
+
+	doSassBuiltInCompletion(
+		document: TextDocument,
+		node: Module,
+		moduleDocs: SassBuiltInModule,
+	): CompletionItem[] {
+		const items: CompletionItem[] = [];
+		for (const [name, docs] of Object.entries(moduleDocs.exports)) {
+			const { description, signature, parameterSnippet, returns } = docs;
+			// Client needs the namespace as part of the text that is matched,
+			const filterText = `${node.getIdentifier()}.${name}`;
+
+			// Inserted text needs to include the `.` which will otherwise
+			// be replaced (except when we're embedded in Vue, Svelte or Astro).
+			// Example result: .floor(${1:number})
+			const isEmbedded = document.languageId !== "scss";
+			const insertText = node.getText().includes(".")
+				? `${isEmbedded ? "" : "."}${name}${
+						signature ? `(${parameterSnippet})` : ""
+					}`
+				: name;
+
+			items.push({
+				label: name,
+				filterText,
+				insertText,
+				insertTextFormat: parameterSnippet
+					? InsertTextFormat.Snippet
+					: InsertTextFormat.PlainText,
+				labelDetails: {
+					detail:
+						signature && returns ? `${signature} => ${returns}` : signature,
+				},
+				documentation: {
+					kind: MarkupKind.Markdown,
+					value: `${description}\n\n[Sass documentation](${moduleDocs.reference}#${name})`,
+				},
+			});
+		}
+
+		return items;
 	}
 
 	async doModuleImportCompletion(

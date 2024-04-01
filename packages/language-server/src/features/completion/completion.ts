@@ -165,6 +165,7 @@ function doNamespacedCompletion(
 		return completions;
 	}
 
+	// Find the link that matches the Module namespace
 	const namespace = context.namespace as string;
 
 	let use: ScssUse | null = null;
@@ -183,6 +184,7 @@ function doNamespacedCompletion(
 		return completions;
 	}
 
+	// Get the document that it links to and use that as the root for traversal
 	const namespaceRootDocument = storage.get(use.link.target);
 	if (!namespaceRootDocument) {
 		// Look for matches in built-in namespaces, which do not appear in storage

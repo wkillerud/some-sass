@@ -233,11 +233,12 @@ export class DoComplete extends LanguageFeature {
 						case SymbolKind.Variable: {
 							// Avoid ending up with namespace.prefix-$variable
 							const label = `$${prefix}${asDollarlessVariable(symbol.name)}`;
-							const rawValue = this.getVariableValue(document, symbol);
-							const value = await this.ls.findValue(
-								document,
+							const rawValue = this.getVariableValue(currentDocument, symbol);
+							let value = await this.ls.findValue(
+								currentDocument,
 								symbol.selectionRange.start,
 							);
+							value = value || rawValue;
 							const color = value ? getColorValue(value) : null;
 							const completionKind = color
 								? CompletionItemKind.Color
@@ -346,8 +347,9 @@ export class DoComplete extends LanguageFeature {
 		for (const [name, docs] of Object.entries(moduleDocs.exports)) {
 			const { description, signature, parameterSnippet, returns } = docs;
 			// Client needs the namespace as part of the text that is matched,
-			const filterText = `${node.getIdentifier()}.${name}`;
+			const filterText = `${node.getIdentifier()?.getText()}.${name}`;
 
+			// TODO: regression test this mess
 			// Inserted text needs to include the `.` which will otherwise
 			// be replaced (except when we're embedded in Vue, Svelte or Astro).
 			// Example result: .floor(${1:number})
@@ -359,19 +361,22 @@ export class DoComplete extends LanguageFeature {
 				: name;
 
 			items.push({
-				label: name,
+				documentation: {
+					kind: MarkupKind.Markdown,
+					value: `${description}\n\n[Sass documentation](${moduleDocs.reference}#${name})`,
+				},
 				filterText,
 				insertText,
 				insertTextFormat: parameterSnippet
 					? InsertTextFormat.Snippet
 					: InsertTextFormat.PlainText,
+				kind: signature
+					? CompletionItemKind.Function
+					: CompletionItemKind.Variable,
+				label: name,
 				labelDetails: {
 					detail:
 						signature && returns ? `${signature} => ${returns}` : signature,
-				},
-				documentation: {
-					kind: MarkupKind.Markdown,
-					value: `${description}\n\n[Sass documentation](${moduleDocs.reference}#${name})`,
 				},
 			});
 		}

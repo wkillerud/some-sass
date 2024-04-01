@@ -158,8 +158,10 @@ export abstract class LanguageFeature {
 			}
 
 			let prefix = accumulatedPrefix;
-			if (link.type === NodeType.Forward && link.as) {
-				prefix += link.as;
+			if (link.type === NodeType.Forward) {
+				if (link.as) {
+					prefix += link.as;
+				}
 				if (link.hide) {
 					hide.push(...link.hide);
 				}

@@ -30,6 +30,9 @@ jobs:
         with:
           node-version: "lts/*"
 
+      - name: Update npm for attestation feature
+        run: npm install -g npm@latest
+
       - name: Install dependencies
         run: npm clean-install
 

@@ -167,7 +167,6 @@ export class DoComplete extends LanguageFeature {
 			return result;
 		}
 
-		// TODO: isPlaceholderDeclarationContext, doPlaceholderDeclarationComplete
 		// TODO: hasWildcardNamespace, this.findInWorkspace (extended with a "links" parameter limited to wildcard links) completionItems
 
 		// TODO: calculate the equivalent of function from completionContext and only suggest functions if it's true

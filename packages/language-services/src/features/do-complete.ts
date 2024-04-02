@@ -135,7 +135,7 @@ export class DoComplete extends LanguageFeature {
 				position,
 				stylesheet,
 				this.getDocumentContext(),
-				// TODO: pass on CompletionSettings
+				this.configuration.completionSettings,
 			);
 			if (upstreamResult.items.length > 0) {
 				result.items.push(...upstreamResult.items);
@@ -158,19 +158,17 @@ export class DoComplete extends LanguageFeature {
 		// TODO: isPlaceholderDeclarationContext, doPlaceholderDeclarationComplete
 		// TODO: hasWildcardNamespace, this.findInWorkspace (extended with a "links" parameter limited to wildcard links) completionItems
 
-		// TODO: placeholder complete
-		const suggestFromUseOnly = false; // TODO: get CompletionSettings via configure and read here
+		const suggestFromUseOnly =
+			this.configuration.completionSettings?.suggestFromUseOnly;
 		if (!suggestFromUseOnly) {
-			// TODO: @import-style fallback complete
 			const documents = this._internal.cache.documents();
 			for (const currentDocument of documents) {
-				// TODO: take in settings
-				// if (
-				// 	!settings.suggestAllFromOpenDocument &&
-				// 	scssDocument.uri === document.uri
-				// ) {
-				// 	continue;
-				// }
+				if (
+					!this.configuration.completionSettings?.suggestAllFromOpenDocument &&
+					currentDocument.uri === document.uri
+				) {
+					continue;
+				}
 
 				const symbols = this.ls.findDocumentSymbols(document);
 				for (const symbol of symbols) {
@@ -234,7 +232,8 @@ export class DoComplete extends LanguageFeature {
 						}
 						case SymbolKind.Method: {
 							const label = symbol.name;
-							let insertText = label;
+							const insertText = label;
+							const filterText = label;
 							const sortText = isPrivate
 								? label.replace(/^$[_]/, "")
 								: undefined;
@@ -261,18 +260,19 @@ export class DoComplete extends LanguageFeature {
 									const parametersSnippet = requiredParameters
 										.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
 										.join(", ");
-									insertText += `(${parametersSnippet})`;
+									const insert = insertText + `(${parametersSnippet})`;
 
 									const detail = requiredParameters
 										.map((p) => mapParameterSignature(p))
 										.join(", ");
 
 									const item: CompletionItem = {
-										detail,
+										detail: `(${detail})`,
 										documentation,
+										filterText,
 										kind: CompletionItemKind.Method,
 										label,
-										insertText,
+										insertText: insert,
 										sortText,
 										tags: symbol.sassdoc?.deprecated
 											? [CompletionItemTag.Deprecated]
@@ -284,18 +284,19 @@ export class DoComplete extends LanguageFeature {
 									const parametersSnippet = parameters
 										.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
 										.join(", ");
-									insertText += `(${parametersSnippet})`;
+									const insert = insertText + `(${parametersSnippet})`;
 
 									const detail = parameters
 										.map((p) => mapParameterSignature(p))
 										.join(", ");
 
 									const item: CompletionItem = {
-										detail,
+										detail: `(${detail})`,
 										documentation,
+										filterText,
 										kind: CompletionItemKind.Method,
 										label,
-										insertText,
+										insertText: insert,
 										sortText,
 										tags: symbol.sassdoc?.deprecated
 											? [CompletionItemTag.Deprecated]
@@ -306,6 +307,7 @@ export class DoComplete extends LanguageFeature {
 							} else {
 								const item: CompletionItem = {
 									documentation,
+									filterText,
 									kind: CompletionItemKind.Method,
 									label,
 									insertText,
@@ -320,7 +322,8 @@ export class DoComplete extends LanguageFeature {
 						}
 						case SymbolKind.Function: {
 							const label = symbol.name;
-							let insertText = label;
+							const insertText = label;
+							const filterText = label;
 							const sortText = isPrivate
 								? label.replace(/^$[_]/, "")
 								: undefined;
@@ -341,45 +344,42 @@ export class DoComplete extends LanguageFeature {
 							const requiredParameters = parameters.filter(
 								(p) => !p.defaultValue,
 							);
-							if (requiredParameters.length > 0) {
-								const parametersSnippet = requiredParameters
-									.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
-									.join(", ");
-								insertText += `(${parametersSnippet})`;
+							const parametersSnippet = requiredParameters
+								.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
+								.join(", ");
+							const detail = requiredParameters
+								.map((p) => mapParameterSignature(p))
+								.join(", ");
 
-								const detail = requiredParameters
-									.map((p) => mapParameterSignature(p))
-									.join(", ");
+							const item: CompletionItem = {
+								detail: `(${detail})`,
+								documentation,
+								filterText,
+								kind: CompletionItemKind.Function,
+								label,
+								insertText: `${insertText}(${parametersSnippet})`,
+								sortText,
+								tags: symbol.sassdoc?.deprecated
+									? [CompletionItemTag.Deprecated]
+									: [],
+							};
+							result.items.push(item);
 
-								const item: CompletionItem = {
-									detail,
-									documentation,
-									kind: CompletionItemKind.Function,
-									label,
-									insertText,
-									sortText,
-									tags: symbol.sassdoc?.deprecated
-										? [CompletionItemTag.Deprecated]
-										: [],
-								};
-								result.items.push(item);
-							}
 							if (requiredParameters.length !== parameters.length) {
 								const parametersSnippet = parameters
 									.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
 									.join(", ");
-								insertText += `(${parametersSnippet})`;
-
 								const detail = parameters
 									.map((p) => mapParameterSignature(p))
 									.join(", ");
 
 								const item: CompletionItem = {
-									detail,
+									detail: `(${detail})`,
 									documentation,
+									filterText,
 									kind: CompletionItemKind.Function,
 									label,
-									insertText,
+									insertText: `${insertText}(${parametersSnippet})`,
 									sortText,
 									tags: symbol.sassdoc?.deprecated
 										? [CompletionItemTag.Deprecated]
@@ -430,7 +430,7 @@ export class DoComplete extends LanguageFeature {
 			position,
 			stylesheet,
 			this.getDocumentContext(),
-			// TODO: pass on CompletionSettings
+			this.configuration.completionSettings,
 		);
 		if (upstreamResult.items.length > 0) {
 			result.items.push(...upstreamResult.items);
@@ -647,7 +647,7 @@ export class DoComplete extends LanguageFeature {
 						}
 						case SymbolKind.Function: {
 							const label = `${prefix}${symbol.name}`;
-							let insertText = namespace !== "*" ? `.${label}` : label;
+							const insertText = namespace !== "*" ? `.${label}` : label;
 							const filterText =
 								namespace !== "*" ? `${namespace}.${label}` : label;
 							const sortText = isPrivate
@@ -670,47 +670,42 @@ export class DoComplete extends LanguageFeature {
 							const requiredParameters = parameters.filter(
 								(p) => !p.defaultValue,
 							);
-							if (requiredParameters.length > 0) {
-								const parametersSnippet = requiredParameters
-									.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
-									.join(", ");
-								insertText += `(${parametersSnippet})`;
+							const parametersSnippet = requiredParameters
+								.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
+								.join(", ");
+							const detail = requiredParameters
+								.map((p) => mapParameterSignature(p))
+								.join(", ");
 
-								const detail = requiredParameters
-									.map((p) => mapParameterSignature(p))
-									.join(", ");
+							const item: CompletionItem = {
+								detail: `(${detail})`,
+								documentation,
+								filterText,
+								kind: CompletionItemKind.Function,
+								label,
+								insertText: `${insertText}(${parametersSnippet})`,
+								sortText,
+								tags: symbol.sassdoc?.deprecated
+									? [CompletionItemTag.Deprecated]
+									: [],
+							};
+							items.push(item);
 
-								const item: CompletionItem = {
-									detail,
-									documentation,
-									filterText,
-									kind: CompletionItemKind.Function,
-									label,
-									insertText,
-									sortText,
-									tags: symbol.sassdoc?.deprecated
-										? [CompletionItemTag.Deprecated]
-										: [],
-								};
-								items.push(item);
-							}
 							if (requiredParameters.length !== parameters.length) {
 								const parametersSnippet = parameters
 									.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
 									.join(", ");
-								insertText += `(${parametersSnippet})`;
-
 								const detail = parameters
 									.map((p) => mapParameterSignature(p))
 									.join(", ");
 
 								const item: CompletionItem = {
-									detail,
+									detail: `(${detail})`,
 									documentation,
 									filterText,
 									kind: CompletionItemKind.Function,
 									label,
-									insertText,
+									insertText: `${insertText}(${parametersSnippet})`,
 									sortText,
 									tags: symbol.sassdoc?.deprecated
 										? [CompletionItemTag.Deprecated]
@@ -718,38 +713,6 @@ export class DoComplete extends LanguageFeature {
 								};
 								items.push(item);
 							}
-							break;
-						}
-						case SymbolKind.Class: {
-							// TODO: these completions shouldn't be _here_ though, should they?
-							if (!symbol.name.startsWith("%")) {
-								break;
-							}
-
-							let documentation = symbol.name;
-							const sassdoc = applySassDoc(symbol);
-							if (sassdoc) {
-								documentation += `\n____\n${sassdoc}`;
-							}
-
-							const filterText = symbol.name.substring(1);
-
-							const item: CompletionItem = {
-								detail: `Placeholder declared in ${this.getFileName(currentDocument)}`,
-								documentation: {
-									kind: "markdown",
-									value: documentation,
-								},
-								filterText,
-								insertText: filterText,
-								insertTextFormat: InsertTextFormat.Snippet,
-								kind: CompletionItemKind.Class,
-								label: symbol.name,
-								tags: symbol.sassdoc?.deprecated
-									? [CompletionItemTag.Deprecated]
-									: undefined,
-							};
-							items.push(item);
 							break;
 						}
 					}

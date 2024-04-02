@@ -329,7 +329,7 @@ test("should suggest mixin with required parameter", async () => {
 	);
 });
 
-test("given both required and optional parameters should suggest two variants - one with all parameters and one with only required", async () => {
+test("given both required and optional parameters should suggest two variants of mixin - one with all parameters and one with only required", async () => {
 	const one = fileSystemProvider.createDocument(
 		[
 			"@mixin primary($background, $color: red) { color: $color; background-color: $background; }",
@@ -373,6 +373,158 @@ test("given both required and optional parameters should suggest two variants - 
 				filterText: "one.primary",
 				insertText: ".primary(${1:background}, ${2:color})",
 				kind: 2,
+				label: "primary",
+				sortText: undefined,
+				tags: [],
+			},
+		],
+	);
+});
+
+test("should suggest function with no parameter", async () => {
+	const one = fileSystemProvider.createDocument(
+		["@function primary() { @return $primary; }"],
+		{ uri: "one.scss" },
+	);
+	const two = fileSystemProvider.createDocument([
+		'@use "./one";',
+		".a { @include one.",
+	]);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	assert.deepStrictEqual(
+		items.find((item) => item.label === "primary"),
+		{
+			detail: "()",
+			documentation: {
+				kind: "markdown",
+				value:
+					"```scss\n@function primary()\n```\n____\nFunction declared in one.scss",
+			},
+			filterText: "one.primary",
+			insertText: ".primary()",
+			kind: CompletionItemKind.Function,
+			label: "primary",
+			sortText: undefined,
+			tags: [],
+		},
+	);
+});
+
+test("should suggest function with optional parameter", async () => {
+	const one = fileSystemProvider.createDocument(
+		["@function primary($color: red) { @return $color; }"],
+		{ uri: "one.scss" },
+	);
+	const two = fileSystemProvider.createDocument([
+		'@use "./one";',
+		".a { @include one.",
+	]);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	assert.deepStrictEqual(
+		items.find((item) => item.label === "primary"),
+		{
+			detail: "()",
+			documentation: {
+				kind: "markdown",
+				value:
+					"```scss\n@function primary($color: red)\n```\n____\nFunction declared in one.scss",
+			},
+			filterText: "one.primary",
+			insertText: ".primary()",
+			kind: CompletionItemKind.Function,
+			label: "primary",
+			sortText: undefined,
+			tags: [],
+		},
+	);
+});
+
+test("should suggest function with required parameter", async () => {
+	const one = fileSystemProvider.createDocument(
+		["@function primary($color) { @return $color; }"],
+		{ uri: "one.scss" },
+	);
+	const two = fileSystemProvider.createDocument([
+		'@use "./one";',
+		".a { @include one.",
+	]);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	assert.deepStrictEqual(
+		items.find((item) => item.label === "primary"),
+		{
+			detail: "($color)",
+			documentation: {
+				kind: "markdown",
+				value:
+					"```scss\n@function primary($color)\n```\n____\nFunction declared in one.scss",
+			},
+			filterText: "one.primary",
+			insertText: ".primary(${1:color})",
+			kind: CompletionItemKind.Function,
+			label: "primary",
+			sortText: undefined,
+			tags: [],
+		},
+	);
+});
+
+test("given both required and optional parameters should suggest two variants of function - one with all parameters and one with only required", async () => {
+	const one = fileSystemProvider.createDocument(
+		["@function primary($a, $b: 1) { @return $a * $b; }"],
+		{ uri: "one.scss" },
+	);
+	const two = fileSystemProvider.createDocument([
+		'@use "./one";',
+		".a { @include one.",
+	]);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	assert.deepStrictEqual(
+		items.filter((item) => item.label === "primary"),
+		[
+			{
+				detail: "($a)",
+				documentation: {
+					kind: "markdown",
+					value:
+						"```scss\n@function primary($a, $b: 1)\n```\n____\nFunction declared in one.scss",
+				},
+				filterText: "one.primary",
+				insertText: ".primary(${1:a})",
+				kind: CompletionItemKind.Function,
+				label: "primary",
+				sortText: undefined,
+				tags: [],
+			},
+			{
+				detail: "($a, $b: 1)",
+				documentation: {
+					kind: "markdown",
+					value:
+						"```scss\n@function primary($a, $b: 1)\n```\n____\nFunction declared in one.scss",
+				},
+				filterText: "one.primary",
+				insertText: ".primary(${1:a}, ${2:b})",
+				kind: CompletionItemKind.Function,
 				label: "primary",
 				sortText: undefined,
 				tags: [],

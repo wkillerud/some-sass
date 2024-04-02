@@ -71,6 +71,7 @@ import {
 	Module,
 	Marker,
 	getNodeAtOffset,
+	CompletionSettings as VSCodeCompletionSettings,
 } from "@somesass/vscode-css-languageservice";
 import type { ParseResult } from "scss-sassdoc-parser";
 import { TextDocument } from "vscode-languageserver-textdocument";
@@ -235,6 +236,8 @@ export type Rename =
 	| { defaultBehavior: boolean };
 
 export interface LanguageServiceConfiguration {
+	completionSettings?: CompletionSettings;
+	editorSettings?: EditorSettings;
 	/**
 	 * Configure custom aliases that the link resolution should resolve.
 	 *
@@ -248,6 +251,52 @@ export interface LanguageServiceConfiguration {
 	 */
 	importAliases?: AliasSettings;
 	workspaceRoot?: URI;
+}
+
+export interface CompletionSettings extends VSCodeCompletionSettings {
+	suggestAllFromOpenDocument: boolean;
+	/**
+	 * 	Mixins with `@content` SassDoc annotations and `%placeholders` get two suggestions by default:
+	 *   - One without `{ }`.
+	 *   - One _with_ `{ }`. This one creates a new block, and moves the cursor inside the block.
+	 *
+	 * If you find this noisy, you can control which suggestions you would like to see:
+	 *   - All suggestions (default).
+	 *   - No brackets.
+	 *   - Only brackets. This still includes other suggestions, where there are no brackets to begin with.
+	 *
+	 * @default "all"
+	 */
+	suggestionStyle: "all" | "nobracket" | "bracket";
+	/**
+	 * Recommended if you don't rely on `@import`. With this setting turned on,
+	 * Some Sass will only suggest variables, mixins and functions from the
+	 * namespaces that are in use in the open document.
+	 */
+	suggestFromUseOnly?: boolean;
+	/**
+	 * Suggest functions after the specified symbols when in a string context.
+	 * For example, if you add the `/` symbol to this setting, then `background: url(images/he|)`
+	 * could suggest a `hello()` function (`|` in this case indicates cursor position).
+	 *
+	 * @default " (+-*%"
+	 */
+	suggestFunctionsInStringContextAfterSymbols: string;
+}
+
+export interface EditorSettings {
+	/**
+	 * Insert spaces rather than tabs.
+	 */
+	insertSpaces?: boolean;
+	/**
+	 * If {@link insertSpaces} is true this option determines the number of space characters is inserted per indent level.
+	 */
+	indentSize?: number;
+	/**
+	 * An older editor setting in VS Code. If both this and {@link indentSize} is set, only `indentSize` will be used.
+	 */
+	tabSize?: number;
 }
 
 export interface AliasSettings {

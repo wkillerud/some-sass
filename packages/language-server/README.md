@@ -28,14 +28,6 @@ Then start the language server like so:
 some-sass-language-server --stdio
 ```
 
-Required initialization options:
-
-- `workspace` – typically the root directory of your project
-
-Optional initialization parameters:
-
-- `settings` – see [workspace configuration](#workspace-configuration)
-
 ### Workspace configuration
 
 The language server requests configuration via `workspace/configuration` on the `somesass` key. All fields are optional.

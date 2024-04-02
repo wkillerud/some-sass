@@ -26,6 +26,7 @@ import {
 	CompletionList,
 	FileType,
 	Position,
+	SassDocumentSymbol,
 	TextDocument,
 	URI,
 	Utils,
@@ -147,14 +148,6 @@ export class DoComplete extends LanguageFeature {
 			return result;
 		}
 
-		const moduleNode: Module | null = getModuleNode(node);
-		if (moduleNode) {
-			const items = await this.doNamespaceCompletion(document, moduleNode);
-			if (items.length > 0) {
-				result.items.push(...items);
-			}
-		}
-
 		const isPlaceholderDeclaration =
 			node.parent &&
 			node.parent.type === NodeType.SimpleSelector &&
@@ -167,16 +160,36 @@ export class DoComplete extends LanguageFeature {
 			return result;
 		}
 
+		const isPlaceholderUsage =
+			node.parent &&
+			node.parent.type === NodeType.ExtendsReference &&
+			node.getText().startsWith("%");
+		if (isPlaceholderUsage) {
+			const items = await this.doPlaceholderUsageCompletion(document);
+			if (items.length > 0) {
+				result.items.push(...items);
+			}
+			return result;
+		}
+
+		/* Completions for variables, functions and mixins */
+
+		const moduleNode: Module | null = getModuleNode(node);
+		if (moduleNode) {
+			const items = await this.doNamespaceCompletion(document, moduleNode);
+			if (items.length > 0) {
+				result.items.push(...items);
+			}
+		}
+
 		// TODO: hasWildcardNamespace, this.findInWorkspace (extended with a "links" parameter limited to wildcard links) completionItems
 
 		// TODO: calculate the equivalent of function from completionContext and only suggest functions if it's true
 		// TODO: calculate the equivalent of mixin from completionContext and only suggest mixins if it's true
 		// TODO: calculate the equivalent of variable from completionContext and only suggest variables if it's true
-		// TODO: calculate the equivalent of placeholder from completionContext and only suggest placeholders if it's true (i. e. @extend )
 
-		const suggestFromUseOnly =
-			this.configuration.completionSettings?.suggestFromUseOnly;
-		if (!suggestFromUseOnly) {
+		// Legacy @import style suggestions
+		if (!this.configuration.completionSettings?.suggestFromUseOnly) {
 			const documents = this._internal.cache.documents();
 			for (const currentDocument of documents) {
 				if (
@@ -405,40 +418,23 @@ export class DoComplete extends LanguageFeature {
 							}
 							break;
 						}
-						case SymbolKind.Class: {
-							if (!symbol.name.startsWith("%")) {
-								break;
-							}
-
-							let documentation = symbol.name;
-							const sassdoc = applySassDoc(symbol);
-							if (sassdoc) {
-								documentation += `\n____\n${sassdoc}`;
-							}
-
-							const filterText = symbol.name.substring(1);
-
-							const item: CompletionItem = {
-								detail: `Placeholder declared in ${this.getFileName(currentDocument)}`,
-								documentation: {
-									kind: "markdown",
-									value: documentation,
-								},
-								filterText,
-								insertText: filterText,
-								insertTextFormat: InsertTextFormat.Snippet,
-								kind: CompletionItemKind.Class,
-								label: symbol.name,
-								tags: symbol.sassdoc?.deprecated
-									? [CompletionItemTag.Deprecated]
-									: undefined,
-							};
-							result.items.push(item);
-							break;
-						}
 					}
 				}
 			}
+
+			if (result.items.length > 0) {
+				return result;
+			}
+
+			// If we don't have any suggestions, maybe upstream does
+			const upstreamResult = await this._internal.scssLs.doComplete2(
+				document,
+				position,
+				stylesheet,
+				this.getDocumentContext(),
+				this.configuration.completionSettings,
+			);
+			return upstreamResult;
 		}
 
 		const upstreamResult = await this._internal.scssLs.doComplete2(
@@ -452,6 +448,67 @@ export class DoComplete extends LanguageFeature {
 			result.items.push(...upstreamResult.items);
 		}
 		return result;
+	}
+
+	async doPlaceholderUsageCompletion(
+		initialDocument: TextDocument,
+	): Promise<CompletionItem[]> {
+		if (this.configuration.completionSettings?.suggestFromUseOnly) {
+			const result = await this.findInWorkspace<CompletionItem>((document) => {
+				const symbols = this.ls.findDocumentSymbols(document);
+				const items: CompletionItem[] = [];
+				for (const symbol of symbols) {
+					if (symbol.kind === SymbolKind.Class && symbol.name.startsWith("%")) {
+						const item: CompletionItem = this.toCompletionItem(
+							document,
+							symbol,
+						);
+						items.push(item);
+					}
+				}
+				return items;
+			}, initialDocument);
+			return result;
+		} else {
+			const items: CompletionItem[] = [];
+			const documents = this._internal.cache.documents();
+			for (const current of documents) {
+				const symbols = this.ls.findDocumentSymbols(current);
+				for (const symbol of symbols) {
+					if (symbol.kind === SymbolKind.Class && symbol.name.startsWith("%")) {
+						const item: CompletionItem = this.toCompletionItem(current, symbol);
+						items.push(item);
+					}
+				}
+			}
+			return items;
+		}
+	}
+
+	private toCompletionItem(document: TextDocument, symbol: SassDocumentSymbol) {
+		const filterText = symbol.name.substring(1);
+
+		let documentation = symbol.name;
+		const sassdoc = applySassDoc(symbol);
+		if (sassdoc) {
+			documentation += `\n____\n${sassdoc}`;
+		}
+
+		const detail = `Placeholder declared in ${this.getFileName(document)}`;
+
+		const item: CompletionItem = {
+			detail,
+			documentation,
+			filterText,
+			insertText: filterText,
+			insertTextFormat: InsertTextFormat.PlainText,
+			kind: CompletionItemKind.Class,
+			label: symbol.name,
+			tags: symbol.sassdoc?.deprecated
+				? [CompletionItemTag.Deprecated]
+				: undefined,
+		};
+		return item;
 	}
 
 	/**

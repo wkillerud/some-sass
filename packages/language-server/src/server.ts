@@ -40,11 +40,6 @@ import type { ISettings } from "./settings";
 import StorageService from "./storage";
 import { getSCSSRegionsDocument } from "./utils/embedded";
 
-interface InitializationOption {
-	workspace: string;
-	settings: ISettings;
-}
-
 export class SomeSassServer {
 	private readonly connection: Connection;
 	private readonly runtime: RuntimeEnvironment;
@@ -73,8 +68,6 @@ export class SomeSassServer {
 		// _in the passed params the rootPath of the workspace plus the client capabilites
 		this.connection.onInitialize(
 			async (params: InitializeParams): Promise<InitializeResult> => {
-				const options = params.initializationOptions as InitializationOption;
-
 				clientCapabilities = params.capabilities;
 
 				fileSystemProvider = getFileSystemProvider(
@@ -82,7 +75,10 @@ export class SomeSassServer {
 					this.runtime,
 				);
 
-				workspaceRoot = URI.parse(options.workspace);
+				// TODO: migrate to workspace folders. Workspace was an unnecessary older workaround of mine.
+				workspaceRoot = URI.parse(
+					params.initializationOptions?.workspace || params.rootUri!,
+				);
 
 				this.connection.console.debug(
 					`[Server(${process.pid}) ${workspaceRoot}] Initialize received`,

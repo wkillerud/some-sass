@@ -119,10 +119,11 @@ export class DoComplete extends LanguageFeature {
 
 		// Same as for Sassdoc, but if we reach this point we can assume it's a regular comment block
 		// where we don't want to provide any suggestions.
-		const isCommentContext = !node || node.type === NodeType.Stylesheet;
-		if (isCommentContext) {
-			return result;
-		}
+		// This here broke legacy @import style imports
+		// const isCommentContext = !node || node.type === NodeType.Stylesheet;
+		// if (isCommentContext) {
+		// 	return result;
+		// }
 
 		if (
 			node &&
@@ -149,6 +150,7 @@ export class DoComplete extends LanguageFeature {
 		}
 
 		const isPlaceholderDeclaration =
+			node &&
 			node.parent &&
 			node.parent.type === NodeType.SimpleSelector &&
 			node.getText().startsWith("%");
@@ -161,6 +163,7 @@ export class DoComplete extends LanguageFeature {
 		}
 
 		const isPlaceholderUsage =
+			node &&
 			node.parent &&
 			node.parent.type === NodeType.ExtendsReference &&
 			node.getText().startsWith("%");
@@ -199,7 +202,7 @@ export class DoComplete extends LanguageFeature {
 					continue;
 				}
 
-				const symbols = this.ls.findDocumentSymbols(document);
+				const symbols = this.ls.findDocumentSymbols(currentDocument);
 				for (const symbol of symbols) {
 					const isPrivate = symbol.name.match(rePrivate);
 					if (isPrivate && currentDocument.uri !== document.uri) {
@@ -432,7 +435,12 @@ export class DoComplete extends LanguageFeature {
 				position,
 				stylesheet,
 				this.getDocumentContext(),
-				this.configuration.completionSettings,
+				{
+					...this.configuration.completionSettings,
+					triggerPropertyValueCompletion:
+						this.configuration.completionSettings
+							?.triggerPropertyValueCompletion || false,
+				},
 			);
 			return upstreamResult;
 		}
@@ -442,7 +450,12 @@ export class DoComplete extends LanguageFeature {
 			position,
 			stylesheet,
 			this.getDocumentContext(),
-			this.configuration.completionSettings,
+			{
+				...this.configuration.completionSettings,
+				triggerPropertyValueCompletion:
+					this.configuration.completionSettings
+						?.triggerPropertyValueCompletion || false,
+			},
 		);
 		if (upstreamResult.items.length > 0) {
 			result.items.push(...upstreamResult.items);

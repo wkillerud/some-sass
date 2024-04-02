@@ -253,8 +253,8 @@ export interface LanguageServiceConfiguration {
 	workspaceRoot?: URI;
 }
 
-export interface CompletionSettings extends VSCodeCompletionSettings {
-	suggestAllFromOpenDocument: boolean;
+export interface CompletionSettings extends Partial<VSCodeCompletionSettings> {
+	suggestAllFromOpenDocument?: boolean;
 	/**
 	 * 	Mixins with `@content` SassDoc annotations and `%placeholders` get two suggestions by default:
 	 *   - One without `{ }`.
@@ -267,7 +267,7 @@ export interface CompletionSettings extends VSCodeCompletionSettings {
 	 *
 	 * @default "all"
 	 */
-	suggestionStyle: "all" | "nobracket" | "bracket";
+	suggestionStyle?: "all" | "nobracket" | "bracket";
 	/**
 	 * Recommended if you don't rely on `@import`. With this setting turned on,
 	 * Some Sass will only suggest variables, mixins and functions from the
@@ -281,7 +281,7 @@ export interface CompletionSettings extends VSCodeCompletionSettings {
 	 *
 	 * @default " (+-*%"
 	 */
-	suggestFunctionsInStringContextAfterSymbols: string;
+	suggestFunctionsInStringContextAfterSymbols?: string;
 }
 
 export interface EditorSettings {

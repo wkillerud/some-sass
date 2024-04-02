@@ -23,6 +23,17 @@ export type LanguageFeatureInternal = {
 	scssLs: VSCodeLanguageService;
 };
 
+const defaultConfiguration: LanguageServiceConfiguration = {
+	completionSettings: {
+		triggerPropertyValueCompletion: false,
+		completePropertyWithSemicolon: false,
+		suggestAllFromOpenDocument: false,
+		suggestFromUseOnly: false,
+		suggestFunctionsInStringContextAfterSymbols: " (+-*%",
+		suggestionStyle: "all",
+	},
+};
+
 /**
  * Base class for features. Provides helpers to do the navigation
  * between modules.
@@ -46,7 +57,16 @@ export abstract class LanguageFeature {
 	}
 
 	configure(configuration: LanguageServiceConfiguration): void {
-		this.configuration = configuration;
+		this.configuration = {
+			...defaultConfiguration,
+			completionSettings: {
+				...defaultConfiguration.completionSettings,
+				...configuration.completionSettings,
+				triggerPropertyValueCompletion:
+					configuration.completionSettings?.triggerPropertyValueCompletion ||
+					false,
+			},
+		};
 		this._internal.scssLs.configure(configuration);
 	}
 

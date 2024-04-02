@@ -12,6 +12,7 @@ const ls = getLanguageService({ fileSystemProvider, ...rest });
 
 beforeEach(() => {
 	ls.clearCache();
+	ls.configure({}); // Reset any configuration to default
 });
 
 test("suggests built-in sass modules", async () => {
@@ -83,7 +84,7 @@ test("should suggest symbol from a different document via @use", async () => {
 	);
 });
 
-test("should suggest prefixed symbol from a different document via @use and", async () => {
+test("should suggest prefixed symbol from a different document via @use and @forward", async () => {
 	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
 		uri: "one.scss",
 	});
@@ -123,7 +124,13 @@ test("should suggest prefixed symbol from a different document via @use and", as
 	);
 });
 
-test("should not include hidden symbol", async () => {
+test("should not include hidden symbol if configured", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
 	const one = fileSystemProvider.createDocument(
 		["$primary: limegreen;", "$secret: red;"],
 		{
@@ -184,7 +191,13 @@ test("should not include private symbol", async () => {
 	);
 });
 
-test("should only include shown symbol", async () => {
+test("should only include shown symbol if configured", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
 	const one = fileSystemProvider.createDocument(
 		["$primary: limegreen;", "$secondary: yellow;", "$public: red;"],
 		{
@@ -225,6 +238,12 @@ test("should only include shown symbol", async () => {
 });
 
 test("should suggest mixin with no parameter", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
 	const one = fileSystemProvider.createDocument(
 		["@mixin primary() { color: $primary; }"],
 		{ uri: "one.scss" },
@@ -258,6 +277,12 @@ test("should suggest mixin with no parameter", async () => {
 });
 
 test("should suggest mixin with optional parameter", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
 	const one = fileSystemProvider.createDocument(
 		["@mixin primary($color: red) { color: $color; }"],
 		{ uri: "one.scss" },
@@ -294,6 +319,12 @@ test("should suggest mixin with optional parameter", async () => {
 });
 
 test("should suggest mixin with required parameter", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
 	const one = fileSystemProvider.createDocument(
 		["@mixin primary($color) { color: $color; }"],
 		{ uri: "one.scss" },
@@ -330,6 +361,12 @@ test("should suggest mixin with required parameter", async () => {
 });
 
 test("given both required and optional parameters should suggest two variants of mixin - one with all parameters and one with only required", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
 	const one = fileSystemProvider.createDocument(
 		[
 			"@mixin primary($background, $color: red) { color: $color; background-color: $background; }",
@@ -382,6 +419,12 @@ test("given both required and optional parameters should suggest two variants of
 });
 
 test("should suggest function with no parameter", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
 	const one = fileSystemProvider.createDocument(
 		["@function primary() { @return $primary; }"],
 		{ uri: "one.scss" },
@@ -416,6 +459,12 @@ test("should suggest function with no parameter", async () => {
 });
 
 test("should suggest function with optional parameter", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
 	const one = fileSystemProvider.createDocument(
 		["@function primary($color: red) { @return $color; }"],
 		{ uri: "one.scss" },
@@ -450,6 +499,12 @@ test("should suggest function with optional parameter", async () => {
 });
 
 test("should suggest function with required parameter", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
 	const one = fileSystemProvider.createDocument(
 		["@function primary($color) { @return $color; }"],
 		{ uri: "one.scss" },
@@ -484,6 +539,12 @@ test("should suggest function with required parameter", async () => {
 });
 
 test("given both required and optional parameters should suggest two variants of function - one with all parameters and one with only required", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
 	const one = fileSystemProvider.createDocument(
 		["@function primary($a, $b: 1) { @return $a * $b; }"],
 		{ uri: "one.scss" },
@@ -530,5 +591,61 @@ test("given both required and optional parameters should suggest two variants of
 				tags: [],
 			},
 		],
+	);
+});
+
+test("should suggest all symbols as legacy @import may be in use", async () => {
+	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(".a { color: ", {
+		uri: "two.scss",
+	});
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(0, 12));
+	assert.notEqual(
+		0,
+		items.length,
+		"Expected to find a completion item for $primary",
+	);
+	assert.deepStrictEqual(
+		items.find((annotation) => annotation.label === "$primary"),
+		{
+			commitCharacters: [";", ","],
+			documentation: "limegreen\n____\nVariable declared in one.scss",
+			kind: CompletionItemKind.Color,
+			label: "$primary",
+			sortText: undefined,
+			tags: [],
+		},
+	);
+});
+
+test("should not suggest legacy @import symbols if configured", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(".a { color: ", {
+		uri: "two.scss",
+	});
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(0, 12));
+	assert.isUndefined(
+		items.find((annotation) => annotation.label === "$primary"),
+		"Expected not to find a suggestion for $primary",
 	);
 });

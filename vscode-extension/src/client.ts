@@ -25,7 +25,6 @@ import {
 	REQUEST_FS_STAT,
 } from "./constants";
 import { Runtime } from "./runtime";
-import { defaultSettings, ISettings } from "./settings";
 import { getEOL } from "./utils/string";
 
 const output = window.createOutputChannel(EXTENSION_NAME);
@@ -68,37 +67,6 @@ export function createLanguageClientOptions(
 		];
 	}
 
-	const configuration = workspace.getConfiguration(
-		"somesass",
-		currentWorkspace,
-	);
-
-	// The browser Worker stumbles if initializationOptions is given the WorkspaceConfiguration object directly.
-	// Map it to a POJSO with default settings as well so both browser and node client/server comminication will work.
-	const settings: ISettings = {
-		scannerDepth:
-			configuration.get<number>("scannerDepth") || defaultSettings.scannerDepth,
-		scannerExclude:
-			configuration.get<string[]>("scannerExclude") ||
-			defaultSettings.scannerExclude,
-		scanImportedFiles:
-			configuration.get<boolean>("scanImportedFiles") ||
-			defaultSettings.scanImportedFiles,
-		suggestionStyle:
-			configuration.get<"all" | "bracket" | "nobracket">("suggestionStyle") ||
-			defaultSettings.suggestionStyle,
-		suggestAllFromOpenDocument:
-			configuration.get<boolean>("suggestAllFromOpenDocument") ||
-			defaultSettings.suggestAllFromOpenDocument,
-		suggestFromUseOnly:
-			configuration.get<boolean>("suggestFromUseOnly") ||
-			defaultSettings.suggestFromUseOnly,
-		suggestFunctionsInStringContextAfterSymbols:
-			configuration.get<string>(
-				"suggestFunctionsInStringContextAfterSymbols",
-			) || defaultSettings.suggestFunctionsInStringContextAfterSymbols,
-	};
-
 	const clientOptions: LanguageClientOptions = {
 		documentSelector,
 		synchronize: {
@@ -110,10 +78,6 @@ export function createLanguageClientOptions(
 						pattern: "**/*.{scss,vue,svelte,astro}",
 					})
 				: undefined,
-		},
-		initializationOptions: {
-			workspace: currentWorkspace?.uri.toString(),
-			settings,
 		},
 		diagnosticCollectionName: EXTENSION_ID,
 		outputChannel: output,

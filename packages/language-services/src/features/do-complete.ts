@@ -155,8 +155,25 @@ export class DoComplete extends LanguageFeature {
 			}
 		}
 
+		const isPlaceholderDeclaration =
+			node.parent &&
+			node.parent.type === NodeType.SimpleSelector &&
+			node.getText().startsWith("%");
+		if (isPlaceholderDeclaration) {
+			const items = await this.doPlaceholderDeclarationCompletion();
+			if (items.length > 0) {
+				result.items.push(...items);
+			}
+			return result;
+		}
+
 		// TODO: isPlaceholderDeclarationContext, doPlaceholderDeclarationComplete
 		// TODO: hasWildcardNamespace, this.findInWorkspace (extended with a "links" parameter limited to wildcard links) completionItems
+
+		// TODO: calculate the equivalent of function from completionContext and only suggest functions if it's true
+		// TODO: calculate the equivalent of mixin from completionContext and only suggest mixins if it's true
+		// TODO: calculate the equivalent of variable from completionContext and only suggest variables if it's true
+		// TODO: calculate the equivalent of placeholder from completionContext and only suggest placeholders if it's true (i. e. @extend )
 
 		const suggestFromUseOnly =
 			this.configuration.completionSettings?.suggestFromUseOnly;
@@ -436,6 +453,42 @@ export class DoComplete extends LanguageFeature {
 			result.items.push(...upstreamResult.items);
 		}
 		return result;
+	}
+
+	/**
+	 * Make completion items for each `%placeholder` used in an `@extend` statement.
+	 * This is useful for workflows where the selectors often change, but the semantics
+	 * are stable.
+	 *
+	 * @see https://github.com/wkillerud/some-sass/issues/49
+	 */
+	async doPlaceholderDeclarationCompletion(): Promise<CompletionItem[]> {
+		const items: CompletionItem[] = [];
+		const documents = this._internal.cache.documents();
+		for (const currentDocument of documents) {
+			const symbols = this.ls.findDocumentSymbols(currentDocument);
+			for (const symbol of symbols) {
+				if (symbol.kind === SymbolKind.Class) {
+					if (!symbol.children) continue;
+
+					// cssNavigation should only add these placeholder symbols as children
+					// if the node parent is an @extend reference, meaning a placeholder usage.
+					for (const child of symbol.children) {
+						if (child.kind === SymbolKind.Class && child.name.startsWith("%")) {
+							const filterText = child.name.substring(1);
+							items.push({
+								filterText,
+								insertText: filterText,
+								insertTextFormat: InsertTextFormat.PlainText,
+								kind: CompletionItemKind.Class,
+								label: child.name,
+							});
+						}
+					}
+				}
+			}
+		}
+		return items;
 	}
 
 	async doNamespaceCompletion(

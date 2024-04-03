@@ -36,7 +36,7 @@ import type { FileSystemProvider } from "./file-system";
 import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";
 import ScannerService from "./scanner";
-import type { ISettings } from "./settings";
+import { defaultSettings, IEditorSettings, type ISettings } from "./settings";
 import StorageService from "./storage";
 import { getSCSSRegionsDocument } from "./utils/embedded";
 
@@ -125,11 +125,23 @@ export class SomeSassServer {
 		);
 
 		this.connection.onInitialized(async () => {
-			const settings =
+			const somesassConfiguration: Partial<ISettings> =
 				await this.connection.workspace.getConfiguration("somesass");
-			const editorSettings =
+			const editorConfiguration: Partial<IEditorSettings> =
 				await this.connection.workspace.getConfiguration("editor");
 			const storageService = new StorageService();
+
+			const settings: ISettings = {
+				...defaultSettings,
+				...somesassConfiguration,
+			};
+
+			const editorSettings: IEditorSettings = {
+				insertSpaces: false,
+				indentSize: undefined,
+				tabSize: 2,
+				...editorConfiguration,
+			};
 
 			createContext({
 				clientCapabilities,

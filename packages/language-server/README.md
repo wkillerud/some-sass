@@ -28,6 +28,10 @@ Then start the language server like so:
 some-sass-language-server --stdio
 ```
 
+**Options**
+
+`--debug` – runs the development build of the language server, helpful to get more context if the server crashes
+
 ### Workspace configuration
 
 The language server requests configuration via `workspace/configuration` on the `somesass` key. All fields are optional.

@@ -20,6 +20,8 @@ npm install
 npm test
 ```
 
+For the documentation you need [mdbook](https://rust-lang.github.io/mdBook/guide/installation.html). If you're on macOS and use [Homebrew](https://brew.sh) you can `brew install mdbook`.
+
 ### If using VS Code
 
 Go to the _Run and Debug_ pane in VS Code and run _Launch extension_. Rebuild the project and restart the debugging session to see changes take effect.
@@ -148,6 +150,19 @@ Set breakpoints in the compiled output (`web/dist/suite/index.js`).
 
 At time of writing you may have to set the breakpoints after the debugger has attached. I've had the best success rate clicking repeatedly to set the breakpoint.
 
+## Documentation
+
+There's a documentation website in [`docs/`](./docs).
+
+To preview the documentation on your machine you need [mdbook](https://rust-lang.github.io/mdBook/guide/installation.html). If you're on macOS and use [Homebrew](https://brew.sh) you can `brew install mdbook`.
+
+```sh
+cd docs
+mdbook serve --open
+```
+
+To learn how to work with an mdbook, head over to [the mdbook user guide](https://rust-lang.github.io/mdBook/guide/creating.html).
+
 ## Conventional commits
 
 This repository uses [conventional commits and `semantic-release`](https://github.com/semantic-release/semantic-release#how-does-it-work) to automatically publish changes merged to `main`.
@@ -161,6 +176,7 @@ Keep both in mind when deciding whether a change is a patch, minor or major rele
 
 | Commit message                                                                                                                            | Release type                                                                                                                                                         |
 | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs: added a guide for configuring sublime text`                                                                                        | Patch. Bugfix release, updates for runtime dependencies.                                                                                                             |
 | `fix: update css-languageservice`                                                                                                         | Patch. Bugfix release, updates for runtime dependencies.                                                                                                             |
 | `feat: add support for show keyword in forward`                                                                                           | Minor. New feature release.                                                                                                                                          |
 | `refactor: remove reduntant options for latest language version`<br><br>`BREAKING CHANGE: The scanImportedFiles option has been removed.` | Major. Breaking release, like removing an option or changing `engines` version. <br /> (Note that the `BREAKING CHANGE: ` token must be in the footer of the commit) |

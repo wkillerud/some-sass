@@ -1,0 +1,7 @@
+[book]
+authors = ["William Killerud"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Some Sass"
+description = "Some Sass is a language server for SCSS using the Language Server Protocol (LSP). There is an official extension for Visual Studio Code, and community contributed clients for other editors."

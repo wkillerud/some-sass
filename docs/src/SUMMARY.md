@@ -13,16 +13,21 @@
 - [Document highlights]()
 - [Code folding]()
 
-# For developers
+# Adding support for new editors
 
-- [Getting started]()
-  - [A primer on language servers]()
+- [A primer on LSP]()
+- [Editor requirements]()
+- [Example: Neovim]()
+- [Example: Sublime text]()
+
+# Contributing to Some Sass
+
+- [Writing documentation](contributing/writing-documentation.md)
+- [Working on Some Sass]()
   - [Extensions for VS Code]()
   - [Architecture]()
-- [Development environment]()
-  - [Setting up VS Code]()
-  - [Debugging the Node server]()
-  - [Debugging the Browser server]()
-  - [Debugging integration tests]()
-- [Configuring a new client]()
-- [Writing documentation]()
+  - [Development environment]()
+    - [Setting up VS Code]()
+    - [Debugging the Node server]()
+    - [Debugging in the browser]()
+    - [Debugging integration tests]()

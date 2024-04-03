@@ -1,8 +1,8 @@
 # Contributing
 
-Thank you for showing an interest in contributing, be it to the language server or to the VS Code extension 🌟
+Thank you for showing an interest in contributing, be it to the language server, to the VS Code extension, the documentation, or in some other way 🌟
 
-Before you start, please make a [new Issue](https://github.com/wkillerud/some-sass/issues/new/choose). I don't always make new issues for all the things I work on. By making a new Issue we can avoid duplicating our efforts.
+The best place to get started if you're new here is to read the guide for new contributors.
 
 ## Development environment
 

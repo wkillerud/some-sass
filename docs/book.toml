@@ -3,5 +3,5 @@ authors = ["William Killerud"]
 language = "en"
 multilingual = false
 src = "src"
-title = "Some Sass"
-description = "Some Sass is a language server for SCSS using the Language Server Protocol (LSP). There is an official extension for Visual Studio Code, and community contributed clients for other editors."
+title = "Documentation for Some Sass"
+description = "Some Sass is an extension for Visual Studio Code as well as a standalone LSP server for SCSS. It provides code suggestions, hover information with SassSoc and code navigation for SCSS. It has full support for @use and @forward, including prefixes and hide/show."

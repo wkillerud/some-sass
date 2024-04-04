@@ -47,7 +47,7 @@ export class FindValue extends LanguageFeature {
 			// there instead.
 			const definition = await this.ls.findDefinition(document, position);
 			if (definition) {
-				const newDocument = this._internal.cache.document(definition.uri);
+				const newDocument = this._internal.cache.getDocument(definition.uri);
 				if (!newDocument) {
 					return null;
 				}

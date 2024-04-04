@@ -118,8 +118,6 @@ export abstract class LanguageFeature {
 		) => T | T[] | undefined | Promise<T | T[] | undefined>,
 		initialDocument: TextDocument,
 	): Promise<T[]> {
-		// TODO: keep track of visits and skip processing the same document multiple times
-		// one, it's good sense. two, it avoids duplicate suggestions in do-complete.
 		return this.internalFindInWorkspace(callback, initialDocument);
 	}
 
@@ -135,14 +133,19 @@ export abstract class LanguageFeature {
 		accumulatedPrefix = "",
 		hide: string[] = [],
 		show: string[] = [],
+		visited = new Set<string>(),
 		depth = 0,
 	): Promise<T[]> {
+		if (visited.has(currentDocument.uri)) return [];
+
 		const callbackResult = await callback(
 			currentDocument,
 			accumulatedPrefix,
 			hide,
 			show,
 		);
+
+		visited.add(currentDocument.uri);
 
 		const allLinks = await this.ls.findDocumentLinks(currentDocument);
 
@@ -172,7 +175,7 @@ export abstract class LanguageFeature {
 				continue;
 			}
 
-			const next = this._internal.cache.document(link.target!);
+			const next = this._internal.cache.getDocument(link.target!);
 			if (!next) {
 				continue;
 			}
@@ -197,6 +200,7 @@ export abstract class LanguageFeature {
 				prefix,
 				hide,
 				show,
+				visited,
 				depth + 1,
 			);
 			result = result.concat(linkResult);

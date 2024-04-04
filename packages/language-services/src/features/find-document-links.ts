@@ -17,8 +17,10 @@ export class FindDocumentLinks extends LanguageFeature {
 	}
 
 	async findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]> {
+		const cached = this._internal.cache.getResolvedLinks(document);
+		if (cached) return cached;
+
 		const stylesheet = this.ls.parseStylesheet(document);
-		// TODO: this IO stuff really ought to be cached similarly to the parsed stylesheet
 		const links = await this._internal.scssLs.findDocumentLinks2(
 			document,
 			stylesheet,
@@ -34,6 +36,9 @@ export class FindDocumentLinks extends LanguageFeature {
 				link.target = realpath.toString();
 			}
 		}
+
+		this._internal.cache.putResolvedLinks(document, links);
+
 		return links;
 	}
 }

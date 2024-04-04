@@ -649,3 +649,45 @@ test("should not suggest legacy @import symbols if configured", async () => {
 		"Expected not to find a suggestion for $primary",
 	);
 });
+
+test("should suggest symbol from a different document via @use with wildcard alias", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(
+		['@use "./one" as *;', ".a { color: "],
+		{
+			uri: "two.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 12));
+	assert.notEqual(
+		0,
+		items.length,
+		"Expected to find a completion item for $primary",
+	);
+	assert.deepStrictEqual(
+		items.find((annotation) => annotation.label === "$primary"),
+		{
+			commitCharacters: [";", ","],
+			documentation: "limegreen\n____\nVariable declared in one.scss",
+			filterText: undefined,
+			insertText: undefined,
+			kind: CompletionItemKind.Color,
+			label: "$primary",
+			sortText: undefined,
+			tags: [],
+		},
+	);
+});

@@ -9,6 +9,7 @@ import {
 	Stylesheet,
 	LanguageModelCacheOptions,
 	Node,
+	SassDocumentLink,
 } from "./language-services-types";
 
 type LanguageModels = {
@@ -18,8 +19,11 @@ type LanguageModels = {
 		cTime: number;
 		languageModel: Stylesheet;
 		document: TextDocument;
+		links?: SassDocumentLink[];
 	};
 };
+
+const defaultCacheEvictInterval = 360; // five minutes
 
 export class LanguageModelCache {
 	#languageModels: LanguageModels = {};
@@ -31,12 +35,13 @@ export class LanguageModelCache {
 		options: LanguageModelCacheOptions & { scssLs: VSCodeLanguageService },
 	) {
 		this.#options = {
-			maxEntries: Number.MAX_SAFE_INTEGER,
-			cleanupIntervalTimeInSeconds: 0,
+			maxEntries: 10_000,
+			cleanupIntervalTimeInSeconds: defaultCacheEvictInterval,
 			...options,
 		};
 
-		const intervalTime = this.#options.cleanupIntervalTimeInSeconds || 0;
+		const intervalTime =
+			this.#options.cleanupIntervalTimeInSeconds || defaultCacheEvictInterval;
 		if (intervalTime > 0) {
 			this.#cleanupInterval = setInterval(() => {
 				const cutoffTime = Date.now() - intervalTime * 1000;
@@ -73,6 +78,7 @@ export class LanguageModelCache {
 			languageId,
 			cTime: Date.now(),
 			document,
+			links: undefined,
 		};
 		if (!languageModelInfo) {
 			this.#nModels++;
@@ -96,7 +102,7 @@ export class LanguageModelCache {
 		return languageModel;
 	}
 
-	document(uri: string): TextDocument | undefined {
+	getDocument(uri: string): TextDocument | undefined {
 		return this.#languageModels[uri]?.document;
 	}
 
@@ -106,6 +112,18 @@ export class LanguageModelCache {
 
 	has(document: TextDocument) {
 		return typeof this.#languageModels[document.uri] !== "undefined";
+	}
+
+	putResolvedLinks(document: TextDocument, links: SassDocumentLink[]): void {
+		if (this.has(document)) {
+			this.#languageModels[document.uri].links = links;
+		}
+	}
+
+	getResolvedLinks(document: TextDocument): SassDocumentLink[] | undefined {
+		if (this.has(document)) {
+			return this.#languageModels[document.uri].links;
+		}
 	}
 
 	onDocumentChanged(document: TextDocument) {
@@ -120,6 +138,7 @@ export class LanguageModelCache {
 			languageId,
 			cTime: Date.now(),
 			document,
+			links: undefined,
 		};
 	}
 

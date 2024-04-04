@@ -123,13 +123,13 @@ export interface SassDocumentLink extends DocumentLink {
 	/**
 	 * The namespace of the module. Either equal to {@link as} or derived from {@link target}.
 	 *
-	 * | Link               | Value      |
-	 * | ------------------ | ---------- |
-	 * | `"./colors"`       | `"colors"` |
-	 * | `"./colors" as c`  | `"c"`      |
-	 * | `"./colors" as *`  | `"*"`      |
-	 * | `"./_colors"`      | `"colors"` |
-	 * | `"./_colors.scss"` | `"colors"` |
+	 * | Link               | Value       |
+	 * | ------------------ | ----------- |
+	 * | `"./colors"`       | `"colors"`  |
+	 * | `"./colors" as c`  | `"c"`       |
+	 * | `"./colors" as *`  | `undefined` |
+	 * | `"./_colors"`      | `"colors"`  |
+	 * | `"./_colors.scss"` | `"colors"`  |
 	 *
 	 * @see https://sass-lang.com/documentation/at-rules/use/#choosing-a-namespace
 	 */
@@ -346,11 +346,11 @@ export interface LanguageServiceOptions {
 
 export type LanguageModelCacheOptions = {
 	/**
-	 * @default 0 – disabled
+	 * @default 360 - five minutes
 	 */
 	cleanupIntervalTimeInSeconds?: number;
 	/**
-	 * @default Number.MAX_SAFE_INTEGER
+	 * @default 10_000
 	 */
 	maxEntries?: number;
 };

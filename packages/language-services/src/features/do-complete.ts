@@ -51,7 +51,14 @@ export class DoComplete extends LanguageFeature {
 
 		const stylesheet = this.ls.parseStylesheet(document);
 		const offset = document.offsetAt(position);
-		const node = getNodeAtOffset(stylesheet, offset);
+		let node = getNodeAtOffset(stylesheet, offset);
+
+		// In a handful of cases we don't get a node because our offset lands on a whitespace of
+		// an incomplete declaration, for instance "@include ". Try to look back at offset - 1 and
+		// see if we get a node there.
+		if (!node && offset > 0) {
+			node = getNodeAtOffset(stylesheet, offset - 1);
+		}
 
 		// If the document begins with a comment, the Stylesheet node does not begin at offset 0,
 		// instead starting where the comment block ends. In that case node may be null. Otherwise
@@ -138,7 +145,12 @@ export class DoComplete extends LanguageFeature {
 				position,
 				stylesheet,
 				this.getDocumentContext(),
-				this.configuration.completionSettings,
+				{
+					...this.configuration.completionSettings,
+					triggerPropertyValueCompletion:
+						this.configuration.completionSettings
+							?.triggerPropertyValueCompletion || false,
+				},
 			);
 			if (upstreamResult.items.length > 0) {
 				result.items.push(...upstreamResult.items);
@@ -165,9 +177,10 @@ export class DoComplete extends LanguageFeature {
 
 		const isPlaceholderUsage =
 			node &&
-			node.parent &&
-			node.parent.type === NodeType.ExtendsReference &&
-			node.getText().startsWith("%");
+			(node.type === NodeType.ExtendsReference ||
+				(node.parent &&
+					node.parent.type === NodeType.ExtendsReference &&
+					node.getText().startsWith("%")));
 		if (isPlaceholderUsage) {
 			const items = await this.doPlaceholderUsageCompletion(document);
 			if (items.length > 0) {
@@ -177,6 +190,14 @@ export class DoComplete extends LanguageFeature {
 		}
 
 		/* Completions for variables, functions and mixins */
+
+		const isFunctionContext = false;
+		const isVariableContext = false;
+		const isMixinContext = false;
+		const isInterpolationContext = false;
+		// TODO: calculate the equivalent of function from completionContext and only suggest functions if it's true
+		// TODO: calculate the equivalent of mixin from completionContext and only suggest mixins if it's true
+		// TODO: calculate the equivalent of variable from completionContext and only suggest variables if it's true
 
 		const moduleNode: Module | null = getModuleNode(node);
 		if (moduleNode) {
@@ -200,10 +221,6 @@ export class DoComplete extends LanguageFeature {
 				result.items.push(...items);
 			}
 		}
-
-		// TODO: calculate the equivalent of function from completionContext and only suggest functions if it's true
-		// TODO: calculate the equivalent of mixin from completionContext and only suggest mixins if it's true
-		// TODO: calculate the equivalent of variable from completionContext and only suggest variables if it's true
 
 		// Legacy @import style suggestions
 		if (!this.configuration.completionSettings?.suggestFromUseOnly) {

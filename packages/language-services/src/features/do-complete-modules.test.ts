@@ -84,6 +84,178 @@ test("should suggest symbol from a different document via @use", async () => {
 	);
 });
 
+test("should suggest symbol from a different document via @use when in string interpolation", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(
+		['@use "./one";', '.a { background: url("/#{one.'],
+		{
+			uri: "two.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 29));
+	assert.ok(items.find((annotation) => annotation.label === "$primary"));
+});
+
+test("should suggest symbol from a different document via @use when in @return", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(
+		['@use "./one";', "@function test() { @return one."],
+		{
+			uri: "two.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 31));
+	assert.ok(items.find((annotation) => annotation.label === "$primary"));
+});
+
+test("should suggest symbol from a different document via @use when in @if", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(['@use "./one";', "@if one."], {
+		uri: "two.scss",
+	});
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 8));
+	assert.ok(items.find((annotation) => annotation.label === "$primary"));
+});
+
+test("should suggest symbol from a different document via @use when in @else if", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(
+		['@use "./one";', "@if $foo {", "} @else if one."],
+		{
+			uri: "two.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(2, 15));
+	assert.ok(items.find((annotation) => annotation.label === "$primary"));
+});
+
+test("should suggest symbol from a different document via @use when in @each", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(
+		['@use "./one";', "@each $foo in one."],
+		{
+			uri: "two.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 18));
+	assert.ok(items.find((annotation) => annotation.label === "$primary"));
+});
+
+test("should suggest symbol from a different document via @use when in @for", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(
+		['@use "./one";', "@for $i from one."],
+		{
+			uri: "two.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	assert.ok(items.find((annotation) => annotation.label === "$primary"));
+});
+
+test("should suggest symbol from a different document via @use when in @wile", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(
+		['@use "./one";', "@while $i > one."],
+		{
+			uri: "two.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 16));
+	assert.ok(items.find((annotation) => annotation.label === "$primary"));
+});
+
 test("should suggest prefixed symbol from a different document via @use and @forward", async () => {
 	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
 		uri: "one.scss",

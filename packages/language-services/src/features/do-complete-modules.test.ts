@@ -603,7 +603,7 @@ test("should suggest function with no parameter", async () => {
 	);
 	const two = fileSystemProvider.createDocument([
 		'@use "./one";',
-		".a { @include one.",
+		".a { content: one.",
 	]);
 
 	// emulate scanner of language service which adds workspace documents to the cache
@@ -643,7 +643,7 @@ test("should suggest function with optional parameter", async () => {
 	);
 	const two = fileSystemProvider.createDocument([
 		'@use "./one";',
-		".a { @include one.",
+		".a { content:q one.",
 	]);
 
 	// emulate scanner of language service which adds workspace documents to the cache
@@ -683,7 +683,7 @@ test("should suggest function with required parameter", async () => {
 	);
 	const two = fileSystemProvider.createDocument([
 		'@use "./one";',
-		".a { @include one.",
+		".a { content: one.",
 	]);
 
 	// emulate scanner of language service which adds workspace documents to the cache
@@ -723,7 +723,7 @@ test("given both required and optional parameters should suggest two variants of
 	);
 	const two = fileSystemProvider.createDocument([
 		'@use "./one";',
-		".a { @include one.",
+		".a { content: one.",
 	]);
 
 	// emulate scanner of language service which adds workspace documents to the cache

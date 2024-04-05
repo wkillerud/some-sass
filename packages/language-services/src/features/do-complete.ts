@@ -16,6 +16,8 @@ import {
 	SymbolKind,
 	CompletionItemTag,
 	MixinReference,
+	ForStatement,
+	EachStatement,
 } from "@somesass/vscode-css-languageservice";
 import ColorDotJS from "colorjs.io";
 import { ParseResult } from "scss-sassdoc-parser";
@@ -131,14 +133,6 @@ export class DoComplete extends LanguageFeature {
 			}
 		}
 
-		// Same as for Sassdoc, but if we reach this point we can assume it's a regular comment block
-		// where we don't want to provide any suggestions.
-		// This here broke legacy @import style imports
-		// const isCommentContext = !node || node.type === NodeType.Stylesheet;
-		// if (isCommentContext) {
-		// 	return result;
-		// }
-
 		if (
 			node &&
 			node.parent &&
@@ -197,9 +191,24 @@ export class DoComplete extends LanguageFeature {
 
 		/* Completions for variables, functions and mixins */
 
-		const isFunctionContext = true;
-		const isVariableContext = true;
+		// At this point we're at `@for ` and will declare a variable.
+		// We don't need suggestions here.
+		const forDeclaration = node instanceof ForStatement && !node.hasChildren();
+		if (forDeclaration) {
+			return result;
+		}
+
+		// At this point we're at `@for ` and will declare a variable.
+		// We don't need suggestions here.
+		const eachDeclaration =
+			node instanceof EachStatement && !node.variables?.hasChildren();
+		if (eachDeclaration) {
+			return result;
+		}
+
 		const isMixinContext = node instanceof MixinReference;
+		const isFunctionContext = !isMixinContext;
+		const isVariableContext = !isMixinContext;
 
 		const context: CompletionContext = {
 			isFunctionContext,
@@ -1580,6 +1589,12 @@ function getModuleNode(node: Node | null): Module | null {
 		}
 		case NodeType.Module: {
 			return node as Module;
+		}
+		case NodeType.Identifier: {
+			if (node.parent && node.parent.type === NodeType.Module) {
+				return node.parent as Module;
+			}
+			return null;
 		}
 		default: {
 			return null;

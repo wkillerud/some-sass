@@ -18,6 +18,7 @@ import {
 	MixinReference,
 	ForStatement,
 	EachStatement,
+	Identifier,
 } from "@somesass/vscode-css-languageservice";
 import ColorDotJS from "colorjs.io";
 import { ParseResult } from "scss-sassdoc-parser";
@@ -1597,6 +1598,28 @@ function getModuleNode(node: Node | null): Module | null {
 			return null;
 		}
 		default: {
+			const text = node.getText();
+			const interpolationStart = text.indexOf("#{");
+			if (interpolationStart !== -1) {
+				const dotDelim = text.indexOf(".", interpolationStart + 2);
+				if (dotDelim !== -1) {
+					const maybeNamespace = text.substring(
+						interpolationStart + 2,
+						dotDelim + 1,
+					);
+					const module = new Module(
+						node.offset + interpolationStart + 2,
+						maybeNamespace.length,
+						NodeType.Module,
+					);
+					const identifier = new Identifier(
+						node.offset + interpolationStart + 2,
+						maybeNamespace.length - 1,
+					);
+					module.setIdentifier(identifier);
+					return module;
+				}
+			}
 			return null;
 		}
 	}

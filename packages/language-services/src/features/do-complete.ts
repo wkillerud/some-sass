@@ -42,6 +42,12 @@ const reSassdocLine = /\/\/\/\s/;
 const reSassExt = /\.s(a|c)ss$/;
 const rePrivate = /^\$?[_].*$/;
 
+type CompletionContext = {
+	isMixinContext: boolean;
+	isFunctionContext: boolean;
+	isVariableContext: boolean;
+};
+
 export class DoComplete extends LanguageFeature {
 	async doComplete(
 		document: TextDocument,
@@ -191,17 +197,23 @@ export class DoComplete extends LanguageFeature {
 
 		/* Completions for variables, functions and mixins */
 
-		const isFunctionContext = false;
-		const isVariableContext = false;
-		const isMixinContext = false;
-		const isInterpolationContext = false;
-		// TODO: calculate the equivalent of function from completionContext and only suggest functions if it's true
-		// TODO: calculate the equivalent of mixin from completionContext and only suggest mixins if it's true
-		// TODO: calculate the equivalent of variable from completionContext and only suggest variables if it's true
+		const isFunctionContext = true;
+		const isVariableContext = true;
+		const isMixinContext = node instanceof MixinReference;
+
+		const context: CompletionContext = {
+			isFunctionContext,
+			isVariableContext,
+			isMixinContext,
+		};
 
 		const moduleNode: Module | null = getModuleNode(node);
 		if (moduleNode) {
-			const items = await this.doNamespaceCompletion(document, moduleNode);
+			const items = await this.doNamespaceCompletion(
+				document,
+				moduleNode,
+				context,
+			);
 			if (items.length > 0) {
 				result.items.push(...items);
 			}
@@ -216,7 +228,7 @@ export class DoComplete extends LanguageFeature {
 			}
 		}
 		if (wildcards.length > 0) {
-			const items = await this.doWildcardCompletion(wildcards);
+			const items = await this.doWildcardCompletion(wildcards, context);
 			if (items.length > 0) {
 				result.items.push(...items);
 			}
@@ -242,6 +254,8 @@ export class DoComplete extends LanguageFeature {
 
 					switch (symbol.kind) {
 						case SymbolKind.Variable: {
+							if (!context.isVariableContext) break;
+
 							const label = symbol.name;
 							const rawValue = this.getVariableValue(currentDocument, symbol);
 							let value = await this.ls.findValue(
@@ -294,6 +308,8 @@ export class DoComplete extends LanguageFeature {
 							break;
 						}
 						case SymbolKind.Method: {
+							if (!context.isMixinContext) break;
+
 							const label = symbol.name;
 							const insertText = label;
 							const filterText = label;
@@ -384,6 +400,8 @@ export class DoComplete extends LanguageFeature {
 							break;
 						}
 						case SymbolKind.Function: {
+							if (!context.isFunctionContext) break;
+
 							const label = symbol.name;
 							const insertText = label;
 							const filterText = label;
@@ -496,6 +514,7 @@ export class DoComplete extends LanguageFeature {
 
 	async doWildcardCompletion(
 		wildcards: DocumentLink[],
+		context: CompletionContext,
 	): Promise<CompletionItem[]> {
 		const items: CompletionItem[] = [];
 		for (const link of wildcards) {
@@ -521,6 +540,8 @@ export class DoComplete extends LanguageFeature {
 
 						switch (symbol.kind) {
 							case SymbolKind.Variable: {
+								if (!context.isVariableContext) break;
+
 								// Avoid ending up with namespace.prefix-$variable
 								const label = `$${prefix}${asDollarlessVariable(symbol.name)}`;
 								const rawValue = this.getVariableValue(currentDocument, symbol);
@@ -582,6 +603,8 @@ export class DoComplete extends LanguageFeature {
 								break;
 							}
 							case SymbolKind.Method: {
+								if (!context.isMixinContext) break;
+
 								const label = `${prefix}${symbol.name}`;
 								const insertText = label;
 								const filterText = label;
@@ -672,6 +695,8 @@ export class DoComplete extends LanguageFeature {
 								break;
 							}
 							case SymbolKind.Function: {
+								if (!context.isFunctionContext) break;
+
 								const label = `${prefix}${symbol.name}`;
 								const insertText = label;
 								const filterText = label;
@@ -854,6 +879,7 @@ export class DoComplete extends LanguageFeature {
 	async doNamespaceCompletion(
 		document: TextDocument,
 		node: Module,
+		context: CompletionContext,
 	): Promise<CompletionItem[]> {
 		const items: CompletionItem[] = [];
 
@@ -907,6 +933,8 @@ export class DoComplete extends LanguageFeature {
 
 					switch (symbol.kind) {
 						case SymbolKind.Variable: {
+							if (!context.isVariableContext) break;
+
 							// Avoid ending up with namespace.prefix-$variable
 							const label = `$${prefix}${asDollarlessVariable(symbol.name)}`;
 							const rawValue = this.getVariableValue(currentDocument, symbol);
@@ -968,6 +996,8 @@ export class DoComplete extends LanguageFeature {
 							break;
 						}
 						case SymbolKind.Method: {
+							if (!context.isMixinContext) break;
+
 							const label = `${prefix}${symbol.name}`;
 							const insertText = namespace !== "*" ? `.${label}` : label;
 							const filterText =
@@ -1059,6 +1089,8 @@ export class DoComplete extends LanguageFeature {
 							break;
 						}
 						case SymbolKind.Function: {
+							if (!context.isFunctionContext) break;
+
 							const label = `${prefix}${symbol.name}`;
 							const insertText = namespace !== "*" ? `.${label}` : label;
 							const filterText =

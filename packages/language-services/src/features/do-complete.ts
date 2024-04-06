@@ -1617,6 +1617,7 @@ function getModuleNode(node: Node | null): Module | null {
 						maybeNamespace.length - 1,
 					);
 					module.setIdentifier(identifier);
+					module.parent = node; // to get access to textProvider
 					return module;
 				}
 			}

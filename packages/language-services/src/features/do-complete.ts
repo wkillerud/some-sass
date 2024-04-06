@@ -217,7 +217,7 @@ export class DoComplete extends LanguageFeature {
 			isMixinContext,
 		};
 
-		const moduleNode: Module | null = getModuleNode(node);
+		const moduleNode: Module | null = this.getModuleNode(document, node);
 		if (moduleNode) {
 			const items = await this.doNamespaceCompletion(
 				document,
@@ -645,10 +645,7 @@ export class DoComplete extends LanguageFeature {
 
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
 
-		const originalExt = currentDocument.uri.slice(
-			Math.max(0, currentDocument.uri.lastIndexOf(".") + 1),
-		);
-		const isEmbedded = !originalExt.match(reSassExt);
+		const isEmbedded = this.isEmbedded(currentDocument);
 		let insertText: string | undefined;
 		let filterText: string | undefined;
 
@@ -688,6 +685,14 @@ export class DoComplete extends LanguageFeature {
 		return [item];
 	}
 
+	private isEmbedded(currentDocument: TextDocument) {
+		const originalExt = currentDocument.uri.slice(
+			Math.max(0, currentDocument.uri.lastIndexOf(".") + 1),
+		);
+		const isEmbedded = !originalExt.match(reSassExt);
+		return isEmbedded;
+	}
+
 	private async doMixinCompletion(
 		currentDocument: TextDocument,
 		currentWord: string,
@@ -705,10 +710,7 @@ export class DoComplete extends LanguageFeature {
 				: `${prefix}${symbol.name}`
 			: symbol.name;
 
-		const originalExt = currentDocument.uri.slice(
-			Math.max(0, currentDocument.uri.lastIndexOf(".") + 1),
-		);
-		const isEmbedded = !originalExt.match(reSassExt);
+		const isEmbedded = this.isEmbedded(currentDocument);
 
 		const insertText = namespace
 			? namespace !== "*" && !isEmbedded
@@ -827,10 +829,7 @@ export class DoComplete extends LanguageFeature {
 			? `${namespace !== "*" ? namespace : ""}.${prefix}${symbol.name}`
 			: symbol.name;
 
-		const originalExt = currentDocument.uri.slice(
-			Math.max(0, currentDocument.uri.lastIndexOf(".") + 1),
-		);
-		const isEmbedded = !originalExt.match(reSassExt);
+		const isEmbedded = this.isEmbedded(currentDocument);
 		const insertText = namespace
 			? namespace !== "*" && !isEmbedded
 				? `.${prefix}${symbol.name}`
@@ -910,10 +909,7 @@ export class DoComplete extends LanguageFeature {
 			// Inserted text needs to include the `.` which will otherwise
 			// be replaced (except when we're embedded in Vue, Svelte or Astro).
 			// Example result: .floor(${1:number})
-			const originalExt = document.uri.slice(
-				Math.max(0, document.uri.lastIndexOf(".") + 1),
-			);
-			const isEmbedded = !originalExt.match(reSassExt);
+			const isEmbedded = this.isEmbedded(document);
 
 			const insertText = node.getText().includes(".")
 				? `${isEmbedded ? "" : "."}${name}${
@@ -1169,6 +1165,85 @@ export class DoComplete extends LanguageFeature {
 			sortText: "-", // Give highest priority
 		};
 	}
+
+	getModuleNode(document: TextDocument, node: Node | null): Module | null {
+		if (!node) return null;
+
+		switch (node.type) {
+			case NodeType.MixinReference: {
+				const identifier = (node as MixinReference).getIdentifier();
+				if (
+					identifier &&
+					identifier.parent &&
+					identifier.parent.type === NodeType.Module
+				) {
+					return identifier.parent as Module;
+				}
+				return null;
+			}
+			case NodeType.Module: {
+				return node as Module;
+			}
+			case NodeType.Identifier: {
+				if (node.parent && node.parent.type === NodeType.Module) {
+					return node.parent as Module;
+				}
+				return null;
+			}
+			default: {
+				const text = node.getText();
+				const interpolationStart = text.indexOf("#{");
+				if (interpolationStart !== -1) {
+					const dotDelim = text.indexOf(".", interpolationStart + 2);
+					if (dotDelim !== -1) {
+						const maybeNamespace = text.substring(
+							interpolationStart + 2,
+							dotDelim + 1,
+						);
+						const module = new Module(
+							node.offset + interpolationStart + 2,
+							maybeNamespace.length,
+							NodeType.Module,
+						);
+						const identifier = new Identifier(
+							node.offset + interpolationStart + 2,
+							maybeNamespace.length - 1,
+						);
+						module.setIdentifier(identifier);
+						module.parent = node; // to get access to textProvider
+						return module;
+					}
+				} else if (this.isEmbedded(document)) {
+					const dotIndex = text.indexOf(".");
+					if (dotIndex !== -1) {
+						let startOffset = dotIndex;
+						const endOffset = dotIndex;
+						while (startOffset > 0) {
+							const char = text.charAt(startOffset - 1);
+							if (char.match(/\s/)) {
+								break;
+							}
+							startOffset -= 1;
+						}
+
+						const module = new Module(
+							node.offset + startOffset,
+							endOffset - startOffset,
+							NodeType.Module,
+						);
+						const identifier = new Identifier(
+							node.offset + startOffset,
+							endOffset - startOffset,
+						);
+						module.setIdentifier(identifier);
+						module.parent = node; // to get access to textProvider
+						return module;
+					}
+				}
+				return null;
+			}
+		}
+	}
 }
 
 function getModuleNameFromPath(modulePath: string) {
@@ -1291,57 +1366,4 @@ function parseStringLiteralChoices(docstring: string[] | string): string[] {
 	}
 
 	return result;
-}
-
-function getModuleNode(node: Node | null): Module | null {
-	if (!node) return null;
-
-	switch (node.type) {
-		case NodeType.MixinReference: {
-			const identifier = (node as MixinReference).getIdentifier();
-			if (
-				identifier &&
-				identifier.parent &&
-				identifier.parent.type === NodeType.Module
-			) {
-				return identifier.parent as Module;
-			}
-			return null;
-		}
-		case NodeType.Module: {
-			return node as Module;
-		}
-		case NodeType.Identifier: {
-			if (node.parent && node.parent.type === NodeType.Module) {
-				return node.parent as Module;
-			}
-			return null;
-		}
-		default: {
-			const text = node.getText();
-			const interpolationStart = text.indexOf("#{");
-			if (interpolationStart !== -1) {
-				const dotDelim = text.indexOf(".", interpolationStart + 2);
-				if (dotDelim !== -1) {
-					const maybeNamespace = text.substring(
-						interpolationStart + 2,
-						dotDelim + 1,
-					);
-					const module = new Module(
-						node.offset + interpolationStart + 2,
-						maybeNamespace.length,
-						NodeType.Module,
-					);
-					const identifier = new Identifier(
-						node.offset + interpolationStart + 2,
-						maybeNamespace.length - 1,
-					);
-					module.setIdentifier(identifier);
-					module.parent = node; // to get access to textProvider
-					return module;
-				}
-			}
-			return null;
-		}
-	}
 }

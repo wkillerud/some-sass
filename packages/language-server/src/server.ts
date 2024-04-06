@@ -90,6 +90,9 @@ export class SomeSassServer {
 				ls = getLanguageService({
 					clientCapabilities,
 					fileSystemProvider,
+					languageModelCache: {
+						cleanupIntervalTimeInSeconds: 60,
+					},
 				});
 
 				this.connection.console.debug(

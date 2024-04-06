@@ -27,7 +27,6 @@ import {
 	useContext,
 } from "./context-provider";
 import { ExtractProvider } from "./features/code-actions";
-import { doCompletion } from "./features/completion";
 import { doDiagnostics } from "./features/diagnostics/diagnostics";
 import { provideReferences } from "./features/references";
 import { doRename, prepareRename } from "./features/rename";
@@ -297,16 +296,21 @@ export class SomeSassServer {
 		});
 
 		this.connection.onCompletion(async (textDocumentPosition) => {
+			if (!ls) return null;
+
 			const uri = documents.get(textDocumentPosition.textDocument.uri);
 			if (!uri) return null;
 
-			const { document, offset } = getSCSSRegionsDocument(
+			const { document } = getSCSSRegionsDocument(
 				uri,
 				textDocumentPosition.position,
 			);
 			if (!document) return null;
 
-			const result = await doCompletion(document, offset);
+			const result = await ls.doComplete(
+				document,
+				textDocumentPosition.position,
+			);
 			return result;
 		});
 

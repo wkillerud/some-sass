@@ -37,7 +37,7 @@ test("suggests built-in sass modules", async () => {
 					"The value of the mathematical constant **π**.\n\n[Sass documentation](https://sass-lang.com/documentation/modules/math#$pi)",
 			},
 			filterText: "math.$pi",
-			insertText: ".$pi",
+			insertText: "$pi",
 			insertTextFormat: InsertTextFormat.PlainText,
 			kind: CompletionItemKind.Variable,
 			label: "$pi",
@@ -74,8 +74,8 @@ test("should suggest symbol from a different document via @use", async () => {
 		{
 			commitCharacters: [";", ","],
 			documentation: "limegreen\n____\nVariable declared in one.scss",
-			filterText: undefined,
-			insertText: undefined,
+			filterText: "one.$primary",
+			insertText: "$primary",
 			kind: CompletionItemKind.Color,
 			label: "$primary",
 			sortText: undefined,
@@ -286,8 +286,8 @@ test("should suggest prefixed symbol from a different document via @use and @for
 		{
 			commitCharacters: [";", ","],
 			documentation: "limegreen\n____\nVariable declared in one.scss",
-			filterText: undefined,
-			insertText: undefined,
+			filterText: "two.$foo-primary",
+			insertText: "$foo-primary",
 			kind: CompletionItemKind.Color,
 			label: "$foo-primary",
 			sortText: undefined,
@@ -439,9 +439,11 @@ test("should suggest mixin with no parameter", async () => {
 					"```scss\n@mixin primary()\n```\n____\nMixin declared in one.scss",
 			},
 			filterText: "one.primary",
-			insertText: ".primary",
+			insertText: "primary",
+			insertTextFormat: InsertTextFormat.Snippet,
 			kind: CompletionItemKind.Method,
 			label: "primary",
+			labelDetails: undefined,
 			sortText: undefined,
 			tags: [],
 		},
@@ -473,16 +475,32 @@ test("should suggest mixin with optional parameter", async () => {
 		items.filter((item) => item.label === "primary"),
 		[
 			{
-				detail: "($color: red)",
 				documentation: {
 					kind: "markdown",
 					value:
 						"```scss\n@mixin primary($color: red)\n```\n____\nMixin declared in one.scss",
 				},
 				filterText: "one.primary",
-				insertText: ".primary(${1:color})",
+				insertText: "primary(${1:color})",
+				insertTextFormat: InsertTextFormat.Snippet,
 				kind: CompletionItemKind.Method,
 				label: "primary",
+				labelDetails: { detail: "($color: red)" },
+				sortText: undefined,
+				tags: [],
+			},
+			{
+				documentation: {
+					kind: "markdown",
+					value:
+						"```scss\n@mixin primary($color: red)\n```\n____\nMixin declared in one.scss",
+				},
+				filterText: "one.primary",
+				insertText: "primary(${1:color}) {\n\t$0\n}",
+				insertTextFormat: InsertTextFormat.Snippet,
+				kind: CompletionItemKind.Method,
+				label: "primary",
+				labelDetails: { detail: "($color: red) { }" },
 				sortText: undefined,
 				tags: [],
 			},
@@ -515,16 +533,32 @@ test("should suggest mixin with required parameter", async () => {
 		items.filter((item) => item.label === "primary"),
 		[
 			{
-				detail: "($color)",
 				documentation: {
 					kind: "markdown",
 					value:
 						"```scss\n@mixin primary($color)\n```\n____\nMixin declared in one.scss",
 				},
 				filterText: "one.primary",
-				insertText: ".primary(${1:color})",
+				insertText: "primary(${1:color})",
+				insertTextFormat: InsertTextFormat.Snippet,
 				kind: CompletionItemKind.Method,
 				label: "primary",
+				labelDetails: { detail: "($color)" },
+				sortText: undefined,
+				tags: [],
+			},
+			{
+				documentation: {
+					kind: "markdown",
+					value:
+						"```scss\n@mixin primary($color)\n```\n____\nMixin declared in one.scss",
+				},
+				filterText: "one.primary",
+				insertText: "primary(${1:color}) {\n\t$0\n}",
+				insertTextFormat: InsertTextFormat.Snippet,
+				kind: CompletionItemKind.Method,
+				label: "primary",
+				labelDetails: { detail: "($color) { }" },
 				sortText: undefined,
 				tags: [],
 			},
@@ -559,30 +593,62 @@ test("given both required and optional parameters should suggest two variants of
 		items.filter((item) => item.label === "primary"),
 		[
 			{
-				detail: "($background)",
 				documentation: {
 					kind: "markdown",
 					value:
 						"```scss\n@mixin primary($background, $color: red)\n```\n____\nMixin declared in one.scss",
 				},
 				filterText: "one.primary",
-				insertText: ".primary(${1:background})",
-				kind: 2,
+				insertText: "primary(${1:background})",
+				insertTextFormat: InsertTextFormat.Snippet,
+				kind: CompletionItemKind.Method,
 				label: "primary",
+				labelDetails: { detail: "($background)" },
 				sortText: undefined,
 				tags: [],
 			},
 			{
-				detail: "($background, $color: red)",
 				documentation: {
 					kind: "markdown",
 					value:
 						"```scss\n@mixin primary($background, $color: red)\n```\n____\nMixin declared in one.scss",
 				},
 				filterText: "one.primary",
-				insertText: ".primary(${1:background}, ${2:color})",
-				kind: 2,
+				insertText: "primary(${1:background}) {\n\t$0\n}",
+				insertTextFormat: InsertTextFormat.Snippet,
+				kind: CompletionItemKind.Method,
 				label: "primary",
+				labelDetails: { detail: "($background) { }" },
+				sortText: undefined,
+				tags: [],
+			},
+			{
+				documentation: {
+					kind: "markdown",
+					value:
+						"```scss\n@mixin primary($background, $color: red)\n```\n____\nMixin declared in one.scss",
+				},
+				filterText: "one.primary",
+				insertText: "primary(${1:background}, ${2:color})",
+				insertTextFormat: InsertTextFormat.Snippet,
+				kind: CompletionItemKind.Method,
+				label: "primary",
+				labelDetails: { detail: "($background, $color: red)" },
+				sortText: undefined,
+				tags: [],
+			},
+			{
+				documentation: {
+					kind: "markdown",
+					value:
+						"```scss\n@mixin primary($background, $color: red)\n```\n____\nMixin declared in one.scss",
+				},
+				filterText: "one.primary",
+				insertText: "primary(${1:background}, ${2:color}) {\n\t$0\n}",
+				insertTextFormat: InsertTextFormat.Snippet,
+				kind: CompletionItemKind.Method,
+				label: "primary",
+				labelDetails: { detail: "($background, $color: red) { }" },
 				sortText: undefined,
 				tags: [],
 			},
@@ -614,16 +680,17 @@ test("should suggest function with no parameter", async () => {
 	assert.deepStrictEqual(
 		items.find((item) => item.label === "primary"),
 		{
-			detail: "()",
 			documentation: {
 				kind: "markdown",
 				value:
 					"```scss\n@function primary()\n```\n____\nFunction declared in one.scss",
 			},
 			filterText: "one.primary",
-			insertText: ".primary()",
+			insertText: "primary()",
+			insertTextFormat: InsertTextFormat.Snippet,
 			kind: CompletionItemKind.Function,
 			label: "primary",
+			labelDetails: { detail: "()" },
 			sortText: undefined,
 			tags: [],
 		},
@@ -654,16 +721,17 @@ test("should suggest function with optional parameter", async () => {
 	assert.deepStrictEqual(
 		items.find((item) => item.label === "primary"),
 		{
-			detail: "()",
 			documentation: {
 				kind: "markdown",
 				value:
 					"```scss\n@function primary($color: red)\n```\n____\nFunction declared in one.scss",
 			},
 			filterText: "one.primary",
-			insertText: ".primary()",
+			insertText: "primary()",
+			insertTextFormat: InsertTextFormat.Snippet,
 			kind: CompletionItemKind.Function,
 			label: "primary",
+			labelDetails: { detail: "()" },
 			sortText: undefined,
 			tags: [],
 		},
@@ -694,16 +762,17 @@ test("should suggest function with required parameter", async () => {
 	assert.deepStrictEqual(
 		items.find((item) => item.label === "primary"),
 		{
-			detail: "($color)",
 			documentation: {
 				kind: "markdown",
 				value:
 					"```scss\n@function primary($color)\n```\n____\nFunction declared in one.scss",
 			},
 			filterText: "one.primary",
-			insertText: ".primary(${1:color})",
+			insertText: "primary(${1:color})",
+			insertTextFormat: InsertTextFormat.Snippet,
 			kind: CompletionItemKind.Function,
 			label: "primary",
+			labelDetails: { detail: "($color)" },
 			sortText: undefined,
 			tags: [],
 		},
@@ -735,30 +804,32 @@ test("given both required and optional parameters should suggest two variants of
 		items.filter((item) => item.label === "primary"),
 		[
 			{
-				detail: "($a)",
 				documentation: {
 					kind: "markdown",
 					value:
 						"```scss\n@function primary($a, $b: 1)\n```\n____\nFunction declared in one.scss",
 				},
 				filterText: "one.primary",
-				insertText: ".primary(${1:a})",
+				insertText: "primary(${1:a})",
+				insertTextFormat: InsertTextFormat.Snippet,
 				kind: CompletionItemKind.Function,
 				label: "primary",
+				labelDetails: { detail: "($a)" },
 				sortText: undefined,
 				tags: [],
 			},
 			{
-				detail: "($a, $b: 1)",
 				documentation: {
 					kind: "markdown",
 					value:
 						"```scss\n@function primary($a, $b: 1)\n```\n____\nFunction declared in one.scss",
 				},
 				filterText: "one.primary",
-				insertText: ".primary(${1:a}, ${2:b})",
+				insertText: "primary(${1:a}, ${2:b})",
+				insertTextFormat: InsertTextFormat.Snippet,
 				kind: CompletionItemKind.Function,
 				label: "primary",
+				labelDetails: { detail: "($a, $b: 1)" },
 				sortText: undefined,
 				tags: [],
 			},
@@ -789,6 +860,8 @@ test("should suggest all symbols as legacy @import may be in use", async () => {
 		{
 			commitCharacters: [";", ","],
 			documentation: "limegreen\n____\nVariable declared in one.scss",
+			filterText: undefined,
+			insertText: undefined,
 			kind: CompletionItemKind.Color,
 			label: "$primary",
 			sortText: undefined,

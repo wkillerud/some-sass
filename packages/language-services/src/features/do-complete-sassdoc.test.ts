@@ -20,7 +20,7 @@ test("sassdoc comment block for mixin", async () => {
 	const { items } = await ls.doComplete(document, Position.create(2, 3));
 	assert.equal(items.length, 1, "Expected to get a completion result");
 	assert.deepStrictEqual(items[0], {
-		insertText: " ${0}\n/// @output ${1}",
+		insertText: " ${0}\n/// @output ${1} ${2:-}",
 		insertTextFormat: 2,
 		label: "SassDoc Block",
 		sortText: "-",
@@ -39,7 +39,26 @@ test("sassdoc comment block for mixin with parameters", async () => {
 	assert.equal(items.length, 1, "Expected to get a completion result");
 	assert.deepStrictEqual(items[0], {
 		insertText:
-			" ${0}\n/// @param {${1:type}} \\$color [blue] ${2:-}\n/// @output ${3}",
+			" ${0}\n/// @param {${1:type}} \\$color [blue] ${2:-}\n/// @output ${3} ${4:-}",
+		insertTextFormat: 2,
+		label: "SassDoc Block",
+		sortText: "-",
+	});
+});
+
+test("sassdoc comment block for function with parameters", async () => {
+	const document = fileSystemProvider.createDocument([
+		"$a: 1;",
+		"",
+		"///",
+		"@function interactive($color: blue) { @return $color; }",
+	]);
+
+	const { items } = await ls.doComplete(document, Position.create(2, 3));
+	assert.equal(items.length, 1, "Expected to get a completion result");
+	assert.deepStrictEqual(items[0], {
+		insertText:
+			" ${0}\n/// @param {${1:type}} \\$color [blue] ${2:-}\n/// @return {${3:type}} ${4:-}",
 		insertTextFormat: 2,
 		label: "SassDoc Block",
 		sortText: "-",
@@ -61,7 +80,7 @@ test("sassdoc comment block for mixin with @content", async () => {
 	const { items } = await ls.doComplete(document, Position.create(2, 3));
 	assert.equal(items.length, 1, "Expected to get a completion result");
 	assert.deepStrictEqual(items[0], {
-		insertText: " ${0}\n/// @content ${1}\n/// @output ${2}",
+		insertText: " ${0}\n/// @content ${1}\n/// @output ${2} ${3:-}",
 		insertTextFormat: 2,
 		label: "SassDoc Block",
 		sortText: "-",
@@ -86,7 +105,7 @@ test("sassdoc comment block for mixin with parameters and @content", async () =>
 	assert.equal(items.length, 1, "Expected to get a completion result");
 	assert.deepStrictEqual(items[0], {
 		insertText:
-			" ${0}\n/// @param {${1:Color}} \\$color [#fff] ${2:-}\n/// @param {${3:type}} \\$visibility [hidden] ${4:-}\n/// @content ${5}\n/// @output ${6}",
+			" ${0}\n/// @param {${1:Color}} \\$color [#fff] ${2:-}\n/// @param {${3:type}} \\$visibility [hidden] ${4:-}\n/// @content ${5}\n/// @output ${6} ${7:-}",
 		insertTextFormat: 2,
 		label: "SassDoc Block",
 		sortText: "-",

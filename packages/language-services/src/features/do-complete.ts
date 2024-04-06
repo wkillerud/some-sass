@@ -58,6 +58,8 @@ export class DoComplete extends LanguageFeature {
 	): Promise<CompletionList> {
 		const result = CompletionList.create([]);
 
+		// Might be overthinking this. String-based approach for at least some of these were so much simpler :see_no_evil:
+
 		const stylesheet = this.ls.parseStylesheet(document);
 		const offset = document.offsetAt(position);
 		let node = getNodeAtOffset(stylesheet, offset);
@@ -176,12 +178,7 @@ export class DoComplete extends LanguageFeature {
 			return result;
 		}
 
-		const isPlaceholderUsage =
-			node &&
-			(node.type === NodeType.ExtendsReference ||
-				(node.parent &&
-					node.parent.type === NodeType.ExtendsReference &&
-					node.getText().startsWith("%")));
+		const isPlaceholderUsage = this.isPlaceholderUsage(node);
 		if (isPlaceholderUsage) {
 			const items = await this.doPlaceholderUsageCompletion(document);
 			if (items.length > 0) {
@@ -353,27 +350,38 @@ export class DoComplete extends LanguageFeature {
 		return result;
 	}
 
+	private isPlaceholderUsage(node: Node | null): boolean {
+		let maybeExtends = node;
+		while (maybeExtends) {
+			if (maybeExtends && maybeExtends.type === NodeType.ExtendsReference) {
+				return true;
+			}
+			maybeExtends = maybeExtends.getParent();
+		}
+		return false;
+	}
+
 	async doPlaceholderUsageCompletion(
 		initialDocument: TextDocument,
 	): Promise<CompletionItem[]> {
-		if (this.configuration.completionSettings?.suggestFromUseOnly) {
-			const result = await this.findInWorkspace<CompletionItem>((document) => {
-				const symbols = this.ls.findDocumentSymbols(document);
-				const items: CompletionItem[] = [];
-				for (const symbol of symbols) {
-					if (symbol.kind === SymbolKind.Class && symbol.name.startsWith("%")) {
-						const item: CompletionItem = this.toCompletionItem(
-							document,
-							symbol,
-						);
-						items.push(item);
-					}
-				}
-				return items;
-			}, initialDocument);
-			return result;
-		} else {
+		const items: CompletionItem[] = [];
+		const result = await this.findInWorkspace<CompletionItem>((document) => {
+			const symbols = this.ls.findDocumentSymbols(document);
 			const items: CompletionItem[] = [];
+			for (const symbol of symbols) {
+				if (symbol.kind === SymbolKind.Class && symbol.name.startsWith("%")) {
+					const item: CompletionItem = this.toCompletionItem(document, symbol);
+					items.push(item);
+				}
+			}
+			return items;
+		}, initialDocument);
+
+		if (result.length > 0) {
+			items.push(...result);
+		}
+
+		if (!this.configuration.completionSettings?.suggestFromUseOnly) {
 			const documents = this._internal.cache.documents();
 			for (const current of documents) {
 				const symbols = this.ls.findDocumentSymbols(current);
@@ -384,8 +392,9 @@ export class DoComplete extends LanguageFeature {
 					}
 				}
 			}
-			return items;
 		}
+
+		return items;
 	}
 
 	private toCompletionItem(document: TextDocument, symbol: SassDocumentSymbol) {

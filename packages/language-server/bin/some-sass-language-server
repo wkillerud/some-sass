@@ -1,3 +1,9 @@
 #!/usr/bin/env node
 const path = require("path");
-require(path.join(__dirname, "..", "dist", "node-server.js"));
+
+const args = process.argv.slice(2);
+if (args.includes("--debug")) {
+	require(path.join(__dirname, "..", "dist", "development", "node-server.js"));
+} else {
+	require(path.join(__dirname, "..", "dist", "node-server.js"));
+}

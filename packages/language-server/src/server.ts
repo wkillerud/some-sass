@@ -35,14 +35,9 @@ import type { FileSystemProvider } from "./file-system";
 import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";
 import ScannerService from "./scanner";
-import type { ISettings } from "./settings";
+import { defaultSettings, IEditorSettings, type ISettings } from "./settings";
 import StorageService from "./storage";
 import { getSCSSRegionsDocument } from "./utils/embedded";
-
-interface InitializationOption {
-	workspace: string;
-	settings: ISettings;
-}
 
 export class SomeSassServer {
 	private readonly connection: Connection;
@@ -73,9 +68,6 @@ export class SomeSassServer {
 		// _in the passed params the rootPath of the workspace plus the client capabilites
 		this.connection.onInitialize(
 			(params: InitializeParams): InitializeResult => {
-				const options = params.initializationOptions as InitializationOption;
-				workspaceRoot = URI.parse(options.workspace);
-
 				this.connection.console.debug(
 					`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialize> received`,
 				);
@@ -94,6 +86,11 @@ export class SomeSassServer {
 						cleanupIntervalTimeInSeconds: 60,
 					},
 				});
+
+				// TODO: migrate to workspace folders. Workspace was an unnecessary older workaround of mine.
+				workspaceRoot = URI.parse(
+					params.initializationOptions?.workspace || params.rootUri!,
+				);
 
 				this.connection.console.debug(
 					`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialize> returning server capabilities`,
@@ -146,11 +143,23 @@ export class SomeSassServer {
 					`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> received`,
 				);
 
-				const settings =
+				const somesassConfiguration: Partial<ISettings> =
 					await this.connection.workspace.getConfiguration("somesass");
-				const editorSettings =
+				const editorConfiguration: Partial<IEditorSettings> =
 					await this.connection.workspace.getConfiguration("editor");
 				const storageService = new StorageService();
+
+				const settings: ISettings = {
+					...defaultSettings,
+					...somesassConfiguration,
+				};
+
+				const editorSettings: IEditorSettings = {
+					insertSpaces: false,
+					indentSize: undefined,
+					tabSize: 2,
+					...editorConfiguration,
+				};
 
 				if (
 					!ls ||

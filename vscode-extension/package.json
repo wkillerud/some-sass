@@ -2,7 +2,7 @@
 	"name": "some-sass",
 	"displayName": "Some Sass: extended support for SCSS and SassDoc",
 	"description": "Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
-	"version": "3.0.0",
+	"version": "3.0.1",
 	"publisher": "SomewhatStationery",
 	"license": "MIT",
 	"engines": {
@@ -102,7 +102,7 @@
 	},
 	"dependencies": {
 		"fast-glob": "3.3.2",
-		"some-sass-language-server": "*",
+		"some-sass-language-server": "1.1.0",
 		"vscode-css-languageservice": "6.2.12",
 		"vscode-languageclient": "9.0.1",
 		"vscode-uri": "3.0.7"
@@ -112,9 +112,9 @@
 		"@types/sinon": "17.0.3",
 		"@types/vscode": "1.86.0",
 		"@vscode/test-electron": "2.3.9",
-		"@vscode/test-web": "0.0.51",
+		"@vscode/test-web": "0.0.53",
 		"assert": "2.1.0",
-		"mocha": "10.3.0",
+		"mocha": "10.4.0",
 		"shx": "0.3.4"
 	},
 	"scripts": {

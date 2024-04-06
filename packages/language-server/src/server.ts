@@ -172,6 +172,11 @@ export class SomeSassServer {
 					);
 				}
 
+				ls.configure({
+					editorSettings,
+					workspaceRoot,
+				});
+
 				createContext({
 					clientCapabilities: clientCapabilities!,
 					fs: fileSystemProvider!,

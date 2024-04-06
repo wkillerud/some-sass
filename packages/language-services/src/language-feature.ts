@@ -59,6 +59,7 @@ export abstract class LanguageFeature {
 	configure(configuration: LanguageServiceConfiguration): void {
 		this.configuration = {
 			...defaultConfiguration,
+			...configuration,
 			completionSettings: {
 				...defaultConfiguration.completionSettings,
 				...configuration.completionSettings,

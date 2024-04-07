@@ -20,7 +20,7 @@ test("sassdoc comment block for mixin", async () => {
 	const { items } = await ls.doComplete(document, Position.create(2, 3));
 	assert.equal(items.length, 1, "Expected to get a completion result");
 	assert.deepStrictEqual(items[0], {
-		insertText: " ${0}\n/// @output ${1} ${2:-}",
+		insertText: " ${0}\n/// @output ${1:-}",
 		insertTextFormat: 2,
 		label: "SassDoc Block",
 		sortText: "-",
@@ -39,7 +39,7 @@ test("sassdoc comment block for mixin with parameters", async () => {
 	assert.equal(items.length, 1, "Expected to get a completion result");
 	assert.deepStrictEqual(items[0], {
 		insertText:
-			" ${0}\n/// @param {${1:type}} \\$color [blue] ${2:-}\n/// @output ${3} ${4:-}",
+			" ${0}\n/// @param {${1:type}} \\$color [blue] ${2:-}\n/// @output ${3:-}",
 		insertTextFormat: 2,
 		label: "SassDoc Block",
 		sortText: "-",
@@ -80,7 +80,7 @@ test("sassdoc comment block for mixin with @content", async () => {
 	const { items } = await ls.doComplete(document, Position.create(2, 3));
 	assert.equal(items.length, 1, "Expected to get a completion result");
 	assert.deepStrictEqual(items[0], {
-		insertText: " ${0}\n/// @content ${1}\n/// @output ${2} ${3:-}",
+		insertText: " ${0}\n/// @content ${1}\n/// @output ${2:-}",
 		insertTextFormat: 2,
 		label: "SassDoc Block",
 		sortText: "-",
@@ -105,7 +105,7 @@ test("sassdoc comment block for mixin with parameters and @content", async () =>
 	assert.equal(items.length, 1, "Expected to get a completion result");
 	assert.deepStrictEqual(items[0], {
 		insertText:
-			" ${0}\n/// @param {${1:Color}} \\$color [#fff] ${2:-}\n/// @param {${3:type}} \\$visibility [hidden] ${4:-}\n/// @content ${5}\n/// @output ${6} ${7:-}",
+			" ${0}\n/// @param {${1:Color}} \\$color [#fff] ${2:-}\n/// @param {${3:type}} \\$visibility [hidden] ${4:-}\n/// @content ${5}\n/// @output ${6:-}",
 		insertTextFormat: 2,
 		label: "SassDoc Block",
 		sortText: "-",

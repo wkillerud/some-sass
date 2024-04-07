@@ -1162,7 +1162,7 @@ export class DoComplete extends LanguageFeature {
 			if (hasContentAtKeyword) {
 				snippet += `\n/// @content \${${position++}}`;
 			}
-			snippet += `\n/// @output \${${position++}} \${${position++}:-}`;
+			snippet += `\n/// @output \${${position++}}`;
 		} else {
 			snippet += `\n/// @return {\${${position++}:type}} \${${position++}:-}`;
 		}

@@ -336,7 +336,7 @@ describe("SassDoc Completion Test", () => {
 			{
 				label: "SassDoc Block",
 				insertText:
-					'" ${0}\\n/// @param {${1:Number}} \\\\$a [1px] ${2:-}\\n/// @param {${3:Number}} \\\\$b [2px] ${4:-}\\n/// @output ${5:-}"',
+					'" ${0}\\n/// @param {${1:Number}} \\\\$a [1px] ${2:-}\\n/// @param {${3:Number}} \\\\$b [2px] ${4:-}\\n/// @output ${5}"',
 			},
 		];
 
@@ -348,7 +348,7 @@ describe("SassDoc Completion Test", () => {
 			{
 				label: "SassDoc Block",
 				insertText:
-					'" ${0}\\n/// @param {${1:type}} \\\\$a ${2:-}\\n/// @param {${3:type}} \\\\$b ${4:-}\\n/// @output ${5:-}"',
+					'" ${0}\\n/// @param {${1:type}} \\\\$a ${2:-}\\n/// @param {${3:type}} \\\\$b ${4:-}\\n/// @content ${5}\\n/// @output ${6}"',
 			},
 		];
 

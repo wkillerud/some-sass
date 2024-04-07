@@ -227,7 +227,7 @@ test("should suggest symbol from a different document via @use when in @for", as
 	ls.parseStylesheet(one);
 	ls.parseStylesheet(two);
 
-	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	const { items } = await ls.doComplete(two, Position.create(1, 18));
 	assert.ok(items.find((annotation) => annotation.label === "$primary"));
 });
 
@@ -242,7 +242,7 @@ test("should suggest symbol from a different document via @use when in @wile", a
 		uri: "one.scss",
 	});
 	const two = fileSystemProvider.createDocument(
-		['@use "./one";', "@while $i > one."],
+		['@use "./one";', "@while $i > one.$"],
 		{
 			uri: "two.scss",
 		},
@@ -252,7 +252,7 @@ test("should suggest symbol from a different document via @use when in @wile", a
 	ls.parseStylesheet(one);
 	ls.parseStylesheet(two);
 
-	const { items } = await ls.doComplete(two, Position.create(1, 16));
+	const { items } = await ls.doComplete(two, Position.create(1, 18));
 	assert.ok(items.find((annotation) => annotation.label === "$primary"));
 });
 
@@ -429,7 +429,7 @@ test("should suggest mixin with no parameter", async () => {
 	ls.parseStylesheet(one);
 	ls.parseStylesheet(two);
 
-	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	const { items } = await ls.doComplete(two, Position.create(1, 18));
 	assert.deepStrictEqual(
 		items.find((item) => item.label === "primary"),
 		{
@@ -470,7 +470,7 @@ test("should suggest mixin with optional parameter", async () => {
 	ls.parseStylesheet(one);
 	ls.parseStylesheet(two);
 
-	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	const { items } = await ls.doComplete(two, Position.create(1, 18));
 	assert.deepStrictEqual(
 		items.filter((item) => item.label === "primary"),
 		[
@@ -528,7 +528,7 @@ test("should suggest mixin with required parameter", async () => {
 	ls.parseStylesheet(one);
 	ls.parseStylesheet(two);
 
-	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	const { items } = await ls.doComplete(two, Position.create(1, 18));
 	assert.deepStrictEqual(
 		items.filter((item) => item.label === "primary"),
 		[
@@ -588,7 +588,7 @@ test("given both required and optional parameters should suggest two variants of
 	ls.parseStylesheet(one);
 	ls.parseStylesheet(two);
 
-	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	const { items } = await ls.doComplete(two, Position.create(1, 18));
 	assert.deepStrictEqual(
 		items.filter((item) => item.label === "primary"),
 		[
@@ -676,7 +676,7 @@ test("should suggest function with no parameter", async () => {
 	ls.parseStylesheet(one);
 	ls.parseStylesheet(two);
 
-	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	const { items } = await ls.doComplete(two, Position.create(1, 18));
 	assert.deepStrictEqual(
 		items.find((item) => item.label === "primary"),
 		{
@@ -710,14 +710,14 @@ test("should suggest function with optional parameter", async () => {
 	);
 	const two = fileSystemProvider.createDocument([
 		'@use "./one";',
-		".a { content:q one.",
+		".a { content: one.",
 	]);
 
 	// emulate scanner of language service which adds workspace documents to the cache
 	ls.parseStylesheet(one);
 	ls.parseStylesheet(two);
 
-	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	const { items } = await ls.doComplete(two, Position.create(1, 18));
 	assert.deepStrictEqual(
 		items.find((item) => item.label === "primary"),
 		{
@@ -758,7 +758,7 @@ test("should suggest function with required parameter", async () => {
 	ls.parseStylesheet(one);
 	ls.parseStylesheet(two);
 
-	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	const { items } = await ls.doComplete(two, Position.create(1, 18));
 	assert.deepStrictEqual(
 		items.find((item) => item.label === "primary"),
 		{
@@ -799,7 +799,7 @@ test("given both required and optional parameters should suggest two variants of
 	ls.parseStylesheet(one);
 	ls.parseStylesheet(two);
 
-	const { items } = await ls.doComplete(two, Position.create(1, 17));
+	const { items } = await ls.doComplete(two, Position.create(1, 18));
 	assert.deepStrictEqual(
 		items.filter((item) => item.label === "primary"),
 		[

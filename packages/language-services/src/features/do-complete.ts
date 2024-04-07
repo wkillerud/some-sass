@@ -50,6 +50,7 @@ const reEach = /^.*@each .+ in /;
 const reFor = /^.*@for .+ from /;
 const reIf = /^.*@if /;
 const reElseIf = /^.*@else if /;
+const reWhile = /^.*@while /;
 const rePropertyValue = /.*:\s*/;
 const reEmptyPropertyValue = /.*:\s*$/;
 const reQuotedValueInString = /["'](?:[^"'\\]|\\.)*["']/g;
@@ -425,13 +426,15 @@ export class DoComplete extends LanguageFeature {
 		const isElseIf = reElseIf.test(lineBeforePosition);
 		const isEach = reEach.test(lineBeforePosition);
 		const isFor = reFor.test(lineBeforePosition);
+		const isWhile = reWhile.test(lineBeforePosition);
 		const isPropertyValue = rePropertyValue.test(lineBeforePosition);
 		const isEmptyValue = reEmptyPropertyValue.test(lineBeforePosition);
 		const isQuotes = reQuotes.test(
 			lineBeforePosition.replace(reQuotedValueInString, ""),
 		);
 
-		const isControlFlow = isReturn || isIf || isElseIf || isEach || isFor;
+		const isControlFlow =
+			isReturn || isIf || isElseIf || isEach || isFor || isWhile;
 
 		if ((isControlFlow || isPropertyValue) && !isEmptyValue && !isQuotes) {
 			if (context.namespace && currentWord.endsWith(".")) {
@@ -462,6 +465,8 @@ export class DoComplete extends LanguageFeature {
 			}
 		} else if (isQuotes) {
 			context.isFunctionContext = isInterpolation;
+		} else if (isPropertyValue && isEmptyValue) {
+			context.isFunctionContext = true;
 		}
 
 		if (!isPropertyValue && reMixinReference.test(lineBeforePosition)) {

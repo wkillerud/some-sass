@@ -123,8 +123,8 @@ test("should suggest symbol from a different document via @use", async () => {
 		{
 			commitCharacters: [";", ","],
 			documentation: "limegreen\n____\nVariable declared in one.scss",
-			filterText: "$primary",
-			insertText: "primary",
+			filterText: "ns.$primary",
+			insertText: "$primary",
 			kind: CompletionItemKind.Color,
 			label: "$primary",
 			sortText: undefined,

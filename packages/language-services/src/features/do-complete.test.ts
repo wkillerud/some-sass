@@ -140,7 +140,32 @@ test("should not suggest mixin or placeholder in string interpolation", async ()
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
 
-test("should not suggest mixin or placeholder in @return", async () => {
+test("should suggest variable in @return", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestAllFromOpenDocument: true,
+			suggestFromUseOnly: false,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument([
+		'$name: "value";',
+		"@mixin mixin($a: 1, $b) {}",
+		"%placeholder { color: blue; }",
+		"@function compare($a: 1, $b) { @return $",
+	]);
+
+	ls.parseStylesheet(one);
+
+	const { items } = await ls.doComplete(one, Position.create(3, 40));
+
+	assert.ok(items.find((item) => item.label === "$name"));
+	assert.isUndefined(items.find((item) => item.label === "compare")); // allow for recursion
+	assert.isUndefined(items.find((item) => item.label === "mixin"));
+	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
+});
+
+test("should suggest function in @return", async () => {
 	ls.configure({
 		completionSettings: {
 			suggestAllFromOpenDocument: true,
@@ -159,13 +184,39 @@ test("should not suggest mixin or placeholder in @return", async () => {
 
 	const { items } = await ls.doComplete(one, Position.create(3, 39));
 
-	assert.ok(items.find((item) => item.label === "$name"));
 	assert.ok(items.find((item) => item.label === "compare")); // allow for recursion
+	assert.isUndefined(items.find((item) => item.label === "$name"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
 
-test("should not suggest mixin or placeholder in @if", async () => {
+test("should suggest variable in @if", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestAllFromOpenDocument: true,
+			suggestFromUseOnly: false,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument([
+		'$name: "value";',
+		"@mixin mixin($a: 1, $b) {}",
+		"%placeholder { color: blue; }",
+		"@function compare($a: 1, $b) { @return $a * $b; }",
+		"@if $",
+	]);
+
+	ls.parseStylesheet(one);
+
+	const { items } = await ls.doComplete(one, Position.create(4, 5));
+
+	assert.ok(items.find((item) => item.label === "$name"));
+	assert.isUndefined(items.find((item) => item.label === "compare"));
+	assert.isUndefined(items.find((item) => item.label === "mixin"));
+	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
+});
+
+test("should suggest function in @if", async () => {
 	ls.configure({
 		completionSettings: {
 			suggestAllFromOpenDocument: true,
@@ -185,13 +236,40 @@ test("should not suggest mixin or placeholder in @if", async () => {
 
 	const { items } = await ls.doComplete(one, Position.create(4, 4));
 
-	assert.ok(items.find((item) => item.label === "$name"));
 	assert.ok(items.find((item) => item.label === "compare"));
+	assert.isUndefined(items.find((item) => item.label === "$name"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
 
-test("should not suggest mixin or placeholder in @else if", async () => {
+test("should suggest variable in @else if", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestAllFromOpenDocument: true,
+			suggestFromUseOnly: false,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument([
+		'$name: "value";',
+		"@mixin mixin($a: 1, $b) {}",
+		"%placeholder { color: blue; }",
+		"@function compare($a: 1, $b) { @return $a * $b; }",
+		"@if $name {",
+		"} @else if $",
+	]);
+
+	ls.parseStylesheet(one);
+
+	const { items } = await ls.doComplete(one, Position.create(5, 12));
+
+	assert.ok(items.find((item) => item.label === "$name"));
+	assert.isUndefined(items.find((item) => item.label === "compare"));
+	assert.isUndefined(items.find((item) => item.label === "mixin"));
+	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
+});
+
+test("should suggest function in @else if", async () => {
 	ls.configure({
 		completionSettings: {
 			suggestAllFromOpenDocument: true,
@@ -210,37 +288,10 @@ test("should not suggest mixin or placeholder in @else if", async () => {
 
 	ls.parseStylesheet(one);
 
-	const { items } = await ls.doComplete(one, Position.create(5, 11));
+	const { items } = await ls.doComplete(one, Position.create(5, 12));
 
-	assert.ok(items.find((item) => item.label === "$name"));
 	assert.ok(items.find((item) => item.label === "compare"));
-	assert.isUndefined(items.find((item) => item.label === "mixin"));
-	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
-});
-
-test("should not suggest mixin or placeholder in @else if", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
-	const one = fileSystemProvider.createDocument([
-		'$name: "value";',
-		"@mixin mixin($a: 1, $b) {}",
-		"%placeholder { color: blue; }",
-		"@function compare($a: 1, $b) { @return $a * $b; }",
-		"@if $name {",
-		"} @else if ",
-	]);
-
-	ls.parseStylesheet(one);
-
-	const { items } = await ls.doComplete(one, Position.create(5, 11));
-
-	assert.ok(items.find((item) => item.label === "$name"));
-	assert.ok(items.find((item) => item.label === "compare"));
+	assert.isUndefined(items.find((item) => item.label === "$name"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
@@ -268,7 +319,33 @@ test("should not suggest anything for @each before in", async () => {
 	assert.equal(items.length, 0);
 });
 
-test("should not suggest mixin or placeholder for @each $foo in", async () => {
+test("should suggest variable in for @each $foo in", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestAllFromOpenDocument: true,
+			suggestFromUseOnly: false,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument([
+		'$name: "value";',
+		"@mixin mixin($a: 1, $b) {}",
+		"%placeholder { color: blue; }",
+		"@function compare($a: 1, $b) { @return $a * $b; }",
+		"@each $foo in $",
+	]);
+
+	ls.parseStylesheet(one);
+
+	const { items } = await ls.doComplete(one, Position.create(4, 15));
+
+	assert.ok(items.find((item) => item.label === "$name"));
+	assert.isUndefined(items.find((item) => item.label === "compare"));
+	assert.isUndefined(items.find((item) => item.label === "mixin"));
+	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
+});
+
+test("should suggest function in for @each $foo in", async () => {
 	ls.configure({
 		completionSettings: {
 			suggestAllFromOpenDocument: true,
@@ -286,10 +363,10 @@ test("should not suggest mixin or placeholder for @each $foo in", async () => {
 
 	ls.parseStylesheet(one);
 
-	const { items } = await ls.doComplete(one, Position.create(4, 14));
+	const { items } = await ls.doComplete(one, Position.create(4, 15));
 
-	assert.ok(items.find((item) => item.label === "$name"));
 	assert.ok(items.find((item) => item.label === "compare"));
+	assert.isUndefined(items.find((item) => item.label === "$name"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
@@ -317,7 +394,33 @@ test("should not suggest anything in @for before from", async () => {
 	assert.equal(items.length, 0);
 });
 
-test("should not suggest mixin or placeholder in @for $i from ", async () => {
+test("should suggest variable in @for $i from ", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestAllFromOpenDocument: true,
+			suggestFromUseOnly: false,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument([
+		'$name: "value";',
+		"@mixin mixin($a: 1, $b) {}",
+		"%placeholder { color: blue; }",
+		"@function compare($a: 1, $b) { @return $a * $b; }",
+		"@for $i from $",
+	]);
+
+	ls.parseStylesheet(one);
+
+	const { items } = await ls.doComplete(one, Position.create(4, 15));
+
+	assert.ok(items.find((item) => item.label === "$name"));
+	assert.isUndefined(items.find((item) => item.label === "compare"));
+	assert.isUndefined(items.find((item) => item.label === "mixin"));
+	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
+});
+
+test("should suggest function in @for $i from ", async () => {
 	ls.configure({
 		completionSettings: {
 			suggestAllFromOpenDocument: true,
@@ -335,15 +438,41 @@ test("should not suggest mixin or placeholder in @for $i from ", async () => {
 
 	ls.parseStylesheet(one);
 
-	const { items } = await ls.doComplete(one, Position.create(4, 14));
+	const { items } = await ls.doComplete(one, Position.create(4, 15));
 
-	assert.ok(items.find((item) => item.label === "$name"));
 	assert.ok(items.find((item) => item.label === "compare"));
+	assert.isUndefined(items.find((item) => item.label === "$name"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
 
-test("should not suggest mixin or placeholder in @for $i from 1 to ", async () => {
+test("should suggest variable @for $i from 1 to ", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestAllFromOpenDocument: true,
+			suggestFromUseOnly: false,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument([
+		'$name: "value";',
+		"@mixin mixin($a: 1, $b) {}",
+		"%placeholder { color: blue; }",
+		"@function compare($a: 1, $b) { @return $a * $b; }",
+		"@for $i from 1 to $",
+	]);
+
+	ls.parseStylesheet(one);
+
+	const { items } = await ls.doComplete(one, Position.create(4, 19));
+
+	assert.ok(items.find((item) => item.label === "$name"));
+	assert.isUndefined(items.find((item) => item.label === "compare"));
+	assert.isUndefined(items.find((item) => item.label === "mixin"));
+	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
+});
+
+test("should suggest function @for $i from 1 to ", async () => {
 	ls.configure({
 		completionSettings: {
 			suggestAllFromOpenDocument: true,
@@ -363,8 +492,8 @@ test("should not suggest mixin or placeholder in @for $i from 1 to ", async () =
 
 	const { items } = await ls.doComplete(one, Position.create(4, 23));
 
-	assert.ok(items.find((item) => item.label === "$name"));
 	assert.ok(items.find((item) => item.label === "compare"));
+	assert.isUndefined(items.find((item) => item.label === "$name"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });

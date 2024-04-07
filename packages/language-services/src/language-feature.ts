@@ -15,6 +15,7 @@ import {
 	NodeType,
 	Range,
 	SassDocumentSymbol,
+	URI,
 } from "./language-services-types";
 import { joinPath } from "./utils/resources";
 
@@ -176,9 +177,21 @@ export abstract class LanguageFeature {
 				continue;
 			}
 
-			const next = this._internal.cache.getDocument(link.target!);
+			let next = this._internal.cache.getDocument(link.target!);
 			if (!next) {
-				continue;
+				try {
+					// If the linked document hasn't been parsed yet, create a TextDocument
+					const content = await this.options.fileSystemProvider.readFile(
+						URI.parse(link.target),
+					);
+					const originalExt = link.target.slice(
+						Math.max(0, link.target.lastIndexOf(".") + 1),
+					);
+					next = TextDocument.create(link.target, originalExt, 1, content);
+					this.ls.parseStylesheet(next); // add it to the cache
+				} catch {
+					continue;
+				}
 			}
 
 			let prefix = accumulatedPrefix;

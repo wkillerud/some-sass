@@ -1,6 +1,6 @@
 import { test, assert, beforeEach } from "vitest";
-import { SymbolKind, getLanguageService } from "../language-services";
-import { getOptions } from "../utils/test-helpers";
+import { SymbolKind, getLanguageService } from "../../language-services";
+import { getOptions } from "../../utils/test-helpers";
 
 const { fileSystemProvider, ...rest } = getOptions();
 const ls = getLanguageService({ fileSystemProvider, ...rest });

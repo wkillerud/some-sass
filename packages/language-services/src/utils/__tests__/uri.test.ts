@@ -1,6 +1,6 @@
 import { test, assert } from "vitest";
-import { URI } from "../language-services-types";
-import { getName } from "./uri";
+import { URI } from "../../language-services-types";
+import { getName } from "../uri";
 
 test("getName gets file names including extensions", () => {
 	assert.equal(

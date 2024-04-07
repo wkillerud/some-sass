@@ -4,8 +4,8 @@ import {
 	Position,
 	TextDocument,
 	getLanguageService,
-} from "../language-services";
-import { getOptions } from "../utils/test-helpers";
+} from "../../language-services";
+import { getOptions } from "../../utils/test-helpers";
 
 const { fileSystemProvider, ...rest } = getOptions();
 const ls = getLanguageService({ fileSystemProvider, ...rest });

@@ -272,6 +272,7 @@ export class DoComplete extends LanguageFeature {
 							if (!context.isVariableContext) break;
 
 							const items = await this.doVariableCompletion(
+								document,
 								currentDocument,
 								currentWord,
 								symbol,
@@ -286,6 +287,7 @@ export class DoComplete extends LanguageFeature {
 							if (!context.isMixinContext) break;
 
 							const items = await this.doMixinCompletion(
+								document,
 								currentDocument,
 								currentWord,
 								symbol,
@@ -300,6 +302,7 @@ export class DoComplete extends LanguageFeature {
 							if (!context.isFunctionContext) break;
 
 							const items = await this.doFunctionCompletion(
+								document,
 								currentDocument,
 								currentWord,
 								symbol,
@@ -673,6 +676,7 @@ export class DoComplete extends LanguageFeature {
 							if (!context.isVariableContext) break;
 
 							const vars = await this.doVariableCompletion(
+								document,
 								currentDocument,
 								context.currentWord,
 								symbol,
@@ -689,6 +693,7 @@ export class DoComplete extends LanguageFeature {
 							if (!context.isMixinContext) break;
 
 							const mixs = await this.doMixinCompletion(
+								document,
 								currentDocument,
 								context.currentWord,
 								symbol,
@@ -705,6 +710,7 @@ export class DoComplete extends LanguageFeature {
 							if (!context.isFunctionContext) break;
 
 							const funcs = await this.doFunctionCompletion(
+								document,
 								currentDocument,
 								context.currentWord,
 								symbol,
@@ -727,6 +733,7 @@ export class DoComplete extends LanguageFeature {
 	}
 
 	private async doVariableCompletion(
+		initialDocument: TextDocument,
 		currentDocument: TextDocument,
 		currentWord: string,
 		symbol: SassDocumentSymbol,
@@ -763,7 +770,7 @@ export class DoComplete extends LanguageFeature {
 
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
 
-		const isEmbedded = this.isEmbedded(currentDocument);
+		const isEmbedded = this.isEmbedded(initialDocument);
 		let insertText: string | undefined;
 		let filterText: string | undefined;
 
@@ -803,15 +810,16 @@ export class DoComplete extends LanguageFeature {
 		return [item];
 	}
 
-	private isEmbedded(currentDocument: TextDocument) {
-		const dotExt = currentDocument.uri.slice(
-			Math.max(0, currentDocument.uri.lastIndexOf(".")),
+	private isEmbedded(initialDocument: TextDocument) {
+		const dotExt = initialDocument.uri.slice(
+			Math.max(0, initialDocument.uri.lastIndexOf(".")),
 		);
 		const isEmbedded = !dotExt.match(reSassDotExt);
 		return isEmbedded;
 	}
 
 	private async doMixinCompletion(
+		initialDocument: TextDocument,
 		currentDocument: TextDocument,
 		currentWord: string,
 		symbol: SassDocumentSymbol,
@@ -828,7 +836,7 @@ export class DoComplete extends LanguageFeature {
 				: `${prefix}${symbol.name}`
 			: symbol.name;
 
-		const isEmbedded = this.isEmbedded(currentDocument);
+		const isEmbedded = this.isEmbedded(initialDocument);
 
 		const insertText = namespace
 			? namespace !== "*" && !isEmbedded
@@ -933,6 +941,7 @@ export class DoComplete extends LanguageFeature {
 	}
 
 	private async doFunctionCompletion(
+		initialDocument: TextDocument,
 		currentDocument: TextDocument,
 		currentWord: string,
 		symbol: SassDocumentSymbol,
@@ -947,7 +956,7 @@ export class DoComplete extends LanguageFeature {
 			? `${namespace !== "*" ? namespace : ""}.${prefix}${symbol.name}`
 			: symbol.name;
 
-		const isEmbedded = this.isEmbedded(currentDocument);
+		const isEmbedded = this.isEmbedded(initialDocument);
 		const insertText = namespace
 			? namespace !== "*" && !isEmbedded
 				? `.${prefix}${symbol.name}`

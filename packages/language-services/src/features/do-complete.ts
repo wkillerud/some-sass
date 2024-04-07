@@ -783,8 +783,8 @@ export class DoComplete extends LanguageFeature {
 
 			filterText = currentWord.endsWith(".") ? `${namespace}.${label}` : label;
 		} else if (
-			currentDocument.languageId === "vue" ||
-			currentDocument.languageId === "astro"
+			initialDocument.languageId === "vue" ||
+			initialDocument.languageId === "astro"
 		) {
 			// In Vue and Astro files, the $ does not get replaced by the suggestion,
 			// so exclude it from the insertText.

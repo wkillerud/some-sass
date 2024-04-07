@@ -45,10 +45,33 @@ const reSassdocLine = /\/\/\/\s/;
 const reSassExt = /\.s(a|c)ss$/;
 const rePrivate = /^\$?[_].*$/;
 
+const reReturn = /^.*@return/;
+const reEach = /^.*@each .+ in /;
+const reFor = /^.*@for .+ from /;
+const reIf = /^.*@if /;
+const reElseIf = /^.*@else if /;
+const rePropertyValue = /.*:\s*/;
+const reEmptyPropertyValue = /.*:\s*$/;
+const reQuotedValueInString = /["'](?:[^"'\\]|\\.)*["']/g;
+const reMixinReference = /.*@include\s+(.*)/;
+const reComment = /^(.*\/\/|.*\/\*|\s*\*)/;
+const reSassDoc = /^[\\s]*\/{3}.*$/;
+const reQuotes = /["']/;
+const rePlaceholder = /@extend\s+/;
+const rePlaceholderDeclaration = /^\s*%/;
+const rePartialModuleAtRule = /@(?:use|forward|import) ["']/;
+
 type CompletionContext = {
-	isMixinContext: boolean;
-	isFunctionContext: boolean;
-	isVariableContext: boolean;
+	currentWord: string;
+	namespace?: string;
+	isMixinContext?: boolean;
+	isFunctionContext?: boolean;
+	isVariableContext?: boolean;
+	isPlaceholderContext?: boolean;
+	isPlaceholderDeclarationContext?: boolean;
+	isCommentContext?: boolean;
+	isSassdocContext?: boolean;
+	isImportContext?: boolean;
 };
 
 export class DoComplete extends LanguageFeature {
@@ -58,7 +81,7 @@ export class DoComplete extends LanguageFeature {
 	): Promise<CompletionList> {
 		const result = CompletionList.create([]);
 
-		// Might be overthinking this. String-based approach for at least some of these were so much simpler :see_no_evil:
+		const context = this.createCompletionContext(document, position);
 
 		const stylesheet = this.ls.parseStylesheet(document);
 		const offset = document.offsetAt(position);
@@ -71,14 +94,7 @@ export class DoComplete extends LanguageFeature {
 			node = getNodeAtOffset(stylesheet, offset - 1);
 		}
 
-		// If the document begins with a comment, the Stylesheet node does not begin at offset 0,
-		// instead starting where the comment block ends. In that case node may be null. Otherwise
-		// if we get NodeType.Stylesheet, it's likely we're in a comment context and want to check
-		// if it's Sassdoc.
-		const isMaybeSassdocContext =
-			(!node && stylesheet.offset !== 0) ||
-			(node && node.type === NodeType.Stylesheet);
-		if (isMaybeSassdocContext) {
+		if (context.isSassdocContext) {
 			const scanner = this.getScanner(document);
 			let token: IToken = scanner.scan();
 			let prevToken: IToken | null = null;
@@ -136,11 +152,11 @@ export class DoComplete extends LanguageFeature {
 			}
 		}
 
-		if (
-			node &&
-			node.parent &&
-			(node.parent instanceof Use || node.parent instanceof Forward)
-		) {
+		if (context.isCommentContext) {
+			return result;
+		}
+
+		if (context.isImportContext) {
 			// Upstream includes thing like suggestions based on relative paths
 			// and imports of built-in sass modules like sass:color and sass:math
 			const upstreamResult = await this._internal.scssLs.doComplete2(
@@ -158,19 +174,22 @@ export class DoComplete extends LanguageFeature {
 			if (upstreamResult.items.length > 0) {
 				result.items.push(...upstreamResult.items);
 			}
-			const items = await this.doModuleImportCompletion(document, node);
-			if (items.length > 0) {
-				result.items.push(...items);
+
+			if (
+				node &&
+				node.parent &&
+				(node.parent instanceof Use || node.parent instanceof Forward)
+			) {
+				const items = await this.doModuleImportCompletion(document, node);
+				if (items.length > 0) {
+					result.items.push(...items);
+				}
 			}
+
 			return result;
 		}
 
-		const isPlaceholderDeclaration =
-			node &&
-			node.parent &&
-			node.parent.type === NodeType.SimpleSelector &&
-			node.getText().startsWith("%");
-		if (isPlaceholderDeclaration) {
+		if (context.isPlaceholderDeclarationContext) {
 			const items = await this.doPlaceholderDeclarationCompletion();
 			if (items.length > 0) {
 				result.items.push(...items);
@@ -178,8 +197,7 @@ export class DoComplete extends LanguageFeature {
 			return result;
 		}
 
-		const isPlaceholderUsage = this.isPlaceholderUsage(node);
-		if (isPlaceholderUsage) {
+		if (context.isPlaceholderContext) {
 			const items = await this.doPlaceholderUsageCompletion(document);
 			if (items.length > 0) {
 				result.items.push(...items);
@@ -196,7 +214,7 @@ export class DoComplete extends LanguageFeature {
 			return result;
 		}
 
-		// At this point we're at `@for ` and will declare a variable.
+		// At this point we're at `@each ` and will declare a variable.
 		// We don't need suggestions here.
 		const eachDeclaration =
 			node instanceof EachStatement && !node.variables?.hasChildren();
@@ -204,23 +222,8 @@ export class DoComplete extends LanguageFeature {
 			return result;
 		}
 
-		const isMixinContext = node instanceof MixinReference;
-		const isFunctionContext = !isMixinContext;
-		const isVariableContext = !isMixinContext;
-
-		const context: CompletionContext = {
-			isFunctionContext,
-			isVariableContext,
-			isMixinContext,
-		};
-
-		const moduleNode: Module | null = this.getModuleNode(document, node);
-		if (moduleNode) {
-			const items = await this.doNamespaceCompletion(
-				document,
-				moduleNode,
-				context,
-			);
+		if (context.namespace) {
+			const items = await this.doNamespaceCompletion(document, context);
 			if (items.length > 0) {
 				result.items.push(...items);
 			}
@@ -235,12 +238,10 @@ export class DoComplete extends LanguageFeature {
 			}
 		}
 		if (wildcards.length > 0) {
-			const items = await this.doWildcardCompletion(
-				document,
-				node ? node.getText() : "",
-				wildcards,
-				context,
-			);
+			const items = await this.doWildcardCompletion(document, wildcards, {
+				...context,
+				namespace: "*",
+			});
 			if (items.length > 0) {
 				result.items.push(...items);
 			}
@@ -248,7 +249,7 @@ export class DoComplete extends LanguageFeature {
 
 		// Legacy @import style suggestions
 		if (!this.configuration.completionSettings?.suggestFromUseOnly) {
-			const currentWord = node ? node.getText() : "";
+			const currentWord = context.currentWord;
 			const documents = this._internal.cache.documents();
 			for (const currentDocument of documents) {
 				if (
@@ -350,15 +351,124 @@ export class DoComplete extends LanguageFeature {
 		return result;
 	}
 
-	private isPlaceholderUsage(node: Node | null): boolean {
-		let maybeExtends = node;
-		while (maybeExtends) {
-			if (maybeExtends && maybeExtends.type === NodeType.ExtendsReference) {
-				return true;
-			}
-			maybeExtends = maybeExtends.getParent();
+	createCompletionContext(
+		document: TextDocument,
+		position: Position,
+	): CompletionContext {
+		const text = document.getText();
+		const offset = document.offsetAt(position);
+		let i = offset - 1;
+		while (!"\n\r".includes(text.charAt(i))) {
+			i--;
 		}
-		return false;
+		const lineBeforePosition = text.substring(i + 1, offset);
+
+		i = offset - 1;
+		while (i >= 0 && !' \t\n\r":[()]}/,'.includes(text.charAt(i))) {
+			i--;
+		}
+		const currentWord = text.substring(i + 1, offset);
+
+		if (rePartialModuleAtRule.test(lineBeforePosition)) {
+			return {
+				currentWord,
+				isImportContext: true,
+			};
+		}
+
+		if (reSassDoc.test(lineBeforePosition)) {
+			return {
+				currentWord,
+				isSassdocContext: true,
+			};
+		}
+
+		if (reComment.test(lineBeforePosition)) {
+			return {
+				currentWord,
+				isCommentContext: true,
+			};
+		}
+
+		if (rePlaceholder.test(lineBeforePosition)) {
+			return {
+				currentWord,
+				isPlaceholderContext: true,
+			};
+		}
+
+		if (rePlaceholderDeclaration.test(lineBeforePosition)) {
+			return {
+				currentWord,
+				isPlaceholderDeclarationContext: true,
+			};
+		}
+
+		const isInterpolation = currentWord.includes("#{");
+
+		const context: CompletionContext = {
+			currentWord,
+		};
+
+		// Is namespace, e.g. `namespace.$var` or `@include namespace.mixin` or `namespace.func()`
+		context.namespace =
+			currentWord.length === 0 || !currentWord.includes(".")
+				? undefined
+				: currentWord.substring(
+						// Skip #{ if this is interpolation
+						isInterpolation ? currentWord.indexOf("{") + 1 : 0,
+						currentWord.indexOf("."),
+					);
+
+		const isReturn = reReturn.test(lineBeforePosition);
+		const isIf = reIf.test(lineBeforePosition);
+		const isElseIf = reElseIf.test(lineBeforePosition);
+		const isEach = reEach.test(lineBeforePosition);
+		const isFor = reFor.test(lineBeforePosition);
+		const isPropertyValue = rePropertyValue.test(lineBeforePosition);
+		const isEmptyValue = reEmptyPropertyValue.test(lineBeforePosition);
+		const isQuotes = reQuotes.test(
+			lineBeforePosition.replace(reQuotedValueInString, ""),
+		);
+
+		const isControlFlow = isReturn || isIf || isElseIf || isEach || isFor;
+
+		if ((isControlFlow || isPropertyValue) && !isEmptyValue && !isQuotes) {
+			if (context.namespace && currentWord.endsWith(".")) {
+				context.isVariableContext = true;
+			} else {
+				context.isVariableContext = currentWord.includes("$");
+			}
+		} else if (isQuotes) {
+			context.isVariableContext = isInterpolation;
+		} else {
+			context.isVariableContext =
+				currentWord.startsWith("$") || isInterpolation || isEmptyValue;
+		}
+
+		if ((isControlFlow || isPropertyValue) && !isEmptyValue && !isQuotes) {
+			if (context.namespace) {
+				context.isFunctionContext = true;
+			} else {
+				const lastChar = lineBeforePosition.charAt(
+					lineBeforePosition.length - 1,
+				);
+				const triggers =
+					this.configuration.completionSettings
+						?.suggestFunctionsInStringContextAfterSymbols;
+				if (triggers) {
+					context.isFunctionContext = triggers.includes(lastChar);
+				}
+			}
+		} else if (isQuotes) {
+			context.isFunctionContext = isInterpolation;
+		}
+
+		if (!isPropertyValue && reMixinReference.test(lineBeforePosition)) {
+			context.isMixinContext = true;
+		}
+
+		return context;
 	}
 
 	async doPlaceholderUsageCompletion(
@@ -461,12 +571,11 @@ export class DoComplete extends LanguageFeature {
 
 	async doNamespaceCompletion(
 		document: TextDocument,
-		node: Module,
 		context: CompletionContext,
 	): Promise<CompletionItem[]> {
 		const items: CompletionItem[] = [];
 
-		const namespace: string | undefined = node.getIdentifier()?.getText();
+		const namespace: string | undefined = context.namespace;
 		if (!namespace) {
 			return items;
 		}
@@ -483,7 +592,11 @@ export class DoComplete extends LanguageFeature {
 					// Look for matches in built-in namespaces, which do not appear in storage
 					for (const [builtIn, docs] of Object.entries(sassBuiltInModules)) {
 						if (builtIn === link.target) {
-							const items = this.doSassBuiltInCompletion(document, node, docs);
+							const items = this.doSassBuiltInCompletion(
+								document,
+								context,
+								docs,
+							);
 							return items;
 						}
 					}
@@ -498,13 +611,9 @@ export class DoComplete extends LanguageFeature {
 			return items;
 		}
 
-		const currentWord = node.getText();
-
 		const result = await this.findCompletionsInWorkspace(
 			document,
 			context,
-			currentWord,
-			namespace,
 			start,
 		);
 		return result;
@@ -512,7 +621,6 @@ export class DoComplete extends LanguageFeature {
 
 	async doWildcardCompletion(
 		document: TextDocument,
-		currentWord: string,
 		wildcards: DocumentLink[],
 		context: CompletionContext,
 	): Promise<CompletionItem[]> {
@@ -524,8 +632,6 @@ export class DoComplete extends LanguageFeature {
 			const result = await this.findCompletionsInWorkspace(
 				document,
 				context,
-				currentWord,
-				"*",
 				start,
 			);
 
@@ -539,8 +645,6 @@ export class DoComplete extends LanguageFeature {
 	private async findCompletionsInWorkspace(
 		document: TextDocument,
 		context: CompletionContext,
-		currentWord: string,
-		namespace: string,
 		start: TextDocument,
 	) {
 		const result = await this.findInWorkspace<CompletionItem>(
@@ -565,10 +669,10 @@ export class DoComplete extends LanguageFeature {
 
 							const vars = await this.doVariableCompletion(
 								currentDocument,
-								currentWord,
+								context.currentWord,
 								symbol,
 								isPrivate,
-								namespace,
+								context.namespace,
 								prefix,
 							);
 							if (vars.length > 0) {
@@ -581,10 +685,10 @@ export class DoComplete extends LanguageFeature {
 
 							const mixs = await this.doMixinCompletion(
 								currentDocument,
-								currentWord,
+								context.currentWord,
 								symbol,
 								isPrivate,
-								namespace,
+								context.namespace,
 								prefix,
 							);
 							if (mixs.length > 0) {
@@ -597,10 +701,10 @@ export class DoComplete extends LanguageFeature {
 
 							const funcs = await this.doFunctionCompletion(
 								currentDocument,
-								currentWord,
+								context.currentWord,
 								symbol,
 								isPrivate,
-								namespace,
+								context.namespace,
 								prefix,
 							);
 							if (funcs.length > 0) {
@@ -906,21 +1010,21 @@ export class DoComplete extends LanguageFeature {
 
 	doSassBuiltInCompletion(
 		document: TextDocument,
-		node: Module,
+		context: CompletionContext,
 		moduleDocs: SassBuiltInModule,
 	): CompletionItem[] {
 		const items: CompletionItem[] = [];
 		for (const [name, docs] of Object.entries(moduleDocs.exports)) {
 			const { description, signature, parameterSnippet, returns } = docs;
 			// Client needs the namespace as part of the text that is matched,
-			const filterText = `${node.getIdentifier()?.getText()}.${name}`;
+			const filterText = `${context.namespace}.${name}`;
 
 			// Inserted text needs to include the `.` which will otherwise
 			// be replaced (except when we're embedded in Vue, Svelte or Astro).
 			// Example result: .floor(${1:number})
 			const isEmbedded = this.isEmbedded(document);
 
-			const insertText = node.getText().includes(".")
+			const insertText = context.currentWord.includes(".")
 				? `${isEmbedded ? "" : "."}${name}${
 						signature ? `(${parameterSnippet})` : ""
 					}`

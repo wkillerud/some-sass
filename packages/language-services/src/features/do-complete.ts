@@ -42,7 +42,7 @@ import { getName } from "../utils/uri";
 
 const reNewSassdocBlock = /\/\/\/\s?$/;
 const reSassdocLine = /\/\/\/\s/;
-const reSassExt = /\.s(a|c)ss$/;
+const reSassDotExt = /\.s(a|c)ss$/;
 const rePrivate = /^\$?[_].*$/;
 
 const reReturn = /^.*@return/;
@@ -804,10 +804,10 @@ export class DoComplete extends LanguageFeature {
 	}
 
 	private isEmbedded(currentDocument: TextDocument) {
-		const originalExt = currentDocument.uri.slice(
-			Math.max(0, currentDocument.uri.lastIndexOf(".") + 1),
+		const dotExt = currentDocument.uri.slice(
+			Math.max(0, currentDocument.uri.lastIndexOf(".")),
 		);
-		const isEmbedded = !originalExt.match(reSassExt);
+		const isEmbedded = !dotExt.match(reSassDotExt);
 		return isEmbedded;
 	}
 
@@ -1090,7 +1090,7 @@ export class DoComplete extends LanguageFeature {
 					await this.options.fileSystemProvider.readDirectory(pathInsideModule);
 				for (const [uri, fileType] of filesInModulePath) {
 					const file = getName(uri);
-					if (fileType === FileType.File && file.match(reSassExt)) {
+					if (fileType === FileType.File && file.match(reSassDotExt)) {
 						const filename = file.startsWith("/") ? file.slice(1) : file;
 						// Prefer to insert without file extension
 						let insertText = filename.slice(0, -5);

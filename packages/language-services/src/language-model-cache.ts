@@ -23,7 +23,7 @@ type LanguageModels = {
 	};
 };
 
-const defaultCacheEvictInterval = 360; // five minutes
+const defaultCacheEvictInterval = 0; // default off to not leave an interval running in case of unit tests
 
 export class LanguageModelCache {
 	#languageModels: LanguageModels = {};
@@ -41,7 +41,9 @@ export class LanguageModelCache {
 		};
 
 		const intervalTime =
-			this.#options.cleanupIntervalTimeInSeconds || defaultCacheEvictInterval;
+			typeof this.#options.cleanupIntervalTimeInSeconds === "undefined"
+				? defaultCacheEvictInterval
+				: this.#options.cleanupIntervalTimeInSeconds;
 		if (intervalTime > 0) {
 			this.#cleanupInterval = setInterval(() => {
 				const cutoffTime = Date.now() - intervalTime * 1000;

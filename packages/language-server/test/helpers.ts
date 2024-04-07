@@ -71,6 +71,10 @@ export const createTestLsOptions = (): LanguageServiceOptions => {
 				},
 			},
 		},
+		languageModelCache: {
+			cleanupIntervalTimeInSeconds: 0,
+			maxEntries: 10_000,
+		},
 	};
 };
 

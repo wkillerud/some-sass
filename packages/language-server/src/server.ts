@@ -186,7 +186,10 @@ export class SomeSassServer {
 					storage: storageService,
 				});
 
-				scannerService = new ScannerService();
+				scannerService = new ScannerService(ls, fileSystemProvider, {
+					scannerDepth: settings.scannerDepth,
+					scanImportedFiles: settings.scanImportedFiles,
+				});
 
 				this.connection.console.debug(
 					`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> scanning workspace for files`,
@@ -200,31 +203,6 @@ export class SomeSassServer {
 				this.connection.console.debug(
 					`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> found ${files.length} files, starting parse`,
 				);
-
-				// Populate the cache for the new language services
-				for (const file of files) {
-					let uri = file;
-					if (file.scheme === "vscode-test-web") {
-						// TODO: test-web paths includes /static/extensions/fs which causes issues.
-						// The URI ends up being vscode-test-web://mount/static/extensions/fs/file.scss when it should only be vscode-test-web://mount/file.scss.
-						// This should probably be landed as a bugfix somewhere upstream.
-						uri = URI.parse(
-							file.toString().replace("/static/extensions/fs", ""),
-						);
-					}
-					const content = await fileSystemProvider.readFile(uri);
-					const document = TextDocument.create(
-						uri.toString(),
-						"scss",
-						1,
-						content,
-					);
-					const scssRegions = getSCSSRegionsDocument(document);
-					if (!scssRegions.document) {
-						continue;
-					}
-					ls.parseStylesheet(document);
-				}
 
 				await scannerService.scan(files);
 

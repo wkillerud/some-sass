@@ -770,7 +770,10 @@ export class DoComplete extends LanguageFeature {
 
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
 
-		const isEmbedded = this.isEmbedded(initialDocument);
+		const dotExt = initialDocument.uri.slice(
+			Math.max(0, initialDocument.uri.lastIndexOf(".")),
+		);
+		const isEmbedded = !dotExt.match(reSassDotExt);
 		let insertText: string | undefined;
 		let filterText: string | undefined;
 
@@ -782,10 +785,7 @@ export class DoComplete extends LanguageFeature {
 					: label;
 
 			filterText = currentWord.endsWith(".") ? `${namespace}.${label}` : label;
-		} else if (
-			initialDocument.languageId === "vue" ||
-			initialDocument.languageId === "astro"
-		) {
+		} else if (dotExt === ".vue" || dotExt === ".astro") {
 			// In Vue and Astro files, the $ does not get replaced by the suggestion,
 			// so exclude it from the insertText.
 			insertText = asDollarlessVariable(label);

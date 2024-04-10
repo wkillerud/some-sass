@@ -1,21 +1,11 @@
-import { LanguageFeature, LanguageFeatureInternal } from "../language-feature";
+import { LanguageFeature } from "../language-feature";
 import {
-	LanguageServiceOptions,
 	TextDocument,
-	LanguageService,
 	SassDocumentLink,
 	URI,
 } from "../language-services-types";
 
 export class FindDocumentLinks extends LanguageFeature {
-	constructor(
-		ls: LanguageService,
-		options: LanguageServiceOptions,
-		_internal: LanguageFeatureInternal,
-	) {
-		super(ls, options, _internal);
-	}
-
 	async findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]> {
 		const cached = this._internal.cache.getResolvedLinks(document);
 		if (cached) return cached;

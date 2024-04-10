@@ -1,10 +1,12 @@
 import { getSCSSLanguageService } from "@somesass/vscode-css-languageservice";
 import { DoComplete } from "./features/do-complete";
 import { DoHover } from "./features/do-hover";
+import { DoRename } from "./features/do-rename";
 import { FindColors } from "./features/find-colors";
 import { FindDefinition } from "./features/find-definition";
 import { FindDocumentHighlights } from "./features/find-document-highlights";
 import { FindDocumentLinks } from "./features/find-document-links";
+import { FindReferences } from "./features/find-references";
 import { FindSymbols } from "./features/find-symbols";
 import { FindValue } from "./features/find-value";
 import { LanguageModelCache as LanguageServerCache } from "./language-model-cache";
@@ -33,10 +35,12 @@ class LanguageService implements ILanguageService {
 	#cache: LanguageServerCache;
 	#doComplete: DoComplete;
 	#doHover: DoHover;
+	#doRename: DoRename;
 	#findColors: FindColors;
 	#findDefinition: FindDefinition;
 	#findDocumentHighlights: FindDocumentHighlights;
 	#findDocumentLinks: FindDocumentLinks;
+	#findReferences: FindReferences;
 	#findSymbols: FindSymbols;
 	#findValue: FindValue;
 
@@ -53,6 +57,7 @@ class LanguageService implements ILanguageService {
 		this.#cache = cache;
 		this.#doComplete = new DoComplete(this, options, { scssLs, cache });
 		this.#doHover = new DoHover(this, options, { scssLs, cache });
+		this.#doRename = new DoRename(this, options, { scssLs, cache });
 		this.#findColors = new FindColors(this, options, { scssLs, cache });
 		this.#findDefinition = new FindDefinition(this, options, { scssLs, cache });
 		this.#findDocumentHighlights = new FindDocumentHighlights(this, options, {
@@ -63,6 +68,7 @@ class LanguageService implements ILanguageService {
 			scssLs,
 			cache,
 		});
+		this.#findReferences = new FindReferences(this, options, { scssLs, cache });
 		this.#findSymbols = new FindSymbols(this, options, { scssLs, cache });
 		this.#findValue = new FindValue(this, options, { scssLs, cache });
 	}
@@ -70,10 +76,12 @@ class LanguageService implements ILanguageService {
 	configure(configuration: LanguageServiceConfiguration): void {
 		this.#doComplete.configure(configuration);
 		this.#doHover.configure(configuration);
+		this.#doRename.configure(configuration);
 		this.#findColors.configure(configuration);
 		this.#findDefinition.configure(configuration);
 		this.#findDocumentHighlights.configure(configuration);
 		this.#findDocumentLinks.configure(configuration);
+		this.#findReferences.configure(configuration);
 		this.#findSymbols.configure(configuration);
 	}
 
@@ -87,6 +95,10 @@ class LanguageService implements ILanguageService {
 
 	doHover(document: TextDocument, position: Position) {
 		return this.#doHover.doHover(document, position);
+	}
+
+	doRename(document: TextDocument, position: Position, newName: string) {
+		return this.#doRename.doRename(document, position, newName);
 	}
 
 	findColors(document: TextDocument): Promise<ColorInformation[]> {
@@ -112,6 +124,10 @@ class LanguageService implements ILanguageService {
 		return this.#findSymbols.findDocumentSymbols(document);
 	}
 
+	findReferences(document: TextDocument, position: Position) {
+		return this.#findReferences.findReferences(document, position);
+	}
+
 	findValue(document: TextDocument, position: Position) {
 		return this.#findValue.findValue(document, position);
 	}
@@ -134,6 +150,10 @@ class LanguageService implements ILanguageService {
 
 	onDocumentRemoved(document: TextDocument | string) {
 		this.#cache.onDocumentRemoved(document);
+	}
+
+	prepareRename(document: TextDocument, position: Position) {
+		return this.#doRename.prepareRename(document, position);
 	}
 
 	clearCache() {

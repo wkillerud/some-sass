@@ -174,6 +174,14 @@ export interface LanguageService {
 		position: Position,
 	): Promise<CompletionList>;
 	doHover(document: TextDocument, position: Position): Promise<Hover | null>;
+	/**
+	 * Called after a {@link prepareRename} to perform the actual renaming.
+	 */
+	doRename(
+		document: TextDocument,
+		position: Position,
+		newName: string,
+	): Promise<WorkspaceEdit | null>;
 	findColors(document: TextDocument): Promise<ColorInformation[]>;
 	findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]>;
 	findDocumentSymbols(document: TextDocument): SassDocumentSymbol[];
@@ -208,6 +216,12 @@ export interface LanguageService {
 	 * @param {TextDocument | string} document Either the document itself or {@link TextDocument.uri}
 	 */
 	onDocumentRemoved(document: TextDocument | string): void;
+	prepareRename(
+		document: TextDocument,
+		position: Position,
+	): Promise<
+		null | { defaultBehavior: boolean } | { range: Range; placeholder: string }
+	>;
 	/**
 	 * Clears all cached documents, forcing everything to be reparsed the next time a feature is used.
 	 */

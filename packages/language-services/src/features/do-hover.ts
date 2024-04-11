@@ -284,7 +284,7 @@ export class DoHover extends LanguageFeature {
 
 		const prefixInfo =
 			maybePrefixedName !== symbol.name ? ` as ${symbol.name}` : "";
-		result.value += `\n____\nFunction declared${prefixInfo} in ${this.getFileName(document)}`;
+		result.value += `\n____\nFunction declared${prefixInfo} in ${this.getFileName(document.uri)}`;
 
 		return {
 			contents: result,
@@ -312,7 +312,7 @@ export class DoHover extends LanguageFeature {
 
 		const prefixInfo =
 			maybePrefixedName !== symbol.name ? ` as ${symbol.name}` : "";
-		result.value += `\n____\nMixin declared${prefixInfo} in ${this.getFileName(document)}`;
+		result.value += `\n____\nMixin declared${prefixInfo} in ${this.getFileName(document.uri)}`;
 
 		return {
 			contents: result,
@@ -333,7 +333,7 @@ export class DoHover extends LanguageFeature {
 			result.value += `\n____\n${sassdoc}`;
 		}
 
-		result.value += `\n____\nPlaceholder declared in ${this.getFileName(document)}`;
+		result.value += `\n____\nPlaceholder declared in ${this.getFileName(document.uri)}`;
 
 		return {
 			contents: result,
@@ -367,7 +367,7 @@ export class DoHover extends LanguageFeature {
 
 		const prefixInfo =
 			maybePrefixedName !== symbol.name ? ` as ${symbol.name}` : "";
-		result.value += `\n____\nVariable declared${prefixInfo} in ${this.getFileName(document)}`;
+		result.value += `\n____\nVariable declared${prefixInfo} in ${this.getFileName(document.uri)}`;
 
 		return {
 			contents: result,

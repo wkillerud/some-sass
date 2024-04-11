@@ -20,6 +20,7 @@ import {
 	ColorInformation,
 	ColorPresentation,
 	Range,
+	ReferenceContext,
 } from "./language-services-types";
 import { mapFsProviders } from "./utils/fs-provider";
 
@@ -124,8 +125,12 @@ class LanguageService implements ILanguageService {
 		return this.#findSymbols.findDocumentSymbols(document);
 	}
 
-	findReferences(document: TextDocument, position: Position) {
-		return this.#findReferences.findReferences(document, position);
+	async findReferences(
+		document: TextDocument,
+		position: Position,
+		context?: ReferenceContext,
+	) {
+		return this.#findReferences.findReferences(document, position, context);
 	}
 
 	findValue(document: TextDocument, position: Position) {

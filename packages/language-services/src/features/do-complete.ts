@@ -524,7 +524,7 @@ export class DoComplete extends LanguageFeature {
 			documentation += `\n____\n${sassdoc}`;
 		}
 
-		const detail = `Placeholder declared in ${this.getFileName(document)}`;
+		const detail = `Placeholder declared in ${this.getFileName(document.uri)}`;
 
 		const item: CompletionItem = {
 			detail,
@@ -766,7 +766,7 @@ export class DoComplete extends LanguageFeature {
 		if (sassdoc) {
 			documentation += `\n____\n${sassdoc}`;
 		}
-		documentation += `\n____\nVariable declared in ${this.getFileName(currentDocument)}`;
+		documentation += `\n____\nVariable declared in ${this.getFileName(currentDocument.uri)}`;
 
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
 
@@ -854,7 +854,7 @@ export class DoComplete extends LanguageFeature {
 		if (sassdoc) {
 			documentation.value += `\n____\n${sassdoc}`;
 		}
-		documentation.value += `\n____\nMixin declared in ${this.getFileName(currentDocument)}`;
+		documentation.value += `\n____\nMixin declared in ${this.getFileName(currentDocument.uri)}`;
 
 		const getCompletionVariants = (
 			insertText: string,
@@ -973,7 +973,7 @@ export class DoComplete extends LanguageFeature {
 		if (sassdoc) {
 			documentation.value += `\n____\n${sassdoc}`;
 		}
-		documentation.value += `\n____\nFunction declared in ${this.getFileName(currentDocument)}`;
+		documentation.value += `\n____\nFunction declared in ${this.getFileName(currentDocument.uri)}`;
 
 		// If there are required parameters, add a suggestion with only them.
 		// If there are optional parameters, add a suggestion with all parameters.

@@ -12,11 +12,13 @@ import {
 	MixinReference,
 	Function,
 	Range,
+	URI,
+	ReferenceContext,
 } from "../language-services-types";
 import { asDollarlessVariable } from "../utils/sass";
 
 type References = {
-	definition: {
+	declaration: {
 		symbol: SassDocumentSymbol;
 		document: TextDocument; // could probably do with only the URI here?
 	} | null;
@@ -34,18 +36,23 @@ export class FindReferences extends LanguageFeature {
 	async findReferences(
 		document: TextDocument,
 		position: Position,
+		context: ReferenceContext = { includeDeclaration: true },
 	): Promise<Location[]> {
-		const references = await this.internalFindReferences(document, position);
+		const references = await this.internalFindReferences(
+			document,
+			position,
+			context,
+		);
 		return references.references.map((r) => r.location);
 	}
 
 	protected async internalFindReferences(
 		document: TextDocument,
 		position: Position,
-		includeDeclaration = false,
+		context: ReferenceContext,
 	): Promise<References> {
 		const references: References = {
-			definition: null,
+			declaration: null,
 			references: [],
 		};
 
@@ -61,7 +68,7 @@ export class FindReferences extends LanguageFeature {
 				if (
 					parent &&
 					(parent.type !== NodeType.VariableDeclaration ||
-						includeDeclaration) &&
+						context.includeDeclaration) &&
 					parent.type !== NodeType.FunctionParameter
 				) {
 					name = (refNode as Variable).getName();
@@ -77,14 +84,15 @@ export class FindReferences extends LanguageFeature {
 					parent &&
 					(parent.type === NodeType.Function ||
 						(parent.type === NodeType.FunctionDeclaration &&
-							includeDeclaration))
+							context.includeDeclaration))
 				) {
 					node = parent;
 					type = SymbolKind.Function;
 				} else if (
 					parent &&
 					(parent.type === NodeType.MixinReference ||
-						(parent.type === NodeType.MixinDeclaration && includeDeclaration))
+						(parent.type === NodeType.MixinDeclaration &&
+							context.includeDeclaration))
 				) {
 					node = parent;
 					type = SymbolKind.Method;
@@ -112,13 +120,17 @@ export class FindReferences extends LanguageFeature {
 			}
 		}
 
+		if (!name || !kind) {
+			return references;
+		}
+
 		// Check to see if we have a symbol of name and kind in the current document
 		const symbols = this.ls.findDocumentSymbols(document);
 		const definition = symbols.find(
 			(symbol) => symbol.name === name && symbol.kind === kind,
 		);
 		if (definition) {
-			references.definition = {
+			references.declaration = {
 				symbol: definition,
 				document,
 			};
@@ -128,12 +140,15 @@ export class FindReferences extends LanguageFeature {
 			if (definition) {
 				const document = this._internal.cache.getDocument(definition.uri);
 				if (document) {
+					const dollarlessName = asDollarlessVariable(name);
 					const symbols = this.ls.findDocumentSymbols(document);
 					const definition = symbols.find(
-						(symbol) => symbol.name === name && symbol.kind === kind,
+						(symbol) =>
+							dollarlessName.includes(asDollarlessVariable(symbol.name)) && // use includes because of @forward prefixing
+							symbol.kind === kind,
 					);
 					if (definition) {
-						references.definition = {
+						references.declaration = {
 							symbol: definition,
 							document,
 						};
@@ -144,7 +159,7 @@ export class FindReferences extends LanguageFeature {
 
 		// If we don't have a definition, we might be dealing with a Sass built-in
 		let builtin: [string, string] | null = null;
-		if (!references.definition) {
+		if (!references.declaration) {
 			// If we don't have a definition anywhere we might be dealing with a built-in.
 			// Check to see if that's the case.
 
@@ -158,21 +173,18 @@ export class FindReferences extends LanguageFeature {
 		}
 
 		// If we have neither a definition nor a built-in, return an empty result
-		if (!builtin) {
+		if (!references.declaration && !builtin) {
 			return references;
 		}
 
 		const dollarlessDefinitionName = asDollarlessVariable(
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			builtin ? builtin[1] : references.definition!.symbol.name,
+			builtin ? builtin[1] : references.declaration!.symbol.name,
 		);
 		for (const doc of this._internal.cache.documents()) {
 			const stylesheet = this.ls.parseStylesheet(doc);
 			const candidates: Reference[] = [];
 
-			// TODO: you are here
-			// Look for all the stuff you do in references.ts,
-			// but try to do it with the AST instead of the scanner.
 			stylesheet.accept((node) => {
 				let name: string | undefined;
 				let kind: SymbolKind | undefined;
@@ -183,7 +195,7 @@ export class FindReferences extends LanguageFeature {
 						if (
 							parent &&
 							(parent.type !== NodeType.VariableDeclaration ||
-								includeDeclaration) &&
+								context.includeDeclaration) &&
 							parent.type !== NodeType.FunctionParameter
 						) {
 							name = (refNode as Variable).getName();
@@ -199,7 +211,7 @@ export class FindReferences extends LanguageFeature {
 							parent &&
 							(parent.type === NodeType.Function ||
 								(parent.type === NodeType.FunctionDeclaration &&
-									includeDeclaration))
+									context.includeDeclaration))
 						) {
 							node = parent;
 							type = SymbolKind.Function;
@@ -207,7 +219,7 @@ export class FindReferences extends LanguageFeature {
 							parent &&
 							(parent.type === NodeType.MixinReference ||
 								(parent.type === NodeType.MixinDeclaration &&
-									includeDeclaration))
+									context.includeDeclaration))
 						) {
 							node = parent;
 							type = SymbolKind.Method;
@@ -258,22 +270,45 @@ export class FindReferences extends LanguageFeature {
 			});
 
 			for (const candidate of candidates) {
-				if (references.definition) {
-					const candidateDefinition = await this.ls.findDefinition(
+				if (references.declaration) {
+					const candidateIsDeclaration =
+						candidate.name === references.declaration.symbol.name &&
+						candidate.kind === references.declaration.symbol.kind &&
+						candidate.location.uri === references.declaration.document.uri &&
+						// Only check the start position here, since
+						// a VariableDeclaration's range is larger than
+						// a Variable reference's range (which doesn't include the value).
+						this.isSamePosition(
+							candidate.location.range.start,
+							references.declaration.symbol.range.start,
+						);
+
+					if (!context.includeDeclaration && candidateIsDeclaration) {
+						continue;
+					} else if (candidateIsDeclaration) {
+						references.references.push(candidate);
+						continue;
+					}
+
+					const candidateDeclaration = await this.ls.findDefinition(
 						doc,
 						candidate.location.range.start,
 					);
-					if (candidateDefinition != null) {
-						const isSameFile =
-							candidateDefinition.uri === references.definition.document.uri;
+					if (candidateDeclaration != null) {
+						const isSameFile = await this.isSameRealPath(
+							candidateDeclaration.uri,
+							references.declaration.document.uri,
+						);
 
-						const isSameRange =
-							candidateDefinition.range.start.line ===
-								references.definition.symbol.range.start.line &&
-							candidateDefinition.range.start.character ===
-								references.definition.symbol.range.start.character;
+						// Only check the start position here, since
+						// a VariableDeclaration's range is larger than
+						// a Variable reference's range (which doesn't include the value).
+						const isSamePosition = this.isSamePosition(
+							candidateDeclaration.range.start,
+							references.declaration.symbol.range.start,
+						);
 
-						if (isSameFile && isSameRange) {
+						if (isSameFile && isSamePosition) {
 							references.references.push(candidate);
 							continue;
 						}
@@ -296,5 +331,51 @@ export class FindReferences extends LanguageFeature {
 		}
 
 		return references;
+	}
+
+	async isSameRealPath(
+		candidate: string,
+		definition: string,
+	): Promise<boolean> {
+		// Checking the file system is expensive, so do the optimistic thing first.
+		// If the URIs match, we're good.
+		if (candidate === definition) {
+			return true;
+		}
+
+		if (candidate.includes(this.getFileName(definition))) {
+			try {
+				const candidateDocument = this._internal.cache.getDocument(candidate);
+				if (!candidateDocument) {
+					return false;
+				}
+
+				const realCandidate = await this.options.fileSystemProvider.realPath(
+					URI.parse(candidate),
+				);
+				if (!realCandidate) {
+					return false;
+				}
+
+				const realDefinition = await this.options.fileSystemProvider.realPath(
+					URI.parse(definition),
+				);
+				if (!realDefinition) {
+					return false;
+				}
+
+				if (realCandidate === realDefinition) {
+					return true;
+				}
+			} catch {
+				// Guess it really doesn't exist
+			}
+		}
+
+		return false;
+	}
+
+	isSamePosition(a: Position, b: Position): boolean {
+		return a.line === b.line && a.character === b.character;
 	}
 }

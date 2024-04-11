@@ -169,6 +169,22 @@ export interface SassDocumentSymbol extends DocumentSymbol {
 }
 
 export interface LanguageService {
+	/**
+	 * Clears all cached documents, forcing everything to be reparsed the next time a feature is used.
+	 */
+	clearCache(): void;
+	/**
+	 * You may want to use this to set the workspace root.
+	 * @param settings {@link LanguageServiceConfiguration}
+	 *
+	 * @example
+	 * ```js
+	 * languageService.configure({
+	 *   workspaceRoot: URI.parse(this.workspace),
+	 * });
+	 * ```
+	 */
+	configure(settings: LanguageServiceConfiguration): void;
 	doComplete(
 		document: TextDocument,
 		position: Position,
@@ -183,13 +199,21 @@ export interface LanguageService {
 		newName: string,
 	): Promise<WorkspaceEdit | null>;
 	findColors(document: TextDocument): Promise<ColorInformation[]>;
-	findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]>;
-	findDocumentSymbols(document: TextDocument): SassDocumentSymbol[];
-	findWorkspaceSymbols(query?: string): SymbolInformation[];
 	findDefinition(
 		document: TextDocument,
 		position: Position,
 	): Promise<Location | null>;
+	findDocumentHighlights(
+		document: TextDocument,
+		position: Position,
+	): DocumentHighlight[];
+	findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]>;
+	findDocumentSymbols(document: TextDocument): SassDocumentSymbol[];
+	findReferences(
+		document: TextDocument,
+		position: Position,
+		context?: ReferenceContext,
+	): Promise<Location[]>;
 	/**
 	 * Looks at {@link position} for a {@link VariableDeclaration} and returns its value as a string (or null if no value was found).
 	 * If the value is a reference to another variable this method will find that variable's definition and look for the value there instead.
@@ -197,10 +221,7 @@ export interface LanguageService {
 	 * If the value is not found in 20 lookups, assumes a circular reference and returns null.
 	 */
 	findValue(document: TextDocument, position: Position): Promise<string | null>;
-	findDocumentHighlights(
-		document: TextDocument,
-		position: Position,
-	): DocumentHighlight[];
+	findWorkspaceSymbols(query?: string): SymbolInformation[];
 	getColorPresentations(
 		document: TextDocument,
 		color: Color,
@@ -216,33 +237,20 @@ export interface LanguageService {
 	 * @param {TextDocument | string} document Either the document itself or {@link TextDocument.uri}
 	 */
 	onDocumentRemoved(document: TextDocument | string): void;
-	prepareRename(
-		document: TextDocument,
-		position: Position,
-	): Promise<
-		null | { defaultBehavior: boolean } | { range: Range; placeholder: string }
-	>;
-	/**
-	 * Clears all cached documents, forcing everything to be reparsed the next time a feature is used.
-	 */
-	clearCache(): void;
 	/**
 	 * Called internally by the other functions to get a cached AST of the document, or parse it if none exists.
 	 * You typically won't use this directly, but you can if you need access to the raw AST for the document.
 	 */
 	parseStylesheet(document: TextDocument): Stylesheet;
 	/**
-	 * You may want to use this to set the workspace root.
-	 * @param settings {@link LanguageServiceConfiguration}
-	 *
-	 * @example
-	 * ```js
-	 * languageService.configure({
-	 *   workspaceRoot: URI.parse(this.workspace),
-	 * });
-	 * ```
+	 * Step one of a rename process, followed by {@link doRename}.
 	 */
-	configure(settings: LanguageServiceConfiguration): void;
+	prepareRename(
+		document: TextDocument,
+		position: Position,
+	): Promise<
+		null | { defaultBehavior: boolean } | { range: Range; placeholder: string }
+	>;
 }
 
 export type Rename =

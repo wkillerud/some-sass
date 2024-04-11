@@ -23,11 +23,9 @@ export class DoRename extends FindReferences {
 		const node = getNodeAtOffset(stylesheet, document.offsetAt(position));
 		if (!node) return defaultBehavior;
 
-		const references = await this.internalFindReferences(
-			document,
-			position,
-			true,
-		);
+		const references = await this.internalFindReferences(document, position, {
+			includeDeclaration: true,
+		});
 
 		if (!references.references.length) {
 			if (
@@ -63,9 +61,9 @@ export class DoRename extends FindReferences {
 		}
 
 		// Exclude any forward-prefixes from the renaming.
-		if (references.definition) {
+		if (references.declaration) {
 			const renamingName = node.getText();
-			const definitionName = references.definition.symbol.name;
+			const definitionName = references.declaration.symbol.name;
 			if (renamingName !== definitionName) {
 				const diff = renamingName.length - definitionName.length;
 				renameRange.start.character += diff;
@@ -83,11 +81,9 @@ export class DoRename extends FindReferences {
 		position: Position,
 		newName: string,
 	): Promise<WorkspaceEdit | null> {
-		const references = await this.internalFindReferences(
-			document,
-			position,
-			true,
-		);
+		const references = await this.internalFindReferences(document, position, {
+			includeDeclaration: true,
+		});
 
 		if (!references.references.length) {
 			return null;
@@ -113,8 +109,8 @@ export class DoRename extends FindReferences {
 			}
 
 			// Exclude any forward-prefixes from the renaming.
-			if (references.definition) {
-				const definitionName = references.definition.symbol.name;
+			if (references.declaration) {
+				const definitionName = references.declaration.symbol.name;
 				if (name !== definitionName) {
 					const diff = name.length - definitionName.length;
 					range.start.character += diff;

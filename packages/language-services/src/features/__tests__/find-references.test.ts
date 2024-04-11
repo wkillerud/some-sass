@@ -18,7 +18,6 @@ test("finds variable references", async () => {
 	const three = fileSystemProvider.createDocument(
 		[
 			'@use "ki";',
-			"",
 			".a::before {",
 			" // Here it comes!",
 			" content: ki.$day;",
@@ -36,7 +35,85 @@ test("finds variable references", async () => {
 
 	const references = await ls.findReferences(two, Position.create(1, 25));
 
-	assert.deepStrictEqual(references, [{ foo: "bar" }]);
+	assert.equal(references.length, 3);
+
+	const [ki, helen, gato] = references;
+	assert.match(ki.uri, /ki\.scss$/);
+	assert.match(helen.uri, /helen\.scss$/);
+	assert.match(gato.uri, /gato\.scss$/);
+
+	assert.deepStrictEqual(ki.range, {
+		start: {
+			line: 0,
+			character: 0,
+		},
+		end: {
+			line: 0,
+			character: 4,
+		},
+	});
+
+	assert.deepStrictEqual(helen.range, {
+		start: {
+			line: 1,
+			character: 24,
+		},
+		end: {
+			line: 1,
+			character: 28,
+		},
+	});
+
+	assert.deepStrictEqual(gato.range, {
+		start: {
+			line: 3,
+			character: 13,
+		},
+		end: {
+			line: 3,
+			character: 17,
+		},
+	});
+});
+
+test("exclude declaration if the user requests so", async () => {
+	const one = fileSystemProvider.createDocument('$day: "monday";', {
+		uri: "ki.scss",
+	});
+	const two = fileSystemProvider.createDocument(
+		['@use "ki";', ".a::after { content: ki.$day; }"],
+		{
+			uri: "helen.scss",
+		},
+	);
+	const three = fileSystemProvider.createDocument(
+		[
+			'@use "ki";',
+			".a::before {",
+			" // Here it comes!",
+			" content: ki.$day;",
+			"}",
+		],
+		{
+			uri: "gato.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(three);
+
+	const references = await ls.findReferences(two, Position.create(1, 25), {
+		includeDeclaration: false,
+	});
+
+	assert.equal(references.length, 2);
+
+	const [helen, gato] = references;
+
+	assert.match(helen.uri, /helen\.scss$/);
+	assert.match(gato.uri, /gato\.scss$/);
 });
 
 test("finds variable with @forward prefix", async () => {
@@ -55,7 +132,6 @@ test("finds variable with @forward prefix", async () => {
 	const four = fileSystemProvider.createDocument(
 		[
 			'@use "ki";',
-			"",
 			".a::before {",
 			" // Here it comes!",
 			" content: ki.$day;",
@@ -74,7 +150,45 @@ test("finds variable with @forward prefix", async () => {
 
 	const references = await ls.findReferences(three, Position.create(1, 30));
 
-	assert.deepStrictEqual(references, [{ foo: "bar" }]);
+	assert.equal(references.length, 3);
+
+	const [ki, helen, gato] = references;
+	assert.match(ki.uri, /ki\.scss$/);
+	assert.match(helen.uri, /helen\.scss$/);
+	assert.match(gato.uri, /gato\.scss$/);
+
+	assert.deepStrictEqual(ki.range, {
+		start: {
+			line: 0,
+			character: 0,
+		},
+		end: {
+			line: 0,
+			character: 4,
+		},
+	});
+
+	assert.deepStrictEqual(helen.range, {
+		start: {
+			line: 1,
+			character: 25,
+		},
+		end: {
+			line: 1,
+			character: 32,
+		},
+	});
+
+	assert.deepStrictEqual(gato.range, {
+		start: {
+			line: 3,
+			character: 13,
+		},
+		end: {
+			line: 3,
+			character: 17,
+		},
+	});
 });
 
 test("finds variables with @forward prefix when used as a function parameter", async () => {
@@ -88,11 +202,9 @@ test("finds variables with @forward prefix when used as a function parameter", a
 			uri: "fun.scss",
 		},
 	);
-
 	const two = fileSystemProvider.createDocument('@forward "fun" as fun-*;', {
 		uri: "dev.scss",
 	});
-
 	const three = fileSystemProvider.createDocument(
 		[
 			'@use "dev";',
@@ -103,7 +215,7 @@ test("finds variables with @forward prefix when used as a function parameter", a
 			"}",
 		],
 		{
-			uri: "one.scss",
+			uri: "usage.scss",
 		},
 	);
 
@@ -114,11 +226,47 @@ test("finds variables with @forward prefix when used as a function parameter", a
 
 	const references = await ls.findReferences(three, Position.create(4, 34));
 
-	assert.deepStrictEqual(references, [{ foo: "bar" }]);
+	assert.equal(references.length, 2);
+
+	const [fun, usage] = references;
+	assert.match(fun.uri, /fun\.scss$/);
+	assert.match(usage.uri, /usage\.scss$/);
+
+	assert.deepStrictEqual(fun.range, {
+		start: {
+			line: 1,
+			character: 0,
+		},
+		end: {
+			line: 1,
+			character: 5,
+		},
+	});
+	assert.deepStrictEqual(usage.range, {
+		start: {
+			line: 4,
+			character: 28,
+		},
+		end: {
+			line: 4,
+			character: 37,
+		},
+	});
 });
 
+// TODO: you are here making tests pass
 // hide/show
-test.todo("finds variable used in visibility modifier");
+test("finds variable used in visibility modifier", async () => {
+	// await helpers.makeDocument(["$secret: 1;"], {
+	// 	uri: "var.scss",
+	// });
+	// const forward = await helpers.makeDocument(
+	// 	'@forward "var" as var-* hide $secret;',
+	// 	{
+	// 		uri: "dev.scss",
+	// 	},
+	// );
+});
 
 test.todo("finds function with @forward prefix");
 

@@ -243,8 +243,7 @@ export abstract class LanguageFeature {
 		return null;
 	}
 
-	protected getFileName(document: TextDocument): string {
-		const uri = document.uri;
+	protected getFileName(uri: string): string {
 		const lastSlash = uri.lastIndexOf("/");
 		return lastSlash === -1 ? uri : uri.slice(Math.max(0, lastSlash + 1));
 	}

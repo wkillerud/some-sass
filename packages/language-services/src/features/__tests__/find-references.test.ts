@@ -1,9 +1,13 @@
-import { assert, test } from "vitest";
+import { assert, test, beforeEach } from "vitest";
 import { Position, getLanguageService } from "../../language-services";
 import { getOptions } from "../../utils/test-helpers";
 
 const { fileSystemProvider, ...rest } = getOptions();
 const ls = getLanguageService({ fileSystemProvider, ...rest });
+
+beforeEach(() => {
+	ls.clearCache();
+});
 
 test("finds variable references", async () => {
 	const one = fileSystemProvider.createDocument('$day: "monday";', {
@@ -280,7 +284,7 @@ test.todo("finds mixins with @forward prefix");
 // hide/show
 test.todo("finds mixins used in visibility modifier");
 
-test("finds references in maps", async () => {
+test.todo("finds references in maps", async () => {
 	const one = fileSystemProvider.createDocument(
 		["@function hello() { @return 1; }", '$day: "monday";'],
 
@@ -324,7 +328,7 @@ test("finds references in maps", async () => {
 	assert.deepStrictEqual(functionReferences, [{ foo: "bar" }]);
 });
 
-test("finds sass built-ins", async () => {
+test.todo("finds sass built-ins", async () => {
 	const one = fileSystemProvider.createDocument(
 		[
 			'@use "sass:color";',

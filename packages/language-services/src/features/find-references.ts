@@ -186,34 +186,34 @@ export class FindReferences extends LanguageFeature {
 			const candidates: Reference[] = [];
 
 			stylesheet.accept((node) => {
-				let name: string | undefined;
-				let kind: SymbolKind | undefined;
+				let candidateName: string | undefined;
+				let candidateKind: SymbolKind | undefined;
 
 				switch (node.type) {
 					case NodeType.VariableName: {
-						const parent = refNode?.getParent();
+						const parent = node?.getParent();
 						if (
 							parent &&
 							(parent.type !== NodeType.VariableDeclaration ||
 								context.includeDeclaration) &&
 							parent.type !== NodeType.FunctionParameter
 						) {
-							name = (refNode as Variable).getName();
-							kind = SymbolKind.Variable;
+							candidateName = (node as Variable).getName();
+							candidateKind = SymbolKind.Variable;
 						}
 						break;
 					}
 					case NodeType.Identifier: {
-						let node;
+						let n;
 						let type: SymbolKind | null = null;
-						const parent = refNode?.getParent();
+						const parent = node?.getParent();
 						if (
 							parent &&
 							(parent.type === NodeType.Function ||
 								(parent.type === NodeType.FunctionDeclaration &&
 									context.includeDeclaration))
 						) {
-							node = parent;
+							n = parent;
 							type = SymbolKind.Function;
 						} else if (
 							parent &&
@@ -221,37 +221,37 @@ export class FindReferences extends LanguageFeature {
 								(parent.type === NodeType.MixinDeclaration &&
 									context.includeDeclaration))
 						) {
-							node = parent;
+							n = parent;
 							type = SymbolKind.Method;
 						}
 						if (type === null) {
 							return true;
 						}
-						if (node) {
-							name = (node as Function | MixinReference).getName();
-							kind = type;
+						if (n) {
+							candidateName = (n as Function | MixinReference).getName();
+							candidateKind = type;
 						}
 						break;
 					}
 
 					case NodeType.MixinReference: {
-						name = (refNode as MixinReference)?.getName();
-						kind = SymbolKind.Method;
+						candidateName = (node as MixinReference)?.getName();
+						candidateKind = SymbolKind.Method;
 						break;
 					}
 
 					case NodeType.SelectorPlaceholder: {
-						name = refNode?.getText();
-						kind = SymbolKind.Class;
+						candidateName = node?.getText();
+						candidateKind = SymbolKind.Class;
 						break;
 					}
 				}
 
-				if (!name || !kind) {
+				if (!candidateName || !candidateKind) {
 					return true;
 				}
 
-				if (name.includes(dollarlessDefinitionName)) {
+				if (candidateName.includes(dollarlessDefinitionName)) {
 					candidates.push({
 						location: {
 							uri: doc.uri,
@@ -260,8 +260,8 @@ export class FindReferences extends LanguageFeature {
 								doc.positionAt(node.end),
 							),
 						},
-						name,
-						kind,
+						name: candidateName,
+						kind: candidateKind,
 						defaultBehavior: false,
 					});
 				}

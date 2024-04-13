@@ -14,6 +14,7 @@ import {
 	Range,
 	URI,
 	ReferenceContext,
+	Node,
 } from "../language-services-types";
 import { asDollarlessVariable } from "../utils/sass";
 
@@ -79,7 +80,22 @@ export class FindReferences extends LanguageFeature {
 			case NodeType.Identifier: {
 				let node;
 				let type: SymbolKind | null = null;
-				const parent = refNode?.getParent();
+				let parent = refNode?.getParent();
+				if (parent && parent.type === NodeType.Module) {
+					parent =
+						parent
+							.getChildren()
+							.find(
+								(c) =>
+									c.type === NodeType.Function ||
+									c.type === NodeType.MixinReference,
+							) || null;
+					if (parent) {
+						node = (
+							parent as Function | MixinReference
+						).getIdentifier() as Node;
+					}
+				}
 				if (
 					parent &&
 					(parent.type === NodeType.Function ||
@@ -142,14 +158,19 @@ export class FindReferences extends LanguageFeature {
 				if (document) {
 					const dollarlessName = asDollarlessVariable(name);
 					const symbols = this.ls.findDocumentSymbols(document);
-					const definition = symbols.find(
+					const definitionSymbol = symbols.find(
 						(symbol) =>
 							dollarlessName.includes(asDollarlessVariable(symbol.name)) && // use includes because of @forward prefixing
 							symbol.kind === kind,
 					);
-					if (definition) {
+					if (definitionSymbol) {
+						// The symbol includes @function and @mixin in the case of declarations, which is what we're looking for here.
+						// Those extra characters makes the range comparison later tricky, so overwrite using the range
+						// without those keywords.
+						definitionSymbol.range = definition.range;
+
 						references.declaration = {
-							symbol: definition,
+							symbol: definitionSymbol,
 							document,
 						};
 					}
@@ -233,7 +254,6 @@ export class FindReferences extends LanguageFeature {
 						}
 						break;
 					}
-
 					case NodeType.MixinReference: {
 						candidateName = (node as MixinReference)?.getName();
 						candidateKind = SymbolKind.Method;

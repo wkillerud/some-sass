@@ -152,7 +152,7 @@ test("finds variable with @forward prefix", async () => {
 	ls.parseStylesheet(three);
 	ls.parseStylesheet(four);
 
-	const references = await ls.findReferences(three, Position.create(1, 30));
+	const references = await ls.findReferences(four, Position.create(3, 15));
 
 	assert.equal(references.length, 3);
 
@@ -258,21 +258,126 @@ test("finds variables with @forward prefix when used as a function parameter", a
 	});
 });
 
-// TODO: you are here making tests pass
 // hide/show
 test("finds variable used in visibility modifier", async () => {
-	// await helpers.makeDocument(["$secret: 1;"], {
-	// 	uri: "var.scss",
-	// });
-	// const forward = await helpers.makeDocument(
-	// 	'@forward "var" as var-* hide $secret;',
-	// 	{
-	// 		uri: "dev.scss",
-	// 	},
-	// );
+	const one = fileSystemProvider.createDocument(["$secret: 1;"], {
+		uri: "var.scss",
+	});
+	const two = fileSystemProvider.createDocument(
+		['@forward "var" as var-* hide $secret;'],
+		{
+			uri: "dev.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const references = await ls.findReferences(one, Position.create(0, 2));
+
+	assert.equal(references.length, 2);
+
+	const [dec, hide] = references;
+	assert.match(dec.uri, /var\.scss$/);
+	assert.match(hide.uri, /dev\.scss$/);
+
+	assert.deepStrictEqual(dec.range, {
+		start: {
+			line: 0,
+			character: 0,
+		},
+		end: {
+			line: 0,
+			character: 7,
+		},
+	});
+	assert.deepStrictEqual(hide.range, {
+		start: {
+			line: 0,
+			character: 29,
+		},
+		end: {
+			line: 0,
+			character: 36,
+		},
+	});
 });
 
-test.todo("finds function with @forward prefix");
+test("finds function with @forward prefix", async () => {
+	const one = fileSystemProvider.createDocument(
+		"@function hello() { @return 1; }",
+		{
+			uri: "func.scss",
+		},
+	);
+	const two = fileSystemProvider.createDocument('@forward "func" as fun-*;', {
+		uri: "dev.scss",
+	});
+	const three = fileSystemProvider.createDocument(
+		['@use "dev";', ".a {", " line-height: dev.fun-hello();", "}"],
+		{
+			uri: "one.scss",
+		},
+	);
+	const four = fileSystemProvider.createDocument(
+		[
+			'@use "func";',
+			".a {",
+			"	// Here it comes!",
+			" line-height: func.hello();",
+			"}",
+		],
+		{
+			uri: "two.scss",
+		},
+	);
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(three);
+	ls.parseStylesheet(four);
+
+	const references = await ls.findReferences(four, Position.create(3, 22));
+
+	assert.equal(references.length, 3);
+
+	const [func, o, t] = references;
+	assert.match(func.uri, /func\.scss$/);
+	assert.match(o.uri, /one\.scss$/);
+	assert.match(t.uri, /two\.scss$/);
+
+	assert.deepStrictEqual(func.range, {
+		start: {
+			line: 0,
+			character: 10,
+		},
+		end: {
+			line: 0,
+			character: 15,
+		},
+	});
+	assert.deepStrictEqual(o.range, {
+		start: {
+			line: 2,
+			character: 18,
+		},
+		end: {
+			line: 2,
+			character: 27,
+		},
+	});
+	assert.deepStrictEqual(t.range, {
+		start: {
+			line: 3,
+			character: 19,
+		},
+		end: {
+			line: 3,
+			character: 24,
+		},
+	});
+});
 
 // hide/show
 test.todo("finds function used in visibility modifier");

@@ -379,8 +379,55 @@ test("finds function with @forward prefix", async () => {
 	});
 });
 
+// TODO: you are here. ForwardVisibility is a bit tricky in that it can be both a mixin or a function in this case.
 // hide/show
-test.todo("finds function used in visibility modifier");
+test("finds function used in visibility modifier", async () => {
+	const one = fileSystemProvider.createDocument(
+		"@function hello() { @return 1; }",
+		{
+			uri: "func.scss",
+		},
+	);
+	const two = fileSystemProvider.createDocument(
+		['@forward "func" as fun-* show hello;'],
+		{
+			uri: "dev.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const references = await ls.findReferences(one, Position.create(0, 12));
+
+	assert.equal(references.length, 2);
+
+	const [dec, hide] = references;
+	assert.match(dec.uri, /func\.scss$/);
+	assert.match(hide.uri, /dev\.scss$/);
+
+	assert.deepStrictEqual(dec.range, {
+		start: {
+			line: 0,
+			character: 10,
+		},
+		end: {
+			line: 0,
+			character: 15,
+		},
+	});
+	assert.deepStrictEqual(hide.range, {
+		start: {
+			line: 0,
+			character: 30,
+		},
+		end: {
+			line: 0,
+			character: 35,
+		},
+	});
+});
 
 test.todo("finds mixins");
 

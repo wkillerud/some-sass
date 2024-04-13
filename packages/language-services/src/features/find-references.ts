@@ -96,6 +96,24 @@ export class FindReferences extends LanguageFeature {
 						).getIdentifier() as Node;
 					}
 				}
+
+				if (parent && parent.type === NodeType.ForwardVisibility) {
+					// At this point the identifier can be both a function and a mixin.
+					// To figure it out we need to look for the original definition.
+					const definition = await this.ls.findDefinition(document, position);
+					if (!definition) return references;
+
+					name = refNode.getText();
+					const definitionSymbol = await this.findDefinitionSymbol(
+						definition,
+						name,
+					);
+
+					if (!definitionSymbol) return references;
+					kind = definitionSymbol.kind;
+					break;
+				}
+
 				if (
 					parent &&
 					(parent.type === NodeType.Function ||
@@ -208,7 +226,7 @@ export class FindReferences extends LanguageFeature {
 
 			stylesheet.accept((node) => {
 				let candidateName: string | undefined;
-				let candidateKind: SymbolKind | undefined;
+				let candidateKinds: SymbolKind[] = [];
 
 				switch (node.type) {
 					case NodeType.VariableName: {
@@ -220,7 +238,7 @@ export class FindReferences extends LanguageFeature {
 							parent.type !== NodeType.FunctionParameter
 						) {
 							candidateName = (node as Variable).getName();
-							candidateKind = SymbolKind.Variable;
+							candidateKinds = [SymbolKind.Variable];
 						}
 						break;
 					}
@@ -228,62 +246,70 @@ export class FindReferences extends LanguageFeature {
 						let n;
 						let type: SymbolKind | null = null;
 						const parent = node?.getParent();
-						if (
-							parent &&
-							(parent.type === NodeType.Function ||
-								(parent.type === NodeType.FunctionDeclaration &&
-									context.includeDeclaration))
-						) {
-							n = parent;
-							type = SymbolKind.Function;
-						} else if (
-							parent &&
-							(parent.type === NodeType.MixinReference ||
-								(parent.type === NodeType.MixinDeclaration &&
-									context.includeDeclaration))
-						) {
-							n = parent;
-							type = SymbolKind.Method;
-						}
-						if (type === null) {
-							return true;
-						}
-						if (n) {
-							candidateName = (n as Function | MixinReference).getName();
-							candidateKind = type;
+						// if parent is ForwardVisibility, we can't tell between functions or mixins, same as find-definition
+						if (parent && parent.type === NodeType.ForwardVisibility) {
+							candidateName = node.getText();
+							candidateKinds = [SymbolKind.Function, SymbolKind.Method];
+						} else {
+							if (
+								parent &&
+								(parent.type === NodeType.Function ||
+									(parent.type === NodeType.FunctionDeclaration &&
+										context.includeDeclaration))
+							) {
+								n = parent;
+								type = SymbolKind.Function;
+							} else if (
+								parent &&
+								(parent.type === NodeType.MixinReference ||
+									(parent.type === NodeType.MixinDeclaration &&
+										context.includeDeclaration))
+							) {
+								n = parent;
+								type = SymbolKind.Method;
+							}
+							if (type === null) {
+								return true;
+							}
+							if (n) {
+								candidateName = (n as Function | MixinReference).getName();
+								candidateKinds = [type];
+							}
 						}
 						break;
 					}
 					case NodeType.MixinReference: {
 						candidateName = (node as MixinReference)?.getName();
-						candidateKind = SymbolKind.Method;
+						candidateKinds = [SymbolKind.Method];
 						break;
 					}
 
 					case NodeType.SelectorPlaceholder: {
 						candidateName = node?.getText();
-						candidateKind = SymbolKind.Class;
+						candidateKinds = [SymbolKind.Class];
 						break;
 					}
 				}
 
-				if (!candidateName || !candidateKind) {
+				if (!candidateName || !candidateKinds.length) {
 					return true;
 				}
 
 				if (candidateName.includes(dollarlessDefinitionName)) {
-					candidates.push({
-						location: {
-							uri: doc.uri,
-							range: Range.create(
-								doc.positionAt(node.offset),
-								doc.positionAt(node.end),
-							),
-						},
-						name: candidateName,
-						kind: candidateKind,
-						defaultBehavior: false,
-					});
+					for (const kind of candidateKinds) {
+						candidates.push({
+							location: {
+								uri: doc.uri,
+								range: Range.create(
+									doc.positionAt(node.offset),
+									doc.positionAt(node.end),
+								),
+							},
+							name: candidateName,
+							kind,
+							defaultBehavior: false,
+						});
+					}
 				}
 
 				return true;
@@ -315,22 +341,33 @@ export class FindReferences extends LanguageFeature {
 						candidate.location.range.start,
 					);
 					if (candidateDeclaration != null) {
-						const isSameFile = await this.isSameRealPath(
-							candidateDeclaration.uri,
-							references.declaration.document.uri,
+						const candidateDeclarationSymbol = await this.findDefinitionSymbol(
+							candidateDeclaration,
+							name,
 						);
+						if (candidateDeclarationSymbol != null) {
+							// The symbol includes @function and @mixin in the case of declarations, which is what we're looking for here.
+							// Those extra characters makes the range comparison later tricky, so overwrite using the range
+							// without those keywords.
+							candidateDeclaration.range = candidateDeclarationSymbol.range;
 
-						// Only check the start position here, since
-						// a VariableDeclaration's range is larger than
-						// a Variable reference's range (which doesn't include the value).
-						const isSamePosition = this.isSamePosition(
-							candidateDeclaration.range.start,
-							references.declaration.symbol.range.start,
-						);
+							const isSameFile = await this.isSameRealPath(
+								candidateDeclaration.uri,
+								references.declaration.document.uri,
+							);
 
-						if (isSameFile && isSamePosition) {
-							references.references.push(candidate);
-							continue;
+							// Only check the start position here, since
+							// a VariableDeclaration's range is larger than
+							// a Variable reference's range (which doesn't include the value).
+							const isSamePosition = this.isSamePosition(
+								candidateDeclaration.range.start,
+								references.declaration.symbol.range.start,
+							);
+
+							if (isSameFile && isSamePosition) {
+								references.references.push(candidate);
+								continue;
+							}
 						}
 					}
 				}
@@ -397,5 +434,35 @@ export class FindReferences extends LanguageFeature {
 
 	isSamePosition(a: Position, b: Position): boolean {
 		return a.line === b.line && a.character === b.character;
+	}
+
+	contains(outer: Range, inner: Range): boolean {
+		return (
+			outer.start.line >= inner.start.line &&
+			outer.start.character >= inner.start.character &&
+			outer.end.line >= inner.end.line &&
+			outer.end.character >= inner.end.character
+		);
+	}
+
+	async findDefinitionSymbol(
+		definition: Location,
+		name: string,
+	): Promise<SassDocumentSymbol | null> {
+		const definitionDocument = this._internal.cache.getDocument(definition.uri);
+		if (definitionDocument) {
+			const dollarlessName = asDollarlessVariable(name);
+			const symbols = this.ls.findDocumentSymbols(definitionDocument);
+			for (const symbol of symbols) {
+				if (
+					dollarlessName.includes(asDollarlessVariable(symbol.name)) &&
+					this.contains(symbol.range, definition.range)
+				) {
+					return symbol;
+				}
+			}
+		}
+
+		return null;
 	}
 }

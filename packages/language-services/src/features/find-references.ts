@@ -123,6 +123,9 @@ export class FindReferences extends LanguageFeature {
 						const identifier = (node as Function).getIdentifier();
 						if (!identifier) break;
 
+						// To avoid collisions with CSS functions, only support built-ins in the module system
+						if (builtin && node.parent?.type !== NodeType.Module) break;
+
 						candidates.push({
 							location: {
 								uri: doc.uri,
@@ -296,7 +299,6 @@ export class FindReferences extends LanguageFeature {
 				// If that's the case, add the reference even without the definition.
 				if (builtin) {
 					const builtinName = builtin[1];
-					// Only support modern modules with this feature as well.
 					if (builtinName.includes(candidate.name)) {
 						references.references.push({
 							...candidate,

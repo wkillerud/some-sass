@@ -258,7 +258,6 @@ test("finds variables with @forward prefix when used as a function parameter", a
 	});
 });
 
-// hide/show
 test("finds variable used in visibility modifier", async () => {
 	const one = fileSystemProvider.createDocument(["$secret: 1;"], {
 		uri: "var.scss",
@@ -381,8 +380,6 @@ test("finds function with @forward prefix", async () => {
 	});
 });
 
-// TODO: you are here. ForwardVisibility is a bit tricky in that it can be both a mixin or a function in this case.
-// hide/show
 test("finds function used in visibility modifier", async () => {
 	const one = fileSystemProvider.createDocument(
 		"@function hello() { @return 1; }",
@@ -431,26 +428,200 @@ test("finds function used in visibility modifier", async () => {
 	});
 });
 
-test.todo("finds mixins");
+test("finds mixins", async () => {
+	const one = fileSystemProvider.createDocument(
+		"@mixin hello() { line-height: 1; }",
+		{
+			uri: "mix.scss",
+		},
+	);
+	const two = fileSystemProvider.createDocument(
+		['@use "mix";', ".a { @include mix.hello(); }"],
+		{
+			uri: "first.scss",
+		},
+	);
+	const three = fileSystemProvider.createDocument(
+		['@use "mix";', ".a {", "	// Here it comes!", " @include mix.hello;", "}"],
+		{
+			uri: "second.scss",
+		},
+	);
 
-test.todo("finds mixins with @forward prefix");
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(three);
 
-// hide/show
-test.todo("finds mixins used in visibility modifier");
+	const references = await ls.findReferences(two, Position.create(1, 20));
 
-test.todo("finds references in maps", async () => {
+	assert.equal(references.length, 3);
+
+	const [mix, first, second] = references;
+	assert.match(mix.uri, /mix\.scss$/);
+	assert.match(first.uri, /first\.scss$/);
+	assert.match(second.uri, /second\.scss$/);
+
+	assert.deepStrictEqual(mix.range, {
+		start: {
+			line: 0,
+			character: 7,
+		},
+		end: {
+			line: 0,
+			character: 12,
+		},
+	});
+	assert.deepStrictEqual(first.range, {
+		start: {
+			line: 1,
+			character: 18,
+		},
+		end: {
+			line: 1,
+			character: 23,
+		},
+	});
+	assert.deepStrictEqual(second.range, {
+		start: {
+			line: 3,
+			character: 14,
+		},
+		end: {
+			line: 3,
+			character: 19,
+		},
+	});
+});
+
+test("finds mixins with @forward prefix", async () => {
+	const one = fileSystemProvider.createDocument(
+		"@mixin hello() {	line-height: 1; }",
+		{
+			uri: "mix.scss",
+		},
+	);
+	const two = fileSystemProvider.createDocument('@forward "mix" as mix-*;', {
+		uri: "dev.scss",
+	});
+	const three = fileSystemProvider.createDocument(
+		['@use "dev";', ".a { @include dev.mix-hello(); }"],
+		{
+			uri: "first.scss",
+		},
+	);
+	const four = fileSystemProvider.createDocument(
+		['@use "mix";', ".a {", "	// Here it comes!", " @include mix.hello();", "}"],
+		{
+			uri: "second.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(three);
+	ls.parseStylesheet(four);
+
+	const references = await ls.findReferences(three, Position.create(1, 24));
+
+	assert.equal(references.length, 3);
+
+	const [mix, first, second] = references;
+	assert.match(mix.uri, /mix\.scss$/);
+	assert.match(first.uri, /first\.scss$/);
+	assert.match(second.uri, /second\.scss$/);
+
+	assert.deepStrictEqual(mix.range, {
+		start: {
+			line: 0,
+			character: 7,
+		},
+		end: {
+			line: 0,
+			character: 12,
+		},
+	});
+	assert.deepStrictEqual(first.range, {
+		start: {
+			line: 1,
+			character: 18,
+		},
+		end: {
+			line: 1,
+			character: 27,
+		},
+	});
+	assert.deepStrictEqual(second.range, {
+		start: {
+			line: 3,
+			character: 14,
+		},
+		end: {
+			line: 3,
+			character: 19,
+		},
+	});
+});
+
+test("finds mixins used in visibility modifier", async () => {
+	const one = fileSystemProvider.createDocument(
+		"@mixin hello() { @return 1; }",
+		{
+			uri: "mix.scss",
+		},
+	);
+	const two = fileSystemProvider.createDocument(
+		['@forward "mix" as mix-* hide hello;'],
+		{
+			uri: "dev.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const references = await ls.findReferences(one, Position.create(0, 10));
+
+	assert.equal(references.length, 2);
+
+	const [dec, hide] = references;
+	assert.match(dec.uri, /mix\.scss$/);
+	assert.match(hide.uri, /dev\.scss$/);
+
+	assert.deepStrictEqual(dec.range, {
+		start: {
+			line: 0,
+			character: 7,
+		},
+		end: {
+			line: 0,
+			character: 12,
+		},
+	});
+	assert.deepStrictEqual(hide.range, {
+		start: {
+			line: 0,
+			character: 29,
+		},
+		end: {
+			line: 0,
+			character: 34,
+		},
+	});
+});
+
+test("finds references in maps", async () => {
 	const one = fileSystemProvider.createDocument(
 		["@function hello() { @return 1; }", '$day: "monday";'],
-
 		{
 			uri: "fun.scss",
 		},
 	);
-
 	const two = fileSystemProvider.createDocument('@forward "fun" as fun-*;', {
 		uri: "dev.scss",
 	});
-
 	const three = fileSystemProvider.createDocument(
 		[
 			'@use "dev";',
@@ -478,11 +649,59 @@ test.todo("finds references in maps", async () => {
 		Position.create(3, 22),
 	);
 
-	assert.deepStrictEqual(variableReferences, [{ foo: "bar" }]);
-	assert.deepStrictEqual(functionReferences, [{ foo: "bar" }]);
+	assert.equal(variableReferences.length, 2);
+	assert.equal(functionReferences.length, 2);
+
+	const [varDec, varMap] = variableReferences;
+
+	assert.match(varDec.uri, /fun\.scss$/);
+	assert.match(varMap.uri, /one\.scss$/);
+
+	assert.deepStrictEqual(varDec.range, {
+		start: {
+			line: 1,
+			character: 0,
+		},
+		end: {
+			line: 1,
+			character: 4,
+		},
+	});
+	assert.deepStrictEqual(varMap.range, {
+		start: {
+			line: 2,
+			character: 15,
+		},
+		end: {
+			line: 2,
+			character: 23,
+		},
+	});
+
+	const [funDec, funMap] = functionReferences;
+	assert.deepStrictEqual(funDec.range, {
+		start: {
+			line: 0,
+			character: 10,
+		},
+		end: {
+			line: 0,
+			character: 15,
+		},
+	});
+	assert.deepStrictEqual(funMap.range, {
+		start: {
+			line: 3,
+			character: 16,
+		},
+		end: {
+			line: 3,
+			character: 25,
+		},
+	});
 });
 
-test.todo("finds sass built-ins", async () => {
+test("finds sass built-ins", async () => {
 	const one = fileSystemProvider.createDocument(
 		[
 			'@use "sass:color";',
@@ -492,9 +711,8 @@ test.todo("finds sass built-ins", async () => {
 			"	transform: scale(1.1);",
 			"}",
 		],
-
 		{
-			uri: "one.scss",
+			uri: "first.scss",
 		},
 	);
 	const two = fileSystemProvider.createDocument(
@@ -502,9 +720,8 @@ test.todo("finds sass built-ins", async () => {
 			'@use "sass:color";',
 			'$_other-color: color.scale($color: "#1b1917", $alpha: -75%);',
 		],
-
 		{
-			uri: "two.scss",
+			uri: "second.scss",
 		},
 	);
 
@@ -514,7 +731,93 @@ test.todo("finds sass built-ins", async () => {
 
 	const references = await ls.findReferences(one, Position.create(1, 16));
 
-	assert.deepStrictEqual(references, [{ foo: "bar" }]);
+	assert.equal(references.length, 2);
+
+	const [first, second] = references;
+	assert.match(first.uri, /first\.scss$/);
+	assert.match(second.uri, /second\.scss$/);
+
+	assert.deepStrictEqual(first.range, {
+		start: {
+			line: 1,
+			character: 15,
+		},
+		end: {
+			line: 1,
+			character: 20,
+		},
+	});
+	assert.deepStrictEqual(second.range, {
+		start: {
+			line: 1,
+			character: 21,
+		},
+		end: {
+			line: 1,
+			character: 26,
+		},
+	});
 });
 
-test.todo("finds placeholders");
+test("finds placeholders", async () => {
+	const one = fileSystemProvider.createDocument("%alert {	color: blue; }", {
+		uri: "place.scss",
+	});
+	const two = fileSystemProvider.createDocument(
+		['@use "place";', ".a { @extend %alert; }"],
+		{
+			uri: "first.scss",
+		},
+	);
+	const three = fileSystemProvider.createDocument(
+		['@use "place";', ".a {", "	// Here it comes!", " @extend %alert;", "}"],
+		{
+			uri: "second.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(three);
+
+	const references = await ls.findReferences(two, Position.create(1, 16));
+
+	assert.equal(references.length, 3);
+
+	const [place, first, second] = references;
+	assert.match(place.uri, /place\.scss$/);
+	assert.match(first.uri, /first\.scss$/);
+	assert.match(second.uri, /second\.scss$/);
+
+	assert.deepStrictEqual(place.range, {
+		start: {
+			line: 0,
+			character: 0,
+		},
+		end: {
+			line: 0,
+			character: 6,
+		},
+	});
+	assert.deepStrictEqual(first.range, {
+		start: {
+			line: 1,
+			character: 13,
+		},
+		end: {
+			line: 1,
+			character: 19,
+		},
+	});
+	assert.deepStrictEqual(second.range, {
+		start: {
+			line: 3,
+			character: 9,
+		},
+		end: {
+			line: 3,
+			character: 15,
+		},
+	});
+});

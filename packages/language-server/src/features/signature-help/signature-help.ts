@@ -13,8 +13,8 @@ import { applySassDoc } from "../../utils/sassdoc";
 import {
 	asDollarlessVariable,
 	getTextBeforePosition,
+	stripParentheses,
 } from "../../utils/string";
-import { getParametersFromDetail } from "../completion/completion-utils";
 import { sassBuiltInModules } from "../sass-built-in-modules";
 import { hasInFacts } from "./facts";
 
@@ -25,6 +25,37 @@ const reSymbolName = /[\w-]+$/;
 interface IMixinEntry {
 	name: string | null;
 	parameters: number;
+}
+
+type Parameter = {
+	name: string;
+	defaultValue?: string;
+};
+
+function getParametersFromDetail(detail?: string): Array<Parameter> {
+	const result: Parameter[] = [];
+	if (!detail) {
+		return result;
+	}
+
+	const parameters = stripParentheses(detail).split(",");
+	for (const param of parameters) {
+		let name = param;
+		let defaultValue: string | undefined = undefined;
+		const defaultValueStart = param.indexOf(":");
+		if (defaultValueStart !== -1) {
+			name = param.substring(0, defaultValueStart);
+			defaultValue = param.substring(defaultValueStart + 1);
+		}
+
+		const parameter: Parameter = {
+			name: name.trim(),
+			defaultValue: defaultValue?.trim(),
+		};
+
+		result.push(parameter);
+	}
+	return result;
 }
 
 /**

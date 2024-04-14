@@ -28,8 +28,6 @@ import {
 } from "./context-provider";
 import { ExtractProvider } from "./features/code-actions";
 import { doDiagnostics } from "./features/diagnostics/diagnostics";
-import { provideReferences } from "./features/references";
-import { doRename, prepareRename } from "./features/rename";
 import { doSignatureHelp } from "./features/signature-help/signature-help";
 import type { FileSystemProvider } from "./file-system";
 import { getFileSystemProvider } from "./file-system-provider";
@@ -360,20 +358,23 @@ export class SomeSassServer {
 		});
 
 		this.connection.onReferences(async (referenceParams) => {
-			const uri = documents.get(referenceParams.textDocument.uri);
-			if (uri === undefined) return null;
+			if (!ls) return null;
 
-			const { document, offset } = getSCSSRegionsDocument(
+			const uri = documents.get(referenceParams.textDocument.uri);
+			if (!uri) return null;
+
+			const { document } = getSCSSRegionsDocument(
 				uri,
 				referenceParams.position,
 			);
 			if (!document) return null;
 
-			const options = referenceParams.context;
-			const references = await provideReferences(document, offset, options);
-			if (!references) return null;
-
-			return references.references.map((r) => r.location);
+			const references = await ls.findReferences(
+				document,
+				referenceParams.position,
+				referenceParams.context,
+			);
+			return references;
 		});
 
 		this.connection.onWorkspaceSymbol((params) => {
@@ -425,24 +426,32 @@ export class SomeSassServer {
 		});
 
 		this.connection.onPrepareRename(async (params) => {
+			if (!ls) return null;
+
 			const uri = documents.get(params.textDocument.uri);
 			if (uri === undefined) return null;
 
-			const { document, offset } = getSCSSRegionsDocument(uri, params.position);
+			const { document } = getSCSSRegionsDocument(uri, params.position);
 			if (!document) return null;
 
-			const preparations = await prepareRename(document, offset);
+			const preparations = await ls.prepareRename(document, params.position);
 			return preparations;
 		});
 
 		this.connection.onRenameRequest(async (params) => {
+			if (!ls) return null;
+
 			const uri = documents.get(params.textDocument.uri);
 			if (uri === undefined) return null;
 
-			const { document, offset } = getSCSSRegionsDocument(uri, params.position);
+			const { document } = getSCSSRegionsDocument(uri, params.position);
 			if (!document) return null;
 
-			const edits = await doRename(document, offset, params.newName);
+			const edits = await ls.doRename(
+				document,
+				params.position,
+				params.newName,
+			);
 			return edits;
 		});
 

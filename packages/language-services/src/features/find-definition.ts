@@ -92,23 +92,27 @@ export class FindDefinition extends LanguageFeature {
 		}
 
 		// Traverse the workspace looking for a symbol of kinds.includes(symbol.kind) && name === symbol.name
-		const result = await this.findInWorkspace<Location>((document, prefix) => {
-			const symbols = this.ls.findDocumentSymbols(document);
-			for (const symbol of symbols) {
-				if (symbol.kind === SymbolKind.Class) {
-					// Placeholders are not prefixed the same way other symbols are
-					if (kinds!.includes(symbol.kind) && symbol.name === name) {
+		const result = await this.findInWorkspace<Location>(
+			(document, prefix) => {
+				const symbols = this.ls.findDocumentSymbols(document);
+				for (const symbol of symbols) {
+					if (symbol.kind === SymbolKind.Class) {
+						// Placeholders are not prefixed the same way other symbols are
+						if (kinds!.includes(symbol.kind) && symbol.name === name) {
+							return Location.create(document.uri, symbol.selectionRange);
+						}
+					}
+
+					const prefixedSymbol = `${prefix}${asDollarlessVariable(symbol.name)}`;
+					const prefixedName = asDollarlessVariable(name!);
+					if (kinds!.includes(symbol.kind) && prefixedSymbol === prefixedName) {
 						return Location.create(document.uri, symbol.selectionRange);
 					}
 				}
-
-				const prefixedSymbol = `${prefix}${asDollarlessVariable(symbol.name)}`;
-				const prefixedName = asDollarlessVariable(name!);
-				if (kinds!.includes(symbol.kind) && prefixedSymbol === prefixedName) {
-					return Location.create(document.uri, symbol.selectionRange);
-				}
-			}
-		}, document);
+			},
+			document,
+			{ lazy: true },
+		);
 
 		if (result.length !== 0) {
 			return result[0];

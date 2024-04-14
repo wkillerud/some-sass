@@ -158,18 +158,22 @@ export class DoHover extends LanguageFeature {
 			// Traverse the workspace looking for a symbol of kinds.includes(symbol.kind) && name === symbol.name
 			const result = await this.findInWorkspace<
 				[TextDocument, SassDocumentSymbol]
-			>((document, prefix) => {
-				const symbols = this.ls.findDocumentSymbols(document);
-				for (const symbol of symbols) {
-					if (symbol.kind === kind) {
-						const prefixedSymbol = `${prefix}${asDollarlessVariable(symbol.name)}`;
-						const prefixedName = asDollarlessVariable(name!);
-						if (prefixedSymbol === prefixedName) {
-							return [[document, symbol]];
+			>(
+				(document, prefix) => {
+					const symbols = this.ls.findDocumentSymbols(document);
+					for (const symbol of symbols) {
+						if (symbol.kind === kind) {
+							const prefixedSymbol = `${prefix}${asDollarlessVariable(symbol.name)}`;
+							const prefixedName = asDollarlessVariable(name!);
+							if (prefixedSymbol === prefixedName) {
+								return [[document, symbol]];
+							}
 						}
 					}
-				}
-			}, document);
+				},
+				document,
+				{ lazy: true },
+			);
 
 			let symbolDocument: TextDocument | null = null;
 			let symbol: SassDocumentSymbol | null = null;

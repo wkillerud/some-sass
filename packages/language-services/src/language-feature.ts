@@ -24,6 +24,14 @@ export type LanguageFeatureInternal = {
 	scssLs: VSCodeLanguageService;
 };
 
+type FindOptions = {
+	/**
+	 * Whether to stop searching if the callback returns a truthy response.
+	 * @default false
+	 */
+	lazy: boolean;
+};
+
 const defaultConfiguration: LanguageServiceConfiguration = {
 	completionSettings: {
 		triggerPropertyValueCompletion: false,
@@ -119,8 +127,9 @@ export abstract class LanguageFeature {
 			show: string[],
 		) => T | T[] | undefined | Promise<T | T[] | undefined>,
 		initialDocument: TextDocument,
+		options: FindOptions = { lazy: false },
 	): Promise<T[]> {
-		return this.internalFindInWorkspace(callback, initialDocument);
+		return this.internalFindInWorkspace(callback, initialDocument, options);
 	}
 
 	private async internalFindInWorkspace<T>(
@@ -131,6 +140,7 @@ export abstract class LanguageFeature {
 			show: string[],
 		) => T | T[] | undefined | Promise<T | T[] | undefined>,
 		initialDocument: TextDocument,
+		options: FindOptions,
 		currentDocument: TextDocument = initialDocument,
 		accumulatedPrefix = "",
 		hide: string[] = [],
@@ -148,6 +158,9 @@ export abstract class LanguageFeature {
 		);
 
 		visited.add(currentDocument.uri);
+
+		if (options.lazy && callbackResult)
+			return Array.isArray(callbackResult) ? callbackResult : [callbackResult];
 
 		const allLinks = await this.ls.findDocumentLinks(currentDocument);
 
@@ -210,6 +223,7 @@ export abstract class LanguageFeature {
 			const linkResult = await this.internalFindInWorkspace(
 				callback,
 				initialDocument,
+				options,
 				next,
 				prefix,
 				hide,

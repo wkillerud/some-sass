@@ -227,6 +227,7 @@ export interface LanguageService {
 		color: Color,
 		range: Range,
 	): ColorPresentation[];
+	hasCached(uri: URI): boolean;
 	/**
 	 * Utility function to reparse an updated document.
 	 * Like {@link LanguageService.parseStylesheet}, but returns nothing.

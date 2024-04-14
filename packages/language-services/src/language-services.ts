@@ -21,6 +21,7 @@ import {
 	ColorPresentation,
 	Range,
 	ReferenceContext,
+	URI,
 } from "./language-services-types";
 import { mapFsProviders } from "./utils/fs-provider";
 
@@ -139,6 +140,10 @@ class LanguageService implements ILanguageService {
 
 	findWorkspaceSymbols(query?: string) {
 		return this.#findSymbols.findWorkspaceSymbols(query);
+	}
+
+	hasCached(uri: URI): boolean {
+		return this.#cache.has(uri.toString());
 	}
 
 	getColorPresentations(

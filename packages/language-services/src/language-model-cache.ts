@@ -4,12 +4,14 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { LanguageService as VSCodeLanguageService } from "@somesass/vscode-css-languageservice";
+import { ParseResult, parseSync } from "scss-sassdoc-parser";
 import {
 	TextDocument,
 	Stylesheet,
 	LanguageModelCacheOptions,
 	Node,
 	SassDocumentLink,
+	SassDocumentSymbol,
 } from "./language-services-types";
 
 type LanguageModels = {
@@ -19,6 +21,8 @@ type LanguageModels = {
 		cTime: number;
 		languageModel: Stylesheet;
 		document: TextDocument;
+		sassdoc?: ParseResult[];
+		symbols?: SassDocumentSymbol[];
 		links?: SassDocumentLink[];
 	};
 };
@@ -74,12 +78,20 @@ export class LanguageModelCache {
 		const languageModel = this.#options.scssLs.parseStylesheet(
 			document,
 		) as Node;
+		let sassdoc: ParseResult[] = [];
+		try {
+			const text = document.getText();
+			sassdoc = parseSync(text);
+		} catch {
+			// do nothing
+		}
 		this.#languageModels[document.uri] = {
 			languageModel,
 			version,
 			languageId,
 			cTime: Date.now(),
 			document,
+			sassdoc,
 			links: undefined,
 		};
 		if (!languageModelInfo) {
@@ -108,23 +120,42 @@ export class LanguageModelCache {
 		return this.#languageModels[uri]?.document;
 	}
 
+	getSassdoc(document: TextDocument): ParseResult[] {
+		return this.#languageModels[document.uri]?.sassdoc || [];
+	}
+
 	documents(): TextDocument[] {
 		return Object.values(this.#languageModels).map((cached) => cached.document);
 	}
 
-	has(document: TextDocument) {
-		return typeof this.#languageModels[document.uri] !== "undefined";
+	has(uri: string) {
+		return typeof this.#languageModels[uri] !== "undefined";
 	}
 
 	putResolvedLinks(document: TextDocument, links: SassDocumentLink[]): void {
-		if (this.has(document)) {
+		if (this.has(document.uri)) {
 			this.#languageModels[document.uri].links = links;
 		}
 	}
 
 	getResolvedLinks(document: TextDocument): SassDocumentLink[] | undefined {
-		if (this.has(document)) {
+		if (this.has(document.uri)) {
 			return this.#languageModels[document.uri].links;
+		}
+	}
+
+	putCachedSymbols(
+		document: TextDocument,
+		symbols: SassDocumentSymbol[],
+	): void {
+		if (this.has(document.uri)) {
+			this.#languageModels[document.uri].symbols = symbols;
+		}
+	}
+
+	getCachedSymbols(document: TextDocument): SassDocumentSymbol[] | undefined {
+		if (this.has(document.uri)) {
+			return this.#languageModels[document.uri].symbols;
 		}
 	}
 
@@ -134,12 +165,21 @@ export class LanguageModelCache {
 		const languageModel = this.#options.scssLs.parseStylesheet(
 			document,
 		) as Node;
+		let sassdoc: ParseResult[] = [];
+		try {
+			const text = document.getText();
+			sassdoc = parseSync(text);
+		} catch {
+			// do nothing
+		}
 		this.#languageModels[document.uri] = {
 			languageModel,
 			version,
 			languageId,
 			cTime: Date.now(),
 			document,
+			sassdoc,
+			symbols: undefined,
 			links: undefined,
 		};
 	}

@@ -4,6 +4,8 @@
 logs/
 *.log
 npm-debug.log*
+.cpuprofile
+.heapprofile
 
 # Dependency directory
 node_modules/

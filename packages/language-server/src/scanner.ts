@@ -136,6 +136,15 @@ export default class ScannerService {
 			// This should probably be landed as a bugfix somewhere upstream.
 			uri = URI.parse(file.toString().replace("/static/extensions/fs", ""));
 		}
+
+		const alreadyParsed = this.#ls.hasCached(uri);
+		if (alreadyParsed) {
+			// The same file may be referenced by multiple other files,
+			// so skip doing the parsing work if it's already been done.
+			// Changes to the file are handled by the `update` method.
+			return;
+		}
+
 		const content = await this.#fs.readFile(uri);
 		const document = TextDocument.create(uri.toString(), "scss", 1, content);
 		const scssRegions = getSCSSRegionsDocument(document);

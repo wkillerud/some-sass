@@ -1,4 +1,4 @@
-import { ParseResult, parseSync } from "scss-sassdoc-parser";
+import { ParseResult } from "scss-sassdoc-parser";
 import { LanguageFeature } from "../language-feature";
 import {
 	TextDocument,
@@ -10,72 +10,58 @@ import {
 
 export class FindSymbols extends LanguageFeature {
 	findDocumentSymbols(document: TextDocument): SassDocumentSymbol[] {
+		// While not IO-costly like findDocumentLinks, findDocumentSymbols is such a
+		// hot path that the CPU time it takes to call findDocumentSymbols2 adds up.
+		const cachedSymbols = this._internal.cache.getCachedSymbols(document);
+		if (cachedSymbols) return cachedSymbols;
+
 		const stylesheet = this.ls.parseStylesheet(document);
 		const symbols = this._internal.scssLs.findDocumentSymbols2(
 			document,
 			stylesheet,
 		) as SassDocumentSymbol[];
 
-		if (symbols.length === 0) {
-			return symbols;
-		}
-
-		let sassdoc: ParseResult[] = [];
-		try {
-			const text = document.getText();
-			sassdoc = parseSync(text);
-		} catch {
-			// do nothing
-		}
-
-		if (sassdoc.length === 0) {
-			return symbols;
-		}
-
-		for (const symbol of symbols) {
-			switch (symbol.kind) {
-				case SymbolKind.Variable: {
-					const dollarlessName = symbol.name.replace("$", "");
-					const docs = sassdoc.find(
-						(v) =>
-							v.context.name === dollarlessName &&
-							v.context.type === "variable",
+		const sassdoc: ParseResult[] = this._internal.cache.getSassdoc(document);
+		for (const doc of sassdoc) {
+			switch (doc.context.type) {
+				case "variable": {
+					const symbol = symbols.find(
+						(s) =>
+							s.kind === SymbolKind.Variable &&
+							s.name.replace("$", "") === doc.context.name,
 					);
-					symbol.sassdoc = docs;
+					if (symbol) symbol.sassdoc = doc;
 					break;
 				}
-
-				case SymbolKind.Method: {
-					const docs = sassdoc.find(
-						(v) => v.context.name === symbol.name && v.context.type === "mixin",
+				case "mixin": {
+					const symbol = symbols.find(
+						(s) => s.kind === SymbolKind.Method && s.name === doc.context.name,
 					);
-					symbol.sassdoc = docs;
+					if (symbol) symbol.sassdoc = doc;
 					break;
 				}
-
-				case SymbolKind.Function: {
-					const docs = sassdoc.find(
-						(v) =>
-							v.context.name === symbol.name && v.context.type === "function",
+				case "function": {
+					const symbol = symbols.find(
+						(s) =>
+							s.kind === SymbolKind.Function && s.name === doc.context.name,
 					);
-					symbol.sassdoc = docs;
+					if (symbol) symbol.sassdoc = doc;
 					break;
 				}
-
-				case SymbolKind.Class: {
-					if (symbol.name.startsWith("%")) {
-						const sansPercent = symbol.name.substring(1);
-						const docs = sassdoc.find(
-							(v) =>
-								v.context.name === sansPercent &&
-								v.context.type === "placeholder",
-						);
-						symbol.sassdoc = docs;
-					}
+				case "placeholder": {
+					const symbol = symbols.find(
+						(s) =>
+							s.kind === SymbolKind.Class &&
+							s.name.startsWith("%") &&
+							s.name.substring(1) === doc.context.name,
+					);
+					if (symbol) symbol.sassdoc = doc;
 					break;
 				}
 			}
 		}
+
+		this._internal.cache.putCachedSymbols(document, symbols);
 
 		return symbols;
 	}

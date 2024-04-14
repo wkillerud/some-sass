@@ -87,7 +87,12 @@ export class FindReferences extends LanguageFeature {
 			return references;
 		}
 
-		for (const doc of this._internal.cache.documents()) {
+		const declarationName = asDollarlessVariable(
+			builtin ? builtin[1] : references.declaration!.symbol.name,
+		);
+
+		const documents = this._internal.cache.documents();
+		for (const doc of documents) {
 			const stylesheet = this.ls.parseStylesheet(doc);
 			const candidates: Reference[] = [];
 
@@ -103,6 +108,8 @@ export class FindReferences extends LanguageFeature {
 							parent.type !== NodeType.FunctionParameter
 						) {
 							const candidateName = (node as Variable).getName();
+							if (!candidateName.includes(declarationName)) break;
+
 							candidates.push({
 								location: {
 									uri: doc.uri,
@@ -126,6 +133,9 @@ export class FindReferences extends LanguageFeature {
 						// To avoid collisions with CSS functions, only support built-ins in the module system
 						if (builtin && node.parent?.type !== NodeType.Module) break;
 
+						const candidateName = identifier.getText();
+						if (!candidateName.includes(declarationName)) break;
+
 						candidates.push({
 							location: {
 								uri: doc.uri,
@@ -134,7 +144,7 @@ export class FindReferences extends LanguageFeature {
 									doc.positionAt(identifier.end),
 								),
 							},
-							name: identifier.getText(),
+							name: candidateName,
 							kind: SymbolKind.Function,
 							defaultBehavior: false,
 						});
@@ -146,6 +156,9 @@ export class FindReferences extends LanguageFeature {
 						const identifier = (node as MixinDeclaration).getIdentifier();
 						if (!identifier) break;
 
+						const candidateName = identifier.getText();
+						if (!candidateName.includes(declarationName)) break;
+
 						candidates.push({
 							location: {
 								uri: doc.uri,
@@ -154,7 +167,7 @@ export class FindReferences extends LanguageFeature {
 									doc.positionAt(identifier.end),
 								),
 							},
-							name: identifier.getText(),
+							name: candidateName,
 							kind: SymbolKind.Function,
 							defaultBehavior: false,
 						});
@@ -165,6 +178,9 @@ export class FindReferences extends LanguageFeature {
 						const identifier = (node as MixinReference).getIdentifier();
 						if (!identifier) break;
 
+						const candidateName = identifier.getText();
+						if (!candidateName.includes(declarationName)) break;
+
 						candidates.push({
 							location: {
 								uri: doc.uri,
@@ -173,7 +189,7 @@ export class FindReferences extends LanguageFeature {
 									doc.positionAt(identifier.end),
 								),
 							},
-							name: identifier.getText(),
+							name: candidateName,
 							kind: SymbolKind.Method,
 							defaultBehavior: false,
 						});
@@ -185,6 +201,9 @@ export class FindReferences extends LanguageFeature {
 						const identifier = (node as MixinDeclaration).getIdentifier();
 						if (!identifier) break;
 
+						const candidateName = identifier.getText();
+						if (!candidateName.includes(declarationName)) break;
+
 						candidates.push({
 							location: {
 								uri: doc.uri,
@@ -193,7 +212,7 @@ export class FindReferences extends LanguageFeature {
 									doc.positionAt(identifier.end),
 								),
 							},
-							name: identifier.getText(),
+							name: candidateName,
 							kind: SymbolKind.Method,
 							defaultBehavior: false,
 						});
@@ -201,7 +220,9 @@ export class FindReferences extends LanguageFeature {
 					}
 
 					case NodeType.SelectorPlaceholder: {
-						const candidateName = node?.getText();
+						const candidateName = node.getText();
+						if (!candidateName.includes(declarationName)) break;
+
 						candidates.push({
 							location: {
 								uri: doc.uri,
@@ -222,9 +243,11 @@ export class FindReferences extends LanguageFeature {
 						if (!parent) break;
 
 						if (parent.type === NodeType.ForwardVisibility) {
+							const candidateName = node.getText();
+							if (!candidateName.includes(declarationName)) break;
+
 							// if parent is ForwardVisibility, we can't tell between functions or mixins, so look for both.
 							const candidateKinds = [SymbolKind.Function, SymbolKind.Method];
-							const candidateName = node.getText();
 							for (const kind of candidateKinds) {
 								candidates.push({
 									location: {

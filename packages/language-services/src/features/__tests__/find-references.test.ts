@@ -338,7 +338,9 @@ test("finds function with @forward prefix", async () => {
 	ls.parseStylesheet(three);
 	ls.parseStylesheet(four);
 
-	const references = await ls.findReferences(four, Position.create(3, 22));
+	const references = await ls.findReferences(four, Position.create(3, 22), {
+		includeDeclaration: true,
+	});
 
 	assert.equal(references.length, 3);
 

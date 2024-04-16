@@ -87,6 +87,7 @@ import {
 	FoldingRange,
 	FoldingRangeKind,
 	SignatureHelp,
+	SignatureInformation,
 	SelectionRange,
 	ReferenceContext,
 	SymbolTag,
@@ -198,6 +199,10 @@ export interface LanguageService {
 		position: Position,
 		newName: string,
 	): Promise<WorkspaceEdit | null>;
+	doSignatureHelp(
+		document: TextDocument,
+		position: Position,
+	): Promise<SignatureHelp>;
 	findColors(document: TextDocument): Promise<ColorInformation[]>;
 	findDefinition(
 		document: TextDocument,
@@ -534,6 +539,7 @@ export {
 	Term,
 	AttributeSelector,
 	Operator,
+	SignatureInformation,
 	HexColorValue,
 	RatioValue,
 	NumericValue,

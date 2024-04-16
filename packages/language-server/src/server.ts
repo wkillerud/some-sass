@@ -28,7 +28,6 @@ import {
 } from "./context-provider";
 import { ExtractProvider } from "./features/code-actions";
 import { doDiagnostics } from "./features/diagnostics/diagnostics";
-import { doSignatureHelp } from "./features/signature-help/signature-help";
 import type { FileSystemProvider } from "./file-system";
 import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";
@@ -320,17 +319,16 @@ export class SomeSassServer {
 			return result;
 		});
 
-		this.connection.onSignatureHelp((textDocumentPosition) => {
-			const uri = documents.get(textDocumentPosition.textDocument.uri);
+		this.connection.onSignatureHelp(async (params) => {
+			if (!ls) return null;
+
+			const uri = documents.get(params.textDocument.uri);
 			if (!uri) return null;
 
-			const { document, offset } = getSCSSRegionsDocument(
-				uri,
-				textDocumentPosition.position,
-			);
+			const { document } = getSCSSRegionsDocument(uri, params.position);
 			if (!document) return null;
 
-			const result = doSignatureHelp(document, offset);
+			const result = await ls.doSignatureHelp(document, params.position);
 			return result;
 		});
 

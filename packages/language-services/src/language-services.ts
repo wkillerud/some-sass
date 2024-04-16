@@ -2,6 +2,7 @@ import { getSCSSLanguageService } from "@somesass/vscode-css-languageservice";
 import { DoComplete } from "./features/do-complete";
 import { DoHover } from "./features/do-hover";
 import { DoRename } from "./features/do-rename";
+import { DoSignatureHelp } from "./features/do-signature-help";
 import { FindColors } from "./features/find-colors";
 import { FindDefinition } from "./features/find-definition";
 import { FindDocumentHighlights } from "./features/find-document-highlights";
@@ -38,6 +39,7 @@ class LanguageService implements ILanguageService {
 	#doComplete: DoComplete;
 	#doHover: DoHover;
 	#doRename: DoRename;
+	#doSignatureHelp: DoSignatureHelp;
 	#findColors: FindColors;
 	#findDefinition: FindDefinition;
 	#findDocumentHighlights: FindDocumentHighlights;
@@ -60,6 +62,10 @@ class LanguageService implements ILanguageService {
 		this.#doComplete = new DoComplete(this, options, { scssLs, cache });
 		this.#doHover = new DoHover(this, options, { scssLs, cache });
 		this.#doRename = new DoRename(this, options, { scssLs, cache });
+		this.#doSignatureHelp = new DoSignatureHelp(this, options, {
+			scssLs,
+			cache,
+		});
 		this.#findColors = new FindColors(this, options, { scssLs, cache });
 		this.#findDefinition = new FindDefinition(this, options, { scssLs, cache });
 		this.#findDocumentHighlights = new FindDocumentHighlights(this, options, {
@@ -79,6 +85,7 @@ class LanguageService implements ILanguageService {
 		this.#doComplete.configure(configuration);
 		this.#doHover.configure(configuration);
 		this.#doRename.configure(configuration);
+		this.#doSignatureHelp.configure(configuration);
 		this.#findColors.configure(configuration);
 		this.#findDefinition.configure(configuration);
 		this.#findDocumentHighlights.configure(configuration);
@@ -101,6 +108,10 @@ class LanguageService implements ILanguageService {
 
 	doRename(document: TextDocument, position: Position, newName: string) {
 		return this.#doRename.doRename(document, position, newName);
+	}
+
+	doSignatureHelp(document: TextDocument, position: Position) {
+		return this.#doSignatureHelp.doSignatureHelp(document, position);
 	}
 
 	findColors(document: TextDocument): Promise<ColorInformation[]> {

@@ -42,49 +42,71 @@ export class FindDefinition extends LanguageFeature {
 		// so we'll need to look for more than one SymbolKind.
 		let kinds: SymbolKind[] | undefined;
 		let name: string | undefined;
-
-		if (node.type === NodeType.VariableName) {
-			const parent = node.getParent();
-			if (parent) {
-				if (
-					!(parent instanceof FunctionParameter) &&
-					!(parent instanceof VariableDeclaration)
-				) {
-					name = (node as Variable).getName();
-					kinds = [SymbolKind.Variable];
+		switch (node.type) {
+			case NodeType.VariableName: {
+				const parent = node.getParent();
+				if (parent) {
+					if (
+						!(parent instanceof FunctionParameter) &&
+						!(parent instanceof VariableDeclaration)
+					) {
+						name = (node as Variable).getName();
+						kinds = [SymbolKind.Variable];
+					}
 				}
+				break;
 			}
-		} else if (node.type === NodeType.Identifier) {
-			const parent = node.getParent();
-			if (parent && parent.type === NodeType.ForwardVisibility) {
+			case NodeType.SelectorPlaceholder: {
 				name = node.getText();
-				// At this point the identifier can be both a function and a mixin.
-				kinds = [SymbolKind.Method, SymbolKind.Function];
-			} else {
-				let i = 0;
-				let n: Node | null = node;
-				let isMixin = false;
-				let isFunction = false;
-				while (n && !isMixin && !isFunction && i !== 2) {
-					n = n.getParent();
-					if (n) {
-						isMixin = n.type === NodeType.MixinReference;
-						isFunction = n.type === NodeType.Function;
-					}
-					i++;
-				}
-				if (n && (isMixin || isFunction)) {
-					let kind: SymbolKind = SymbolKind.Method;
-					if (isFunction) {
-						kind = SymbolKind.Function;
-					}
-					name = (n as Function | MixinReference).getName();
-					kinds = [kind];
-				}
+				kinds = [SymbolKind.Class];
+				break;
 			}
-		} else if (node.type === NodeType.SelectorPlaceholder) {
-			name = node.getText();
-			kinds = [SymbolKind.Class];
+			case NodeType.Function: {
+				const identifier = (node as Function).getIdentifier();
+				if (!identifier) break;
+
+				name = identifier.getText();
+				kinds = [SymbolKind.Function];
+				break;
+			}
+			case NodeType.MixinReference: {
+				const identifier = (node as MixinReference).getIdentifier();
+				if (!identifier) break;
+
+				name = identifier.getText();
+				kinds = [SymbolKind.Method];
+				break;
+			}
+			case NodeType.Identifier: {
+				const parent = node.getParent();
+				if (parent && parent.type === NodeType.ForwardVisibility) {
+					name = node.getText();
+					// At this point the identifier can be both a function and a mixin.
+					kinds = [SymbolKind.Method, SymbolKind.Function];
+				} else {
+					let i = 0;
+					let n: Node | null = node;
+					let isMixin = false;
+					let isFunction = false;
+					while (n && !isMixin && !isFunction && i !== 2) {
+						n = n.getParent();
+						if (n) {
+							isMixin = n.type === NodeType.MixinReference;
+							isFunction = n.type === NodeType.Function;
+						}
+						i++;
+					}
+					if (n && (isMixin || isFunction)) {
+						let kind: SymbolKind = SymbolKind.Method;
+						if (isFunction) {
+							kind = SymbolKind.Function;
+						}
+						name = (n as Function | MixinReference).getName();
+						kinds = [kind];
+					}
+				}
+				break;
+			}
 		}
 
 		if (!name || !kinds) {

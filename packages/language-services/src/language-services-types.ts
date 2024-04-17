@@ -190,6 +190,7 @@ export interface LanguageService {
 		document: TextDocument,
 		position: Position,
 	): Promise<CompletionList>;
+	doDiagnostics(document: TextDocument): Promise<Diagnostic[]>;
 	doHover(document: TextDocument, position: Position): Promise<Hover | null>;
 	/**
 	 * Called after a {@link prepareRename} to perform the actual renaming.
@@ -219,13 +220,6 @@ export interface LanguageService {
 		position: Position,
 		context?: ReferenceContext,
 	): Promise<Location[]>;
-	/**
-	 * Looks at {@link position} for a {@link VariableDeclaration} and returns its value as a string (or null if no value was found).
-	 * If the value is a reference to another variable this method will find that variable's definition and look for the value there instead.
-	 *
-	 * If the value is not found in 20 lookups, assumes a circular reference and returns null.
-	 */
-	findValue(document: TextDocument, position: Position): Promise<string | null>;
 	findWorkspaceSymbols(query?: string): SymbolInformation[];
 	getColorPresentations(
 		document: TextDocument,

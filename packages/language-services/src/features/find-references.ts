@@ -551,37 +551,7 @@ export class FindReferences extends LanguageFeature {
 		return false;
 	}
 
-	isSamePosition(a: Position, b: Position): boolean {
+	protected isSamePosition(a: Position, b: Position): boolean {
 		return a.line === b.line && a.character === b.character;
-	}
-
-	contains(outer: Range, inner: Range): boolean {
-		return (
-			outer.start.line >= inner.start.line &&
-			outer.start.character >= inner.start.character &&
-			outer.end.line >= inner.end.line &&
-			outer.end.character >= inner.end.character
-		);
-	}
-
-	async findDefinitionSymbol(
-		definition: Location,
-		name: string,
-	): Promise<SassDocumentSymbol | null> {
-		const definitionDocument = this._internal.cache.getDocument(definition.uri);
-		if (definitionDocument) {
-			const dollarlessName = asDollarlessVariable(name);
-			const symbols = this.ls.findDocumentSymbols(definitionDocument);
-			for (const symbol of symbols) {
-				if (
-					dollarlessName.includes(asDollarlessVariable(symbol.name)) &&
-					this.contains(symbol.selectionRange, definition.range)
-				) {
-					return symbol;
-				}
-			}
-		}
-
-		return null;
 	}
 }

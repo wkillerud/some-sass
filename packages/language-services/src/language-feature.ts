@@ -1,8 +1,11 @@
 import { resolve } from "url";
 import {
+	Location,
+	Position,
 	SCSSScanner,
 	Scanner,
 	LanguageService as VSCodeLanguageService,
+	Variable,
 	VariableDeclaration,
 	getNodeAtOffset,
 } from "@somesass/vscode-css-languageservice";
@@ -18,6 +21,7 @@ import {
 	URI,
 } from "./language-services-types";
 import { joinPath } from "./utils/resources";
+import { asDollarlessVariable } from "./utils/sass";
 
 export type LanguageFeatureInternal = {
 	cache: LanguageModelCache;
@@ -52,7 +56,10 @@ export abstract class LanguageFeature {
 	protected options;
 	protected configuration: LanguageServiceConfiguration = {};
 
-	/** @private */
+	/**
+	 * @private
+	 * @deprecated Should be refactored to private, access via functions on LanguageFeature
+	 */
 	protected _internal: LanguageFeatureInternal;
 
 	constructor(
@@ -257,8 +264,98 @@ export abstract class LanguageFeature {
 		return null;
 	}
 
+	private contains(outer: Range, inner: Range): boolean {
+		return (
+			outer.start.line >= inner.start.line &&
+			outer.start.character >= inner.start.character &&
+			outer.end.line >= inner.end.line &&
+			outer.end.character >= inner.end.character
+		);
+	}
+
+	protected async findDefinitionSymbol(
+		definition: Location,
+		name: string,
+	): Promise<SassDocumentSymbol | null> {
+		const definitionDocument = this._internal.cache.getDocument(definition.uri);
+		if (definitionDocument) {
+			const dollarlessName = asDollarlessVariable(name);
+			const symbols = this.ls.findDocumentSymbols(definitionDocument);
+			for (const symbol of symbols) {
+				if (
+					dollarlessName.includes(asDollarlessVariable(symbol.name)) &&
+					this.contains(symbol.selectionRange, definition.range)
+				) {
+					return symbol;
+				}
+			}
+		}
+
+		return null;
+	}
+
 	protected getFileName(uri: string): string {
 		const lastSlash = uri.lastIndexOf("/");
 		return lastSlash === -1 ? uri : uri.slice(Math.max(0, lastSlash + 1));
+	}
+
+	/**
+	 * Looks at {@link position} for a {@link VariableDeclaration} and returns its value as a string (or null if no value was found).
+	 * If the value is a reference to another variable this method will find that variable's definition and look for the value there instead.
+	 *
+	 * If the value is not found in 20 lookups, assumes a circular reference and returns null.
+	 */
+	async findValue(
+		document: TextDocument,
+		position: Position,
+	): Promise<string | null> {
+		return this.internalFindValue(document, position);
+	}
+
+	private async internalFindValue(
+		document: TextDocument,
+		position: Position,
+		depth = 0,
+	): Promise<string | null> {
+		const MAX_VARIABLE_REFERENCE_LOOKUPS = 20;
+		if (depth > MAX_VARIABLE_REFERENCE_LOOKUPS) {
+			return null;
+		}
+		const offset = document.offsetAt(position);
+		const stylesheet = this.ls.parseStylesheet(document);
+
+		const variable = getNodeAtOffset(stylesheet, offset);
+		if (!(variable instanceof Variable)) {
+			return null;
+		}
+
+		const parent = variable.getParent();
+		if (parent instanceof VariableDeclaration) {
+			return parent.getValue()?.getText() || null;
+		}
+
+		const valueString = variable.getText();
+		const dollarIndex = valueString.indexOf("$");
+		if (dollarIndex !== -1) {
+			// If the variable at position references another variable,
+			// find that variable's definition and look for the real value
+			// there instead.
+			const definition = await this.ls.findDefinition(document, position);
+			if (definition) {
+				const newDocument = this._internal.cache.getDocument(definition.uri);
+				if (!newDocument) {
+					return null;
+				}
+				return await this.internalFindValue(
+					newDocument,
+					definition.range.start,
+					depth + 1,
+				);
+			} else {
+				return null;
+			}
+		} else {
+			return valueString;
+		}
 	}
 }

@@ -350,7 +350,7 @@ export class DoHover extends LanguageFeature {
 		maybePrefixedName: string,
 	): Promise<Hover> {
 		const rawValue = this.getVariableValue(document, symbol) || "";
-		let value = await this.ls.findValue(document, symbol.selectionRange.start);
+		let value = await this.findValue(document, symbol.selectionRange.start);
 		value = value || rawValue;
 
 		const result = {

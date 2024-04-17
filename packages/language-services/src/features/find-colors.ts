@@ -34,7 +34,7 @@ export class FindColors extends LanguageFeature {
 		});
 
 		for (const variable of variables) {
-			const value = await this.ls.findValue(
+			const value = await this.findValue(
 				document,
 				document.positionAt(variable.offset),
 			);

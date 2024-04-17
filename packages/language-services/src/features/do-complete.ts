@@ -744,7 +744,7 @@ export class DoComplete extends LanguageFeature {
 		// Avoid ending up with namespace.prefix-$variable
 		const label = `$${prefix}${asDollarlessVariable(symbol.name)}`;
 		const rawValue = this.getVariableValue(currentDocument, symbol);
-		let value = await this.ls.findValue(
+		let value = await this.findValue(
 			currentDocument,
 			symbol.selectionRange.start,
 		);

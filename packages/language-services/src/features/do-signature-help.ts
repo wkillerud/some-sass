@@ -10,9 +10,6 @@ import {
 	NodeType,
 	MixinReference,
 	Function,
-	Location,
-	SassDocumentSymbol,
-	Range,
 } from "../language-services-types";
 import { asDollarlessVariable } from "../utils/sass";
 import { applySassDoc } from "../utils/sassdoc";
@@ -147,27 +144,6 @@ export class DoSignatureHelp extends LanguageFeature {
 
 		return result;
 	}
-
-	private async findDefinitionSymbol(
-		definition: Location,
-		name: string,
-	): Promise<SassDocumentSymbol | null> {
-		const definitionDocument = this._internal.cache.getDocument(definition.uri);
-		if (definitionDocument) {
-			const dollarlessName = asDollarlessVariable(name);
-			const symbols = this.ls.findDocumentSymbols(definitionDocument);
-			for (const symbol of symbols) {
-				if (
-					dollarlessName.includes(asDollarlessVariable(symbol.name)) &&
-					contains(symbol.selectionRange, definition.range)
-				) {
-					return symbol;
-				}
-			}
-		}
-
-		return null;
-	}
 }
 
 type Parameter = {
@@ -199,13 +175,4 @@ function getParametersFromDetail(detail?: string): Array<Parameter> {
 		result.push(parameter);
 	}
 	return result;
-}
-
-function contains(outer: Range, inner: Range): boolean {
-	return (
-		outer.start.line >= inner.start.line &&
-		outer.start.character >= inner.start.character &&
-		outer.end.line >= inner.end.line &&
-		outer.end.character >= inner.end.character
-	);
 }

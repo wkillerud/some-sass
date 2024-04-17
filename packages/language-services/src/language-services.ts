@@ -1,5 +1,6 @@
 import { getSCSSLanguageService } from "@somesass/vscode-css-languageservice";
 import { DoComplete } from "./features/do-complete";
+import { DoDiagnostics } from "./features/do-diagnostics";
 import { DoHover } from "./features/do-hover";
 import { DoRename } from "./features/do-rename";
 import { DoSignatureHelp } from "./features/do-signature-help";
@@ -9,7 +10,6 @@ import { FindDocumentHighlights } from "./features/find-document-highlights";
 import { FindDocumentLinks } from "./features/find-document-links";
 import { FindReferences } from "./features/find-references";
 import { FindSymbols } from "./features/find-symbols";
-import { FindValue } from "./features/find-value";
 import { LanguageModelCache as LanguageServerCache } from "./language-model-cache";
 import {
 	LanguageService as ILanguageService,
@@ -37,6 +37,7 @@ export function getLanguageService(
 class LanguageService implements ILanguageService {
 	#cache: LanguageServerCache;
 	#doComplete: DoComplete;
+	#doDiagnostics: DoDiagnostics;
 	#doHover: DoHover;
 	#doRename: DoRename;
 	#doSignatureHelp: DoSignatureHelp;
@@ -46,7 +47,6 @@ class LanguageService implements ILanguageService {
 	#findDocumentLinks: FindDocumentLinks;
 	#findReferences: FindReferences;
 	#findSymbols: FindSymbols;
-	#findValue: FindValue;
 
 	constructor(options: LanguageServiceOptions) {
 		const scssLs = getSCSSLanguageService({
@@ -60,6 +60,7 @@ class LanguageService implements ILanguageService {
 		});
 		this.#cache = cache;
 		this.#doComplete = new DoComplete(this, options, { scssLs, cache });
+		this.#doDiagnostics = new DoDiagnostics(this, options, { scssLs, cache });
 		this.#doHover = new DoHover(this, options, { scssLs, cache });
 		this.#doRename = new DoRename(this, options, { scssLs, cache });
 		this.#doSignatureHelp = new DoSignatureHelp(this, options, {
@@ -78,11 +79,11 @@ class LanguageService implements ILanguageService {
 		});
 		this.#findReferences = new FindReferences(this, options, { scssLs, cache });
 		this.#findSymbols = new FindSymbols(this, options, { scssLs, cache });
-		this.#findValue = new FindValue(this, options, { scssLs, cache });
 	}
 
 	configure(configuration: LanguageServiceConfiguration): void {
 		this.#doComplete.configure(configuration);
+		this.#doDiagnostics.configure(configuration);
 		this.#doHover.configure(configuration);
 		this.#doRename.configure(configuration);
 		this.#doSignatureHelp.configure(configuration);
@@ -100,6 +101,10 @@ class LanguageService implements ILanguageService {
 
 	doComplete(document: TextDocument, position: Position) {
 		return this.#doComplete.doComplete(document, position);
+	}
+
+	doDiagnostics(document: TextDocument) {
+		return this.#doDiagnostics.doDiagnostics(document);
 	}
 
 	doHover(document: TextDocument, position: Position) {
@@ -143,10 +148,6 @@ class LanguageService implements ILanguageService {
 		context?: ReferenceContext,
 	) {
 		return this.#findReferences.findReferences(document, position, context);
-	}
-
-	findValue(document: TextDocument, position: Position) {
-		return this.#findValue.findValue(document, position);
 	}
 
 	findWorkspaceSymbols(query?: string) {

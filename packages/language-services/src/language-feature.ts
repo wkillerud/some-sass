@@ -264,13 +264,8 @@ export abstract class LanguageFeature {
 		return null;
 	}
 
-	private contains(outer: Range, inner: Range): boolean {
-		return (
-			outer.start.line >= inner.start.line &&
-			outer.start.character >= inner.start.character &&
-			outer.end.line >= inner.end.line &&
-			outer.end.character >= inner.end.character
-		);
+	protected isSamePosition(a: Position, b: Position): boolean {
+		return a.line === b.line && a.character === b.character;
 	}
 
 	protected async findDefinitionSymbol(
@@ -284,7 +279,10 @@ export abstract class LanguageFeature {
 			for (const symbol of symbols) {
 				if (
 					dollarlessName.includes(asDollarlessVariable(symbol.name)) &&
-					this.contains(symbol.selectionRange, definition.range)
+					this.isSamePosition(
+						definition.range.start,
+						symbol.selectionRange.start,
+					)
 				) {
 					return symbol;
 				}

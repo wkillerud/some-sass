@@ -550,8 +550,4 @@ export class FindReferences extends LanguageFeature {
 
 		return false;
 	}
-
-	protected isSamePosition(a: Position, b: Position): boolean {
-		return a.line === b.line && a.character === b.character;
-	}
 }

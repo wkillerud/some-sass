@@ -21,21 +21,10 @@ export class FindDefinition extends LanguageFeature {
 		position: Position,
 	): Promise<Location | null> {
 		const stylesheet = this.ls.parseStylesheet(document);
-		const location = this._internal.scssLs.findDefinition(
-			document,
-			position,
-			stylesheet,
-		);
-
-		if (location) {
-			return location;
-		}
-
-		// Symbol was not in the current document, go look for it in the workspace
 		const offset = document.offsetAt(position);
 		const node = getNodeAtOffset(stylesheet, offset);
 		if (!node) {
-			return location;
+			return this.goUpstream(document, position, stylesheet);
 		}
 
 		// Sometimes we can't tell at position whether an identifier is a Method or a Function
@@ -110,7 +99,7 @@ export class FindDefinition extends LanguageFeature {
 		}
 
 		if (!name || !kinds) {
-			return location;
+			return this.goUpstream(document, position, stylesheet);
 		}
 
 		// Traverse the workspace looking for a symbol of kinds.includes(symbol.kind) && name === symbol.name
@@ -148,6 +137,14 @@ export class FindDefinition extends LanguageFeature {
 			}
 		}
 
-		return location;
+		return this.goUpstream(document, position, stylesheet);
+	}
+
+	private goUpstream(
+		document: TextDocument,
+		position: Position,
+		stylesheet: Node,
+	): Location | null {
+		return this._internal.scssLs.findDefinition(document, position, stylesheet);
 	}
 }

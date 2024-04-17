@@ -18,6 +18,7 @@ import {
 import type {
 	InitializeParams,
 	InitializeResult,
+	TextDocumentChangeEvent,
 } from "vscode-languageserver/node";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
@@ -27,7 +28,6 @@ import {
 	useContext,
 } from "./context-provider";
 import { ExtractProvider } from "./features/code-actions";
-import { doDiagnostics } from "./features/diagnostics/diagnostics";
 import type { FileSystemProvider } from "./file-system";
 import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";
@@ -211,32 +211,35 @@ export class SomeSassServer {
 			}
 		});
 
-		documents.onDidChangeContent(async (change) => {
+		const onDocumentChanged = async (
+			params: TextDocumentChangeEvent<TextDocument>,
+		) => {
 			if (!scannerService || !ls) return;
 
 			try {
-				ls.onDocumentChanged(change.document);
-				await scannerService.update(change.document);
+				ls.onDocumentChanged(params.document);
+				await scannerService.update(params.document);
 			} catch (error) {
 				// Something went wrong trying to parse the changed document.
 				this.connection.console.error((error as Error).message);
 				return;
 			}
 
-			const diagnostics = await doDiagnostics(change.document);
+			const diagnostics = await ls.doDiagnostics(params.document);
 
-			// Check that no new version has been made while we waited
-			const latestTextDocument = documents.get(change.document.uri);
-			if (
-				latestTextDocument &&
-				latestTextDocument.version === change.document.version
-			) {
-				this.connection.sendDiagnostics({
-					uri: latestTextDocument.uri,
-					diagnostics,
-				});
-			}
-		});
+			// Check that no new version has been made while we waited,
+			// in which case the diagnostics may no longer be valid.
+			const latest = documents.get(params.document.uri);
+			if (!latest || latest.version !== params.document.version) return;
+
+			this.connection.sendDiagnostics({
+				uri: latest.uri,
+				diagnostics,
+			});
+		};
+
+		documents.onDidOpen(onDocumentChanged);
+		documents.onDidChangeContent(onDocumentChanged);
 
 		this.connection.onDidChangeConfiguration((params) => {
 			const settings: ISettings = params.settings.somesass;

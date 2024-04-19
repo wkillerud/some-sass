@@ -13,10 +13,7 @@ import { CSSValidation } from "./services/cssValidation";
 
 import { SCSSParser } from "./parser/scssParser";
 import { SCSSCompletion } from "./services/scssCompletion";
-import { LESSParser } from "./parser/lessParser";
-import { LESSCompletion } from "./services/lessCompletion";
 import { getFoldingRanges } from "./services/cssFolding";
-import { format } from "./services/cssFormatter";
 
 import {
 	LanguageSettings,
@@ -29,7 +26,6 @@ import {
 	Hover,
 	Location,
 	DocumentHighlight,
-	DocumentLink,
 	SymbolInformation,
 	Range,
 	CodeActionContext,
@@ -46,8 +42,6 @@ import {
 	CSSDataV1,
 	HoverSettings,
 	CompletionSettings,
-	TextEdit,
-	CSSFormatConfiguration,
 	DocumentSymbol,
 	StylesheetDocumentLink,
 } from "./cssLanguageTypes";
@@ -121,7 +115,6 @@ export interface LanguageService {
 	doRename(document: TextDocument, position: Position, newName: string, stylesheet: Stylesheet): WorkspaceEdit;
 	getFoldingRanges(document: TextDocument, context?: { rangeLimit?: number }): FoldingRange[];
 	getSelectionRanges(document: TextDocument, positions: Position[], stylesheet: Stylesheet): SelectionRange[];
-	format(document: TextDocument, range: Range | undefined, options: CSSFormatConfiguration): TextEdit[];
 }
 
 export function getDefaultCSSDataProvider(): ICSSDataProvider {
@@ -155,7 +148,6 @@ function createFacade(
 		doComplete2: completion.doComplete2.bind(completion),
 		setCompletionParticipants: completion.setCompletionParticipants.bind(completion),
 		doHover: hover.doHover.bind(hover),
-		format,
 		findDefinition: navigation.findDefinition.bind(navigation),
 		findReferences: navigation.findReferences.bind(navigation),
 		findDocumentHighlights: navigation.findDocumentHighlights.bind(navigation),
@@ -200,21 +192,6 @@ export function getSCSSLanguageService(
 		new SCSSCompletion(options, cssDataManager),
 		new CSSHover(options && options.clientCapabilities, cssDataManager),
 		new SCSSNavigation(options && options.fileSystemProvider),
-		new CSSCodeActions(cssDataManager),
-		new CSSValidation(cssDataManager),
-		cssDataManager,
-	);
-}
-
-export function getLESSLanguageService(
-	options: LanguageServiceOptions = defaultLanguageServiceOptions,
-): LanguageService {
-	const cssDataManager = new CSSDataManager(options);
-	return createFacade(
-		new LESSParser(),
-		new LESSCompletion(options, cssDataManager),
-		new CSSHover(options && options.clientCapabilities, cssDataManager),
-		new CSSNavigation(options && options.fileSystemProvider, true),
 		new CSSCodeActions(cssDataManager),
 		new CSSValidation(cssDataManager),
 		cssDataManager,

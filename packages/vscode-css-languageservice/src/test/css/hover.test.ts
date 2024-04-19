@@ -6,24 +6,13 @@
 "use strict";
 
 import * as assert from "assert";
-import {
-	Hover,
-	TextDocument,
-	getCSSLanguageService,
-	getLESSLanguageService,
-	getSCSSLanguageService,
-} from "../../cssLanguageService";
+import { Hover, TextDocument, getCSSLanguageService, getSCSSLanguageService } from "../../cssLanguageService";
 import { HoverSettings } from "../../cssLanguageTypes";
 
 function assertHover(value: string, expected: Hover, languageId = "css", hoverSettings?: HoverSettings): void {
 	let offset = value.indexOf("|");
 	value = value.substr(0, offset) + value.substr(offset + 1);
-	const ls =
-		languageId === "css"
-			? getCSSLanguageService()
-			: languageId === "less"
-				? getLESSLanguageService()
-				: getSCSSLanguageService();
+	const ls = languageId === "css" ? getCSSLanguageService() : getSCSSLanguageService();
 
 	const document = TextDocument.create(`test://foo/bar.${languageId}`, languageId, 1, value);
 	const hoverResult = ls.doHover(document, document.positionAt(offset), ls.parseStylesheet(document), hoverSettings);

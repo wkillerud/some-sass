@@ -252,10 +252,10 @@ suite("SCSS Folding", () => {
 	});
 });
 
-suite("SCSS/LESS Folding - Regions", () => {
+suite("SCSS Folding - Regions", () => {
 	test("Simple region with comment", () => {
 		const input = [/*0*/ "/* #region */", /*1*/ "& .bar {", /*2*/ "  color: red;", /*3*/ "}", /*4*/ "/* #endregion */"];
-		assertRangesForLanguages(input, [r(0, 4, "region"), r(1, 2)], ["scss", "less"]);
+		assertRangesForLanguages(input, [r(0, 4, "region"), r(1, 2)], ["scss"]);
 	});
 
 	test("Simple region with padded comment", () => {
@@ -266,17 +266,17 @@ suite("SCSS/LESS Folding - Regions", () => {
 			/*3*/ "}",
 			/*4*/ "/*   #endregion   */",
 		];
-		assertRangesForLanguages(input, [r(0, 4, "region"), r(1, 2)], ["scss", "less"]);
+		assertRangesForLanguages(input, [r(0, 4, "region"), r(1, 2)], ["scss"]);
 	});
 
 	test("Region with SCSS single line comment", () => {
 		const input = [/*0*/ "// #region", /*1*/ "& .bar {", /*2*/ "  color: red;", /*3*/ "}", /*4*/ "// #endregion"];
-		assertRangesForLanguages(input, [r(0, 4, "region"), r(1, 2)], ["scss", "less"]);
+		assertRangesForLanguages(input, [r(0, 4, "region"), r(1, 2)], ["scss"]);
 	});
 
 	test("Region with SCSS single line padded comment", () => {
 		const input = [/*0*/ "//   #region  ", /*1*/ "& .bar {", /*2*/ "  color: red;", /*3*/ "}", /*4*/ "//   #endregion"];
-		assertRangesForLanguages(input, [r(0, 4, "region"), r(1, 2)], ["scss", "less"]);
+		assertRangesForLanguages(input, [r(0, 4, "region"), r(1, 2)], ["scss"]);
 	});
 
 	test("Region with both simple comments and region comments", () => {
@@ -290,6 +290,6 @@ suite("SCSS/LESS Folding - Regions", () => {
 			/*6*/ "}",
 			/*7*/ "// #endregion",
 		];
-		assertRangesForLanguages(input, [r(0, 7, "region"), r(1, 3, "comment"), r(4, 5)], ["scss", "less"]);
+		assertRangesForLanguages(input, [r(0, 7, "region"), r(1, 3, "comment"), r(4, 5)], ["scss"]);
 	});
 });

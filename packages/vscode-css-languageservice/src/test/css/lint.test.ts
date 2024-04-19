@@ -11,7 +11,6 @@ import { LintVisitor } from "../../services/lint";
 import { Rule, Rules, LintConfigurationSettings } from "../../services/lintRules";
 import { TextDocument } from "../../cssLanguageTypes";
 import { SCSSParser } from "../../parser/scssParser";
-import { LESSParser } from "../../parser/lessParser";
 import { CSSDataManager } from "../../languageFacts/dataManager";
 
 const cssDataManager = new CSSDataManager({ useDefaultDataProvider: true });
@@ -45,7 +44,7 @@ export function assertEntries(
 		}
 	}
 }
-const parsers = [new Parser(), new LESSParser(), new SCSSParser()];
+const parsers = [new Parser(), new SCSSParser()];
 
 function assertStyleSheet(input: string, ...rules: Rule[]): void {
 	for (const p of parsers) {

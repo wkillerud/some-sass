@@ -23,7 +23,6 @@ import {
 	MarkupContent,
 	MixinReferenceCompletionContext,
 	getSCSSLanguageService,
-	getLESSLanguageService,
 	ICSSDataProvider,
 	newCSSDataProvider,
 } from "../../cssLanguageService";
@@ -137,8 +136,6 @@ export async function testCompletionFor(
 	let ls;
 	if (lang === "scss") {
 		ls = getSCSSLanguageService(lsOptions);
-	} else if (lang === "less") {
-		ls = getLESSLanguageService(lsOptions);
 	} else {
 		ls = getCSSLanguageService(lsOptions);
 	}

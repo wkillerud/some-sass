@@ -226,6 +226,11 @@ export interface LanguageService {
 		color: Color,
 		range: Range,
 	): ColorPresentation[];
+	getCodeActions(
+		document: TextDocument,
+		range: Range,
+		context?: CodeActionContext,
+	): Promise<CodeAction[]>;
 	hasCached(uri: URI): boolean;
 	/**
 	 * Utility function to reparse an updated document.

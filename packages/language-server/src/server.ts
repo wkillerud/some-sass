@@ -27,7 +27,7 @@ import {
 	createContext,
 	useContext,
 } from "./context-provider";
-import { ExtractProvider } from "./features/code-actions";
+import { ExtractProvider } from "./features/code-actions/extract-provider";
 import type { FileSystemProvider } from "./file-system";
 import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";

@@ -2,7 +2,7 @@ import { deepStrictEqual } from "assert";
 import { EOL } from "os";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { Position, Range } from "vscode-languageserver-types";
-import { ExtractProvider } from "../../../src/features/code-actions";
+import { ExtractProvider } from "../../../src/features/code-actions/extract-provider";
 
 describe("Providers/Extract", () => {
 	it("supports extracting a variable", async () => {

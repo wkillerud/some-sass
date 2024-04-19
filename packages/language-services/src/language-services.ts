@@ -1,4 +1,8 @@
-import { getSCSSLanguageService } from "@somesass/vscode-css-languageservice";
+import {
+	CodeActionContext,
+	getSCSSLanguageService,
+} from "@somesass/vscode-css-languageservice";
+import { CodeActions } from "./features/code-actions";
 import { DoComplete } from "./features/do-complete";
 import { DoDiagnostics } from "./features/do-diagnostics";
 import { DoHover } from "./features/do-hover";
@@ -36,6 +40,7 @@ export function getLanguageService(
 
 class LanguageService implements ILanguageService {
 	#cache: LanguageServerCache;
+	#codeActions: CodeActions;
 	#doComplete: DoComplete;
 	#doDiagnostics: DoDiagnostics;
 	#doHover: DoHover;
@@ -59,6 +64,7 @@ class LanguageService implements ILanguageService {
 			...options.languageModelCache,
 		});
 		this.#cache = cache;
+		this.#codeActions = new CodeActions(this, options, { scssLs, cache });
 		this.#doComplete = new DoComplete(this, options, { scssLs, cache });
 		this.#doDiagnostics = new DoDiagnostics(this, options, { scssLs, cache });
 		this.#doHover = new DoHover(this, options, { scssLs, cache });
@@ -82,6 +88,7 @@ class LanguageService implements ILanguageService {
 	}
 
 	configure(configuration: LanguageServiceConfiguration): void {
+		this.#codeActions.configure(configuration);
 		this.#doComplete.configure(configuration);
 		this.#doDiagnostics.configure(configuration);
 		this.#doHover.configure(configuration);
@@ -164,6 +171,14 @@ class LanguageService implements ILanguageService {
 		range: Range,
 	): ColorPresentation[] {
 		return this.#findColors.getColorPresentations(document, color, range);
+	}
+
+	getCodeActions(
+		document: TextDocument,
+		range: Range,
+		context?: CodeActionContext,
+	) {
+		return this.#codeActions.getCodeActions(document, range, context);
 	}
 
 	onDocumentChanged(document: TextDocument) {

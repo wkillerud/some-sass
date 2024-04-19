@@ -1,4 +1,4 @@
-import { FileStat, FileType } from "vscode-css-languageservice";
+import { FileStat, FileType } from "@somesass/language-services";
 import type { CancellationToken } from "vscode-languageserver";
 import type { URI } from "vscode-uri";
 

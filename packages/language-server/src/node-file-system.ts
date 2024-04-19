@@ -1,6 +1,6 @@
 import { promises, constants, existsSync } from "fs";
+import { type FileStat, FileType } from "@somesass/language-services";
 import * as fg from "fast-glob";
-import { type FileStat, FileType } from "vscode-css-languageservice";
 import { URI, Utils } from "vscode-uri";
 import type { FileSystemProvider } from "./file-system";
 

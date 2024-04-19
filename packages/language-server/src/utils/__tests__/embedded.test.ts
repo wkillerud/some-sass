@@ -1,4 +1,4 @@
-import { strictEqual, deepStrictEqual, notDeepStrictEqual } from "assert";
+import { assert, describe, it } from "vitest";
 import { Position } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
@@ -6,93 +6,111 @@ import {
 	getSCSSRegions,
 	getSCSSContent,
 	getSCSSRegionsDocument,
-} from "../../src/utils/embedded";
+} from "../embedded";
 
 describe("Utils/VueSvelte", () => {
 	it("isFileWhereScssCanBeEmbedded", () => {
-		strictEqual(isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.vue"), true);
-		strictEqual(
+		assert.strictEqual(
+			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.vue"),
+			true,
+		);
+		assert.strictEqual(
 			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.scss.vue"),
 			true,
 		);
-		strictEqual(isFileWhereScssCanBeEmbedded("sda.vue/AppButton.scss"), false);
-		strictEqual(
+		assert.strictEqual(
+			isFileWhereScssCanBeEmbedded("sda.vue/AppButton.scss"),
+			false,
+		);
+		assert.strictEqual(
 			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.vue.scss"),
 			false,
 		);
 
-		strictEqual(isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.svelte"), true);
-		strictEqual(
+		assert.strictEqual(
+			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.svelte"),
+			true,
+		);
+		assert.strictEqual(
 			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.scss.svelte"),
 			true,
 		);
-		strictEqual(
+		assert.strictEqual(
 			isFileWhereScssCanBeEmbedded("sda.svelte/AppButton.scss"),
 			false,
 		);
-		strictEqual(
+		assert.strictEqual(
 			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.svelte.scss"),
 			false,
 		);
 
-		strictEqual(isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.astro"), true);
-		strictEqual(
+		assert.strictEqual(
+			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.astro"),
+			true,
+		);
+		assert.strictEqual(
 			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.scss.astro"),
 			true,
 		);
-		strictEqual(
+		assert.strictEqual(
 			isFileWhereScssCanBeEmbedded("sda.astro/AppButton.scss"),
 			false,
 		);
-		strictEqual(
+		assert.strictEqual(
 			isFileWhereScssCanBeEmbedded("sdasdsa/AppButton.astro.scss"),
 			false,
 		);
 	});
 
 	it("getSCSSRegions", () => {
-		deepStrictEqual(
+		assert.deepStrictEqual(
 			getSCSSRegions('<style sdad lang="scss" afsaf sdd></style>'),
 			[[34, 34]],
 		);
-		deepStrictEqual(getSCSSRegions('<style lang="scss" scoped></style>'), [
-			[26, 26],
+		assert.deepStrictEqual(
+			getSCSSRegions('<style lang="scss" scoped></style>'),
+			[[26, 26]],
+		);
+		assert.deepStrictEqual(
+			getSCSSRegions('<style lang="scss" module></style>'),
+			[[26, 26]],
+		);
+		assert.deepStrictEqual(getSCSSRegions('<style lang="scss"></style>'), [
+			[19, 19],
 		]);
-		deepStrictEqual(getSCSSRegions('<style lang="scss" module></style>'), [
-			[26, 26],
+		assert.deepStrictEqual(getSCSSRegions("<style lang='scss'></style>"), [
+			[19, 19],
 		]);
-		deepStrictEqual(getSCSSRegions('<style lang="scss"></style>'), [[19, 19]]);
-		deepStrictEqual(getSCSSRegions("<style lang='scss'></style>"), [[19, 19]]);
-		deepStrictEqual(getSCSSRegions('<style type="text/scss"></style>'), [
+		assert.deepStrictEqual(getSCSSRegions('<style type="text/scss"></style>'), [
 			[24, 24],
 		]);
 
-		deepStrictEqual(
+		assert.deepStrictEqual(
 			getSCSSRegions(
 				"<template><p>style lang='scss'</p></template><script></script></script><style lang='scss'></style>",
 			),
 			[[90, 90]],
 		);
-		deepStrictEqual(
+		assert.deepStrictEqual(
 			getSCSSRegions(
 				"<template><p>style lang='scss'</p></template><script></script></script>\n<style lang='scss'></style>",
 			),
 			[[91, 91]],
 		);
-		deepStrictEqual(
+		assert.deepStrictEqual(
 			getSCSSRegions(
 				"<template><p>style lang='scss'</p></template><script></script></script>\n<style lang='scss'>\n</style>",
 			),
 			[[91, 92]],
 		);
-		deepStrictEqual(
+		assert.deepStrictEqual(
 			getSCSSRegions(
 				"<template><p>style lang='scss'</p></template><script></script></script>\n<style lang='scss'>a { color: white; }</style>",
 			),
 			[[91, 110]],
 		);
 
-		deepStrictEqual(
+		assert.deepStrictEqual(
 			getSCSSRegions(
 				"<template><p>style lang='scss'</p></template><script></script></script><style lang='scss'>a { color: white; }</style><style lang='scss' module>a { color: white; }</style>\n",
 			),
@@ -101,7 +119,7 @@ describe("Utils/VueSvelte", () => {
 				[143, 162],
 			],
 		);
-		deepStrictEqual(
+		assert.deepStrictEqual(
 			getSCSSRegions(
 				"<template><p>style lang='scss'</p></template><script></script></script><style lang='scss'>a { color: white; }</style><style lang='scss' module>a { color: white; }</style>\n\n<style lang='scss' module=\"a\">a { color: white; }</style>",
 			),
@@ -112,19 +130,22 @@ describe("Utils/VueSvelte", () => {
 			],
 		);
 
-		deepStrictEqual(getSCSSRegions('<style lang="sass"></style>'), []);
-		deepStrictEqual(getSCSSRegions('<style lang="stylus"></style>'), []);
-		deepStrictEqual(getSCSSRegions('<style lang="sass" scoped></style>'), []);
-		deepStrictEqual(getSCSSRegions("<style></style>"), []);
-		deepStrictEqual(getSCSSRegions('<style>lang="scss"</style>'), []);
+		assert.deepStrictEqual(getSCSSRegions('<style lang="sass"></style>'), []);
+		assert.deepStrictEqual(getSCSSRegions('<style lang="stylus"></style>'), []);
+		assert.deepStrictEqual(
+			getSCSSRegions('<style lang="sass" scoped></style>'),
+			[],
+		);
+		assert.deepStrictEqual(getSCSSRegions("<style></style>"), []);
+		assert.deepStrictEqual(getSCSSRegions('<style>lang="scss"</style>'), []);
 	});
 
 	it("getSCSSContent", () => {
-		strictEqual(
+		assert.strictEqual(
 			getSCSSContent("sadja|sio|fuioaf", [[5, 10]]),
 			"     |sio|      ",
 		);
-		strictEqual(
+		assert.strictEqual(
 			getSCSSContent("sadja|sio|fuio^af^", [
 				[5, 10],
 				[14, 18],
@@ -132,7 +153,7 @@ describe("Utils/VueSvelte", () => {
 			"     |sio|    ^af^",
 		);
 
-		strictEqual(
+		assert.strictEqual(
 			getSCSSContent(
 				"<template><p>style lang='scss'</p></template><script></script></script><style lang='scss'> a\n { color: white;  }</style>",
 			),
@@ -147,8 +168,8 @@ describe("Utils/VueSvelte", () => {
 			1,
 			"",
 		);
-		strictEqual(
-			getSCSSRegionsDocument(exSCSSDocument, Position.create(0, 0)).document,
+		assert.strictEqual(
+			getSCSSRegionsDocument(exSCSSDocument, Position.create(0, 0)),
 			exSCSSDocument,
 		);
 
@@ -165,30 +186,30 @@ describe("Utils/VueSvelte", () => {
 			</style>
 		`,
 		);
-		notDeepStrictEqual(
-			getSCSSRegionsDocument(exVueDocument, Position.create(2, 15)).document,
+		assert.notDeepEqual(
+			getSCSSRegionsDocument(exVueDocument, Position.create(2, 15)),
 			exVueDocument,
 		);
-		deepStrictEqual(
-			getSCSSRegionsDocument(exVueDocument, Position.create(2, 15)).document,
+		assert.deepStrictEqual(
+			getSCSSRegionsDocument(exVueDocument, Position.create(2, 15)),
 			null,
 		);
 
-		notDeepStrictEqual(
-			getSCSSRegionsDocument(exVueDocument, Position.create(5, 15)).document,
+		assert.notDeepEqual(
+			getSCSSRegionsDocument(exVueDocument, Position.create(5, 15)),
 			exVueDocument,
 		);
-		notDeepStrictEqual(
-			getSCSSRegionsDocument(exVueDocument, Position.create(5, 15)).document,
+		assert.notDeepEqual(
+			getSCSSRegionsDocument(exVueDocument, Position.create(5, 15)),
 			null,
 		);
 
-		notDeepStrictEqual(
-			getSCSSRegionsDocument(exVueDocument, Position.create(6, 9)).document,
+		assert.notDeepEqual(
+			getSCSSRegionsDocument(exVueDocument, Position.create(6, 9)),
 			exVueDocument,
 		);
-		deepStrictEqual(
-			getSCSSRegionsDocument(exVueDocument, Position.create(6, 9)).document,
+		assert.deepStrictEqual(
+			getSCSSRegionsDocument(exVueDocument, Position.create(6, 9)),
 			null,
 		);
 	});

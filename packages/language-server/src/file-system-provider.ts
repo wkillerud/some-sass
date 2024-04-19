@@ -1,4 +1,4 @@
-import { type FileStat, FileType } from "vscode-css-languageservice";
+import { type FileStat, FileType } from "@somesass/language-services";
 import { type Connection, RequestType } from "vscode-languageserver";
 import { URI } from "vscode-uri";
 import {

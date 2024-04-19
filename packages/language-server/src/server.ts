@@ -27,7 +27,6 @@ import {
 	createContext,
 	useContext,
 } from "./context-provider";
-import { ExtractProvider } from "./features/code-actions/extract-provider";
 import type { FileSystemProvider } from "./file-system";
 import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";
@@ -386,44 +385,43 @@ export class SomeSassServer {
 		});
 
 		this.connection.onCodeAction(async (params) => {
-			const context = useContext();
-			if (!context) return null;
-
-			const { editorSettings } = context;
-			const codeActionProviders = [new ExtractProvider(editorSettings)];
+			if (!ls) return null;
 
 			const document = documents.get(params.textDocument.uri);
-			if (document === undefined) return null;
+			if (!document) return null;
 
-			const allActions: (Command | CodeAction)[] = [];
+			const result: (Command | CodeAction)[] = [];
 
-			for (const provider of codeActionProviders) {
-				const actions = await provider.provideCodeActions(
-					document,
-					params.range,
-				);
+			const actions = await ls.getCodeActions(
+				document,
+				params.range,
+				params.context,
+			);
 
-				if (provider instanceof ExtractProvider) {
-					for (const action of actions) {
-						const edit: TextDocumentEdit | undefined = action.edit
-							?.documentChanges?.[0] as TextDocumentEdit;
+			for (const action of actions) {
+				if (action.kind?.startsWith("refactor.extract")) {
+					// Replace with a custom command that immediately starts a rename after applying the edit.
+					// If this causes problems for other clients, look into passing some kind of client identifier (optional)
+					// with initOptions that indicate this command exists in the client.
 
-						const command = Command.create(
-							action.title,
-							"_somesass.applyExtractCodeAction",
-							document.uri,
-							document.version,
-							edit && edit.edits[0],
-						);
+					const edit: TextDocumentEdit | undefined = action.edit
+						?.documentChanges?.[0] as TextDocumentEdit;
 
-						allActions.push(
-							CodeAction.create(action.title, command, action.kind),
-						);
-					}
+					const command = Command.create(
+						action.title,
+						"_somesass.applyExtractCodeAction",
+						document.uri,
+						document.version,
+						edit && edit.edits[0],
+					);
+
+					result.push(CodeAction.create(action.title, command, action.kind));
+				} else {
+					result.push(action);
 				}
 			}
 
-			return allActions;
+			return result;
 		});
 
 		this.connection.onPrepareRename(async (params) => {

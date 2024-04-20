@@ -1,13 +1,13 @@
 import { EOL } from "node:os";
 import { test, assert, beforeEach } from "vitest";
+import { getLanguageService } from "../../language-services";
 import {
 	CodeAction,
 	Position,
 	Range,
 	TextDocumentEdit,
 	TextEdit,
-	getLanguageService,
-} from "../../language-services";
+} from "../../language-services-types";
 import { getOptions } from "../../utils/test-helpers";
 
 const { fileSystemProvider, ...rest } = getOptions();

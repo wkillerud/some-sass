@@ -1,17 +1,15 @@
+import { getNodeAtOffset } from "@somesass/vscode-css-languageservice";
+import { sassBuiltInModules } from "../facts/sass";
+import { sassDocAnnotations } from "../facts/sassdoc";
+import { LanguageFeature } from "../language-feature";
 import {
 	IToken,
 	MarkupKind,
 	Range,
 	TokenType,
-} from "@somesass/vscode-css-languageservice";
-import { sassBuiltInModules } from "../facts/sass";
-import { sassDocAnnotations } from "../facts/sassdoc";
-import { LanguageFeature } from "../language-feature";
-import {
 	TextDocument,
 	Position,
 	Hover,
-	getNodeAtOffset,
 	NodeType,
 	Variable,
 	SymbolKind,

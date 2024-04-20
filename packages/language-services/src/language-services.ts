@@ -1,7 +1,4 @@
-import {
-	CodeActionContext,
-	getSCSSLanguageService,
-} from "@somesass/vscode-css-languageservice";
+import { getSCSSLanguageService } from "@somesass/vscode-css-languageservice";
 import { CodeActions } from "./features/code-actions";
 import { DoComplete } from "./features/do-complete";
 import { DoDiagnostics } from "./features/do-diagnostics";
@@ -16,29 +13,31 @@ import { FindReferences } from "./features/find-references";
 import { FindSymbols } from "./features/find-symbols";
 import { LanguageModelCache as LanguageServerCache } from "./language-model-cache";
 import {
-	LanguageService as ILanguageService,
+	CodeActionContext,
+	LanguageService,
 	LanguageServiceConfiguration,
 	LanguageServiceOptions,
 	Position,
 	TextDocument,
+	FileSystemProvider,
+	FileStat,
+	FileType,
 	Color,
-	ColorInformation,
-	ColorPresentation,
 	Range,
 	ReferenceContext,
 	URI,
 } from "./language-services-types";
 import { mapFsProviders } from "./utils/fs-provider";
 
-export * from "./language-services-types";
+export { LanguageService, FileStat, FileSystemProvider, FileType };
 
 export function getLanguageService(
 	options: LanguageServiceOptions,
 ): LanguageService {
-	return new LanguageService(options);
+	return new LanguageServiceImpl(options);
 }
 
-class LanguageService implements ILanguageService {
+class LanguageServiceImpl implements LanguageService {
 	#cache: LanguageServerCache;
 	#codeActions: CodeActions;
 	#doComplete: DoComplete;
@@ -126,7 +125,7 @@ class LanguageService implements ILanguageService {
 		return this.#doSignatureHelp.doSignatureHelp(document, position);
 	}
 
-	findColors(document: TextDocument): Promise<ColorInformation[]> {
+	findColors(document: TextDocument) {
 		return this.#findColors.findColors(document);
 	}
 
@@ -165,11 +164,7 @@ class LanguageService implements ILanguageService {
 		return this.#cache.has(uri.toString());
 	}
 
-	getColorPresentations(
-		document: TextDocument,
-		color: Color,
-		range: Range,
-	): ColorPresentation[] {
+	getColorPresentations(document: TextDocument, color: Color, range: Range) {
 		return this.#findColors.getColorPresentations(document, color, range);
 	}
 

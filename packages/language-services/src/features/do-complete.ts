@@ -1,3 +1,9 @@
+import { getNodeAtOffset } from "@somesass/vscode-css-languageservice";
+import ColorDotJS from "colorjs.io";
+import { ParseResult } from "scss-sassdoc-parser";
+import { SassBuiltInModule, sassBuiltInModules } from "../facts/sass";
+import { sassDocAnnotations } from "../facts/sassdoc";
+import { LanguageFeature } from "../language-feature";
 import {
 	TokenType,
 	IToken,
@@ -19,13 +25,6 @@ import {
 	ForStatement,
 	EachStatement,
 	Identifier,
-} from "@somesass/vscode-css-languageservice";
-import ColorDotJS from "colorjs.io";
-import { ParseResult } from "scss-sassdoc-parser";
-import { SassBuiltInModule, sassBuiltInModules } from "../facts/sass";
-import { sassDocAnnotations } from "../facts/sassdoc";
-import { LanguageFeature } from "../language-feature";
-import {
 	CompletionList,
 	DocumentLink,
 	FileType,
@@ -34,7 +33,6 @@ import {
 	TextDocument,
 	URI,
 	Utils,
-	getNodeAtOffset,
 } from "../language-services-types";
 import { asDollarlessVariable } from "../utils/sass";
 import { applySassDoc } from "../utils/sassdoc";

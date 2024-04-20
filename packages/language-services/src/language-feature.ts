@@ -1,13 +1,9 @@
 import { resolve } from "url";
 import {
-	Location,
-	Position,
-	SCSSScanner,
-	Scanner,
-	LanguageService as VSCodeLanguageService,
-	Variable,
-	VariableDeclaration,
 	getNodeAtOffset,
+	LanguageService as VSCodeLanguageService,
+	Scanner,
+	SCSSScanner,
 } from "@somesass/vscode-css-languageservice";
 import { LanguageModelCache } from "./language-model-cache";
 import {
@@ -18,6 +14,10 @@ import {
 	NodeType,
 	Range,
 	SassDocumentSymbol,
+	Location,
+	Position,
+	Variable,
+	VariableDeclaration,
 	URI,
 } from "./language-services-types";
 import { joinPath } from "./utils/resources";

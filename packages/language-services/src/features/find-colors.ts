@@ -1,3 +1,4 @@
+import { getNodeAtOffset } from "@somesass/vscode-css-languageservice";
 import ColorDotJS from "colorjs.io";
 import { LanguageFeature } from "../language-feature";
 import {
@@ -8,7 +9,6 @@ import {
 	Range,
 	TextDocument,
 	Variable,
-	getNodeAtOffset,
 } from "../language-services-types";
 
 export class FindColors extends LanguageFeature {

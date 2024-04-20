@@ -1,8 +1,8 @@
+import { getNodeAtOffset } from "@somesass/vscode-css-languageservice";
 import {
 	TextDocument,
 	Position,
 	WorkspaceEdit,
-	getNodeAtOffset,
 	NodeType,
 	Range,
 	SymbolKind,

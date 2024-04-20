@@ -1,6 +1,6 @@
-import { NodeType } from "@somesass/language-services";
 import { test, assert } from "vitest";
 import { getLanguageService } from "../../language-services";
+import { NodeType } from "../../language-services-types";
 import { getOptions } from "../../utils/test-helpers";
 
 const { fileSystemProvider, ...rest } = getOptions();

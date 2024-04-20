@@ -1,3 +1,4 @@
+import { getNodeAtOffset } from "@somesass/vscode-css-languageservice";
 import { sassBuiltInModules } from "../facts/sass";
 import { LanguageFeature } from "../language-feature";
 import {
@@ -6,7 +7,6 @@ import {
 	Location,
 	SymbolKind,
 	Position,
-	getNodeAtOffset,
 	NodeType,
 	Variable,
 	MixinReference,

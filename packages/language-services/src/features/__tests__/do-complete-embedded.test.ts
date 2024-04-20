@@ -1,10 +1,10 @@
 import { test, assert, beforeEach } from "vitest";
+import { getLanguageService } from "../../language-services";
 import {
 	CompletionItemKind,
 	Position,
 	TextDocument,
-	getLanguageService,
-} from "../../language-services";
+} from "../../language-services-types";
 import { getOptions } from "../../utils/test-helpers";
 
 const { fileSystemProvider, ...rest } = getOptions();

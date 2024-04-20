@@ -1,3 +1,4 @@
+import { getNodeAtOffset } from "@somesass/vscode-css-languageservice";
 import { LanguageFeature } from "../language-feature";
 import {
 	TextDocument,
@@ -10,7 +11,6 @@ import {
 	NodeType,
 	SymbolKind,
 	VariableDeclaration,
-	getNodeAtOffset,
 	Variable,
 } from "../language-services-types";
 import { asDollarlessVariable } from "../utils/sass";

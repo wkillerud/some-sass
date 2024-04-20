@@ -1,10 +1,10 @@
 # Summary
 
 [Introduction](README.md)
-[Installation]()
 
 # User guide
 
+- [Settings](user-guide/settings.md)
 - [Navigation]()
 - [Hover info]()
 - [Completions]()
@@ -13,21 +13,20 @@
 - [Document highlights]()
 - [Code folding]()
 
-# Adding support for new editors
+# Use outside VS Code
 
-- [A primer on LSP]()
-- [Editor requirements]()
-- [Example: Neovim]()
-- [Example: Sublime text]()
+- [Getting started](language-server/getting-started.md)
+- [Neovim](language-server/neovim.md)
 
 # Contributing to Some Sass
 
-- [Writing documentation](contributing/writing-documentation.md)
-- [Working on Some Sass]()
-  - [Extensions for VS Code]()
-  - [Architecture]()
-  - [Development environment]()
-    - [Setting up VS Code]()
-    - [Debugging the Node server]()
+- [New contributors](contributing/new-contributors.md)
+  - [Extensions for VS Code](contributing/extensions-for-vs-code.md)
+  - [Language Server Protocol](contributing/language-server-protocol.md)
+- [Architecture]()
+- [Development environment]()
+  - [Set up VS Code]()
+  - [Debugging]()
     - [Debugging in the browser]()
-    - [Debugging integration tests]()
+    - [Debugging end-to-end tests]()
+- [Writing documentation](contributing/writing-documentation.md)

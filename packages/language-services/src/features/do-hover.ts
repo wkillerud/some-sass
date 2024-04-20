@@ -179,7 +179,7 @@ export class DoHover extends LanguageFeature {
 				[symbolDocument, symbol] = result[0];
 			} else {
 				// Fall back to looking through all the things, assuming folks use @import
-				const documents = this._internal.cache.documents();
+				const documents = this.cache.documents();
 				for (const document of documents) {
 					const symbols = this.ls.findDocumentSymbols(document);
 					for (const sym of symbols) {
@@ -262,7 +262,11 @@ export class DoHover extends LanguageFeature {
 		}
 
 		// Lastly, fall back to CSS hover information
-		return this._internal.scssLs.doHover(document, position, stylesheet);
+		return this.getUpstreamLanguageServer().doHover(
+			document,
+			position,
+			stylesheet,
+		);
 	}
 
 	getFunctionHoverContent(

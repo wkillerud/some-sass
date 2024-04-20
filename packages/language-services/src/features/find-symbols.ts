@@ -12,16 +12,16 @@ export class FindSymbols extends LanguageFeature {
 	findDocumentSymbols(document: TextDocument): SassDocumentSymbol[] {
 		// While not IO-costly like findDocumentLinks, findDocumentSymbols is such a
 		// hot path that the CPU time it takes to call findDocumentSymbols2 adds up.
-		const cachedSymbols = this._internal.cache.getCachedSymbols(document);
+		const cachedSymbols = this.cache.getCachedSymbols(document);
 		if (cachedSymbols) return cachedSymbols;
 
 		const stylesheet = this.ls.parseStylesheet(document);
-		const symbols = this._internal.scssLs.findDocumentSymbols2(
+		const symbols = this.getUpstreamLanguageServer().findDocumentSymbols2(
 			document,
 			stylesheet,
 		) as SassDocumentSymbol[];
 
-		const sassdoc: ParseResult[] = this._internal.cache.getSassdoc(document);
+		const sassdoc: ParseResult[] = this.cache.getSassdoc(document);
 		for (const doc of sassdoc) {
 			switch (doc.context.type) {
 				case "variable": {
@@ -61,13 +61,13 @@ export class FindSymbols extends LanguageFeature {
 			}
 		}
 
-		this._internal.cache.putCachedSymbols(document, symbols);
+		this.cache.putCachedSymbols(document, symbols);
 
 		return symbols;
 	}
 
 	findWorkspaceSymbols(query?: string): SymbolInformation[] {
-		const documents = this._internal.cache.documents();
+		const documents = this.cache.documents();
 		const result: SymbolInformation[] = [];
 		for (const document of documents) {
 			const symbols = this.findDocumentSymbols(document);

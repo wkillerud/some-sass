@@ -78,7 +78,7 @@ export class FindColors extends LanguageFeature {
 		if (node && node.type === NodeType.VariableName) {
 			const parent = node.getParent();
 			if (parent && parent.type === NodeType.VariableDeclaration) {
-				return this._internal.scssLs.getColorPresentations(
+				return this.getUpstreamLanguageServer().getColorPresentations(
 					document,
 					stylesheet,
 					color,

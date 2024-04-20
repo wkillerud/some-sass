@@ -145,6 +145,10 @@ export class FindDefinition extends LanguageFeature {
 		position: Position,
 		stylesheet: Node,
 	): Location | null {
-		return this._internal.scssLs.findDefinition(document, position, stylesheet);
+		return this.getUpstreamLanguageServer().findDefinition(
+			document,
+			position,
+			stylesheet,
+		);
 	}
 }

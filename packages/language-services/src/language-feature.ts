@@ -56,11 +56,11 @@ export abstract class LanguageFeature {
 	protected options;
 	protected configuration: LanguageServiceConfiguration = {};
 
-	/**
-	 * @private
-	 * @deprecated Should be refactored to private, access via functions on LanguageFeature
-	 */
-	protected _internal: LanguageFeatureInternal;
+	private _internal: LanguageFeatureInternal;
+
+	protected get cache(): LanguageModelCache {
+		return this._internal.cache;
+	}
 
 	constructor(
 		ls: LanguageService,
@@ -85,6 +85,10 @@ export abstract class LanguageFeature {
 			},
 		};
 		this._internal.scssLs.configure(configuration);
+	}
+
+	protected getUpstreamLanguageServer(): VSCodeLanguageService {
+		return this._internal.scssLs;
 	}
 
 	protected getDocumentContext() {
@@ -197,7 +201,7 @@ export abstract class LanguageFeature {
 				continue;
 			}
 
-			let next = this._internal.cache.getDocument(link.target!);
+			let next = this.cache.getDocument(link.target!);
 			if (!next) {
 				try {
 					// If the linked document hasn't been parsed yet, create a TextDocument
@@ -272,7 +276,7 @@ export abstract class LanguageFeature {
 		definition: Location,
 		name: string,
 	): Promise<SassDocumentSymbol | null> {
-		const definitionDocument = this._internal.cache.getDocument(definition.uri);
+		const definitionDocument = this.cache.getDocument(definition.uri);
 		if (definitionDocument) {
 			const dollarlessName = asDollarlessVariable(name);
 			const symbols = this.ls.findDocumentSymbols(definitionDocument);
@@ -340,7 +344,7 @@ export abstract class LanguageFeature {
 			// there instead.
 			const definition = await this.ls.findDefinition(document, position);
 			if (definition) {
-				const newDocument = this._internal.cache.getDocument(definition.uri);
+				const newDocument = this.cache.getDocument(definition.uri);
 				if (!newDocument) {
 					return null;
 				}

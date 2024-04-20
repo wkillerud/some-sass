@@ -79,6 +79,7 @@ export class DoComplete extends LanguageFeature {
 		position: Position,
 	): Promise<CompletionList> {
 		const result = CompletionList.create([]);
+		const upstreamLs = this.getUpstreamLanguageServer();
 
 		const context = this.createCompletionContext(document, position);
 
@@ -158,7 +159,7 @@ export class DoComplete extends LanguageFeature {
 		if (context.isImportContext) {
 			// Upstream includes thing like suggestions based on relative paths
 			// and imports of built-in sass modules like sass:color and sass:math
-			const upstreamResult = await this._internal.scssLs.doComplete2(
+			const upstreamResult = await upstreamLs.doComplete2(
 				document,
 				position,
 				stylesheet,
@@ -249,7 +250,7 @@ export class DoComplete extends LanguageFeature {
 		// Legacy @import style suggestions
 		if (!this.configuration.completionSettings?.suggestFromUseOnly) {
 			const currentWord = context.currentWord;
-			const documents = this._internal.cache.documents();
+			const documents = this.cache.documents();
 			for (const currentDocument of documents) {
 				if (
 					!this.configuration.completionSettings?.suggestAllFromOpenDocument &&
@@ -320,7 +321,7 @@ export class DoComplete extends LanguageFeature {
 			}
 
 			// If we don't have any suggestions, maybe upstream does
-			const upstreamResult = await this._internal.scssLs.doComplete2(
+			const upstreamResult = await upstreamLs.doComplete2(
 				document,
 				position,
 				stylesheet,
@@ -335,7 +336,7 @@ export class DoComplete extends LanguageFeature {
 			return upstreamResult;
 		}
 
-		const upstreamResult = await this._internal.scssLs.doComplete2(
+		const upstreamResult = await upstreamLs.doComplete2(
 			document,
 			position,
 			stylesheet,
@@ -498,7 +499,7 @@ export class DoComplete extends LanguageFeature {
 		}
 
 		if (!this.configuration.completionSettings?.suggestFromUseOnly) {
-			const documents = this._internal.cache.documents();
+			const documents = this.cache.documents();
 			for (const current of documents) {
 				const symbols = this.ls.findDocumentSymbols(current);
 				for (const symbol of symbols) {
@@ -548,7 +549,7 @@ export class DoComplete extends LanguageFeature {
 	 */
 	async doPlaceholderDeclarationCompletion(): Promise<CompletionItem[]> {
 		const items: CompletionItem[] = [];
-		const documents = this._internal.cache.documents();
+		const documents = this.cache.documents();
 		for (const currentDocument of documents) {
 			const symbols = this.ls.findDocumentSymbols(currentDocument);
 			for (const symbol of symbols) {
@@ -607,7 +608,7 @@ export class DoComplete extends LanguageFeature {
 						}
 					}
 				} else {
-					start = this._internal.cache.getDocument(link.target);
+					start = this.cache.getDocument(link.target);
 				}
 				break;
 			}
@@ -632,7 +633,7 @@ export class DoComplete extends LanguageFeature {
 	): Promise<CompletionItem[]> {
 		const items: CompletionItem[] = [];
 		for (const link of wildcards) {
-			const start = this._internal.cache.getDocument(link.target!);
+			const start = this.cache.getDocument(link.target!);
 			if (!start) continue;
 
 			const result = await this.findCompletionsInWorkspace(

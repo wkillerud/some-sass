@@ -7,11 +7,11 @@ import {
 
 export class FindDocumentLinks extends LanguageFeature {
 	async findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]> {
-		const cached = this._internal.cache.getResolvedLinks(document);
+		const cached = this.cache.getResolvedLinks(document);
 		if (cached) return cached;
 
 		const stylesheet = this.ls.parseStylesheet(document);
-		const links = await this._internal.scssLs.findDocumentLinks2(
+		const links = await this.getUpstreamLanguageServer().findDocumentLinks2(
 			document,
 			stylesheet,
 			this.getDocumentContext(),
@@ -27,7 +27,7 @@ export class FindDocumentLinks extends LanguageFeature {
 			}
 		}
 
-		this._internal.cache.putResolvedLinks(document, links);
+		this.cache.putResolvedLinks(document, links);
 
 		return links;
 	}

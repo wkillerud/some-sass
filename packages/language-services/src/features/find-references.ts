@@ -91,7 +91,7 @@ export class FindReferences extends LanguageFeature {
 			builtin ? builtin[1] : references.declaration!.symbol.name,
 		);
 
-		const documents = this._internal.cache.documents();
+		const documents = this.cache.documents();
 		for (const doc of documents) {
 			const stylesheet = this.ls.parseStylesheet(doc);
 			const candidates: Reference[] = [];
@@ -486,7 +486,7 @@ export class FindReferences extends LanguageFeature {
 			// If not, get the definition for the current position
 			const definition = await this.ls.findDefinition(document, position);
 			if (definition) {
-				const document = this._internal.cache.getDocument(definition.uri);
+				const document = this.cache.getDocument(definition.uri);
 				if (document) {
 					const dollarlessName = asDollarlessVariable(result.name);
 					const symbols = this.ls.findDocumentSymbols(document);
@@ -521,7 +521,7 @@ export class FindReferences extends LanguageFeature {
 
 		if (candidate.includes(this.getFileName(definition))) {
 			try {
-				const candidateDocument = this._internal.cache.getDocument(candidate);
+				const candidateDocument = this.cache.getDocument(candidate);
 				if (!candidateDocument) {
 					return false;
 				}

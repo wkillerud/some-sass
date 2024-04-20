@@ -16,14 +16,16 @@
 # Use outside VS Code
 
 - [Getting started](language-server/getting-started.md)
-- [Neovim](language-server/neovim.md)
+- [Configure a client](language-server/configure-a-client.md)
+- [Existing clients](language-server/existing-clients.md)
+  - [Neovim](language-server/neovim.md)
 
 # Contributing to Some Sass
 
 - [New contributors](contributing/new-contributors.md)
   - [Extensions for VS Code](contributing/extensions-for-vs-code.md)
   - [Language Server Protocol](contributing/language-server-protocol.md)
-- [Architecture]()
+- [Architecture](contributing/architecture.md)
 - [Development environment]()
   - [Set up VS Code]()
   - [Debugging]()

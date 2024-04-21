@@ -109,7 +109,6 @@
 	},
 	"devDependencies": {
 		"@types/mocha": "10.0.6",
-		"@types/sinon": "17.0.3",
 		"@types/vscode": "1.86.0",
 		"@vscode/test-electron": "2.3.9",
 		"@vscode/test-web": "0.0.53",

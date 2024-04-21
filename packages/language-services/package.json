@@ -47,7 +47,7 @@
 	"license": "MIT",
 	"scripts": {
 		"prepublishOnly": "npm run build",
-		"build": "npm run clean && tsc",
+		"build": "tsc",
 		"clean": "shx rm -rf dist",
 		"test": "vitest",
 		"coverage": "vitest run --coverage"

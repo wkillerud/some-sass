@@ -119,7 +119,7 @@
 	"scripts": {
 		"vscode:prepublish": "npm install && npm run clean && webpack --mode production",
 		"clean": "shx rm -rf dist",
-		"build": "npm run clean && webpack --mode development",
+		"build": "webpack --mode development",
 		"start:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=.",
 		"lint": "eslint \"**/*.ts\" --cache",
 		"test:e2e": "node ./test/e2e/runTest.js",

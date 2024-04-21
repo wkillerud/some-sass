@@ -1,5 +1,7 @@
 # Refactoring
 
+TODO: you are here
+
 ## Rename symbol
 
 https://code.visualstudio.com/docs/editor/refactoring#_rename-symbol

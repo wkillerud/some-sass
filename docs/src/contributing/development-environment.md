@@ -17,7 +17,7 @@ To preview the documentation you need [mdbook](https://rust-lang.github.io/mdBoo
 
 Clone the repo and install dependencies:
 
-```
+```sh
 git clone git@github.com:wkillerud/some-sass.git
 cd some-sass
 npm install
@@ -25,7 +25,7 @@ npm install
 
 Run the build and automated tests. Some of the automated tests open a new window and run in Visual Studio Code Insiders.
 
-```
+```sh
 npm run build
 npm run test:all
 ```
@@ -33,3 +33,5 @@ npm run test:all
 ## Next steps
 
 You may want to have a look at the [architecture](./architecture.md) of the language server. Most of the functionality of the language server is in the `language-services` package in `packages/`.
+
+[Test-driven development](./debugging-unit-tests.md) with Vitest and the VS Code debugger gives the shortest feedback loop.

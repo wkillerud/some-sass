@@ -6,7 +6,7 @@ You can use Some Sass with Visual Studio Code running in the browser. This docum
 
 In a terminal, run:
 
-```
+```sh
 npm run start:web
 ```
 

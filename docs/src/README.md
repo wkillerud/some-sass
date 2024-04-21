@@ -9,6 +9,8 @@ Some features include:
 - Rich documentation through [SassDoc][sassdoc].
 - Language features for [`%placeholders`][placeholder], both when using them and writing them.
 
+![](./images/usage/suggestions-mixins.gif)
+
 ## Get the extension
 
 You can find the extension here:

@@ -2,28 +2,7 @@
 
 Thank you for showing an interest in contributing, be it to the language server, to the VS Code extension, the documentation, or in some other way 🌟
 
-The best place to get started if you're new here is to read the guide for new contributors.
-
-### Debugging integration tests for the browser version
-
-Like [debugging integration tests](#debugging-integration-tests), do this when you want to debug the tests themselves rather than functionality. The web integration tests compile to in `web/src/suite/`.
-
-Set breakpoints in the compiled output (`web/dist/suite/index.js`).
-
-At time of writing you may have to set the breakpoints after the debugger has attached. I've had the best success rate clicking repeatedly to set the breakpoint.
-
-## Documentation
-
-There's a documentation website in [`docs/`](./docs).
-
-To preview the documentation on your machine you need [mdbook](https://rust-lang.github.io/mdBook/guide/installation.html). If you're on macOS and use [Homebrew](https://brew.sh) you can `brew install mdbook`.
-
-```sh
-cd docs
-mdbook serve --open
-```
-
-To learn how to work with an mdbook, head over to [the mdbook user guide](https://rust-lang.github.io/mdBook/guide/creating.html).
+The best place to get started is [the guide for new contributors](docs/src/contributing/new-contributors.md).
 
 ## Conventional commits
 

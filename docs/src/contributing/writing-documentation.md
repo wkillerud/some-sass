@@ -11,13 +11,13 @@ New contributors are especially welcome to write documentation and add examples.
 
 Fork and clone the repository from [GitHub][repo]. The documentation is in the `docs/src/` folder.
 
-```
+```sh
 git clone git@github.com:wkillerud/some-sass.git
 ```
 
 Once you're happy, commit the changes and prefix the commit message with `docs:`
 
-```
+```sh
 git commit -m "docs: add GIF demoing Go to definition"
 ```
 

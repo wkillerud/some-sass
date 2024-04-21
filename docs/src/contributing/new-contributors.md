@@ -13,4 +13,8 @@ If you've never worked on Some Sass you're in the right place. There are several
 
 Have a look at [Writing documentation](./writing-documentation.md) if you want to work on the docs.
 
-Diving in to code? You may want to start with the primers on [extensions for Visual Studio Code](./extensions-for-vs-code.md) and the [Language Server Protocol](./language-server-protocol.md) before you set up your [development environment](./development-environment.md).
+Diving in to code? You may be interested in:
+
+- Primers on [extensions for Visual Studio Code](./extensions-for-vs-code.md) and the [Language Server Protocol](./language-server-protocol.md)
+- How you set up your [development environment](./development-environment.md).
+- Before long you'll need to do some [debugging](./debugging.md).

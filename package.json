@@ -11,6 +11,7 @@
 	],
 	"scripts": {
 		"prepare": "husky",
+		"coverage": "npm run coverage --workspaces --if-present",
 		"build": "npm run build --workspaces --if-present",
 		"lint": "eslint \"**/*.ts\" --cache",
 		"lint-staged": "lint-staged",

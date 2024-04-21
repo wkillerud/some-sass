@@ -12,7 +12,7 @@
 			"autoAttachChildProcesses": true
 		},
 		{
-			"name": "Launch Web Extension in VS Code",
+			"name": "Launch web extension",
 			"type": "extensionHost",
 			"debugWebWorkerHost": true,
 			"request": "launch",
@@ -24,7 +24,7 @@
 			"autoAttachChildProcesses": true
 		},
 		{
-			"name": "Integration Tests",
+			"name": "Launch integration tests",
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
@@ -53,11 +53,11 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Launch web integration test",
+			"name": "Run web integration test",
 			"outputCapture": "std",
 			"program": "${workspaceFolder}/vscode-extension/out/test/web/runTest.js",
 			"args": ["--waitForDebugger=9229"],
-			"cascadeTerminateToConfigurations": ["Launch web integration test"],
+			"cascadeTerminateToConfigurations": ["Run web integration test"],
 			"presentation": {
 				"hidden": true
 			}
@@ -65,9 +65,9 @@
 	],
 	"compounds": [
 		{
-			"name": "Web Integration Tests",
+			"name": "Launch web integration tests",
 			"configurations": [
-				"Launch web integration test",
+				"Run web integration test",
 				"Attach to web integration test"
 			]
 		}

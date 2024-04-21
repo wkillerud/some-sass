@@ -1,5 +1,4 @@
 {
-	"mochaExplorer.cwd": "server",
 	"somesass.scannerDepth": 30,
 	"somesass.scannerExclude": [
 		"**/.git/**",

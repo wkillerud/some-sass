@@ -14,6 +14,7 @@
 		"build": "npm run build --workspaces --if-present",
 		"lint": "eslint \"**/*.ts\" --cache",
 		"lint-staged": "lint-staged",
+		"start:web": "npm run --workspace=some-sass start:web",
 		"test": "CI=true npm run test --workspaces --if-present",
 		"test:all": "npm run test && npm run test:e2e && npm run test:web",
 		"test:e2e": "npm run test:e2e --workspaces --if-present",

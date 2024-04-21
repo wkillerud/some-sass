@@ -8,6 +8,8 @@ In other words, LSP lets you build the language support tools once and run in an
 
 For the most part you don't need to worry about the implementation details of the LSP. Microsoft's [TypeScript implementation][implementation] handles the nitty-gritty.
 
+## Language features
+
 The Visual Studio Code documentation for [Programatic language features][features] gives a good sense of what's possible with LSP. If you want to dive deep, the [specification] lists all the messages and their parameters.
 
 [why-lsp]: https://code.visualstudio.com/api/language-extensions/language-server-extension-guide#why-language-server

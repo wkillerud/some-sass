@@ -1,20 +1,23 @@
-import * as assert from "assert";
-import * as vscode from "vscode";
-import { getDocUri, showFile, position, sleep } from "./util";
+const assert = require("assert");
+const vscode = require("vscode");
+const { getDocUri, showFile, position, sleep } = require("./util");
 
-async function testSignature(
-	docUri: vscode.Uri,
-	position: vscode.Position,
-	signature: vscode.SignatureHelp,
-) {
+/**
+ * @param {import('vscode').Uri} docUri
+ * @param {import('vscode').Position} position
+ * @param {import('vscode').SignatureHelp} signature
+ * @returns {Promise<void>}
+ */
+async function testSignature(docUri, position, signature) {
 	await showFile(docUri);
 
-	const result = await vscode.commands.executeCommand<vscode.SignatureHelp>(
-		"vscode.executeSignatureHelpProvider",
-		docUri,
-		position,
+	const result = /** @type {import('vscode').SignatureHelp} */ (
+		await vscode.commands.executeCommand(
+			"vscode.executeSignatureHelpProvider",
+			docUri,
+			position,
+		)
 	);
-
 	if (result === undefined) {
 		assert.fail("The 'result' is undefined.");
 	}

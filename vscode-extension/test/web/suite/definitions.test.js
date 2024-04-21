@@ -1,19 +1,31 @@
-import * as assert from "assert";
-import * as vscode from "vscode";
-import { getDocUri, showFile, position, sameLineLocation, sleep } from "./util";
+const assert = require("assert");
+const vscode = require("vscode");
+const {
+	getDocUri,
+	showFile,
+	position,
+	sameLineLocation,
+	sleep,
+} = require("./util");
 
-async function testDefinition(
-	docUri: vscode.Uri,
-	position: vscode.Position,
-	expectedLocation: vscode.Location,
-) {
+/**
+ * @param {import('vscode').Uri} docUri
+ * @param {import('vscode').Position} position
+ * @param {import('vscode').Location} expectedLocation
+ * @returns {Promise<void>}
+ */
+async function testDefinition(docUri, position, expectedLocation) {
 	await showFile(docUri);
 
-	const result: any = await vscode.commands.executeCommand(
-		"vscode.executeDefinitionProvider",
-		docUri,
-		position,
-	);
+	const result =
+		/** @type {import('vscode').Location[]} */
+		(
+			await vscode.commands.executeCommand(
+				"vscode.executeDefinitionProvider",
+				docUri,
+				position,
+			)
+		);
 
 	if (result[0] === undefined) {
 		assert.fail("The 'result[0]' is undefined.");

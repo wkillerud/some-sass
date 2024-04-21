@@ -1,27 +1,34 @@
-import * as assert from "assert";
-import * as vscode from "vscode";
-import { getDocUri, position, showFile, sleep } from "./util";
+const assert = require("assert");
+const vscode = require("vscode");
+const { getDocUri, showFile, position, sleep } = require("./util");
 
-type CompletionTestOptions = {
-	/**
-	 * @default false
-	 */
-	expectNoMatch: boolean;
-};
+/**
+ * @typedef {object} CompletionTestOptions
+ * @property {boolean} [expectNoMatch=false]
+ */
 
+/**
+ * @param {import('vscode').Uri} docUri
+ * @param {import('vscode').Position} position
+ * @param {Array<string | import('vscode-languageclient').CompletionItem>} expectedItems
+ * @param {CompletionTestOptions} options
+ * @returns {Promise<void>}
+ */
 async function testCompletion(
-	docUri: vscode.Uri,
-	position: vscode.Position,
-	expectedItems: (string | vscode.CompletionItem)[],
-	options: CompletionTestOptions = { expectNoMatch: false },
+	docUri,
+	position,
+	expectedItems,
+	options = { expectNoMatch: false },
 ) {
 	await showFile(docUri);
 
-	const result = (await vscode.commands.executeCommand(
-		"vscode.executeCompletionItemProvider",
-		docUri,
-		position,
-	)) as vscode.CompletionList;
+	const result = /** @type {import('vscode').CompletionList} */ (
+		await vscode.commands.executeCommand(
+			"vscode.executeCompletionItemProvider",
+			docUri,
+			position,
+		)
+	);
 
 	expectedItems.forEach((ei) => {
 		if (typeof ei === "string") {
@@ -76,15 +83,11 @@ async function testCompletion(
 				assert.strictEqual(match.detail, ei.detail);
 			}
 			if (ei.insertText) {
-				const value =
-					typeof ei.insertText === "string"
-						? ei.insertText
-						: ei.insertText.value;
 				assert.ok(
-					JSON.stringify(match.insertText).includes(value),
-					`Expected insertText to include ${value}. Actual: ${JSON.stringify(
-						match.insertText,
-					)}`,
+					JSON.stringify(match.insertText).includes(ei.insertText),
+					`Expected insertText to include ${
+						ei.insertText
+					}. Actual: ${JSON.stringify(match.insertText)}`,
 				);
 			}
 
@@ -99,22 +102,16 @@ async function testCompletion(
 				);
 			}
 
-			if (ei.documentation) {
-				if (typeof match.documentation === "string") {
-					assert.strictEqual(match.documentation, ei.documentation);
-				} else {
-					const value = ei.documentation
-						? typeof ei.documentation === "string"
-							? ei.documentation
-							: ei.documentation.value
-						: "";
-					if (value && match.documentation) {
-						assert.strictEqual(
-							(match.documentation as vscode.MarkdownString).value,
-							value,
-						);
-					}
-				}
+			if (
+				typeof match.documentation === "string" &&
+				typeof ei.documentation === "string"
+			) {
+				assert.strictEqual(match.documentation, ei.documentation);
+			} else if (
+				typeof ei.documentation === "object" &&
+				typeof match.documentation === "object"
+			) {
+				assert.strictEqual(match.documentation.value, ei.documentation.value);
 			}
 		}
 	});

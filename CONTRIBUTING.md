@@ -4,14 +4,6 @@ Thank you for showing an interest in contributing, be it to the language server,
 
 The best place to get started if you're new here is to read the guide for new contributors.
 
-### Debugging integration tests
-
-- To compile changes in test code, run `npm run compile` in the `e2e` directory.
-
-You set breakpoints in the compiled output. Integration tests compile to `vscode-extension/out/suite/`. Breakpoints can _only be set in test code_, meaning any code in the `e2e/out/` folder.
-
-Breakpoints set, go to the _Run and Debug_ pane in VS Code and run the Integration Tests configuration.
-
 ### Debugging integration tests for the browser version
 
 Like [debugging integration tests](#debugging-integration-tests), do this when you want to debug the tests themselves rather than functionality. The web integration tests compile to in `web/src/suite/`.

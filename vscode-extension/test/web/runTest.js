@@ -1,5 +1,5 @@
-import * as path from "path";
-import { runTests } from "@vscode/test-web";
+const path = require("path");
+const { runTests } = require("@vscode/test-web");
 
 process.on("uncaughtException", (e) => {
 	console.error(e);
@@ -8,12 +8,19 @@ process.on("uncaughtException", (e) => {
 async function main() {
 	try {
 		// The folder containing the Extension Manifest package.json
-		const extensionDevelopmentPath = path.resolve(__dirname, "..", "..", "..");
+		const extensionDevelopmentPath = path.resolve(__dirname, "..", "..");
 
-		// The path to module with the test runner and tests
-		const extensionTestsPath = path.resolve(__dirname, "suite", "index");
+		// The path to module with the bundled test runner and tests
+		const extensionTestsPath = path.resolve(
+			__dirname,
+			"..",
+			"..",
+			"out",
+			"test",
+			"web-tests.js",
+		);
 
-		const folderPath = path.resolve(__dirname, "..", "fixtures");
+		const folderPath = path.resolve(__dirname, "..", "..", "test", "fixtures");
 
 		const attachArgName = "--waitForDebugger=";
 		const waitForDebugger = process.argv.find((arg) =>

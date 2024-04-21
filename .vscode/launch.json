@@ -24,50 +24,26 @@
 			"autoAttachChildProcesses": true
 		},
 		{
-			"name": "Launch integration tests",
+			"name": "Launch end-to-end tests",
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}/vscode-extension",
 				"--extensionTestsPath=${workspaceFolder}/vscode-extension/test/e2e/suite",
-				"${workspaceFolder}/vscode-extension/out/test/fixtures/"
+				"${workspaceFolder}/vscode-extension/test/fixtures/"
 			]
 		},
 		{
-			"type": "chrome",
-			"request": "attach",
-			"name": "Attach to web integration test",
-			"skipFiles": ["<node_internals>/**"],
-			"port": 9229,
-			"timeout": 30000, // give it time to download vscode if needed
-			"resolveSourceMapLocations": [
-				"!**/vs/**", // exclude core vscode sources
-				"!**/static/build/extensions/**" // exclude built-in extensions
-			],
-			"presentation": {
-				"hidden": true
-			}
-		},
-		{
-			"type": "node",
+			"name": "Launch web end-to-end tests",
+			"type": "extensionHost",
+			"debugWebWorkerHost": true,
 			"request": "launch",
-			"name": "Run web integration test",
-			"outputCapture": "std",
-			"program": "${workspaceFolder}/vscode-extension/out/test/web/runTest.js",
-			"args": ["--waitForDebugger=9229"],
-			"cascadeTerminateToConfigurations": ["Run web integration test"],
-			"presentation": {
-				"hidden": true
-			}
-		}
-	],
-	"compounds": [
-		{
-			"name": "Launch web integration tests",
-			"configurations": [
-				"Run web integration test",
-				"Attach to web integration test"
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}/vscode-extension",
+				"--extensionDevelopmentKind=web",
+				"--extensionTestsPath=${workspaceFolder}/vscode-extension/out/test/web-tests.js",
+				"${workspaceFolder}/vscode-extension/test/fixtures/"
 			]
 		}
 	]

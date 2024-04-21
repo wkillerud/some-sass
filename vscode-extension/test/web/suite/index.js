@@ -1,7 +1,10 @@
 // imports mocha for the browser, defining the `mocha` global.
 require("mocha/mocha");
 
-export function run(): Promise<void> {
+/**
+ * @returns {Promise<void>}
+ */
+function run() {
 	return new Promise((c, e) => {
 		mocha.setup({
 			ui: "bdd",
@@ -10,8 +13,7 @@ export function run(): Promise<void> {
 		});
 
 		// bundles all files in the current directory matching `*.test`
-		const importAll = (r: __WebpackModuleApi.RequireContext) =>
-			r.keys().forEach(r);
+		const importAll = (r) => r.keys().forEach(r);
 		importAll(require.context(".", true, /\.test$/));
 
 		try {
@@ -29,3 +31,5 @@ export function run(): Promise<void> {
 		}
 	});
 }
+
+module.exports = { run };

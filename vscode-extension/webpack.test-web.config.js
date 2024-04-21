@@ -11,16 +11,16 @@ const browserTestsConfig = {
 	mode: "none",
 	target: "webworker",
 	entry: {
-		"suite/index": "./test/web/suite/index.ts",
+		"suite/index": "./test/web/suite/index.js",
 	},
 	output: {
-		filename: "[name].js",
-		path: path.join(__dirname, "out", "test", "web"),
+		filename: "web-tests.js",
+		path: path.join(__dirname, "out", "test"),
 		libraryTarget: "commonjs",
 	},
 	resolve: {
 		mainFields: ["module", "main"],
-		extensions: [".ts", ".js"],
+		extensions: [".js"],
 		alias: {},
 		fallback: {
 			assert: require.resolve("assert"),
@@ -37,15 +37,6 @@ const browserTestsConfig = {
 				resolve: {
 					fullySpecified: false,
 				},
-			},
-			{
-				test: /\.ts$/,
-				exclude: /node_modules/,
-				use: [
-					{
-						loader: "ts-loader",
-					},
-				],
 			},
 		],
 	},

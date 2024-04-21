@@ -1,28 +1,34 @@
-import * as assert from "assert";
-import * as vscode from "vscode";
-import type { CompletionItem, MarkupContent } from "vscode-languageclient";
-import { showFile } from "../util";
+const assert = require("assert");
+const vscode = require("vscode");
+const { showFile } = require("../util");
 
-type CompletionTestOptions = {
-	/**
-	 * @default false
-	 */
-	expectNoMatch: boolean;
-};
+/**
+ * @typedef {object} CompletionTestOptions
+ * @property {boolean} [expectNoMatch=false]
+ */
 
-export async function testCompletion(
-	docUri: vscode.Uri,
-	position: vscode.Position,
-	expectedItems: (string | CompletionItem)[],
-	options: CompletionTestOptions = { expectNoMatch: false },
+/**
+ * @param {import('vscode').Uri} docUri
+ * @param {import('vscode').Position} position
+ * @param {Array<string | import('vscode-languageclient').CompletionItem>} expectedItems
+ * @param {CompletionTestOptions} options
+ * @returns {Promise<void>}
+ */
+async function testCompletion(
+	docUri,
+	position,
+	expectedItems,
+	options = { expectNoMatch: false },
 ) {
 	await showFile(docUri);
 
-	const result = (await vscode.commands.executeCommand(
-		"vscode.executeCompletionItemProvider",
-		docUri,
-		position,
-	)) as vscode.CompletionList;
+	const result = /** @type {import('vscode').CompletionList} */ (
+		await vscode.commands.executeCommand(
+			"vscode.executeCompletionItemProvider",
+			docUri,
+			position,
+		)
+	);
 
 	expectedItems.forEach((ei) => {
 		if (typeof ei === "string") {
@@ -94,22 +100,21 @@ export async function testCompletion(
 				);
 			}
 
-			if (ei.documentation) {
-				if (typeof match.documentation === "string") {
-					assert.strictEqual(match.documentation, ei.documentation);
-				} else {
-					if (
-						ei.documentation &&
-						(ei.documentation as MarkupContent).value &&
-						match.documentation
-					) {
-						assert.strictEqual(
-							(match.documentation as vscode.MarkdownString).value,
-							(ei.documentation as MarkupContent).value,
-						);
-					}
-				}
+			if (
+				typeof match.documentation === "string" &&
+				typeof ei.documentation === "string"
+			) {
+				assert.strictEqual(match.documentation, ei.documentation);
+			} else if (
+				typeof ei.documentation === "object" &&
+				typeof match.documentation === "object"
+			) {
+				assert.strictEqual(match.documentation.value, ei.documentation.value);
 			}
 		}
 	});
 }
+
+module.exports = {
+	testCompletion,
+};

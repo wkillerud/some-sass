@@ -1,11 +1,11 @@
-import {
+const {
 	getDocUri,
 	showFile,
 	position,
 	sameLineLocation,
 	sleepCI,
-} from "../util";
-import { testDefinition } from "./helper";
+} = require("../util");
+const { testDefinition } = require("./helper");
 
 describe("SCSS Definition Test", function () {
 	const docUri = getDocUri("definition/main.scss");

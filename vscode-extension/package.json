@@ -126,8 +126,8 @@
 		"lint": "eslint \"**/*.ts\" --cache",
 		"test": "npm run test:build",
 		"test:build": "tsc -p ./ && shx cp -r ./test/fixtures ./out/test && webpack --config ./webpack.test-web.config.js",
-		"test:e2e": "node ./out/test/e2e/runTest.js",
-		"test:web": "node ./out/test/web/runTest.js"
+		"test:e2e": "node ./test/e2e/runTest.js",
+		"test:web": "node ./test/web/runTest.js"
 	},
 	"__metadata": {
 		"id": "6d35099c-3671-464c-ac0b-34a0c3823927",

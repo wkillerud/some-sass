@@ -30,10 +30,9 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}/vscode-extension",
-				"--extensionTestsPath=${workspaceFolder}/vscode-extension/out/test/e2e/suite",
+				"--extensionTestsPath=${workspaceFolder}/vscode-extension/test/e2e/suite",
 				"${workspaceFolder}/vscode-extension/out/test/fixtures/"
-			],
-			"outFiles": ["${workspaceFolder}/vscode-extension/out/test/e2e/**/*.js"]
+			]
 		},
 		{
 			"type": "chrome",

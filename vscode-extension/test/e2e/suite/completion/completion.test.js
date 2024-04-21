@@ -1,5 +1,5 @@
-import { getDocUri, showFile, position, sleepCI } from "../util";
-import { testCompletion } from "./helper";
+const { getDocUri, showFile, position, sleepCI } = require("../util");
+const { testCompletion } = require("./helper");
 
 describe("SCSS Completion Test", function () {
 	const docUri = getDocUri("completion/main.scss");

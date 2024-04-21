@@ -19,7 +19,9 @@ See existing tests in `vscode-extension/test/` for some examples. There is a sep
 
 ## Launch integration tests
 
-Go to the [Run and Debug pane][vsdebug] in VS Code and run Launch integration tests.
+Set breakpoints in the test code before continuing.
+
+Go to the [Run and Debug pane][vsdebug] in VS Code and run Launch integration tests. The tests will start running immediately, and the window closes when the test run is finished.
 
 [jsapi]: https://code.visualstudio.com/api/references/vscode-api
 [vsdebug]: https://code.visualstudio.com/docs/editor/debugging

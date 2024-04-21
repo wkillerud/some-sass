@@ -1,5 +1,5 @@
-import { getDocUri, showFile, position, sleepCI } from "../util";
-import { testSignature } from "./helper";
+const { getDocUri, showFile, position, sleepCI } = require("../util");
+const { testSignature } = require("./helper");
 
 describe("SCSS Signature Help Test", function () {
 	const docUri = getDocUri("signature/main.scss");

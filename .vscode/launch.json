@@ -33,18 +33,6 @@
 				"--extensionTestsPath=${workspaceFolder}/vscode-extension/test/e2e/suite",
 				"${workspaceFolder}/vscode-extension/test/fixtures/"
 			]
-		},
-		{
-			"name": "Launch web end-to-end tests",
-			"type": "extensionHost",
-			"debugWebWorkerHost": true,
-			"request": "launch",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}/vscode-extension",
-				"--extensionDevelopmentKind=web",
-				"--extensionTestsPath=${workspaceFolder}/vscode-extension/out/test/web-tests.js",
-				"${workspaceFolder}/vscode-extension/test/fixtures/"
-			]
 		}
 	]
 }

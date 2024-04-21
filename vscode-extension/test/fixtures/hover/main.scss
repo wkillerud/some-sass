@@ -1,29 +1,9 @@
-@use "../functions" as *;
-@use "../mixins" as *;
-@use "../variables" as *;
-@use "../placeholders";
-
-.test {
-  content: $variable + function();
-
-  @include mixin();
-}
-
-@use "../namespace" as ns;
-
-.foo {
-  color: ns.$var-var-variable;
-  @include ns.mix-mix-mixin;
-}
-
-/// Some wise words
-/// @type String
-$documented-variable: "value";
-
 @use "sass:math" as magic;
 
+$_font-size: magic.floor(19.5px);
+
 .foo {
-  font-size: magic.floor(19.5px);
+  font-size: $_font-size;
 }
 
 .alert {

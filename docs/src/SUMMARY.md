@@ -5,13 +5,12 @@
 # User guide
 
 - [Settings](user-guide/settings.md)
-- [Navigation]()
-- [Hover info]()
-- [Completions]()
-- [Refactoring]()
-- [Color decorators]()
-- [Document highlights]()
-- [Code folding]()
+- [Navigation](user-guide/navigation.md)
+- [IntelliSense](user-guide/completions.md)
+- [Hover info](user-guide/hover.md)
+- [Refactoring](user-guide/refactoring.md)
+- [Diagnostics](user-guide/diagnostics.md)
+- [Color decorators](user-guide/color.md)
 
 # Use outside VS Code
 

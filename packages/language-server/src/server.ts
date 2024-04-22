@@ -242,10 +242,12 @@ export class SomeSassServer {
 				if (change.type === FileChangeType.Deleted) {
 					ls.onDocumentRemoved(uri.toString());
 				} else if (change.type === FileChangeType.Changed) {
-					const document = ls.hasCached(uri);
+					const document = documents.get(uri.toString());
 					if (!document) {
 						// New to us anyway
 						newFiles.push(uri);
+					} else {
+						ls.onDocumentChanged(document);
 					}
 				} else {
 					newFiles.push(uri);

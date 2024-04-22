@@ -1,6 +1,6 @@
 # Some Sass
 
-Some Sass is a [language server extension][langext] for [Visual Studio Code][vscode]. It brings much improved code suggestions, documentation and code navigation for the [SCSS syntax][scss] of the [Sass language][sasslang].
+Some Sass is a [language server extension][langext] for [Visual Studio Code][vscode]. It brings improved code suggestions, documentation and code navigation for [SCSS][scss].
 
 Some features include:
 
@@ -9,7 +9,7 @@ Some features include:
 - Rich documentation through [SassDoc][sassdoc].
 - Language features for [`%placeholders`][placeholder], both when using them and writing them.
 
-![](./images/usage/suggestions-mixins.gif)
+![](./images/highlight-reel.gif)
 
 ## Get the extension
 
@@ -25,13 +25,16 @@ See the User guide section to learn more about what the extension can do.
 
 Some Sass is also a language server using the [Language Server Protocol (LSP)][lsp].
 
-The language server is [published independently to npm][npm], and can be used with any editor that has an LSP client. See [Getting started](./language-server/getting-started.md) to learn more.
+The language server is [published on npm][npm], and can be used with any editor that has an LSP client. See [Getting started](./language-server/getting-started.md) to learn more.
 
-The language extension for Visual Studio Code is the official client, and there are community contributed clients for other editors.
+## Navigating the docs
+
+To navigate between pages you can click the arrow buttons, press the left and right arrow keys on your keyboard, or use the sidebar menu.
+
+To search click the magnifying class icon to the top left or press `s` on your keyboard.
 
 [lsp]: https://microsoft.github.io/language-server-protocol/
 [npm]: https://www.npmjs.com/package/some-sass-language-server
-[sasslang]: https://sass-lang.com/
 [scss]: https://sass-lang.com/documentation/syntax/
 [use]: https://sass-lang.com/documentation/at-rules/use/
 [forward]: https://sass-lang.com/documentation/at-rules/forward/

@@ -1,6 +1,6 @@
 # Settings
 
-This document describes the settings available in Some Sass, and the recommended settings for both Some Sass and Visual Studio Code.
+This document describes the settings available in Some Sass.
 
 ## Recommended settings
 
@@ -104,7 +104,7 @@ Depending on your project size, you may want to tweak this setting to control ho
 `@deprecated`
 
 If you don't want Some Sass to follow `@import`, `@use` or `@forward` links you can turn this setting off.
-This will severely limit functionality, and is not recommended. This setting will be removed at some point
+This will limit functionality, and is not recommended. This setting will be removed at some point
 after `@import` becomes CSS-only.
 
 - JSON key: `somesass.scanImportedFiles`.

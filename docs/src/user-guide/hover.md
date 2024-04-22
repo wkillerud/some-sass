@@ -4,11 +4,11 @@ This document describes the hover information given by Some Sass.
 
 ## Symbol information
 
-When you hover over a symbol Some Sass shows a preview of the declaration and the name of the file where it was declared. However, things get more interesting when you add SassDoc.
+When you hover over a symbol Some Sass shows a preview of the declaration and the name of the file where it is declared. Things get more interesting when you add SassDoc though.
 
 ## SassDoc documentation
 
-If a symbol is documented with [SassDoc], the documentation will be shown in the hover information similar to how you might see JSDoc. This is especially helpful if you have a core set of utility functions and mixins, or if you use a Sass library provided by a third party.
+If a symbol is documented with [SassDoc], the documentation is shown in the hover information like how you might see JSDoc. This is especially helpful if you have a core set of utility functions and mixins, or if you use a Sass library provided by a third party.
 
 ```scss
 /// Calculate a responsive size value relative to a given screen size

@@ -4,13 +4,13 @@ This page describes what Some Sass adds to [code completions][intellisense], als
 
 ## Namespaced suggestions
 
-With the [recommended settings](./settings.md#recommended-settings), suggestions for namespaces are limited to only the symbols available in that namespace. Code completions from Some Sass has full support for:
+With the [recommended settings](./settings.md#recommended-settings), suggestions get limited to only the symbols available in that namespace. Code completions from Some Sass has full support for:
 
 - aliasing (`@use "foo" as f;`)
 - prefixes (`@forward "foo" as bar-*;`)
 - [hide/show][visibility]
 
-The same treatment is given to Sass [built-in modules][builtin] (such as `"sass:map"`) imported with `@use`.
+Sass [built-in modules][builtin] (such as `"sass:map"`) get the same treatment when imported with `@use`.
 
 ![](../images/usage/suggestions-mixins.gif)
 
@@ -22,7 +22,7 @@ Some Sass works best when you document your codebase with [SassDoc]. To make it 
 
 ## Signature helpers
 
-For functions and mixins, Some Sass gives you signature helpers. These are small information popups that show information about the mixin or function's parameters, and which one you are about to enter.
+For functions and mixins, Some Sass gives you signature helpers. These are small popups that show information about the mixin or function's parameters, and which one you are about to enter.
 
 ![](../images/usage/signature-helper.gif)
 
@@ -41,7 +41,7 @@ This is where you write a placeholder selector first, and then `@extend` it some
 
 ### Extend first
 
-This workflow can be useful in scenarios where the selectors change, but the style should stay the same. You would define a stylesheet with the selectors, `@extend` stable semanticly named placeholder selectors, and then implement those placeholders. This workflow is for instance used in parts of the Discord theming community.
+This workflow can be useful in scenarios where the selectors change, but the style should stay the same. You define a stylesheet with the selectors, `@extend` stable placeholder selectors, and then implement those placeholders. This workflow is for instance used in parts of the Discord theming community.
 
 ![](../images/usage/placeholder-declare.png)
 

@@ -364,7 +364,7 @@ export interface FileSystemProvider {
 		exclude?: string | string[] | null,
 	): Promise<URI[]>;
 	readFile(uri: URI, encoding?: BufferEncoding): Promise<string>;
-	readDirectory(uri: URI): Promise<[URI, FileType][]>;
+	readDirectory(uri: URI): Promise<[string, FileType][]>;
 	stat(uri: URI): Promise<FileStat>;
 	/**
 	 * For monorepos, resolve the actual location on disk rather than the URL to the symlink.

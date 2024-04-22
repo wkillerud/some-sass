@@ -36,7 +36,6 @@ import {
 } from "../language-services-types";
 import { asDollarlessVariable } from "../utils/sass";
 import { applySassDoc } from "../utils/sassdoc";
-import { getName } from "../utils/uri";
 
 const reNewSassdocBlock = /\/\/\/\s?$/;
 const reSassdocLine = /\/\/\/\s/;
@@ -1096,8 +1095,8 @@ export class DoComplete extends LanguageFeature {
 				);
 				const filesInModulePath =
 					await this.options.fileSystemProvider.readDirectory(pathInsideModule);
-				for (const [uri, fileType] of filesInModulePath) {
-					const file = getName(uri);
+				for (const [name, fileType] of filesInModulePath) {
+					const file = name;
 					if (fileType === FileType.File && file.match(reSassDotExt)) {
 						const filename = file.startsWith("/") ? file.slice(1) : file;
 						// Prefer to insert without file extension

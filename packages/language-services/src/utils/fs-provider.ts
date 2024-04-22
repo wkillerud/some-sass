@@ -24,7 +24,7 @@ export function mapFsProviders(
 		async readDirectory(uri: string) {
 			const dir = await ours.readDirectory(URI.parse(uri));
 			const result: [string, FileType][] = dir.map(([uri, info]) => [
-				uri.toString(),
+				uri,
 				info,
 			]);
 			return result;

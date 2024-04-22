@@ -82,7 +82,7 @@ export function getFileSystemProvider(
 				FsReadDirectoryRequest.type,
 				uri.toString(),
 			);
-			return res.map(([uri, type]) => [URI.parse(uri), type]);
+			return res;
 		},
 		async findFiles(pattern, exclude) {
 			const handler = runtime.file;

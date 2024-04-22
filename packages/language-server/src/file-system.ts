@@ -14,7 +14,7 @@ export interface FileSystemProvider {
 		token?: CancellationToken,
 	): Promise<URI[]>;
 	readFile(uri: URI, encoding?: BufferEncoding): Promise<string>;
-	readDirectory(uri: URI): Promise<[URI, FileType][]>;
+	readDirectory(uri: URI): Promise<[string, FileType][]>;
 	stat(uri: URI): Promise<FileStat>;
 	realPath(uri: URI): Promise<URI>;
 }

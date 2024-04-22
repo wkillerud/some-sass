@@ -67,9 +67,16 @@ class MemoryFileSystem implements FileSystemProvider {
 		return Promise.resolve(doc?.getText() || "");
 	}
 
-	async readDirectory(uri: URI): Promise<[URI, FileType][]> {
+	private getName(uriString: string): string {
+		if (uriString.endsWith("/")) {
+			uriString = uriString.slice(0, uriString.length - 1);
+		}
+		return uriString.substring(uriString.lastIndexOf("/") + 1);
+	}
+
+	async readDirectory(uri: URI): Promise<[string, FileType][]> {
 		const toMatch = uri.toString();
-		const result: [URI, FileType][] = [];
+		const result: [string, FileType][] = [];
 		for (const file of this.storage.keys()) {
 			if (!file.startsWith(toMatch)) {
 				continue;
@@ -81,7 +88,7 @@ class MemoryFileSystem implements FileSystemProvider {
 			}
 
 			let fileType = FileType.File;
-			let uri = URI.parse(file);
+			let name = this.getName(file);
 			const subdirectoryIndex = file.indexOf("/", toMatch.length + 1);
 			if (subdirectoryIndex !== -1) {
 				const subdirectory = file.substring(0, subdirectoryIndex);
@@ -91,11 +98,11 @@ class MemoryFileSystem implements FileSystemProvider {
 					continue;
 				}
 
-				uri = URI.parse(subdirectory);
+				name = this.getName(subdirectory);
 				fileType = FileType.Directory;
 			}
 
-			result.push([uri, fileType]);
+			result.push([name, fileType]);
 		}
 		return result;
 	}

@@ -19,6 +19,7 @@ out/
 .eslintcache
 .nyc_output
 coverage/
+docs/book/
 
 # Configuration
 .eslintcache

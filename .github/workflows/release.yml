@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - next
+    paths-ignore:
+      - "docs/**"
 
 permissions:
   contents: read # for checkout

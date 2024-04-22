@@ -64,6 +64,12 @@ This workflow can be useful in scenarios where the selectors change, but the sty
 
 ![](../images/usage/placeholder-declare.png)
 
+## Import suggestions
+
+When you write imports Some Sass reads the file system to help you complete the string.
+
+![](../images/usage/import-completions.png)
+
 [intellisense]: https://code.visualstudio.com/docs/editor/intellisense#_types-of-completions
 [SassDoc]: http://sassdoc.com/annotations#description
 [placeholders]: https://sass-lang.com/documentation/style-rules/placeholder-selectors/

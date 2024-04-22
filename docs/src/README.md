@@ -1,3 +1,3 @@
 # Some Sass
 
-Hello, World!
+Hello, World

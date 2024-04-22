@@ -20,6 +20,25 @@ Some Sass works best when you document your codebase with [SassDoc]. To make it 
 
 ![](../images/usage/sassdoc-block.gif)
 
+## SassDoc string literal union types
+
+If you have a function or mixin that expects only a set of string values you can document them with a string literal union type. Some Sass will present the list of choices when you use them.
+
+```scss
+/// Get a timing value for use in animations.
+/// @param {"sonic" | "link" | "homer" | "snorlax"} $mode - The timing you want
+/// @return {String} - the timing value in ms
+@function timing($mode) {
+	@if map.has-key($_timings, $mode) {
+		@return map.get($_timings, $mode);
+	} @else {
+		@error 'Unable to find a mode for #{$mode}';
+	}
+}
+```
+
+![](../images/usage/string-literal-union-type.png)
+
 ## Signature helpers
 
 For functions and mixins, Some Sass gives you signature helpers. These are small popups that show information about the mixin or function's parameters, and which one you are about to enter.

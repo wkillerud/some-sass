@@ -154,3 +154,92 @@ test("sassdoc annotations", async () => {
 		"Expected to find @type annotation",
 	);
 });
+
+test("sassdoc string literal union type", async () => {
+	const one = fileSystemProvider.createDocument(
+		[
+			"/// Get a timing value for use in animations.",
+			'/// @param {"sonic" | "link" | "homer" | "snorlax"} $mode - The timing you want',
+			"/// @return {String} - the timing value in ms",
+			"@function timing($mode) {",
+			"	@if map.has-key($_timings, $mode) {",
+			"			@return map.get($_timings, $mode);",
+			"	} @else {",
+			"			@error 'Unable to find a mode for #{$mode}';",
+			"	}",
+			"}",
+		],
+		{ uri: "timing.scss" },
+	);
+	const two = fileSystemProvider.createDocument([
+		'@use "./timing" as t;',
+		".a {",
+		"	transition-duration: t.timi",
+		"}",
+	]);
+
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const result = await ls.doComplete(two, Position.create(2, 28));
+
+	assert.deepStrictEqual(result, {
+		isIncomplete: false,
+		items: [
+			{
+				documentation: {
+					kind: "markdown",
+					value: `\`\`\`scss
+@function timing($mode)
+\`\`\`
+____
+Get a timing value for use in animations.
+
+
+@param "sonic" | "link" | "homer" | "snorlax"\`mode\` - The timing you want
+
+@return String - the timing value in ms
+____
+Function declared in timing.scss`,
+				},
+				filterText: "t.timing",
+				insertText: '.timing(${1|"sonic","link","homer","snorlax"|})',
+				insertTextFormat: 2,
+				kind: 3,
+				label: "timing",
+				labelDetails: {
+					detail: "($mode)",
+				},
+				sortText: undefined,
+				tags: [],
+			},
+			{
+				documentation: {
+					kind: "markdown",
+					value: `\`\`\`scss
+@function timing($mode)
+\`\`\`
+____
+Get a timing value for use in animations.
+
+
+@param "sonic" | "link" | "homer" | "snorlax"\`mode\` - The timing you want
+
+@return String - the timing value in ms
+____
+Function declared in timing.scss`,
+				},
+				filterText: "timing",
+				insertText: 'timing(${1|"sonic","link","homer","snorlax"|})',
+				insertTextFormat: 2,
+				kind: 3,
+				label: "timing",
+				labelDetails: {
+					detail: "($mode)",
+				},
+				sortText: undefined,
+				tags: [],
+			},
+		],
+	});
+});

@@ -1450,14 +1450,21 @@ function mapParameterSnippet(
 	index: number,
 	sassdoc?: ParseResult,
 ): string {
-	if (sassdoc?.type?.length) {
-		const choices = parseStringLiteralChoices(sassdoc.type);
+	const dollarlessVariable = asDollarlessVariable(p.name);
+
+	const parameterDocs =
+		sassdoc && sassdoc.parameter
+			? sassdoc.parameter.find((p) => p.name === dollarlessVariable)
+			: undefined;
+
+	if (parameterDocs?.type?.length) {
+		const choices = parseStringLiteralChoices(parameterDocs.type);
 		if (choices.length > 0) {
 			return `\${${index + 1}|${choices.join(",")}|}`;
 		}
 	}
 
-	return `\${${index + 1}:${asDollarlessVariable(p.name)}}`;
+	return `\${${index + 1}:${dollarlessVariable}}`;
 }
 
 function mapParameterSignature(p: Parameter): string {

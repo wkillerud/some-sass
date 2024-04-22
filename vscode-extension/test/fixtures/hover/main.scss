@@ -1,9 +1,29 @@
-@use "sass:math" as magic;
+@use "../functions" as *;
+@use "../mixins" as *;
+@use "../variables" as *;
+@use "../placeholders";
 
-$_font-size: magic.floor(19.5px);
+.test {
+  content: $variable + function();
+
+  @include mixin();
+}
+
+@use "../namespace" as ns;
 
 .foo {
-  font-size: $_font-size;
+  color: ns.$var-var-variable;
+  @include ns.mix-mix-mixin;
+}
+
+/// Some wise words
+/// @type String
+$documented-variable: "value";
+
+@use "sass:math" as magic;
+
+.foo {
+  font-size: magic.floor(19.5px);
 }
 
 .alert {

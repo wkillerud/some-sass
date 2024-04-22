@@ -1,0 +1,7 @@
+[book]
+authors = ["William Killerud"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Documentation for Some Sass"
+description = "Some Sass is an extension for Visual Studio Code as well as a standalone LSP server for SCSS. It provides code suggestions, hover information with SassSoc and code navigation for SCSS. It has full support for @use and @forward, including prefixes and hide/show."

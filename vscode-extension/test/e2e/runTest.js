@@ -32,33 +32,6 @@ async function main() {
 			);
 		}
 
-		childProcess.spawnSync(
-			cli,
-			[...args, "--install-extension", "octref.vetur"],
-			{
-				encoding: "utf-8",
-				stdio: "inherit",
-			},
-		);
-
-		childProcess.spawnSync(
-			cli,
-			[...args, "--install-extension", "svelte.svelte-vscode"],
-			{
-				encoding: "utf-8",
-				stdio: "inherit",
-			},
-		);
-
-		childProcess.spawnSync(
-			cli,
-			[...args, "--install-extension", "astro-build.astro-vscode"],
-			{
-				encoding: "utf-8",
-				stdio: "inherit",
-			},
-		);
-
 		await runTests({
 			vscodeExecutablePath,
 			version,

@@ -4,10 +4,7 @@ End-to-end tests run in Visual Studio Code and are helpful to ensure the user ex
 
 ## Prepare Visual Studio Code
 
-The debugger runs tests in your version of Visual Studio Code, not VS Code insiders like when running the tests from the command line. You need to:
-
-1. Install [Vetur](https://marketplace.visualstudio.com/items?itemName=octref.vetur), [Astro](https://marketplace.visualstudio.com/items?itemName=astro-build.astro-vscode) and [Svelte for VS Code](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
-2. Use the default settings for Some Sass (use the included workspace settings from the repo).
+The debugger runs tests in your version of Visual Studio Code, not VS Code insiders like when running the tests from the command line. You need to use the default settings for Some Sass (use the included workspace settings from the repo).
 
 [exthost]: https://code.visualstudio.com/api/advanced-topics/extension-host
 

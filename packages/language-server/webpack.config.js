@@ -34,6 +34,7 @@ const browserConfig = {
 			events: require.resolve("events/"),
 			path: require.resolve("path-browserify"),
 			util: require.resolve("util/"),
+			url: require.resolve("url/"),
 			"fs/promises": false,
 		},
 	},

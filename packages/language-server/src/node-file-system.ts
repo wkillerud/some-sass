@@ -1,6 +1,6 @@
 import { promises, constants, existsSync } from "fs";
+import { type FileStat, FileType } from "@somesass/language-services";
 import * as fg from "fast-glob";
-import { type FileStat, FileType } from "vscode-css-languageservice";
 import { URI, Utils } from "vscode-uri";
 import type { FileSystemProvider } from "./file-system";
 
@@ -40,15 +40,15 @@ export class NodeFileSystem implements FileSystemProvider {
 		return promises.readFile(uri.fsPath, encoding);
 	}
 
-	async readDirectory(uri: string): Promise<[string, FileType][]> {
-		const dir = await promises.readdir(uri);
+	async readDirectory(uri: URI): Promise<[string, FileType][]> {
+		const dir = await promises.readdir(uri.fsPath);
 		const result: [string, FileType][] = [];
-		for (const file of dir) {
+		for (const name of dir) {
 			try {
-				const stats = await this.stat(Utils.joinPath(URI.parse(uri), file));
-				result.push([file, stats.type]);
+				const stats = await this.stat(Utils.joinPath(uri, name));
+				result.push([name, stats.type]);
 			} catch (e) {
-				result.push([file, FileType.Unknown]);
+				result.push([name, FileType.Unknown]);
 			}
 		}
 		return result;

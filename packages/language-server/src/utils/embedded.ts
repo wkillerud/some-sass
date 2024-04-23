@@ -50,14 +50,24 @@ export function getSCSSContent(
 	return newContent;
 }
 
+/**
+ * Function that extracts only the SCSS region of a template
+ * language such as Vue, Svelte or Astro. This is not the correct
+ * approach for embedded languages, compared to say the HTML language
+ * server.
+ *
+ * @todo Look into how to do this properly with a goal to unship this custom handling.
+ */
 export function getSCSSRegionsDocument(
-	document: TextDocument,
+	document: TextDocument | null | undefined = null,
 	position?: Position,
-) {
+): TextDocument | null {
+	if (!document) return document;
+
 	const offset = position ? document.offsetAt(position) : 0;
 
 	if (!isFileWhereScssCanBeEmbedded(document.uri)) {
-		return { document, offset };
+		return document;
 	}
 
 	const text = document.getText();
@@ -70,16 +80,13 @@ export function getSCSSRegionsDocument(
 		const uri = document.uri;
 		const version = document.version;
 
-		return {
-			document: TextDocument.create(
-				uri,
-				"scss",
-				version,
-				getSCSSContent(text, scssRegions),
-			),
-			offset,
-		};
+		return TextDocument.create(
+			uri,
+			"scss",
+			version,
+			getSCSSContent(text, scssRegions),
+		);
 	}
 
-	return { document: null, offset };
+	return null;
 }

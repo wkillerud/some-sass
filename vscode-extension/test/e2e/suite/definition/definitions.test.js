@@ -1,11 +1,11 @@
-import {
+const {
 	getDocUri,
 	showFile,
 	position,
 	sameLineLocation,
 	sleepCI,
-} from "../util";
-import { testDefinition } from "./helper";
+} = require("../util");
+const { testDefinition } = require("./helper");
 
 describe("SCSS Definition Test", function () {
 	const docUri = getDocUri("definition/main.scss");
@@ -33,7 +33,7 @@ describe("SCSS Definition Test", function () {
 
 	it("should find definition for functions", async () => {
 		const expectedDocumentUri = getDocUri("_functions.scss");
-		const expectedLocation = sameLineLocation(expectedDocumentUri, 1, 1, 9);
+		const expectedLocation = sameLineLocation(expectedDocumentUri, 1, 11, 19);
 
 		await testDefinition(docUri, position(7, 24), expectedLocation);
 		await testDefinition(vueDocUri, position(15, 24), expectedLocation);
@@ -43,7 +43,7 @@ describe("SCSS Definition Test", function () {
 
 	it("should find definition for mixins", async () => {
 		const expectedDocumentUri = getDocUri("_mixins.scss");
-		const expectedLocation = sameLineLocation(expectedDocumentUri, 1, 1, 6);
+		const expectedLocation = sameLineLocation(expectedDocumentUri, 1, 8, 13);
 
 		await testDefinition(docUri, position(9, 12), expectedLocation);
 		await testDefinition(vueDocUri, position(17, 12), expectedLocation);
@@ -70,7 +70,7 @@ describe("SCSS Definition Test", function () {
 
 	it("should find symbol definition behind namespace and prefix", async () => {
 		const expectedDocumentUri = getDocUri("namespace/_mixins.scss");
-		const expectedLocation = sameLineLocation(expectedDocumentUri, 1, 1, 10);
+		const expectedLocation = sameLineLocation(expectedDocumentUri, 1, 8, 17);
 
 		await testDefinition(docUri, position(16, 17), expectedLocation);
 		await testDefinition(vueDocUri, position(24, 17), expectedLocation);

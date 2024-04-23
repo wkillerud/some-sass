@@ -117,11 +117,15 @@ export function getFileSystemProvider(
 			}
 		},
 		realPath(uri) {
-			const handler = runtime.file;
-			if (handler) {
-				return handler.realPath(uri);
+			try {
+				const handler = runtime.file;
+				if (handler) {
+					return handler.realPath(uri);
+				}
+				return Promise.resolve(uri);
+			} catch {
+				return Promise.resolve(uri);
 			}
-			return Promise.resolve(uri);
 		},
 	};
 }

@@ -55,8 +55,12 @@ export class NodeFileSystem implements FileSystemProvider {
 	}
 
 	async realPath(uri: URI): Promise<URI> {
-		const fsPath = await promises.realpath(uri.fsPath);
-		return URI.file(fsPath);
+		try {
+			const fsPath = await promises.realpath(uri.fsPath);
+			return URI.file(fsPath);
+		} catch {
+			return uri;
+		}
 	}
 
 	async stat(uri: URI): Promise<FileStat> {

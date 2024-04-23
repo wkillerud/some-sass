@@ -109,7 +109,6 @@
 	},
 	"devDependencies": {
 		"@types/mocha": "10.0.6",
-		"@types/sinon": "17.0.3",
 		"@types/vscode": "1.86.0",
 		"@vscode/test-electron": "2.3.9",
 		"@vscode/test-web": "0.0.53",
@@ -118,17 +117,14 @@
 		"shx": "0.3.4"
 	},
 	"scripts": {
-		"vscode:prepublish": "npm install && npm run build",
+		"vscode:prepublish": "npm install && npm run clean && webpack --mode production",
 		"clean": "shx rm -rf dist",
-		"build": "npm run clean && webpack --mode production",
-		"dev": "npm run clean && webpack --mode development",
-		"start:web": "vscode-test-web --browserType=chromium",
-		"start:test-web": "vscode-test-web --browserType=chromium  --extensionDevelopmentPath=. ./test/fixtures",
+		"build": "webpack --mode development",
+		"start:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=.",
 		"lint": "eslint \"**/*.ts\" --cache",
-		"test": "npm run test:build",
-		"test:build": "tsc -p ./ && shx cp -r ./test/fixtures ./out/test && webpack --config ./webpack.test-web.config.js",
-		"test:e2e": "node ./out/test/e2e/runTest.js",
-		"test:web": "node ./out/test/web/runTest.js"
+		"test:e2e": "node ./test/e2e/runTest.js",
+		"pretest:web": "webpack --config ./webpack.test-web.config.js ",
+		"test:web": "node ./test/web/runTest.js"
 	},
 	"__metadata": {
 		"id": "6d35099c-3671-464c-ac0b-34a0c3823927",

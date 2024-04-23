@@ -16,7 +16,7 @@ Some features include:
 You can find the extension here:
 
 - On the [Visual Studio Code Marketplace][vsmarketplace].
-- On the [OpenVSX Registry][openvsx].
+- On the [Open VSX Registry][openvsx].
 - In the [Releases section on GitHub][ghreleases].
 
 See the User guide section to learn more about what the extension can do.

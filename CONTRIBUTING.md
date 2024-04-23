@@ -2,7 +2,7 @@
 
 Thank you for showing an interest in contributing, be it to the language server, to the VS Code extension, the documentation, or in some other way 🌟
 
-The best place to get started is [the guide for new contributors](docs/src/contributing/new-contributors.md).
+The best place to get started is [the guide for new contributors](https://wkillerud.github.io/some-sass/contributing/new-contributors.html).
 
 ## Conventional commits
 
@@ -12,8 +12,6 @@ Two assets are published:
 
 - The language server is published to npm
 - The VS Code extension is published to Visual Studio Marketplace and Open VSX
-
-Keep both in mind when deciding whether a change is a patch, minor or major release.
 
 | Commit message                                                                                                                            | Release type                                                                                                                                                         |
 | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

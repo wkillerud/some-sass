@@ -1,11 +1,14 @@
-import { resolve } from "path";
-import * as fg from "fast-glob";
-import * as Mocha from "mocha";
-import { getDocUri, showFile, sleep } from "./util";
+const { resolve } = require("path");
+const fg = require("fast-glob");
+const Mocha = require("mocha");
+const { getDocUri, showFile, sleep } = require("./util");
 
 const ONE_SECOND_IN_MS = 1 * 1000;
 
-export async function run(): Promise<void> {
+/**
+ * @returns {Promise<void>}
+ */
+async function run() {
 	const mocha = new Mocha({
 		ui: "bdd",
 		timeout: ONE_SECOND_IN_MS * 30,
@@ -40,3 +43,5 @@ export async function run(): Promise<void> {
 		});
 	});
 }
+
+module.exports = { run };

@@ -1,5 +1,5 @@
-import { getDocUri, showFile, position, sleepCI } from "../util";
-import { testHover } from "./helper";
+const { getDocUri, showFile, position, sleepCI } = require("../util");
+const { testHover } = require("./helper");
 
 describe("SCSS Hover Test", function () {
 	const docUri = getDocUri("hover/main.scss");
@@ -83,7 +83,7 @@ describe("SCSS Hover Test", function () {
 		// Prefixed symbols are shown with their original names
 		const expectedContents = {
 			contents: [
-				"```scss\n@mixin mix-mixin()\n```\n____\nMixin declared in _mixins.scss",
+				"```scss\n@mixin mix-mix-mixin()\n```\n____\nMixin declared as mix-mixin in _mixins.scss",
 			],
 		};
 

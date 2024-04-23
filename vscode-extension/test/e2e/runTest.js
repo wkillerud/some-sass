@@ -1,20 +1,20 @@
-import * as cp from "child_process";
-import * as path from "path";
-import {
+const childProcess = require("child_process");
+const path = require("path");
+const {
 	runTests,
 	downloadAndUnzipVSCode,
 	resolveCliArgsFromVSCodeExecutablePath,
-} from "@vscode/test-electron";
+} = require("@vscode/test-electron");
 
 async function main() {
 	try {
 		// The folder containing the Extension Manifest package.json
 		// Passed to `--extensionDevelopmentPath`
-		const extensionDevelopmentPath = path.resolve(__dirname, "..", "..", "..");
+		const extensionDevelopmentPath = path.resolve(__dirname, "..", "..");
 
 		// The path to the extension test script
 		// Passed to --extensionTestsPath
-		const extensionTestsPath = path.resolve(__dirname, "suite", "index");
+		const extensionTestsPath = path.resolve(__dirname, "suite", "index.js");
 
 		const workspaceDir = path.resolve(__dirname, "..", "fixtures");
 
@@ -32,12 +32,16 @@ async function main() {
 			);
 		}
 
-		cp.spawnSync(cli, [...args, "--install-extension", "octref.vetur"], {
-			encoding: "utf-8",
-			stdio: "inherit",
-		});
+		childProcess.spawnSync(
+			cli,
+			[...args, "--install-extension", "octref.vetur"],
+			{
+				encoding: "utf-8",
+				stdio: "inherit",
+			},
+		);
 
-		cp.spawnSync(
+		childProcess.spawnSync(
 			cli,
 			[...args, "--install-extension", "svelte.svelte-vscode"],
 			{
@@ -46,7 +50,7 @@ async function main() {
 			},
 		);
 
-		cp.spawnSync(
+		childProcess.spawnSync(
 			cli,
 			[...args, "--install-extension", "astro-build.astro-vscode"],
 			{
@@ -62,9 +66,8 @@ async function main() {
 			extensionTestsPath,
 			launchArgs: [workspaceDir],
 		});
-	} catch (e) {
+	} catch (error) {
 		console.error("Failed to run tests");
-		const error = e as Error;
 		console.error(error.name);
 		console.error(error.message);
 		console.error(error.stack);

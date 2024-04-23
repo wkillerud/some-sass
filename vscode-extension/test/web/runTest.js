@@ -33,12 +33,6 @@ async function main() {
 			browserType: "chromium",
 			extensionDevelopmentPath,
 			extensionTestsPath,
-			extensionIds: [
-				// At time of writing, these don't work in the browser
-				// { id: "octref.vetur" },
-				// { id: "svelte.svelte-vscode" },
-				// { id: "astro-build.astro-vscode" },
-			],
 			folderPath,
 			waitForDebugger: waitForDebugger
 				? Number(waitForDebugger.slice(attachArgName.length))

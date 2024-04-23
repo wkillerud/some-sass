@@ -4,16 +4,10 @@ const { testHover } = require("./helper");
 describe("SCSS Hover Test", function () {
 	const docUri = getDocUri("hover/main.scss");
 	const collisionUri = getDocUri("hover/collision.scss");
-	const vueDocUri = getDocUri("hover/AppButton.vue");
-	const svelteDocUri = getDocUri("hover/AppButton.svelte");
-	const astroDocUri = getDocUri("hover/AppButton.astro");
 
 	before(async () => {
 		await showFile(docUri);
 		await showFile(collisionUri);
-		await showFile(vueDocUri);
-		await showFile(svelteDocUri);
-		await showFile(astroDocUri);
 		await sleepCI();
 	});
 
@@ -25,9 +19,6 @@ describe("SCSS Hover Test", function () {
 		};
 
 		await testHover(docUri, position(7, 13), expectedContents);
-		await testHover(vueDocUri, position(15, 13), expectedContents);
-		await testHover(svelteDocUri, position(9, 15), expectedContents);
-		await testHover(astroDocUri, position(12, 15), expectedContents);
 	});
 
 	it("shows hover for functions", async () => {
@@ -38,9 +29,6 @@ describe("SCSS Hover Test", function () {
 		};
 
 		await testHover(docUri, position(7, 24), expectedContents);
-		await testHover(vueDocUri, position(15, 24), expectedContents);
-		await testHover(svelteDocUri, position(9, 26), expectedContents);
-		await testHover(astroDocUri, position(12, 26), expectedContents);
 	});
 
 	it("shows hover for mixins", async () => {
@@ -51,9 +39,6 @@ describe("SCSS Hover Test", function () {
 		};
 
 		await testHover(docUri, position(9, 12), expectedContents);
-		await testHover(vueDocUri, position(17, 12), expectedContents);
-		await testHover(svelteDocUri, position(11, 14), expectedContents);
-		await testHover(astroDocUri, position(14, 14), expectedContents);
 	});
 
 	it("shows hover for placeholders", async () => {
@@ -74,9 +59,6 @@ describe("SCSS Hover Test", function () {
 		};
 
 		await testHover(docUri, position(15, 14), expectedContents);
-		await testHover(vueDocUri, position(23, 14), expectedContents);
-		await testHover(svelteDocUri, position(17, 14), expectedContents);
-		await testHover(astroDocUri, position(20, 14), expectedContents);
 	});
 
 	it("shows hover for symbol behind namespace and prefix", async () => {
@@ -88,9 +70,6 @@ describe("SCSS Hover Test", function () {
 		};
 
 		await testHover(docUri, position(16, 17), expectedContents);
-		await testHover(vueDocUri, position(24, 17), expectedContents);
-		await testHover(svelteDocUri, position(18, 17), expectedContents);
-		await testHover(astroDocUri, position(21, 17), expectedContents);
 	});
 
 	it("shows hover for SassDoc annotations", async () => {

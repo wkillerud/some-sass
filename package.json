@@ -12,7 +12,9 @@
 		"build": "npm run build --workspaces --if-present",
 		"lint": "eslint \"**/*.ts\" --cache",
 		"lint-staged": "lint-staged",
-		"test": "npm run test --workspaces --if-present",
+		"start:web": "npm run --workspace=some-sass start:web",
+		"test": "cross-env CI=true npm run test --workspaces --if-present",
+		"test:all": "npm run test && npm run test:e2e && npm run test:web",
 		"test:e2e": "npm run test:e2e --workspaces --if-present",
 		"test:web": "npm run test:web --workspaces --if-present"
 	},
@@ -34,6 +36,7 @@
 		"@typescript-eslint/eslint-plugin": "7.5.0",
 		"@typescript-eslint/parser": "7.5.0",
 		"copy-webpack-plugin": "12.0.2",
+		"cross-env": "7.0.3",
 		"eslint": "8.57.0",
 		"eslint-config-prettier": "9.1.0",
 		"eslint-plugin-import": "2.29.1",

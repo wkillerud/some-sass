@@ -1,5 +1,0 @@
-@use "../folderb/testB";
-
-.a {
-	@include testB.mix();
-}

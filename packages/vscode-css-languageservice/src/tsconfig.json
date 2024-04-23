@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"target": "es2020",
+		"module": "umd",
+		"moduleResolution": "node",
+		"sourceMap": true,
+		"declaration": true,
+		"strict": true,
+		"stripInternal": true,
+		"outDir": "../lib/umd",
+		"lib": [
+			"es2020"
+		]
+	}
+}

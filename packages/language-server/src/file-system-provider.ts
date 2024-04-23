@@ -1,4 +1,4 @@
-import { type FileStat, FileType } from "vscode-css-languageservice";
+import { type FileStat, FileType } from "@somesass/language-services";
 import { type Connection, RequestType } from "vscode-languageserver";
 import { URI } from "vscode-uri";
 import {
@@ -73,7 +73,7 @@ export function getFileSystemProvider(
 			});
 			return res;
 		},
-		async readDirectory(uri: string) {
+		async readDirectory(uri: URI) {
 			const handler = runtime.file;
 			if (handler) {
 				return await handler.readDirectory(uri);

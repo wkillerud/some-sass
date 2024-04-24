@@ -195,23 +195,23 @@ export class SomeSassServer {
 
 			try {
 				ls.onDocumentChanged(params.document);
-			} catch (error) {
-				// Something went wrong trying to parse the changed document.
-				this.connection.console.error((error as Error).message);
-				return;
+				// Check that no new version has been made while we waited,
+				// in which case the diagnostics may no longer be valid.
+				let latest = documents.get(params.document.uri);
+				if (!latest || latest.version !== params.document.version) return;
+
+				const diagnostics = await ls.doDiagnostics(params.document);
+
+				latest = documents.get(params.document.uri);
+				if (!latest || latest.version !== params.document.version) return;
+
+				this.connection.sendDiagnostics({
+					uri: latest.uri,
+					diagnostics,
+				});
+			} catch {
+				// Do nothing, the document might have changed
 			}
-
-			const diagnostics = await ls.doDiagnostics(params.document);
-
-			// Check that no new version has been made while we waited,
-			// in which case the diagnostics may no longer be valid.
-			const latest = documents.get(params.document.uri);
-			if (!latest || latest.version !== params.document.version) return;
-
-			this.connection.sendDiagnostics({
-				uri: latest.uri,
-				diagnostics,
-			});
 		};
 
 		documents.onDidOpen(onDocumentChanged);
@@ -238,27 +238,30 @@ export class SomeSassServer {
 
 		this.connection.onDidChangeWatchedFiles(async (event) => {
 			if (!workspaceScanner || !fileSystemProvider || !ls) return;
+			try {
+				const newFiles: URI[] = [];
+				for (const change of event.changes) {
+					const uri = await fileSystemProvider.realPath(URI.parse(change.uri));
 
-			const newFiles: URI[] = [];
-			for (const change of event.changes) {
-				const uri = await fileSystemProvider.realPath(URI.parse(change.uri));
-
-				if (change.type === FileChangeType.Deleted) {
-					ls.onDocumentRemoved(uri.toString());
-				} else if (change.type === FileChangeType.Changed) {
-					const document = documents.get(uri.toString());
-					if (!document) {
-						// New to us anyway
-						newFiles.push(uri);
+					if (change.type === FileChangeType.Deleted) {
+						ls.onDocumentRemoved(uri.toString());
+					} else if (change.type === FileChangeType.Changed) {
+						const document = documents.get(uri.toString());
+						if (!document) {
+							// New to us anyway
+							newFiles.push(uri);
+						} else {
+							ls.onDocumentChanged(document);
+						}
 					} else {
-						ls.onDocumentChanged(document);
+						newFiles.push(uri);
 					}
-				} else {
-					newFiles.push(uri);
 				}
-			}
 
-			await workspaceScanner.scan(newFiles);
+				await workspaceScanner.scan(newFiles);
+			} catch {
+				// do nothing
+			}
 		});
 
 		this.connection.onCompletion(async (params) => {
@@ -322,8 +325,12 @@ export class SomeSassServer {
 			);
 			if (!document) return null;
 
-			const result = ls.findDocumentHighlights(document, params.position);
-			return result;
+			try {
+				const result = ls.findDocumentHighlights(document, params.position);
+				return result;
+			} catch {
+				// Do nothing
+			}
 		});
 
 		this.connection.onDocumentLinks((params) => {
@@ -334,8 +341,12 @@ export class SomeSassServer {
 			);
 			if (!document) return null;
 
-			const result = ls.findDocumentLinks(document);
-			return result;
+			try {
+				const result = ls.findDocumentLinks(document);
+				return result;
+			} catch {
+				// Do nothing
+			}
 		});
 
 		this.connection.onReferences(async (params) => {
@@ -442,8 +453,12 @@ export class SomeSassServer {
 			);
 			if (!document) return null;
 
-			const information = await ls.findColors(document);
-			return information;
+			try {
+				const information = await ls.findColors(document);
+				return information;
+			} catch {
+				// Do nothing
+			}
 		});
 
 		this.connection.onColorPresentation((params) => {

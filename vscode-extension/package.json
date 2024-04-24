@@ -102,7 +102,7 @@
 	},
 	"dependencies": {
 		"fast-glob": "3.3.2",
-		"some-sass-language-server": "1.1.0",
+		"some-sass-language-server": "1.2.0",
 		"vscode-css-languageservice": "6.2.12",
 		"vscode-languageclient": "9.0.1",
 		"vscode-uri": "3.0.7"
@@ -117,7 +117,7 @@
 		"shx": "0.3.4"
 	},
 	"scripts": {
-		"vscode:prepublish": "npm install && npm run clean && webpack --mode production",
+		"vscode:prepublish": "npm run clean && webpack --mode production",
 		"clean": "shx rm -rf dist",
 		"build": "webpack --mode development",
 		"start:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=.",

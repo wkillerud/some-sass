@@ -1,0 +1,5 @@
+@use "pkg:my-components/colors";
+
+button {
+	color: colors.$color-primary;
+}

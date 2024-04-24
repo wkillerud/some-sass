@@ -70,7 +70,14 @@ When you write imports Some Sass reads the file system to help you complete the 
 
 ![](../images/usage/import-completions.png)
 
+### `pkg:` imports
+
+You can get a list of packages in the closest `node_modules` folder by manually [triggering IntelliSense][manual] (Ctrl + Space) to help you write `pkg:` imports.
+
+![](../images/usage/pkg-imports.png)
+
 [intellisense]: https://code.visualstudio.com/docs/editor/intellisense#_types-of-completions
+[manual]: https://code.visualstudio.com/docs/editor/intellisense#_intellisense-features
 [SassDoc]: http://sassdoc.com/annotations#description
 [placeholders]: https://sass-lang.com/documentation/style-rules/placeholder-selectors/
 [visibility]: https://sass-lang.com/documentation/at-rules/forward/#controlling-visibility

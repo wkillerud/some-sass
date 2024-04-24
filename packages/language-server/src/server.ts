@@ -81,6 +81,9 @@ export class SomeSassServer {
 			return {
 				capabilities: {
 					textDocumentSync: TextDocumentSyncKind.Incremental,
+					documentLinkProvider: {
+						resolveProvider: false,
+					},
 					referencesProvider: true,
 					completionProvider: {
 						resolveProvider: false,
@@ -320,6 +323,18 @@ export class SomeSassServer {
 			if (!document) return null;
 
 			const result = ls.findDocumentHighlights(document, params.position);
+			return result;
+		});
+
+		this.connection.onDocumentLinks((params) => {
+			if (!ls) return null;
+
+			const document = getSCSSRegionsDocument(
+				documents.get(params.textDocument.uri),
+			);
+			if (!document) return null;
+
+			const result = ls.findDocumentLinks(document);
 			return result;
 		});
 

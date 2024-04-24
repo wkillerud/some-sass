@@ -519,6 +519,207 @@ suite("SCSS - Navigation", () => {
 				workspaceFolder,
 			);
 		});
+
+		test("SCSS node package resolving", async () => {
+			let ls = getSCSSLS();
+			let testUri = getTestResource("about.scss");
+			let workspaceFolder = getTestResource("");
+			await assertLinks(
+				ls,
+				`@use "pkg:bar"`,
+				[
+					{
+						namespace: "bar",
+						range: newRange(5, 14),
+						target: getTestResource("node_modules/bar/styles/index.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"scss",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:bar/colors"`,
+				[
+					{
+						namespace: "colors",
+						range: newRange(5, 21),
+						target: getTestResource("node_modules/bar/styles/colors.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"scss",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:bar/colors.scss"`,
+				[
+					{
+						namespace: "colors",
+						range: newRange(5, 26),
+						target: getTestResource("node_modules/bar/styles/colors.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"scss",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:@foo/baz"`,
+				[
+					{
+						namespace: "baz",
+						range: newRange(5, 19),
+						target: getTestResource("node_modules/@foo/baz/styles/index.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"scss",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:@foo/baz/colors"`,
+				[
+					{
+						namespace: "colors",
+						range: newRange(5, 26),
+						target: getTestResource("node_modules/@foo/baz/styles/colors.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"scss",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:@foo/baz/colors.scss"`,
+				[
+					{
+						namespace: "colors",
+						range: newRange(5, 31),
+						target: getTestResource("node_modules/@foo/baz/styles/colors.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"scss",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:@foo/baz/button"`,
+				[
+					{
+						namespace: "button",
+						range: newRange(5, 26),
+						target: getTestResource("node_modules/@foo/baz/styles/button.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"scss",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:@foo/baz/button.scss"`,
+				[
+					{
+						namespace: "button",
+						range: newRange(5, 31),
+						target: getTestResource("node_modules/@foo/baz/styles/button.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"scss",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:root-sass"`,
+				[
+					{
+						namespace: "root-sass",
+						range: newRange(5, 20),
+						target: getTestResource("node_modules/root-sass/styles/index.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"scss",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:root-style"`,
+				[
+					{
+						namespace: "root-style",
+						range: newRange(5, 21),
+						target: getTestResource("node_modules/root-style/styles/index.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"scss",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:bar-pattern/anything"`,
+				[
+					{
+						namespace: "anything",
+						range: newRange(5, 31),
+						target: getTestResource("node_modules/bar-pattern/styles/anything.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"scss",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:bar-pattern/anything.scss"`,
+				[
+					{
+						namespace: "anything",
+						range: newRange(5, 36),
+						target: getTestResource("node_modules/bar-pattern/styles/anything.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"scss",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:bar-pattern/theme/dark.scss"`,
+				[
+					{
+						namespace: "dark",
+						range: newRange(5, 38),
+						target: getTestResource("node_modules/bar-pattern/styles/theme/dark.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"scss",
+				testUri,
+				workspaceFolder,
+			);
+		});
 	});
 
 	suite("Symbols", () => {

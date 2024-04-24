@@ -12,7 +12,7 @@
 	"homepage": "https://github.com/wkillerud/some-sass/blob/main/vscode-extension/README.md",
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:wkillerud/some-sass"
+		"url": "https://github.com/wkillerud/some-sass"
 	},
 	"keywords": [
 		"scss",

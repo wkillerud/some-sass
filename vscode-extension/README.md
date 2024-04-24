@@ -9,7 +9,7 @@ Some features include:
 - Rich documentation through [SassDoc](http://sassdoc.com).
 - Language features for [`%placeholders`](https://sass-lang.com/documentation/style-rules/placeholder-selectors/), both when using them and writing them.
 
-![](../docs/src/images/highlight-reel.gif)
+![](/docs/src/images/highlight-reel.gif)
 
 ## User guide
 

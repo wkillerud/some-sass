@@ -4,10 +4,12 @@ const { testHover } = require("./helper");
 describe("SCSS Hover Test", function () {
 	const docUri = getDocUri("hover/main.scss");
 	const collisionUri = getDocUri("hover/collision.scss");
+	const pkgImportUri = getDocUri("pkg-import/src/styles.scss");
 
 	before(async () => {
 		await showFile(docUri);
 		await showFile(collisionUri);
+		await showFile(pkgImportUri);
 		await sleepCI();
 	});
 
@@ -107,5 +109,12 @@ describe("SCSS Hover Test", function () {
 		};
 
 		await testHover(collisionUri, position(5, 20), expectedContents);
+	});
+
+	it("shows hover for symbols from pkg: import", async () => {
+		const expectedContents = {
+			contents: ["Primary brand color"],
+		};
+		await testHover(pkgImportUri, position(4, 19), expectedContents);
 	});
 });

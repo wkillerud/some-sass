@@ -1072,16 +1072,16 @@ export class DoComplete extends LanguageFeature {
 	): Promise<CompletionItem[]> {
 		const items: CompletionItem[] = [];
 		const url = node.getText().replace(/["']/g, "");
-
 		const moduleName = getModuleNameFromPath(url);
-		if (moduleName && moduleName !== "." && moduleName !== "..") {
-			const rootFolderUri = this.configuration.workspaceRoot
-				? Utils.joinPath(this.configuration.workspaceRoot, "/").toString(true)
-				: "";
-			const documentFolderUri = Utils.dirname(URI.parse(document.uri)).toString(
-				true,
-			);
 
+		const rootFolderUri = this.configuration.workspaceRoot
+			? Utils.joinPath(this.configuration.workspaceRoot, "/").toString(true)
+			: "";
+		const documentFolderUri = Utils.dirname(URI.parse(document.uri)).toString(
+			true,
+		);
+
+		if (moduleName && moduleName !== "." && moduleName !== "..") {
 			const modulePath = await this.resolvePathToModule(
 				moduleName,
 				documentFolderUri,
@@ -1132,6 +1132,40 @@ export class DoComplete extends LanguageFeature {
 			}
 		}
 
+		if (!moduleName && url === "pkg:") {
+			// Find the way to the nearest node_modules and list entries.
+			// This won't cover all scenarios (like workspaces) or package managers, but
+			// is better than nothing.
+			const nodeModules = await this.resolvePathToNodeModules(
+				documentFolderUri,
+				rootFolderUri,
+			);
+			if (nodeModules) {
+				const folders =
+					await this.options.fileSystemProvider.readDirectory(nodeModules);
+				for (const [name, fileType] of folders) {
+					if (name.startsWith(".")) continue;
+
+					if (fileType === FileType.Directory) {
+						let insertText = escapePath(name);
+						if (insertText.startsWith("/")) {
+							insertText = insertText.slice(1);
+						}
+						insertText = `${insertText}`;
+						items.push({
+							label: insertText,
+							kind: CompletionItemKind.Folder,
+							insertText,
+							command: {
+								title: "Suggest",
+								command: "editor.action.triggerSuggest",
+							},
+						});
+					}
+				}
+			}
+		}
+
 		return items;
 	}
 
@@ -1157,6 +1191,31 @@ export class DoComplete extends LanguageFeature {
 		) {
 			return this.resolvePathToModule(
 				_moduleName,
+				Utils.dirname(URI.parse(documentFolderUri)).toString(true),
+				rootFolderUri,
+			);
+		}
+		return undefined;
+	}
+
+	async resolvePathToNodeModules(
+		documentFolderUri: string,
+		rootFolderUri: string | undefined,
+	): Promise<URI | undefined> {
+		// resolve the module relative to the document. We can't use `require` here as the code is webpacked.
+
+		const dirPath = Utils.joinPath(
+			URI.parse(documentFolderUri),
+			"node_modules",
+		);
+		if (await this.options.fileSystemProvider.exists(dirPath)) {
+			return dirPath;
+		} else if (
+			rootFolderUri &&
+			documentFolderUri.startsWith(rootFolderUri) &&
+			documentFolderUri.length !== rootFolderUri.length
+		) {
+			return this.resolvePathToNodeModules(
 				Utils.dirname(URI.parse(documentFolderUri)).toString(true),
 				rootFolderUri,
 			);

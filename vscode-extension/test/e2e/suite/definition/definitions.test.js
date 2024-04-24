@@ -9,9 +9,13 @@ const { testDefinition } = require("./helper");
 
 describe("SCSS Definition Test", function () {
 	const docUri = getDocUri("definition/main.scss");
+	const pkgImportUri = getDocUri("pkg-import/src/styles.scss");
+	const scopedPkgImportUri = getDocUri("pkg-import/src/scoped.scss");
 
 	before(async () => {
 		await showFile(docUri);
+		await showFile(pkgImportUri);
+		await showFile(scopedPkgImportUri);
 		await sleepCI();
 	});
 
@@ -55,5 +59,21 @@ describe("SCSS Definition Test", function () {
 		const expectedLocation = sameLineLocation(expectedDocumentUri, 1, 8, 17);
 
 		await testDefinition(docUri, position(16, 17), expectedLocation);
+	});
+
+	it("finds symbol from pkg: import", async () => {
+		const expectedDocumentUri = getDocUri(
+			"pkg-import/node_modules/my-components/styles/colors.scss",
+		);
+		const expectedLocation = sameLineLocation(expectedDocumentUri, 3, 1, 15);
+		await testDefinition(pkgImportUri, position(4, 19), expectedLocation);
+	});
+
+	it("finds symbol from scoped pkg: import", async () => {
+		const expectedDocumentUri = getDocUri(
+			"pkg-import/node_modules/@my-scope/my-components/styles/colors.scss",
+		);
+		const expectedLocation = sameLineLocation(expectedDocumentUri, 3, 1, 15);
+		await testDefinition(scopedPkgImportUri, position(4, 19), expectedLocation);
 	});
 });

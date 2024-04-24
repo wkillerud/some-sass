@@ -29,6 +29,9 @@ export function mapFsProviders(
 			]);
 			return result;
 		},
+		getContent(uri, encoding) {
+			return ours.readFile(URI.parse(uri), encoding);
+		},
 	};
 	return theirs;
 }

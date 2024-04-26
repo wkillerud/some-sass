@@ -61,31 +61,35 @@ export default class WorkspaceScanner {
 			return;
 		}
 
-		const content = await this.#fs.readFile(uri);
+		try {
+			const content = await this.#fs.readFile(uri);
 
-		const document = getSCSSRegionsDocument(
-			TextDocument.create(uri.toString(), "scss", 1, content),
-		);
-		if (!document) return;
+			const document = getSCSSRegionsDocument(
+				TextDocument.create(uri.toString(), "scss", 1, content),
+			);
+			if (!document) return;
 
-		this.#ls.parseStylesheet(document);
+			this.#ls.parseStylesheet(document);
 
-		const links = await this.#ls.findDocumentLinks(document);
-		for (const link of links) {
-			if (
-				!link.target ||
-				link.target.endsWith(".css") ||
-				link.target.includes("#{") ||
-				link.target.startsWith("sass:")
-			) {
-				continue;
+			const links = await this.#ls.findDocumentLinks(document);
+			for (const link of links) {
+				if (
+					!link.target ||
+					link.target.endsWith(".css") ||
+					link.target.includes("#{") ||
+					link.target.startsWith("sass:")
+				) {
+					continue;
+				}
+
+				try {
+					await this.parse(URI.parse(link.target), depth + 1);
+				} catch {
+					// do nothing
+				}
 			}
-
-			try {
-				await this.parse(URI.parse(link.target), depth + 1);
-			} catch {
-				// do nothing
-			}
+		} catch {
+			// Something went wrong parsing this file, try parsing the others
 		}
 	}
 }

@@ -64,9 +64,6 @@ export class SomeSassServer {
 			ls = getLanguageService({
 				clientCapabilities,
 				fileSystemProvider,
-				languageModelCache: {
-					cleanupIntervalTimeInSeconds: 60,
-				},
 			});
 
 			// TODO: migrate to workspace folders. Workspace was an unnecessary older workaround of mine.

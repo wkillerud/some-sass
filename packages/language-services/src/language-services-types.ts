@@ -313,7 +313,7 @@ export interface LanguageServiceOptions {
 
 export type LanguageModelCacheOptions = {
 	/**
-	 * @default 360 - five minutes
+	 * @default 0 - off
 	 */
 	cleanupIntervalTimeInSeconds?: number;
 	/**

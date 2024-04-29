@@ -4,3 +4,5 @@
 	// Here it comes!
 	content: dev.fun-hello(dev.$fun-name);
 }
+
+@use "./circular";

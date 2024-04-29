@@ -64,3 +64,21 @@ test("should return relative links", async () => {
 	const links = await ls.findDocumentLinks(document);
 	assert.strictEqual(links.length, 3, "expected to find three uses");
 });
+
+test("does not break on circular reference", async () => {
+	const ping = fileSystemProvider.createDocument(
+		['@use "./pong";', "$var: ping;"],
+		{ uri: "ping.scss" },
+	);
+	const pong = fileSystemProvider.createDocument(
+		['@use "./ping";', "$var: pong;"],
+		{ uri: "pong.scss" },
+	);
+
+	ls.parseStylesheet(ping);
+	ls.parseStylesheet(pong);
+
+	const links = await ls.findDocumentLinks(ping);
+
+	assert.strictEqual(links.length, 1, "expected to find link to pong");
+});

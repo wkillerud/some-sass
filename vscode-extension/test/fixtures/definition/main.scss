@@ -19,3 +19,5 @@
 .alert {
   @extend %alert;
 }
+
+@use "./circular";

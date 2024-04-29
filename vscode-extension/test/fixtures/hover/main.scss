@@ -29,3 +29,5 @@ $documented-variable: "value";
 .alert {
   @extend %alert;
 }
+
+@use "./circular";

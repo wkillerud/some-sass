@@ -1,4 +1,4 @@
-@use './helpers' as *;
+@use "./helpers" as *;
 
 /// @deprecated
 $_old-private-variable: 1px;
@@ -11,9 +11,11 @@ $_old-private-variable: 1px;
   content: $_old-private-variable;
 }
 
-@use '../namespace' as ns;
+@use "../namespace" as ns;
 
 .foo {
   color: ns.$deprecated;
   @include ns.mix-mix-ohno;
 }
+
+@use "./circular";

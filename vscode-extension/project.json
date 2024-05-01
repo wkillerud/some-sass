@@ -3,27 +3,17 @@
 	"name": "some-sass",
 	"sourceRoot": "vscode-extension/src",
 	"projectType": "application",
-	"semantic-release": {
-		"executor": "@theunderscorer/nx-semantic-release:semantic-release",
-		"options": {
-			"packageJsonDir": "vscode-extension",
-			"commitMessage": "chore(release): ${nextRelease.version}",
-			"tagFormat": "${PROJECT_NAME}-${version}",
-			"plugins": [
-				[
-					"semantic-release-vsce",
-					{
-						"packageVsix": true
-					}
-				]
-			],
-			"githubOptions": {
-				"assets": [
-					{
-						"path": "*.vsix"
-					}
-				]
-			}
+	"targets": {
+		"package": {
+			"executor": "nx:run-commands",
+			"dependsOn": ["build", "^build"],
+			"options": {
+				"commands": [
+					"cd vscode-extension && npx vsce package --out some-sass.vsix"
+				],
+				"parallel": false
+			},
+			"outputs": ["{workspaceRoot}/dist/apps"]
 		}
 	}
 }

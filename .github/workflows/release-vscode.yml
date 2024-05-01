@@ -1,9 +1,9 @@
-name: Release
+name: Release extension
 
 on:
   push:
     tags:
-      - some-sass-language-server@*.*.*
+      - some-sass@*.*.*
 
 permissions:
   contents: read # for checkout
@@ -55,11 +55,17 @@ jobs:
           max_attempts: 3
           command: npm run test:web
 
-      - name: Publish packages
-        run: npx nx release publish
-        shell: bash
+      - name: Publish extension
+        run: |
+          npm run package
+          npx vsce publish --packagePath vscode-extension/some-sass.vsix -p ${{ secrets.VSCE_PAT }}
+          npx ovsx publish vscode-extension/some-sass.vsix -p ${{ secrets.OVSX_PAT }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            vscode-extension/some-sass.vsix
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
-          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -56,7 +56,7 @@
 			"conventionalCommits": true
 		},
 		"projectsRelationship": "independent",
-		"projects": ["packages/*", "vscode-extension"],
+		"projects": ["packages/*", "vscode-extension/*"],
 		"releaseTagPattern": "{projectName}@{version}",
 		"changelog": {
 			"projectChangelogs": {

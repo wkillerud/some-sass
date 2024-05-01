@@ -353,7 +353,7 @@ export class Parser {
 			this._parseViewPort() ||
 			this._parseNamespace() ||
 			this._parseDocument() ||
-			this._parseContainer() ||
+			this._parseContainer(isNested) ||
 			this._parseUnknownAtRule()
 		);
 	}
@@ -391,7 +391,13 @@ export class Parser {
 	}
 
 	protected _parseRuleSetDeclarationAtStatement(): nodes.Node | null {
-		return this._parseMedia(true) || this._parseSupports(true) || this._parseLayer(true) || this._parseUnknownAtRule();
+		return (
+			this._parseMedia(true) ||
+			this._parseSupports(true) ||
+			this._parseLayer(true) ||
+			this._parseContainer(true) ||
+			this._parseUnknownAtRule()
+		);
 	}
 
 	public _parseRuleSetDeclaration(): nodes.Node | null {
@@ -1315,7 +1321,15 @@ export class Parser {
 		return this._parseBody(node, this._parseStylesheetStatement.bind(this));
 	}
 
-	public _parseContainer(): nodes.Node | null {
+	public _parseContainerDeclaration(isNested = false): nodes.Node | null {
+		if (isNested) {
+			// if nested, the body can contain rulesets, but also declarations
+			return this._tryParseRuleset(true) || this._tryToParseDeclaration() || this._parseStylesheetStatement(true);
+		}
+		return this._parseStylesheetStatement(false);
+	}
+
+	public _parseContainer(isNested: boolean = false): nodes.Node | null {
 		if (!this.peekKeyword("@container")) {
 			return null;
 		}
@@ -1325,7 +1339,7 @@ export class Parser {
 		node.addChild(this._parseIdent()); // optional container name
 		node.addChild(this._parseContainerQuery());
 
-		return this._parseBody(node, this._parseStylesheetStatement.bind(this));
+		return this._parseBody(node, this._parseContainerDeclaration.bind(this, isNested));
 	}
 
 	public _parseContainerQuery(): nodes.Node | null {

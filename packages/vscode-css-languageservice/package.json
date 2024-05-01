@@ -9,11 +9,11 @@
 	"author": "Microsoft Corporation",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-css-languageservice"
+		"url": "https://github.com/wkillerud/some-sass"
 	},
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/Microsoft/vscode-css-languageservice"
+		"url": "https://github.com/wkillerud/some-sass"
 	},
 	"devDependencies": {
 		"@types/mocha": "10.0.6",

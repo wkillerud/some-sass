@@ -272,7 +272,7 @@ export class SCSSParser extends cssParser.Parser {
 				this._parseSupports(true) || // @supports
 				this._parseLayer() || // @layer
 				this._parsePropertyAtRule() || // @property
-				this._parseContainer() || // @container
+				this._parseContainer(true) || // nested @container
 				this._parseRuleSetDeclarationAtStatement()
 			);
 		}

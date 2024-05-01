@@ -1,0 +1,15 @@
+diff --git a/node_modules/@nx/js/src/executors/release-publish/release-publish.impl.js b/node_modules/@nx/js/src/executors/release-publish/release-publish.impl.js
+index 9f0253b..2ba66a1 100644
+--- a/node_modules/@nx/js/src/executors/release-publish/release-publish.impl.js
++++ b/node_modules/@nx/js/src/executors/release-publish/release-publish.impl.js
+@@ -194,8 +194,8 @@ async function runExecutor(options, context) {
+                 success: false,
+             };
+         }
+-        catch (err) {
+-            console.error('Something unexpected went wrong when processing the npm publish output\n', err);
++        catch (e) {
++            console.error('Something unexpected went wrong when processing the npm publish output\n', e, err);
+             return {
+                 success: false,
+             };

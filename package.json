@@ -9,6 +9,7 @@
 	],
 	"scripts": {
 		"prepare": "husky",
+		"postinstall": "patch-package",
 		"build": "nx run-many -t build",
 		"clean": "nx run-many -t clean",
 		"coverage": "nx run-many -t coverage",
@@ -50,6 +51,7 @@
 		"husky": "9.0.11",
 		"lint-staged": "15.2.2",
 		"nx": "18.3.4",
+		"patch-package": "8.0.0",
 		"prettier": "3.2.5",
 		"semantic-release": "20.1.0",
 		"semantic-release-vsce": "5.7.1",

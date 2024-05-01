@@ -379,6 +379,11 @@ suite("SCSS - Parser", () => {
 			parser,
 			parser._parseStylesheet.bind(parser),
 		);
+		assertNode(
+			`:root { @container (max-height: 100px) { display: none;} }`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
 	});
 
 	test("@use", function () {

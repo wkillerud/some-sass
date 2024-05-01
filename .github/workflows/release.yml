@@ -3,7 +3,8 @@ name: Release
 on:
   push:
     tags:
-      - "*@*.*.*"
+      - some-sass-language-server@*.*.*
+      - some-sass@*.*.*
 
 permissions:
   contents: read # for checkout

@@ -6,12 +6,7 @@ The best place to get started is [the guide for new contributors](https://wkille
 
 ## Conventional commits
 
-This repository uses [conventional commits and `semantic-release`](https://github.com/semantic-release/semantic-release#how-does-it-work) to automatically publish changes merged to `main`.
-
-Two assets are published:
-
-- The language server is published to npm
-- The VS Code extension is published to Visual Studio Marketplace and Open VSX
+This repository uses [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) to automate versioning and changelog generation.
 
 | Commit message                                                                                                                            | Release type                                                                                                                                                         |
 | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

@@ -18,10 +18,6 @@
 	"bugs": {
 		"url": "https://github.com/wkillerud/some-sass/issues"
 	},
-	"publishConfig": {
-		"registry": "https://registry.npmjs.org/",
-		"tag": "latest"
-	},
 	"main": "dist/node-server.js",
 	"files": [
 		"dist/",

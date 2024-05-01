@@ -26,3 +26,6 @@ docs/book/
 
 # Configuration
 .eslintcache
+
+
+.nx/cache

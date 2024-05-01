@@ -1,0 +1,72 @@
+{
+	"$schema": "./node_modules/nx/schemas/nx-schema.json",
+	"targetDefaults": {
+		"build": {
+			"dependsOn": ["^build"],
+			"outputs": ["{projectRoot}/dist"],
+			"cache": true
+		},
+		"test": {
+			"dependsOn": ["^test"],
+			"cache": true
+		},
+		"coverage": {
+			"dependsOn": ["^coverage"],
+			"outputs": ["{projectRoot}/coverage"],
+			"cache": true
+		},
+		"compile": {
+			"outputs": ["{projectRoot}/lib"],
+			"cache": true
+		},
+		"compile-esm": {
+			"outputs": ["{projectRoot}/lib"],
+			"cache": true
+		},
+		"mocha": {
+			"cache": true
+		},
+		"lint": {
+			"cache": true
+		},
+		"test:e2e": {
+			"cache": true
+		},
+		"pretest:web": {
+			"cache": true
+		},
+		"test:web": {
+			"cache": true
+		}
+	},
+	"defaultBase": "main",
+	"plugins": [
+		{
+			"plugin": "@nx/webpack/plugin",
+			"options": {
+				"buildTargetName": "webpack:build",
+				"serveTargetName": "serve",
+				"previewTargetName": "preview",
+				"serveStaticTargetName": "serve-static"
+			}
+		}
+	],
+	"release": {
+		"version": {
+			"conventionalCommits": true
+		},
+		"projectsRelationship": "independent",
+		"projects": ["packages/*", "vscode-extension"],
+		"releaseTagPattern": "{projectName}@{version}",
+		"changelog": {
+			"projectChangelogs": {
+				"renderOptions": {
+					"authors": false
+				}
+			}
+		},
+		"git": {
+			"commitMessage": "chore(release): {version} [skip ci]"
+		}
+	}
+}

@@ -1,0 +1,29 @@
+{
+	"$schema": "../node_modules/nx/schemas/project-schema.json",
+	"name": "some-sass",
+	"sourceRoot": "vscode-extension/src",
+	"projectType": "application",
+	"semantic-release": {
+		"executor": "@theunderscorer/nx-semantic-release:semantic-release",
+		"options": {
+			"packageJsonDir": "vscode-extension",
+			"commitMessage": "chore(release): ${nextRelease.version} [skip ci]",
+			"tagFormat": "${PROJECT_NAME}-${version}",
+			"plugins": [
+				[
+					"semantic-release-vsce",
+					{
+						"packageVsix": true
+					}
+				]
+			],
+			"githubOptions": {
+				"assets": [
+					{
+						"path": "*.vsix"
+					}
+				]
+			}
+		}
+	}
+}

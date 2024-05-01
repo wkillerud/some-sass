@@ -51,7 +51,7 @@
 		"lint-staged": "15.2.2",
 		"nx": "18.3.4",
 		"prettier": "3.2.5",
-		"semantic-release": "20.1.0",
+		"semantic-release": "23.0.8",
 		"semantic-release-vsce": "5.7.1",
 		"shx": "0.3.4",
 		"ts-loader": "9.5.1",

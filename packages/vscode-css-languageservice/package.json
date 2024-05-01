@@ -16,23 +16,23 @@
 		"url": "https://github.com/Microsoft/vscode-css-languageservice"
 	},
 	"devDependencies": {
-		"@types/mocha": "^10.0.6",
-		"@types/node": "16.18.96",
-		"@typescript-eslint/eslint-plugin": "^6.21.0",
-		"@typescript-eslint/parser": "^6.21.0",
-		"@vscode/web-custom-data": "^0.4.9",
-		"eslint": "^8.57.0",
-		"mocha": "^10.3.0",
+		"@types/mocha": "10.0.6",
+		"@types/node": "20.12.7",
+		"@typescript-eslint/eslint-plugin": "7.8.0",
+		"@typescript-eslint/parser": "7.8.0",
+		"@vscode/web-custom-data": "0.4.9",
+		"eslint": "8.57.0",
+		"mocha": "10.4.0",
 		"nyc": "15.1.0",
-		"rimraf": "^5.0.5",
-		"source-map-support": "^0.5.21",
-		"typescript": "^5.3.3"
+		"rimraf": "5.0.5",
+		"source-map-support": "0.5.21",
+		"typescript": "5.4.5"
 	},
 	"dependencies": {
-		"@vscode/l10n": "^0.0.18",
-		"vscode-languageserver-textdocument": "^1.0.11",
+		"@vscode/l10n": "0.0.18",
+		"vscode-languageserver-textdocument": "1.0.11",
 		"vscode-languageserver-types": "3.17.5",
-		"vscode-uri": "^3.0.8"
+		"vscode-uri": "3.0.8"
 	},
 	"scripts": {
 		"build": "npm run compile && npm run compile-esm",

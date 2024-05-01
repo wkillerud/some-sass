@@ -1,2 +1,3 @@
 vscode-extension/test/e2e/
 vscode-extension/test/web/
+**/dist/**

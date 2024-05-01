@@ -64,9 +64,6 @@
 					"authors": false
 				}
 			}
-		},
-		"git": {
-			"commitMessage": "chore(release): {version} [skip ci]"
 		}
 	}
 }

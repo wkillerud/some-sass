@@ -30,6 +30,25 @@ npm run build
 npm run test:all
 ```
 
+### Watch mode
+
+You can have `nx` watch the workspace for changes and rerun a minimum build:
+
+```sh
+npm run dev
+```
+
+Some packages have watch mode for unit tests using Vitest:
+
+- `packages/language-server/`
+- `packages/language-services/`
+
+In packages with Vitest you start watch mode with the `test` script:
+
+```sh
+npm test
+```
+
 ## Next steps
 
 You may want to have a look at the [architecture](./architecture.md) of the language server. Most of the functionality of the language server is in the `language-services` package in `packages/`.

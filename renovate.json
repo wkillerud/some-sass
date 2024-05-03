@@ -6,16 +6,16 @@
 	"ignoreDeps": ["@types/vscode"],
 	"packageRules": [
 		{
-			"groupName": "linters",
+			"groupName": "devDependencies (non-major)",
 			"matchDepTypes": ["devDependencies"],
-			"matchPackagePatterns": ["lint", "prettier"],
+			"matchUpdateTypes": ["minor", "patch"],
+			"matchCurrentVersion": "!/^0/",
 			"automerge": true
 		},
 		{
-			"groupName": "devDependencies (non-major)",
-			"excludePackagePatterns": ["lint", "prettier"],
+			"groupName": "devDependencies (major)",
 			"matchDepTypes": ["devDependencies"],
-			"matchUpdateTypes": ["minor", "patch"],
+			"matchUpdateTypes": ["major"],
 			"matchCurrentVersion": "!/^0/",
 			"automerge": true
 		},
@@ -27,8 +27,23 @@
 		},
 		{
 			"groupName": "dependencies (non-major)",
+			"excludePackagePatterns": [
+				"vscode-language",
+				"vscode-css-languageservice"
+			],
 			"matchDepTypes": ["dependencies"],
 			"matchUpdateTypes": ["minor", "patch"],
+			"matchCurrentVersion": "!/^0/",
+			"automerge": true
+		},
+		{
+			"groupName": "dependencies (major)",
+			"excludePackagePatterns": [
+				"vscode-language",
+				"vscode-css-languageservice"
+			],
+			"matchDepTypes": ["dependencies"],
+			"matchUpdateTypes": ["major"],
 			"matchCurrentVersion": "!/^0/",
 			"automerge": false
 		}

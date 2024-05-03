@@ -13,6 +13,7 @@
 		"build": "nx run-many -t build",
 		"clean": "nx run-many -t clean",
 		"coverage": "nx run-many -t coverage",
+		"dev": "echo Watching workspace for changes... && nx watch --all -- nx run \\$NX_PROJECT_NAME:build",
 		"lint": "eslint \"**/*.ts\" --cache",
 		"lint-staged": "lint-staged",
 		"package": "nx package some-sass",

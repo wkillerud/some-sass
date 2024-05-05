@@ -8,5 +8,3 @@ Some Sass is a language server extension. It can also run in the browser. The pr
 
 - [Language server extension guide](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide)
 - [Web extensions](https://code.visualstudio.com/api/extension-guides/web-extensions)
-
-Releases are published using Semantic Release whenever pull requests are merged.

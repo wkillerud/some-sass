@@ -1,12 +1,14 @@
 import { LanguageFeature } from "../language-feature";
 import {
 	TextDocument,
-	SassDocumentLink,
+	StylesheetDocumentLink,
 	URI,
 } from "../language-services-types";
 
 export class FindDocumentLinks extends LanguageFeature {
-	async findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]> {
+	async findDocumentLinks(
+		document: TextDocument,
+	): Promise<StylesheetDocumentLink[]> {
 		const cached = this.cache.getResolvedLinks(document);
 		if (cached) return cached;
 

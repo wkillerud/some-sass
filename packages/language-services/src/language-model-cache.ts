@@ -10,7 +10,7 @@ import {
 	Stylesheet,
 	LanguageModelCacheOptions,
 	Node,
-	SassDocumentLink,
+	StylesheetDocumentLink,
 	SassDocumentSymbol,
 } from "./language-services-types";
 
@@ -23,7 +23,7 @@ type LanguageModels = {
 		document: TextDocument;
 		sassdoc?: ParseResult[];
 		symbols?: SassDocumentSymbol[];
-		links?: SassDocumentLink[];
+		links?: StylesheetDocumentLink[];
 	};
 };
 
@@ -132,13 +132,18 @@ export class LanguageModelCache {
 		return typeof this.#languageModels[uri] !== "undefined";
 	}
 
-	putResolvedLinks(document: TextDocument, links: SassDocumentLink[]): void {
+	putResolvedLinks(
+		document: TextDocument,
+		links: StylesheetDocumentLink[],
+	): void {
 		if (this.has(document.uri)) {
 			this.#languageModels[document.uri].links = links;
 		}
 	}
 
-	getResolvedLinks(document: TextDocument): SassDocumentLink[] | undefined {
+	getResolvedLinks(
+		document: TextDocument,
+	): StylesheetDocumentLink[] | undefined {
 		if (this.has(document.uri)) {
 			return this.#languageModels[document.uri].links;
 		}

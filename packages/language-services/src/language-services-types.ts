@@ -22,6 +22,7 @@ import {
 	TokenType,
 	Marker,
 	CompletionSettings as VSCodeCompletionSettings,
+	StylesheetDocumentLink,
 } from "@somesass/vscode-css-languageservice";
 import type { ParseResult } from "scss-sassdoc-parser";
 import { TextDocument } from "vscode-languageserver-textdocument";
@@ -59,45 +60,6 @@ import {
 	VersionedTextDocumentIdentifier,
 } from "vscode-languageserver-types";
 import { URI, Utils } from "vscode-uri";
-
-export interface SassDocumentLink extends DocumentLink {
-	/**
-	 * The namespace of the module. Either equal to {@link as} or derived from {@link target}.
-	 *
-	 * | Link               | Value       |
-	 * | ------------------ | ----------- |
-	 * | `"./colors"`       | `"colors"`  |
-	 * | `"./colors" as c`  | `"c"`       |
-	 * | `"./colors" as *`  | `undefined` |
-	 * | `"./_colors"`      | `"colors"`  |
-	 * | `"./_colors.scss"` | `"colors"`  |
-	 *
-	 * @see https://sass-lang.com/documentation/at-rules/use/#choosing-a-namespace
-	 */
-	namespace?: string;
-	/**
-	 * | Link                         | Value       |
-	 * | ---------------------------- | ----------- |
-	 * | `@use "./colors"`            | `undefined` |
-	 * | `@use "./colors" as c`       | `"c"`       |
-	 * | `@use "./colors" as *`       | `"*"`       |
-	 * | `@forward "./colors"`        | `undefined` |
-	 * | `@forward "./colors" as c-*` | `"c"`       |
-	 *
-	 * @see https://sass-lang.com/documentation/at-rules/use/#choosing-a-namespace
-	 * @see https://sass-lang.com/documentation/at-rules/forward/#adding-a-prefix
-	 */
-	as?: string;
-	/**
-	 * @see https://sass-lang.com/documentation/at-rules/forward/#controlling-visibility
-	 */
-	hide?: string[];
-	/**
-	 * @see https://sass-lang.com/documentation/at-rules/forward/#controlling-visibility
-	 */
-	show?: string[];
-	type?: NodeType;
-}
 
 /**
  * The root of the abstract syntax tree.
@@ -153,7 +115,7 @@ export interface LanguageService {
 		document: TextDocument,
 		position: Position,
 	): DocumentHighlight[];
-	findDocumentLinks(document: TextDocument): Promise<SassDocumentLink[]>;
+	findDocumentLinks(document: TextDocument): Promise<StylesheetDocumentLink[]>;
 	findDocumentSymbols(document: TextDocument): SassDocumentSymbol[];
 	findReferences(
 		document: TextDocument,
@@ -424,6 +386,7 @@ export {
 	Use,
 	Forward,
 	ForwardVisibility,
+	StylesheetDocumentLink,
 	SignatureInformation,
 	ExtendsReference,
 	TokenType,

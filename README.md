@@ -25,7 +25,7 @@ See the User guide section to learn more about what the extension can do.
 
 Some Sass is also a language server using the [Language Server Protocol (LSP)][lsp].
 
-The language server is [published on npm][npm], and can be used with any editor that has an LSP client. See [Getting started](./language-server/getting-started.md) to learn more.
+The language server is [published on npm][npm], and can be used with any editor that has an LSP client. See [Getting started](https://wkillerud.github.io/some-sass/language-server/getting-started.html) to learn more.
 
 ### Editors with clients
 

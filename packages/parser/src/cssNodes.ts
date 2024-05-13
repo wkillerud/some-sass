@@ -1,10 +1,11 @@
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable prefer-spread */
+/* eslint-disable @typescript-eslint/no-this-alias */
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-"use strict";
-
-import { trim } from "../utils/strings";
+import { trim } from "./utils/strings";
 
 /// <summary>
 /// Nodes for the css 2.1 specification. See for reference:
@@ -217,15 +218,24 @@ export class Node {
 	}
 
 	public matches(str: string): boolean {
-		return this.length === str.length && this.getTextProvider()(this.offset, this.length) === str;
+		return (
+			this.length === str.length &&
+			this.getTextProvider()(this.offset, this.length) === str
+		);
 	}
 
 	public startsWith(str: string): boolean {
-		return this.length >= str.length && this.getTextProvider()(this.offset, str.length) === str;
+		return (
+			this.length >= str.length &&
+			this.getTextProvider()(this.offset, str.length) === str
+		);
 	}
 
 	public endsWith(str: string): boolean {
-		return this.length >= str.length && this.getTextProvider()(this.end - str.length, str.length) === str;
+		return (
+			this.length >= str.length &&
+			this.getTextProvider()(this.end - str.length, str.length) === str
+		);
 	}
 
 	public accept(visitor: IVisitorFunction): void {
@@ -281,17 +291,28 @@ export class Node {
 	}
 
 	public hasIssue(rule: IRule): boolean {
-		return Array.isArray(this.issues) && this.issues.some((i) => i.getRule() === rule);
+		return (
+			Array.isArray(this.issues) &&
+			this.issues.some((i) => i.getRule() === rule)
+		);
 	}
 
 	public isErroneous(recursive: boolean = false): boolean {
 		if (this.issues && this.issues.length > 0) {
 			return true;
 		}
-		return recursive && Array.isArray(this.children) && this.children.some((c) => c.isErroneous(true));
+		return (
+			recursive &&
+			Array.isArray(this.children) &&
+			this.children.some((c) => c.isErroneous(true))
+		);
 	}
 
-	public setNode(field: keyof this, node: Node | null, index: number = -1): boolean {
+	public setNode(
+		field: keyof this,
+		node: Node | null,
+		index: number = -1,
+	): boolean {
 		if (node) {
 			node.attachTo(this, index);
 			(<any>this)[field] = node;
@@ -369,7 +390,10 @@ export class Node {
 	}
 
 	public encloses(candidate: Node): boolean {
-		return this.offset <= candidate.offset && this.offset + this.length >= candidate.offset + candidate.length;
+		return (
+			this.offset <= candidate.offset &&
+			this.offset + this.length >= candidate.offset + candidate.length
+		);
 	}
 
 	public getParent(): Node | null {
@@ -529,7 +553,9 @@ export class RuleSet extends BodyDeclaration {
 	}
 
 	public isNested(): boolean {
-		return !!this.parent && this.parent.findParent(NodeType.Declarations) !== null;
+		return (
+			!!this.parent && this.parent.findParent(NodeType.Declarations) !== null
+		);
 	}
 }
 
@@ -624,7 +650,10 @@ export class Declaration extends AbstractDeclaration {
 
 	public getFullPropertyName(): string {
 		const propertyName = this.property ? this.property.getName() : "unknown";
-		if (this.parent instanceof Declarations && this.parent.getParent() instanceof NestedProperties) {
+		if (
+			this.parent instanceof Declarations &&
+			this.parent.getParent() instanceof NestedProperties
+		) {
 			const parentDecl = this.parent.getParent()!.getParent();
 			if (parentDecl instanceof Declaration) {
 				return (<Declaration>parentDecl).getFullPropertyName() + propertyName;
@@ -652,7 +681,9 @@ export class Declaration extends AbstractDeclaration {
 		return this.value;
 	}
 
-	public setNestedProperties(value: NestedProperties | null): value is NestedProperties {
+	public setNestedProperties(
+		value: NestedProperties | null,
+	): value is NestedProperties {
 		return this.setNode("nestedProperties", value);
 	}
 
@@ -672,7 +703,9 @@ export class CustomPropertyDeclaration extends Declaration {
 		return NodeType.CustomPropertyDeclaration;
 	}
 
-	public setPropertySet(value: CustomPropertySet | null): value is CustomPropertySet {
+	public setPropertySet(
+		value: CustomPropertySet | null,
+	): value is CustomPropertySet {
 		return this.setNode("propertySet", value);
 	}
 
@@ -700,7 +733,7 @@ export class Property extends Node {
 	}
 
 	public getName(): string {
-		return trim(this.getText(), /[_\+]+$/); /* +_: less merge */
+		return trim(this.getText(), /[_+]+$/); /* +_: less merge */
 	}
 
 	public isCustomProperty(): boolean {
@@ -833,7 +866,9 @@ export class IfStatement extends BodyDeclaration {
 		return this.setNode("expression", node, 0);
 	}
 
-	public setElseClause(elseClause: BodyDeclaration | null): elseClause is BodyDeclaration {
+	public setElseClause(
+		elseClause: BodyDeclaration | null,
+	): elseClause is BodyDeclaration {
 		return this.setNode("elseClause", elseClause);
 	}
 }
@@ -1639,7 +1674,9 @@ export class MixinReference extends Node {
 		return this.arguments;
 	}
 
-	public setContent(node: MixinContentDeclaration | null): node is MixinContentDeclaration {
+	public setContent(
+		node: MixinContentDeclaration | null,
+	): node is MixinContentDeclaration {
 		return this.setNode("content", node);
 	}
 

@@ -1188,7 +1188,7 @@ export class CSSCompletion {
 	}
 }
 
-function isDeprecated(entry: languageFacts.IEntry2): boolean {
+function isDeprecated(entry: languageFacts.IEntry): boolean {
 	if (entry.status && (entry.status === "nonstandard" || entry.status === "obsolete")) {
 		return true;
 	}

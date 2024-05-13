@@ -4,6 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 "use strict";
+import { suite, test } from "vitest";
 
 import { SCSSParser } from "../../parser/scssParser";
 import { ParseError } from "../../parser/cssErrors";

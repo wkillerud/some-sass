@@ -5,6 +5,7 @@
 "use strict";
 
 import * as path from "path";
+import { suite, test } from "vitest";
 
 import { Position, InsertTextFormat, CompletionItemKind, LanguageSettings } from "../../cssLanguageService";
 import { testCompletionFor as testCSSCompletionFor, ExpectedCompetions } from "../css/completion.test";
@@ -283,7 +284,7 @@ suite("SCSS - Completions", () => {
 		});
 	});
 
-	const testFixturesPath = path.join(__dirname, "../../../../test");
+	const testFixturesPath = path.join(__dirname, "../../../test");
 
 	/**
 	 * For SCSS, `@import 'foo';` can be used for importing partial file `_foo.scss`

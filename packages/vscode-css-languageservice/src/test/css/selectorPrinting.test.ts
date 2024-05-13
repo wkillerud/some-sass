@@ -3,8 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 "use strict";
-
-import * as assert from "assert";
+import { suite, test, assert } from "vitest";
 import { Parser } from "../../parser/cssParser";
 import * as nodes from "../../parser/cssNodes";
 import * as selectorPrinting from "../../services/selectorPrinting";
@@ -57,10 +56,10 @@ function doParse(p: Parser, input: string, selectorName: string): nodes.Selector
 
 export function assertSelector(p: Parser, input: string, selectorName: string, expected: string): void {
 	let selector = doParse(p, input, selectorName);
-	assert(selector);
+	assert.ok(selector);
 
 	let element = selectorPrinting.selectorToElement(selector!);
-	assert(element);
+	assert.ok(element);
 
 	assert.equal(elementToString(element!), expected);
 }
@@ -74,7 +73,7 @@ function assertElement(p: Parser, input: string, expected: { name: string; value
 
 function assertSelectorMarkdown(p: Parser, input: string, selectorName: string, expected: MarkedString[]): void {
 	let selector = doParse(p, input, selectorName);
-	assert(selector);
+	assert.ok(selector);
 	const selectorPrinter = new selectorPrinting.SelectorPrinting(cssDataManager);
 	let printedElement = selectorPrinter.selectorToMarkedString(selector!);
 

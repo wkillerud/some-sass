@@ -2,7 +2,7 @@
 
 This document assumes you use Visual Studio Code and have the [Vitest](https://marketplace.visualstudio.com/items?itemName=vitest.explorer) extension.
 
-Open a unit test file (excluding tests in `vscode-css-languageservice`, which use Mocha) and find the test you want to debug.
+Open a unit test file and find the test you want to debug.
 
 You should see an icon in the gutter. To debug the test, right click and select Debug test.
 

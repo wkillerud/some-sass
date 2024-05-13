@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import * as assert from "assert";
+import { suite, test, assert } from "vitest";
 import * as path from "path";
 import {
 	getCSSLanguageService,
@@ -974,7 +974,7 @@ suite("CSS - Completion", () => {
 		assert.ok("d_a2" < "d_fe");
 	});
 
-	const testFixturesPath = path.join(__dirname, "../../../../test");
+	const testFixturesPath = path.join(__dirname, "../../../test");
 
 	test("CSS url() Path completion", async function () {
 		const testUri = URI.file(path.resolve(testFixturesPath, "pathCompletionFixtures/about/about.css")).toString(true);

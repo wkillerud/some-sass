@@ -5,7 +5,7 @@
 
 "use strict";
 
-import * as assert from "assert";
+import { suite, test, assert } from "vitest";
 import { TextDocument, FoldingRange, FoldingRangeKind, getCSSLanguageService } from "../../cssLanguageService";
 
 function assertRanges(

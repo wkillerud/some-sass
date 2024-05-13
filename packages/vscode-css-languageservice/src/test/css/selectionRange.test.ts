@@ -4,8 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import "mocha";
-import * as assert from "assert";
+import { suite, test, assert } from "vitest";
 import { getCSSLanguageService, TextDocument, SelectionRange } from "../../cssLanguageService";
 
 function assertRanges(content: string, expected: (number | string)[][]): void {

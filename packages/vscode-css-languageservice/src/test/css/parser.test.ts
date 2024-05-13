@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import * as assert from "assert";
+import { suite, test, assert } from "vitest";
 import { Parser } from "../../parser/cssParser";
 import { TokenType } from "../../parser/cssScanner";
 import * as nodes from "../../parser/cssNodes";

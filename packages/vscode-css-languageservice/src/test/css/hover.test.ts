@@ -5,7 +5,7 @@
 
 "use strict";
 
-import * as assert from "assert";
+import { suite, test, assert } from "vitest";
 import { Hover, TextDocument, getCSSLanguageService, getSCSSLanguageService } from "../../cssLanguageService";
 import { HoverSettings } from "../../cssLanguageTypes";
 

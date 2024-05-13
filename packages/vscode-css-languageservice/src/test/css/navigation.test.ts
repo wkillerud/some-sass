@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import * as assert from "assert";
+import { suite, test, assert } from "vitest";
 import { join } from "path";
 import { Scope, GlobalScope, ScopeBuilder } from "../../parser/cssSymbolScope";
 import * as nodes from "../../parser/cssNodes";
@@ -188,7 +188,7 @@ export function assertScopeBuilding(
 }
 
 export function getTestResource(path: string) {
-	return URI.file(join(__dirname, "../../../../test/linksTestFixtures", path)).toString(true);
+	return URI.file(join(__dirname, "../../../test/linksTestFixtures", path)).toString(true);
 }
 
 function scopeToString(scope: Scope): string {

@@ -4,6 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 "use strict";
 
+import { suite, test, assert } from "vitest";
+
 import * as nodes from "../../parser/cssNodes";
 import {
 	assertSymbolsInScope,
@@ -22,7 +24,6 @@ import {
 	LanguageSettings,
 	StylesheetDocumentLink,
 } from "../../cssLanguageService";
-import * as assert from "assert";
 import * as path from "path";
 import { URI } from "vscode-uri";
 import { getFsProvider } from "../testUtil/fsProvider";
@@ -238,7 +239,7 @@ suite("SCSS - Navigation", () => {
 	suite("Links", () => {
 		// For invalid links that have no corresponding file on disk, return no link
 		test("Invalid SCSS partial file links", async () => {
-			const fixtureRoot = path.resolve(__dirname, "../../../../src/test/scss/linkFixture/non-existent");
+			const fixtureRoot = path.resolve(__dirname, "../../../src/test/scss/linkFixture/non-existent");
 			const getDocumentUri = (relativePath: string) => {
 				return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
 			};
@@ -253,7 +254,7 @@ suite("SCSS - Navigation", () => {
 		});
 
 		test("SCSS partial file dynamic links", async () => {
-			const fixtureRoot = path.resolve(__dirname, "../../../../src/test/scss/linkFixture");
+			const fixtureRoot = path.resolve(__dirname, "../../../src/test/scss/linkFixture");
 			const getDocumentUri = (relativePath: string) => {
 				return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
 			};
@@ -313,7 +314,7 @@ suite("SCSS - Navigation", () => {
 		});
 
 		test("SCSS aliased links", async function () {
-			const fixtureRoot = path.resolve(__dirname, "../../../../src/test/scss/linkFixture");
+			const fixtureRoot = path.resolve(__dirname, "../../../src/test/scss/linkFixture");
 			const getDocumentUri = (relativePath: string) => {
 				return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
 			};
@@ -356,7 +357,7 @@ suite("SCSS - Navigation", () => {
 		});
 
 		test("SCSS module file links", async () => {
-			const fixtureRoot = path.resolve(__dirname, "../../../../src/test/scss/linkFixture/module");
+			const fixtureRoot = path.resolve(__dirname, "../../../src/test/scss/linkFixture/module");
 			const getDocumentUri = (relativePath: string) => {
 				return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
 			};

@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import * as assert from "assert";
+import { suite, test, assert } from "vitest";
 import {
 	isColorValue,
 	getColorValue,

@@ -1,9 +1,8 @@
-/* eslint-disable prefer-const */
-/* eslint-disable no-constant-condition */
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+"use strict";
 
 export enum TokenType {
 	Ident,
@@ -130,10 +129,7 @@ export class MultiLineStream {
 
 	public advanceWhileChar(condition: (ch: number) => boolean): number {
 		const posNow = this.position;
-		while (
-			this.position < this.len &&
-			condition(this.source.charCodeAt(this.position))
-		) {
+		while (this.position < this.len && condition(this.source.charCodeAt(this.position))) {
 			this.position++;
 		}
 		return this.position - posNow;
@@ -143,6 +139,7 @@ export class MultiLineStream {
 const _a = "a".charCodeAt(0);
 const _f = "f".charCodeAt(0);
 const _z = "z".charCodeAt(0);
+const _u = "u".charCodeAt(0);
 const _A = "A".charCodeAt(0);
 const _F = "F".charCodeAt(0);
 const _Z = "Z".charCodeAt(0);
@@ -257,11 +254,7 @@ export class Scanner {
 		const offset = this.stream.pos();
 		const content: string[] = [];
 		if (this._unquotedString(content)) {
-			return this.finishToken(
-				offset,
-				TokenType.UnquotedString,
-				content.join(""),
-			);
+			return this.finishToken(offset, TokenType.UnquotedString, content.join(""));
 		}
 		return null;
 	}
@@ -356,11 +349,7 @@ export class Scanner {
 					return this.finishToken(offset, tokenType, content.join(""));
 				} else {
 					// Unknown dimension 43ft
-					return this.finishToken(
-						offset,
-						TokenType.Dimension,
-						content.join(""),
-					);
+					return this.finishToken(offset, TokenType.Dimension, content.join(""));
 				}
 			}
 
@@ -494,22 +483,14 @@ export class Scanner {
 			this.stream.advance(1);
 			ch = this.stream.peekChar();
 			let hexNumCount = 0;
-			while (
-				hexNumCount < 6 &&
-				((ch >= _0 && ch <= _9) ||
-					(ch >= _a && ch <= _f) ||
-					(ch >= _A && ch <= _F))
-			) {
+			while (hexNumCount < 6 && ((ch >= _0 && ch <= _9) || (ch >= _a && ch <= _f) || (ch >= _A && ch <= _F))) {
 				this.stream.advance(1);
 				ch = this.stream.peekChar();
 				hexNumCount++;
 			}
 			if (hexNumCount > 0) {
 				try {
-					const hexVal = parseInt(
-						this.stream.substring(this.stream.pos() - hexNumCount),
-						16,
-					);
+					const hexVal = parseInt(this.stream.substring(this.stream.pos() - hexNumCount), 16);
 					if (hexVal) {
 						result.push(String.fromCharCode(hexVal));
 					}
@@ -539,14 +520,7 @@ export class Scanner {
 	private _stringChar(closeQuote: number, result: string[]) {
 		// not closeQuote, not backslash, not newline
 		const ch = this.stream.peekChar();
-		if (
-			ch !== 0 &&
-			ch !== closeQuote &&
-			ch !== _BSL &&
-			ch !== _CAR &&
-			ch !== _LFD &&
-			ch !== _NWL
-		) {
+		if (ch !== 0 && ch !== closeQuote && ch !== _BSL && ch !== _CAR && ch !== _LFD && ch !== _NWL) {
 			this.stream.advance(1);
 			result.push(String.fromCharCode(ch));
 			return true;
@@ -559,10 +533,7 @@ export class Scanner {
 			const closeQuote = this.stream.nextChar();
 			result.push(String.fromCharCode(closeQuote));
 
-			while (
-				this._stringChar(closeQuote, result) ||
-				this._escape(result, true)
-			) {
+			while (this._stringChar(closeQuote, result) || this._escape(result, true)) {
 				// loop
 			}
 
@@ -610,9 +581,7 @@ export class Scanner {
 
 	private _whitespace(): boolean {
 		const n = this.stream.advanceWhileChar((ch) => {
-			return (
-				ch === _WSP || ch === _TAB || ch === _NWL || ch === _LFD || ch === _CAR
-			);
+			return ch === _WSP || ch === _TAB || ch === _NWL || ch === _LFD || ch === _CAR;
 		});
 		return n > 0;
 	}
@@ -629,11 +598,7 @@ export class Scanner {
 		const pos = this.stream.pos();
 		const hasMinus = this._minus(result);
 		if (hasMinus) {
-			if (
-				this._minus(result) /* -- */ ||
-				this._identFirstChar(result) ||
-				this._escape(result)
-			) {
+			if (this._minus(result) /* -- */ || this._identFirstChar(result) || this._escape(result)) {
 				while (this._identChar(result) || this._escape(result)) {
 					// loop
 				}
@@ -698,14 +663,9 @@ export class Scanner {
 		// assume u has already been parsed
 
 		if (this.stream.advanceIfChar(_PLS)) {
-			const isHexDigit = (ch: number) =>
-				(ch >= _0 && ch <= _9) ||
-				(ch >= _a && ch <= _f) ||
-				(ch >= _A && ch <= _F);
+			const isHexDigit = (ch: number) => (ch >= _0 && ch <= _9) || (ch >= _a && ch <= _f) || (ch >= _A && ch <= _F);
 
-			const codePoints =
-				this.stream.advanceWhileChar(isHexDigit) +
-				this.stream.advanceWhileChar((ch) => ch === _QSM);
+			const codePoints = this.stream.advanceWhileChar(isHexDigit) + this.stream.advanceWhileChar((ch) => ch === _QSM);
 			if (codePoints >= 1 && codePoints <= 6) {
 				if (this.stream.advanceIfChar(_MIN)) {
 					const digits = this.stream.advanceWhileChar(isHexDigit);

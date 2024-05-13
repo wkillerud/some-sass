@@ -2,8 +2,10 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+"use strict";
+
 import * as nodes from "./cssNodes";
-import { findFirst } from "./utils/arrays";
+import { findFirst } from "../utils/arrays";
 
 export class Scope {
 	public parent: Scope | null;
@@ -89,12 +91,7 @@ export class Symbol {
 	public type: nodes.ReferenceType;
 	public node: nodes.Node;
 
-	constructor(
-		name: string,
-		value: string | undefined,
-		node: nodes.Node,
-		type: nodes.ReferenceType,
-	) {
+	constructor(name: string, value: string | undefined, node: nodes.Node, type: nodes.ReferenceType) {
 		this.name = name;
 		this.value = value;
 		this.node = node;
@@ -109,12 +106,7 @@ export class ScopeBuilder implements nodes.IVisitor {
 		this.scope = scope;
 	}
 
-	private addSymbol(
-		node: nodes.Node,
-		name: string,
-		value: string | undefined,
-		type: nodes.ReferenceType,
-	): void {
+	private addSymbol(node: nodes.Node, name: string, value: string | undefined, type: nodes.ReferenceType): void {
 		if (node.offset !== -1) {
 			const current = this.scope.findScope(node.offset, node.length);
 			if (current) {
@@ -126,10 +118,7 @@ export class ScopeBuilder implements nodes.IVisitor {
 	private addScope(node: nodes.Node): Scope | null {
 		if (node.offset !== -1) {
 			const current = this.scope.findScope(node.offset, node.length);
-			if (
-				current &&
-				(current.offset !== node.offset || current.length !== node.length)
-			) {
+			if (current && (current.offset !== node.offset || current.length !== node.length)) {
 				// scope already known?
 				const newScope = new Scope(node.offset, node.length);
 				current.addChild(newScope);
@@ -158,38 +147,19 @@ export class ScopeBuilder implements nodes.IVisitor {
 	public visitNode(node: nodes.Node): boolean {
 		switch (node.type) {
 			case nodes.NodeType.Keyframe:
-				this.addSymbol(
-					node,
-					(<nodes.Keyframe>node).getName(),
-					void 0,
-					nodes.ReferenceType.Keyframe,
-				);
+				this.addSymbol(node, (<nodes.Keyframe>node).getName(), void 0, nodes.ReferenceType.Keyframe);
 				return true;
 			case nodes.NodeType.CustomPropertyDeclaration:
-				return this.visitCustomPropertyDeclarationNode(
-					<nodes.CustomPropertyDeclaration>node,
-				);
+				return this.visitCustomPropertyDeclarationNode(<nodes.CustomPropertyDeclaration>node);
 			case nodes.NodeType.VariableDeclaration:
-				return this.visitVariableDeclarationNode(
-					<nodes.VariableDeclaration>node,
-				);
+				return this.visitVariableDeclarationNode(<nodes.VariableDeclaration>node);
 			case nodes.NodeType.Ruleset:
 				return this.visitRuleSet(<nodes.RuleSet>node);
 			case nodes.NodeType.MixinDeclaration:
-				this.addSymbol(
-					node,
-					(<nodes.MixinDeclaration>node).getName(),
-					void 0,
-					nodes.ReferenceType.Mixin,
-				);
+				this.addSymbol(node, (<nodes.MixinDeclaration>node).getName(), void 0, nodes.ReferenceType.Mixin);
 				return true;
 			case nodes.NodeType.FunctionDeclaration:
-				this.addSymbol(
-					node,
-					(<nodes.FunctionDeclaration>node).getName(),
-					void 0,
-					nodes.ReferenceType.Function,
-				);
+				this.addSymbol(node, (<nodes.FunctionDeclaration>node).getName(), void 0, nodes.ReferenceType.Function);
 				return true;
 			case nodes.NodeType.FunctionParameter: {
 				return this.visitFunctionParameterNode(<nodes.FunctionParameter>node);
@@ -197,7 +167,7 @@ export class ScopeBuilder implements nodes.IVisitor {
 			case nodes.NodeType.Declarations:
 				this.addScope(node);
 				return true;
-			case nodes.NodeType.For: {
+			case nodes.NodeType.For:
 				const forNode = <nodes.ForStatement>node;
 				const scopeNode = forNode.getDeclarations();
 				if (scopeNode && forNode.variable) {
@@ -210,22 +180,13 @@ export class ScopeBuilder implements nodes.IVisitor {
 					);
 				}
 				return true;
-			}
 			case nodes.NodeType.Each: {
 				const eachNode = <nodes.EachStatement>node;
 				const scopeNode = eachNode.getDeclarations();
 				if (scopeNode) {
-					const variables = <nodes.Variable[]>(
-						eachNode.getVariables().getChildren()
-					);
+					const variables = <nodes.Variable[]>eachNode.getVariables().getChildren();
 					for (const variable of variables) {
-						this.addSymbolToChildScope(
-							scopeNode,
-							variable,
-							variable.getName(),
-							void 0,
-							nodes.ReferenceType.Variable,
-						);
+						this.addSymbolToChildScope(scopeNode, variable, variable.getName(), void 0, nodes.ReferenceType.Variable);
 					}
 				}
 				return true;
@@ -241,14 +202,7 @@ export class ScopeBuilder implements nodes.IVisitor {
 				if (child instanceof nodes.Selector) {
 					if (child.getChildren().length === 1) {
 						// only selectors with a single element can be extended
-						current.addSymbol(
-							new Symbol(
-								child.getChild(0)!.getText(),
-								void 0,
-								child,
-								nodes.ReferenceType.Rule,
-							),
-						);
+						current.addSymbol(new Symbol(child.getChild(0)!.getText(), void 0, child, nodes.ReferenceType.Rule));
 					}
 				}
 			}
@@ -256,9 +210,7 @@ export class ScopeBuilder implements nodes.IVisitor {
 		return true;
 	}
 
-	public visitVariableDeclarationNode(
-		node: nodes.VariableDeclaration,
-	): boolean {
+	public visitVariableDeclarationNode(node: nodes.VariableDeclaration): boolean {
 		const value = node.getValue() ? node.getValue()!.getText() : void 0;
 		this.addSymbol(node, node.getName(), value, nodes.ReferenceType.Variable);
 		return true;
@@ -266,42 +218,22 @@ export class ScopeBuilder implements nodes.IVisitor {
 
 	public visitFunctionParameterNode(node: nodes.FunctionParameter): boolean {
 		// parameters are part of the body scope
-		const scopeNode = (<nodes.BodyDeclaration>(
-			node.getParent()
-		)).getDeclarations();
+		const scopeNode = (<nodes.BodyDeclaration>node.getParent()).getDeclarations();
 		if (scopeNode) {
 			const valueNode = (<nodes.FunctionParameter>node).getDefaultValue();
 			const value = valueNode ? valueNode.getText() : void 0;
-			this.addSymbolToChildScope(
-				scopeNode,
-				node,
-				node.getName(),
-				value,
-				nodes.ReferenceType.Variable,
-			);
+			this.addSymbolToChildScope(scopeNode, node, node.getName(), value, nodes.ReferenceType.Variable);
 		}
 		return true;
 	}
 
-	public visitCustomPropertyDeclarationNode(
-		node: nodes.CustomPropertyDeclaration,
-	): boolean {
+	public visitCustomPropertyDeclarationNode(node: nodes.CustomPropertyDeclaration): boolean {
 		const value = node.getValue() ? node.getValue()!.getText() : "";
-		this.addCSSVariable(
-			node.getProperty()!,
-			node.getProperty()!.getName(),
-			value,
-			nodes.ReferenceType.Variable,
-		);
+		this.addCSSVariable(node.getProperty()!, node.getProperty()!.getName(), value, nodes.ReferenceType.Variable);
 		return true;
 	}
 
-	private addCSSVariable(
-		node: nodes.Node,
-		name: string,
-		value: string,
-		type: nodes.ReferenceType,
-	): void {
+	private addCSSVariable(node: nodes.Node, name: string, value: string, type: nodes.ReferenceType): void {
 		if (node.offset !== -1) {
 			this.scope.addSymbol(new Symbol(name, value, node, type));
 		}
@@ -316,10 +248,7 @@ export class Symbols {
 		node.acceptVisitor(new ScopeBuilder(this.global));
 	}
 
-	public findSymbolsAtOffset(
-		offset: number,
-		referenceType: nodes.ReferenceType,
-	): Symbol[] {
+	public findSymbolsAtOffset(offset: number, referenceType: nodes.ReferenceType): Symbol[] {
 		let scope = this.global.findScope(offset, 0);
 		const result: Symbol[] = [];
 		const names: { [name: string]: boolean } = {};
@@ -337,32 +266,17 @@ export class Symbols {
 		return result;
 	}
 
-	private internalFindSymbol(
-		node: nodes.Node,
-		referenceTypes: nodes.ReferenceType[],
-	): Symbol | null {
+	private internalFindSymbol(node: nodes.Node, referenceTypes: nodes.ReferenceType[]): Symbol | null {
 		let scopeNode: nodes.Node | undefined = node;
-		if (
-			node.parent instanceof nodes.FunctionParameter &&
-			node.parent.getParent() instanceof nodes.BodyDeclaration
-		) {
-			scopeNode = (<nodes.BodyDeclaration>(
-				node.parent.getParent()
-			)).getDeclarations();
+		if (node.parent instanceof nodes.FunctionParameter && node.parent.getParent() instanceof nodes.BodyDeclaration) {
+			scopeNode = (<nodes.BodyDeclaration>node.parent.getParent()).getDeclarations();
 		}
-		if (
-			node.parent instanceof nodes.FunctionArgument &&
-			node.parent.getParent() instanceof nodes.Function
-		) {
+		if (node.parent instanceof nodes.FunctionArgument && node.parent.getParent() instanceof nodes.Function) {
 			const funcId = (<nodes.Function>node.parent.getParent()).getIdentifier();
 			if (funcId) {
-				const functionSymbol = this.internalFindSymbol(funcId, [
-					nodes.ReferenceType.Function,
-				]);
+				const functionSymbol = this.internalFindSymbol(funcId, [nodes.ReferenceType.Function]);
 				if (functionSymbol) {
-					scopeNode = (<nodes.FunctionDeclaration>(
-						functionSymbol.node
-					)).getDeclarations();
+					scopeNode = (<nodes.FunctionDeclaration>functionSymbol.node).getDeclarations();
 				}
 			}
 		}
@@ -384,9 +298,7 @@ export class Symbols {
 		return null;
 	}
 
-	private evaluateReferenceTypes(
-		node: nodes.Node,
-	): nodes.ReferenceType[] | null {
+	private evaluateReferenceTypes(node: nodes.Node): nodes.ReferenceType[] | null {
 		if (node instanceof nodes.Identifier) {
 			const referenceTypes = (<nodes.Identifier>node).referenceTypes;
 			if (referenceTypes) {
@@ -400,8 +312,7 @@ export class Symbols {
 				if (decl) {
 					const propertyName = decl.getNonPrefixedPropertyName();
 					if (
-						(propertyName === "animation" ||
-							propertyName === "animation-name") &&
+						(propertyName === "animation" || propertyName === "animation-name") &&
 						decl.getValue() &&
 						decl.getValue()!.offset === node.offset
 					) {
@@ -412,10 +323,7 @@ export class Symbols {
 		} else if (node instanceof nodes.Variable) {
 			return [nodes.ReferenceType.Variable];
 		}
-		const selector = node.findAParent(
-			nodes.NodeType.Selector,
-			nodes.NodeType.ExtendsReference,
-		);
+		const selector = node.findAParent(nodes.NodeType.Selector, nodes.NodeType.ExtendsReference);
 		if (selector) {
 			return [nodes.ReferenceType.Rule];
 		}
@@ -457,11 +365,7 @@ export class Symbols {
 		return nodeSymbol === symbol;
 	}
 
-	public findSymbol(
-		name: string,
-		type: nodes.ReferenceType,
-		offset: number,
-	): Symbol | null {
+	public findSymbol(name: string, type: nodes.ReferenceType, offset: number): Symbol | null {
 		let scope = this.global.findScope(offset);
 		while (scope) {
 			const symbol = scope.getSymbol(name, type);

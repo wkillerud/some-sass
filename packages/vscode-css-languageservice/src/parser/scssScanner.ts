@@ -2,6 +2,8 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+"use strict";
+
 import { TokenType, Scanner, IToken } from "./cssScanner";
 
 const _FSL = "/".charCodeAt(0);
@@ -17,6 +19,7 @@ const _BNG = "!".charCodeAt(0);
 const _LAN = "<".charCodeAt(0);
 const _RAN = ">".charCodeAt(0);
 const _DOT = ".".charCodeAt(0);
+const _ATS = "@".charCodeAt(0);
 
 let customTokenValue = TokenType.CustomToken;
 

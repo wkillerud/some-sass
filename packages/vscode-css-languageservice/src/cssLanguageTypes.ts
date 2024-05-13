@@ -228,6 +228,7 @@ export interface LanguageServiceOptions {
 	clientCapabilities?: ClientCapabilities;
 }
 
+export type EntryStatus = "standard" | "experimental" | "nonstandard" | "obsolete";
 
 export interface IReference {
 	name: string;

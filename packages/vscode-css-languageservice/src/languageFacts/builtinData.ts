@@ -2,6 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+"use strict";
 
 export const positionKeywords: { [name: string]: string } = {
 	bottom:
@@ -16,8 +17,7 @@ export const positionKeywords: { [name: string]: string } = {
 
 export const repeatStyleKeywords: { [name: string]: string } = {
 	"no-repeat": "Placed once and not repeated in this direction.",
-	repeat:
-		"Repeated in this direction as often as needed to cover the background painting area.",
+	repeat: "Repeated in this direction as often as needed to cover the background painting area.",
 	"repeat-x": "Computes to ‘repeat no-repeat’.",
 	"repeat-y": "Computes to ‘no-repeat repeat’.",
 	round:
@@ -33,11 +33,9 @@ export const lineStyleKeywords: { [name: string]: string } = {
 	groove: "Looks as if it were carved in the canvas.",
 	hidden:
 		"Same as ‘none’, but has different behavior in the border conflict resolution rules for border-collapsed tables.",
-	inset:
-		"Looks as if the content on the inside of the border is sunken into the canvas.",
+	inset: "Looks as if the content on the inside of the border is sunken into the canvas.",
 	none: "No border. Color and width are ignored.",
-	outset:
-		"Looks as if the content on the inside of the border is coming out of the canvas.",
+	outset: "Looks as if the content on the inside of the border is coming out of the canvas.",
 	ridge: "Looks as if it were coming out of the canvas.",
 	solid: "A single line segment.",
 };
@@ -46,10 +44,8 @@ export const lineWidthKeywords = ["medium", "thick", "thin"];
 
 export const boxKeywords: { [name: string]: string } = {
 	"border-box": "The background is painted within (clipped to) the border box.",
-	"content-box":
-		"The background is painted within (clipped to) the content box.",
-	"padding-box":
-		"The background is painted within (clipped to) the padding box.",
+	"content-box": "The background is painted within (clipped to) the content box.",
+	"padding-box": "The background is painted within (clipped to) the padding box.",
 };
 
 export const geometryBoxKeywords: { [name: string]: string } = {
@@ -61,58 +57,41 @@ export const geometryBoxKeywords: { [name: string]: string } = {
 
 export const cssWideKeywords: { [name: string]: string } = {
 	initial: "Represents the value specified as the property’s initial value.",
-	inherit:
-		"Represents the computed value of the property on the element’s parent.",
-	unset:
-		"Acts as either `inherit` or `initial`, depending on whether the property is inherited or not.",
+	inherit: "Represents the computed value of the property on the element’s parent.",
+	unset: "Acts as either `inherit` or `initial`, depending on whether the property is inherited or not.",
 };
 
 export const cssWideFunctions: { [name: string]: string } = {
 	"var()": "Evaluates the value of a custom variable.",
-	"calc()":
-		"Evaluates an mathematical expression. The following operators can be used: + - * /.",
+	"calc()": "Evaluates an mathematical expression. The following operators can be used: + - * /.",
 };
 
 export const imageFunctions: { [name: string]: string } = {
 	"url()": "Reference an image file by URL",
 	"image()": "Provide image fallbacks and annotations.",
-	"-webkit-image-set()":
-		"Provide multiple resolutions. Remember to use unprefixed image-set() in addition.",
+	"-webkit-image-set()": "Provide multiple resolutions. Remember to use unprefixed image-set() in addition.",
 	"image-set()":
 		"Provide multiple resolutions of an image and const the UA decide which is most appropriate in a given situation.",
-	"-moz-element()":
-		"Use an element in the document as an image. Remember to use unprefixed element() in addition.",
+	"-moz-element()": "Use an element in the document as an image. Remember to use unprefixed element() in addition.",
 	"element()": "Use an element in the document as an image.",
-	"cross-fade()":
-		"Indicates the two images to be combined and how far along in the transition the combination is.",
-	"-webkit-gradient()":
-		"Deprecated. Use modern linear-gradient() or radial-gradient() instead.",
-	"-webkit-linear-gradient()":
-		"Linear gradient. Remember to use unprefixed version in addition.",
-	"-moz-linear-gradient()":
-		"Linear gradient. Remember to use unprefixed version in addition.",
-	"-o-linear-gradient()":
-		"Linear gradient. Remember to use unprefixed version in addition.",
+	"cross-fade()": "Indicates the two images to be combined and how far along in the transition the combination is.",
+	"-webkit-gradient()": "Deprecated. Use modern linear-gradient() or radial-gradient() instead.",
+	"-webkit-linear-gradient()": "Linear gradient. Remember to use unprefixed version in addition.",
+	"-moz-linear-gradient()": "Linear gradient. Remember to use unprefixed version in addition.",
+	"-o-linear-gradient()": "Linear gradient. Remember to use unprefixed version in addition.",
 	"linear-gradient()":
 		"A linear gradient is created by specifying a straight gradient line, and then several colors placed along that line.",
-	"-webkit-repeating-linear-gradient()":
-		"Repeating Linear gradient. Remember to use unprefixed version in addition.",
-	"-moz-repeating-linear-gradient()":
-		"Repeating Linear gradient. Remember to use unprefixed version in addition.",
-	"-o-repeating-linear-gradient()":
-		"Repeating Linear gradient. Remember to use unprefixed version in addition.",
+	"-webkit-repeating-linear-gradient()": "Repeating Linear gradient. Remember to use unprefixed version in addition.",
+	"-moz-repeating-linear-gradient()": "Repeating Linear gradient. Remember to use unprefixed version in addition.",
+	"-o-repeating-linear-gradient()": "Repeating Linear gradient. Remember to use unprefixed version in addition.",
 	"repeating-linear-gradient()":
 		"Same as linear-gradient, except the color-stops are repeated infinitely in both directions, with their positions shifted by multiples of the difference between the last specified color-stop’s position and the first specified color-stop’s position.",
-	"-webkit-radial-gradient()":
-		"Radial gradient. Remember to use unprefixed version in addition.",
-	"-moz-radial-gradient()":
-		"Radial gradient. Remember to use unprefixed version in addition.",
+	"-webkit-radial-gradient()": "Radial gradient. Remember to use unprefixed version in addition.",
+	"-moz-radial-gradient()": "Radial gradient. Remember to use unprefixed version in addition.",
 	"radial-gradient()":
 		"Colors emerge from a single point and smoothly spread outward in a circular or elliptical shape.",
-	"-webkit-repeating-radial-gradient()":
-		"Repeating radial gradient. Remember to use unprefixed version in addition.",
-	"-moz-repeating-radial-gradient()":
-		"Repeating radial gradient. Remember to use unprefixed version in addition.",
+	"-webkit-repeating-radial-gradient()": "Repeating radial gradient. Remember to use unprefixed version in addition.",
+	"-moz-repeating-radial-gradient()": "Repeating radial gradient. Remember to use unprefixed version in addition.",
 	"repeating-radial-gradient()":
 		"Same as radial-gradient, except the color-stops are repeated infinitely in both directions, with their positions shifted by multiples of the difference between the last specified color-stop’s position and the first specified color-stop’s position.",
 };
@@ -132,45 +111,27 @@ export const transitionTimingFunctions: { [name: string]: string } = {
 	"cubic-bezier(0.6, -0.28, 0.735, 0.045)": "Ease-in Back. Overshoots.",
 	"cubic-bezier(0.68, -0.55, 0.265, 1.55)": "Ease-in-out Back. Overshoots.",
 	"cubic-bezier(0.175, 0.885, 0.32, 1.275)": "Ease-out Back. Overshoots.",
-	"cubic-bezier(0.6, 0.04, 0.98, 0.335)":
-		"Ease-in Circular. Based on half circle.",
-	"cubic-bezier(0.785, 0.135, 0.15, 0.86)":
-		"Ease-in-out Circular. Based on half circle.",
-	"cubic-bezier(0.075, 0.82, 0.165, 1)":
-		"Ease-out Circular. Based on half circle.",
-	"cubic-bezier(0.55, 0.055, 0.675, 0.19)":
-		"Ease-in Cubic. Based on power of three.",
-	"cubic-bezier(0.645, 0.045, 0.355, 1)":
-		"Ease-in-out Cubic. Based on power of three.",
-	"cubic-bezier(0.215, 0.610, 0.355, 1)":
-		"Ease-out Cubic. Based on power of three.",
-	"cubic-bezier(0.95, 0.05, 0.795, 0.035)":
-		"Ease-in Exponential. Based on two to the power ten.",
-	"cubic-bezier(1, 0, 0, 1)":
-		"Ease-in-out Exponential. Based on two to the power ten.",
-	"cubic-bezier(0.19, 1, 0.22, 1)":
-		"Ease-out Exponential. Based on two to the power ten.",
+	"cubic-bezier(0.6, 0.04, 0.98, 0.335)": "Ease-in Circular. Based on half circle.",
+	"cubic-bezier(0.785, 0.135, 0.15, 0.86)": "Ease-in-out Circular. Based on half circle.",
+	"cubic-bezier(0.075, 0.82, 0.165, 1)": "Ease-out Circular. Based on half circle.",
+	"cubic-bezier(0.55, 0.055, 0.675, 0.19)": "Ease-in Cubic. Based on power of three.",
+	"cubic-bezier(0.645, 0.045, 0.355, 1)": "Ease-in-out Cubic. Based on power of three.",
+	"cubic-bezier(0.215, 0.610, 0.355, 1)": "Ease-out Cubic. Based on power of three.",
+	"cubic-bezier(0.95, 0.05, 0.795, 0.035)": "Ease-in Exponential. Based on two to the power ten.",
+	"cubic-bezier(1, 0, 0, 1)": "Ease-in-out Exponential. Based on two to the power ten.",
+	"cubic-bezier(0.19, 1, 0.22, 1)": "Ease-out Exponential. Based on two to the power ten.",
 	"cubic-bezier(0.47, 0, 0.745, 0.715)": "Ease-in Sine.",
 	"cubic-bezier(0.445, 0.05, 0.55, 0.95)": "Ease-in-out Sine.",
 	"cubic-bezier(0.39, 0.575, 0.565, 1)": "Ease-out Sine.",
-	"cubic-bezier(0.55, 0.085, 0.68, 0.53)":
-		"Ease-in Quadratic. Based on power of two.",
-	"cubic-bezier(0.455, 0.03, 0.515, 0.955)":
-		"Ease-in-out Quadratic. Based on power of two.",
-	"cubic-bezier(0.25, 0.46, 0.45, 0.94)":
-		"Ease-out Quadratic. Based on power of two.",
-	"cubic-bezier(0.895, 0.03, 0.685, 0.22)":
-		"Ease-in Quartic. Based on power of four.",
-	"cubic-bezier(0.77, 0, 0.175, 1)":
-		"Ease-in-out Quartic. Based on power of four.",
-	"cubic-bezier(0.165, 0.84, 0.44, 1)":
-		"Ease-out Quartic. Based on power of four.",
-	"cubic-bezier(0.755, 0.05, 0.855, 0.06)":
-		"Ease-in Quintic. Based on power of five.",
-	"cubic-bezier(0.86, 0, 0.07, 1)":
-		"Ease-in-out Quintic. Based on power of five.",
-	"cubic-bezier(0.23, 1, 0.320, 1)":
-		"Ease-out Quintic. Based on power of five.",
+	"cubic-bezier(0.55, 0.085, 0.68, 0.53)": "Ease-in Quadratic. Based on power of two.",
+	"cubic-bezier(0.455, 0.03, 0.515, 0.955)": "Ease-in-out Quadratic. Based on power of two.",
+	"cubic-bezier(0.25, 0.46, 0.45, 0.94)": "Ease-out Quadratic. Based on power of two.",
+	"cubic-bezier(0.895, 0.03, 0.685, 0.22)": "Ease-in Quartic. Based on power of four.",
+	"cubic-bezier(0.77, 0, 0.175, 1)": "Ease-in-out Quartic. Based on power of four.",
+	"cubic-bezier(0.165, 0.84, 0.44, 1)": "Ease-out Quartic. Based on power of four.",
+	"cubic-bezier(0.755, 0.05, 0.855, 0.06)": "Ease-in Quintic. Based on power of five.",
+	"cubic-bezier(0.86, 0, 0.07, 1)": "Ease-in-out Quintic. Based on power of five.",
+	"cubic-bezier(0.23, 1, 0.320, 1)": "Ease-out Quintic. Based on power of five.",
 };
 
 export const basicShapeFunctions: { [name: string]: string } = {

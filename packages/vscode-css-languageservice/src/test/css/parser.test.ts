@@ -15,14 +15,21 @@ export function assertNode(text: string, parser: Parser, f: (...args: any[]) => 
 	assert.ok(node !== null, "no node returned");
 	const markers = nodes.ParseErrorCollector.entries(node);
 	if (markers.length > 0) {
-		assert.ok(
-			false,
-			"node has errors: " +
-				markers[0].getMessage() +
-				", offset: " +
-				markers[0].getNode().offset +
-				" when parsing " +
-				text,
+		assert.fail(
+			`${text} has errors: ` +
+				markers
+					.map((marker) => {
+						const offset = marker.getOffset();
+						const before = text.substring(0, offset);
+						const problem = text.charAt(offset);
+						const after = text.substring(offset + 1);
+
+						return `
+${marker.getMessage()} at offset ${marker.getOffset()} (👉 follow us 👈)
+
+${before}👉👉👉${problem}👈👈👈${after}`;
+					})
+					.join("\n"),
 		);
 	}
 	assert.ok(parser.accept(TokenType.EOF), "Expect scanner at EOF");

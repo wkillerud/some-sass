@@ -32,7 +32,10 @@ export class Parser {
 
 	private lastErrorToken?: IToken;
 
+	dialect;
+
 	constructor({ scanner, dialect }: ParserOptions = {}) {
+		this.dialect = dialect;
 		this.scanner = scanner || new Scanner({ dialect });
 		this.token = { type: TokenType.EOF, offset: -1, len: 0, text: "" };
 		this.prevToken = undefined!;
@@ -418,6 +421,10 @@ export class Parser {
 	}
 
 	public _needsSemicolonAfter(node: nodes.Node): boolean {
+		if (this.dialect === "indented") {
+			return false;
+		}
+
 		switch (node.type) {
 			case nodes.NodeType.Keyframe:
 			case nodes.NodeType.ViewPort:
@@ -453,13 +460,13 @@ export class Parser {
 
 	public _parseDeclarations(parseDeclaration: () => nodes.Node | null): nodes.Declarations | null {
 		const node = this.create(nodes.Declarations);
-		if (!this.accept(TokenType.CurlyL)) {
+		if (!this.accept(TokenType.CurlyL) && !(this.accept(TokenType.Newline) && this.accept(TokenType.Indent))) {
 			return null;
 		}
 
 		let decl = parseDeclaration();
 		while (node.addChild(decl)) {
-			if (this.peek(TokenType.CurlyR)) {
+			if (this.peek(TokenType.CurlyR) || this.peek(TokenType.Dedent)) {
 				break;
 			}
 			if (this._needsSemicolonAfter(decl) && !this.accept(TokenType.SemiColon)) {
@@ -472,17 +479,40 @@ export class Parser {
 			while (this.accept(TokenType.SemiColon)) {
 				// accept empty statements
 			}
+			if (this.dialect === "indented") {
+				while (this.accept(TokenType.Newline)) {
+					// accept empty statements
+				}
+			}
 			decl = parseDeclaration();
 		}
 
-		if (!this.accept(TokenType.CurlyR)) {
-			return this.finish(node, ParseError.RightCurlyExpected, [TokenType.CurlyR, TokenType.SemiColon]);
+		if (this.dialect === "indented") {
+			if (this.accept(TokenType.EOF)) {
+				return this.finish(node);
+			}
+			if (!this.accept(TokenType.Newline)) {
+				return this.finish(node, ParseError.NewlineExpected, [TokenType.Dedent]);
+			}
+			if (this.accept(TokenType.EOF)) {
+				return this.finish(node);
+			}
+			if (!this.accept(TokenType.Dedent)) {
+				return this.finish(node, ParseError.DedentExpected, [TokenType.Newline, TokenType.Indent]);
+			}
+		} else {
+			if (!this.accept(TokenType.CurlyR)) {
+				return this.finish(node, ParseError.RightCurlyExpected, [TokenType.CurlyR, TokenType.SemiColon]);
+			}
 		}
 		return this.finish(node);
 	}
 
 	public _parseBody<T extends nodes.BodyDeclaration>(node: T, parseDeclaration: () => nodes.Node | null): T {
 		if (!node.setDeclarations(this._parseDeclarations(parseDeclaration))) {
+			if (this.dialect === "indented") {
+				return this.finish(node, ParseError.IndentExpected, [TokenType.Dedent]);
+			}
 			return this.finish(node, ParseError.LeftCurlyExpected, [TokenType.CurlyR, TokenType.SemiColon]);
 		}
 		return this.finish(node);

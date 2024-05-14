@@ -21,6 +21,9 @@ export enum TokenType {
 	SemiColon,
 	CurlyL,
 	CurlyR,
+	Indent,
+	Dedent,
+	Newline, // Acts as the end of a statement in the indented syntax
 	ParenthesisL,
 	ParenthesisR,
 	BracketL,
@@ -62,6 +65,17 @@ export class MultiLineStream {
 	private source: string;
 	private len: number;
 	private position: number;
+
+	// Used by the indented dialect to keep track of indents and dedents
+	private _depth: number = 0;
+	get depth() {
+		return this._depth;
+	}
+
+	set depth(value: number) {
+		console.log(`depth ${value}`);
+		this._depth = value;
+	}
 
 	constructor(source: string) {
 		this.source = source;
@@ -229,6 +243,7 @@ export class Scanner {
 	public ignoreWhitespace = true;
 	public inURL = false;
 
+	previousToken: IToken | null = null;
 	dialect;
 
 	constructor({ dialect }: ScannerOptions = {}) {
@@ -240,12 +255,14 @@ export class Scanner {
 	}
 
 	public finishToken(offset: number, type: TokenType, text?: string): IToken {
-		return {
+		const token = {
 			offset: offset,
 			len: this.stream.pos() - offset,
 			type: type,
 			text: text || this.stream.substring(offset),
 		};
+		this.previousToken = token;
+		return token;
 	}
 
 	public substring(offset: number, len: number): string {
@@ -418,16 +435,42 @@ export class Scanner {
 	protected trivia(): IToken | null {
 		while (true) {
 			const offset = this.stream.pos();
-			if (this._whitespace()) {
-				if (!this.ignoreWhitespace) {
-					return this.finishToken(offset, TokenType.Whitespace);
+			if (this.dialect === "indented") {
+				// SassScanner needs to know the amount of whitespace right after a newline
+				// to figure out indents and dedents, so only advance here if the previous
+				// token is not a Newline.
+				if (this.previousToken && this.previousToken.type === TokenType.Newline) {
+					if (this.comment()) {
+						if (!this.ignoreComment) {
+							return this.finishToken(offset, TokenType.Comment);
+						}
+					}
+					return null;
 				}
-			} else if (this.comment()) {
-				if (!this.ignoreComment) {
-					return this.finishToken(offset, TokenType.Comment);
+				const n = this.stream.advanceWhileChar((ch) => {
+					return ch === _WSP || ch === _TAB;
+				});
+				if (n > 0 && !this.ignoreWhitespace) {
+					return this.finishToken(offset, TokenType.Whitespace);
+				} else if (this.comment()) {
+					if (!this.ignoreComment) {
+						return this.finishToken(offset, TokenType.Comment);
+					}
+				} else {
+					return null;
 				}
 			} else {
-				return null;
+				if (this._whitespace()) {
+					if (!this.ignoreWhitespace) {
+						return this.finishToken(offset, TokenType.Whitespace);
+					}
+				} else if (this.comment()) {
+					if (!this.ignoreComment) {
+						return this.finishToken(offset, TokenType.Comment);
+					}
+				} else {
+					return null;
+				}
 			}
 		}
 	}

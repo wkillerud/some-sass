@@ -10,6 +10,8 @@ const _FSL = "/".charCodeAt(0);
 const _NWL = "\n".charCodeAt(0);
 const _CAR = "\r".charCodeAt(0);
 const _LFD = "\f".charCodeAt(0);
+const _WSP = " ".charCodeAt(0);
+const _TAB = "\t".charCodeAt(0);
 
 const _DLR = "$".charCodeAt(0);
 const _HSH = "#".charCodeAt(0);
@@ -79,6 +81,29 @@ export class SassScanner extends Scanner {
 		// ellipis
 		if (this.stream.advanceIfChars([_DOT, _DOT, _DOT])) {
 			return this.finishToken(offset, Ellipsis);
+		}
+
+		// indents and dedents for the indented syntax
+		if (this.dialect === "indented") {
+			let n = this.stream.advanceWhileChar((ch) => {
+				return ch === _NWL || ch === _LFD || ch === _CAR;
+			});
+			if (n > 0) {
+				return this.finishToken(offset, TokenType.Newline);
+			}
+			if (this.previousToken && this.previousToken.type === TokenType.Newline) {
+				n = this.stream.advanceWhileChar((ch) => {
+					return ch === _TAB || ch === _WSP;
+				});
+
+				if (n > this.stream.depth) {
+					this.stream.depth = n;
+					return this.finishToken(offset, TokenType.Indent);
+				} else if (n < this.stream.depth) {
+					this.stream.depth = n;
+					return this.finishToken(offset, TokenType.Dedent);
+				}
+			}
 		}
 
 		return super.scanNext(offset);

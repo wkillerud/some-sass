@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 "use strict";
-import { TokenType, Scanner, IToken } from "./cssScanner";
+import { TokenType, Scanner, IToken, ScannerOptions } from "./cssScanner";
 import * as nodes from "./cssNodes";
 import { ParseError, CSSIssueType } from "./cssErrors";
 import * as languageFacts from "../languageFacts/facts";
@@ -15,6 +15,10 @@ export interface IMark {
 	curr: IToken;
 	pos: number;
 }
+
+export type ParserOptions = ScannerOptions & {
+	scanner?: Scanner;
+};
 
 /// <summary>
 /// A parser for the css core specification. See for reference:
@@ -28,8 +32,8 @@ export class Parser {
 
 	private lastErrorToken?: IToken;
 
-	constructor(scnr: Scanner = new Scanner()) {
-		this.scanner = scnr;
+	constructor({ scanner, dialect }: ParserOptions = {}) {
+		this.scanner = scanner || new Scanner({ dialect });
 		this.token = { type: TokenType.EOF, offset: -1, len: 0, text: "" };
 		this.prevToken = undefined!;
 	}

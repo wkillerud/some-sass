@@ -5,13 +5,13 @@
 "use strict";
 import { suite, test } from "vitest";
 
-import { SCSSParser } from "../../parser/scssParser";
+import { SassParser } from "../../parser/sassParser";
 import { assertColor } from "../css/languageFacts.test";
 import { colorFrom256RGB as newColor } from "../../languageFacts/facts";
 
 suite("SCSS - Language facts", () => {
 	test("is color", function () {
-		let parser = new SCSSParser();
+		let parser = new SassParser();
 		assertColor(parser, "#main { color: foo(red) }", "red", newColor(0xff, 0, 0));
 		assertColor(parser, "#main { color: red() }", "red", null);
 		assertColor(parser, "#main { red { nested: 1px } }", "red", null);

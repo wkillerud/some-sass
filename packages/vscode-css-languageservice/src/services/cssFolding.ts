@@ -6,7 +6,7 @@
 
 import { TextDocument, FoldingRange, FoldingRangeKind } from "../cssLanguageTypes";
 import { TokenType, Scanner, IToken } from "../parser/cssScanner";
-import { SCSSScanner, InterpolationFunction } from "../parser/scssScanner";
+import { SassScanner, InterpolationFunction } from "../parser/sassScanner";
 
 type DelimiterType = "brace" | "comment";
 type Delimiter = { line: number; type: DelimiterType; isStart: boolean };
@@ -26,7 +26,7 @@ function computeFoldingRanges(document: TextDocument): FoldingRange[] {
 	function getScanner() {
 		switch (document.languageId) {
 			case "scss":
-				return new SCSSScanner();
+				return new SassScanner();
 			default:
 				return new Scanner();
 		}

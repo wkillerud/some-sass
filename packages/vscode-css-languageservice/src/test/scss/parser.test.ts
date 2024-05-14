@@ -6,15 +6,15 @@
 "use strict";
 import { suite, test } from "vitest";
 
-import { SCSSParser } from "../../parser/scssParser";
+import { SassParser } from "../../parser/sassParser";
 import { ParseError } from "../../parser/cssErrors";
-import { SCSSParseError } from "../../parser/scssErrors";
+import { SassParseError } from "../../parser/sassErrors";
 
 import { assertNode, assertError } from "../css/parser.test";
 
 suite("SCSS - Parser", () => {
 	test("Comments", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode(" a { b:  /* comment */ c }", parser, parser._parseStylesheet.bind(parser));
 		assertNode(
 			" a { b: /* comment \n * is several\n * lines long\n */ c }",
@@ -25,14 +25,14 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("Variable", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("$color", parser, parser._parseVariable.bind(parser));
 		assertNode("$co42lor", parser, parser._parseVariable.bind(parser));
 		assertNode("$-co42lor", parser, parser._parseVariable.bind(parser));
 	});
 
 	test("Module variable", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("module.$color", parser, parser._parseModuleMember.bind(parser));
 		assertNode("module.$co42lor", parser, parser._parseModuleMember.bind(parser));
 		assertNode("module.$-co42lor", parser, parser._parseModuleMember.bind(parser));
@@ -42,7 +42,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("VariableDeclaration", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("$color: #F5F5F5", parser, parser._parseVariableDeclaration.bind(parser));
 		assertNode("$color: 0", parser, parser._parseVariableDeclaration.bind(parser));
 		assertNode("$color: 255", parser, parser._parseVariableDeclaration.bind(parser));
@@ -74,7 +74,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("Expr", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("($const + 20)", parser, parser._parseExpr.bind(parser));
 		assertNode("($const - 20)", parser, parser._parseExpr.bind(parser));
 		assertNode("($const * 20)", parser, parser._parseExpr.bind(parser));
@@ -150,7 +150,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("SCSSOperator", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode(">=", parser, parser._parseOperator.bind(parser));
 		assertNode(">", parser, parser._parseOperator.bind(parser));
 		assertNode("<", parser, parser._parseOperator.bind(parser));
@@ -167,7 +167,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("Interpolation", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		// assertNode('#{red}', parser, parser._parseIdent.bind(parser));
 		// assertNode('#{$color}', parser, parser._parseIdent.bind(parser));
 		// assertNode('#{3 + 4}', parser, parser._parseIdent.bind(parser));
@@ -204,7 +204,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("Declaration", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("border: thin solid 1px", parser, parser._parseDeclaration.bind(parser));
 		assertNode("dummy: $color", parser, parser._parseDeclaration.bind(parser));
 		assertNode("dummy: blue", parser, parser._parseDeclaration.bind(parser));
@@ -303,7 +303,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("Stylesheet", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("$color: #F5F5F5;", parser, parser._parseStylesheet.bind(parser));
 		assertNode("$color: #F5F5F5; $color: #F5F5F5;", parser, parser._parseStylesheet.bind(parser));
 		assertNode("$color: #F5F5F5; $color: #F5F5F5; $color: #F5F5F5;", parser, parser._parseStylesheet.bind(parser));
@@ -345,7 +345,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@import", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode('@import "test.css"', parser, parser._parseImport.bind(parser));
 		assertNode('@import url("test.css")', parser, parser._parseImport.bind(parser));
 		assertNode('@import "test.css", "bar.css"', parser, parser._parseImport.bind(parser));
@@ -364,12 +364,12 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@layer", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("@layer #{$layer} { }", parser, parser._parseLayer.bind(parser));
 	});
 
 	test("@container", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode(
 			`@container (min-width: #{$minWidth}) { .scss-interpolation { line-height: 10cqh; } }`,
 			parser,
@@ -388,7 +388,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@use", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode('@use "test"', parser, parser._parseUse.bind(parser));
 		assertNode('@use "test" as foo', parser, parser._parseUse.bind(parser));
 		assertNode('@use "test" as *', parser, parser._parseUse.bind(parser));
@@ -420,7 +420,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@forward", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode('@forward "test"', parser, parser._parseForward.bind(parser));
 		assertNode('@forward "test" as foo-*', parser, parser._parseForward.bind(parser));
 		assertNode('@forward "test" hide this', parser, parser._parseForward.bind(parser));
@@ -468,7 +468,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@media", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode(
 			"@media screen { .sidebar { @media (orientation: landscape) { width: 500px; } } }",
 			parser,
@@ -571,7 +571,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@keyframe", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("@keyframes name { @content; }", parser, parser._parseKeyframe.bind(parser));
 		assertNode(
 			"@keyframes name { @for $i from 0 through $steps { #{$i * (100%/$steps)} { transform: $rotate $translate; } } }",
@@ -594,7 +594,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@extend", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode(".themable { @extend %theme; }", parser, parser._parseStylesheet.bind(parser));
 		assertNode("foo { @extend .error; border-width: 3px; }", parser, parser._parseStylesheet.bind(parser));
 		assertNode("a.important { @extend .notice !optional; }", parser, parser._parseStylesheet.bind(parser));
@@ -628,7 +628,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@debug", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("@debug test;", parser, parser._parseStylesheet.bind(parser));
 		assertNode("foo { @debug 1 + 4; nested { @warn 1 4; } }", parser, parser._parseStylesheet.bind(parser));
 		assertNode("@if $foo == 1 { @debug 1 + 4 }", parser, parser._parseStylesheet.bind(parser));
@@ -640,7 +640,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@if", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("@if 1 + 1 == 2 { border: 1px solid;  }", parser, parser._parseRuleSetDeclaration.bind(parser));
 		assertNode("@if 5 < 3      { border: 2px dotted; }", parser, parser._parseRuleSetDeclaration.bind(parser));
 		assertNode("@if null       { border: 3px double; }", parser, parser._parseRuleSetDeclaration.bind(parser));
@@ -716,7 +716,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@for", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode(
 			"@for $i from 1 to 5 { .item-#{$i} { width: 2em * $i; }  }",
 			parser,
@@ -729,12 +729,12 @@ suite("SCSS - Parser", () => {
 			parser._parseRuleSetDeclaration.bind(parser),
 			ParseError.VariableNameExpected,
 		);
-		assertError("@for $i to 4 {}", parser, parser._parseRuleSetDeclaration.bind(parser), SCSSParseError.FromExpected);
+		assertError("@for $i to 4 {}", parser, parser._parseRuleSetDeclaration.bind(parser), SassParseError.FromExpected);
 		assertError(
 			"@for $i from 0 by 4 {}",
 			parser,
 			parser._parseRuleSetDeclaration.bind(parser),
-			SCSSParseError.ThroughOrToExpected,
+			SassParseError.ThroughOrToExpected,
 		);
 		assertError("@for $i from {}", parser, parser._parseRuleSetDeclaration.bind(parser), ParseError.ExpressionExpected);
 		assertError(
@@ -751,7 +751,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@each", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("@each $i in 1, 2, 3 { }", parser, parser._parseRuleSetDeclaration.bind(parser));
 		assertNode("@each $i in 1 2 3 { }", parser, parser._parseRuleSetDeclaration.bind(parser));
 		assertNode(
@@ -765,7 +765,7 @@ suite("SCSS - Parser", () => {
 			parser._parseRuleSetDeclaration.bind(parser),
 			ParseError.VariableNameExpected,
 		);
-		assertError("@each $i from 4 {}", parser, parser._parseRuleSetDeclaration.bind(parser), SCSSParseError.InExpected);
+		assertError("@each $i from 4 {}", parser, parser._parseRuleSetDeclaration.bind(parser), SassParseError.InExpected);
 		assertError("@each $i in {}", parser, parser._parseRuleSetDeclaration.bind(parser), ParseError.ExpressionExpected);
 		assertError(
 			"@each $animal,  in (1, 1, 1), (2, 2, 2) {}",
@@ -776,7 +776,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@while", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode(
 			"@while $i < 0 { .item-#{$i} { width: 2em * $i; } $i: $i - 2; }",
 			parser,
@@ -793,7 +793,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@mixin", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode(
 			"@mixin large-text { font: { family: Arial; size: 20px; } color: #ff0000; }",
 			parser,
@@ -829,13 +829,13 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@content", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("@content", parser, parser._parseMixinContent.bind(parser));
 		assertNode("@content($type)", parser, parser._parseMixinContent.bind(parser));
 	});
 
 	test("@include", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("p { @include sexy-border(blue); }", parser, parser._parseStylesheet.bind(parser));
 		assertNode(
 			".shadows { @include box-shadow(0px 4px 5px #666, 2px 6px 10px #999); }",
@@ -924,7 +924,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@function", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode(
 			"@function grid-width($n) { @return $n * $grid-width + ($n - 1) * $gutter-width; }",
 			parser,
@@ -982,7 +982,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@at-root", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode(
 			"@mixin unify-parent($child) { @at-root #{selector.unify(&, $child)} { }}",
 			parser,
@@ -1002,7 +1002,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("Ruleset", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode(".selector { prop: erty $const 1px; }", parser, parser._parseRuleset.bind(parser));
 		assertNode(".selector { prop: erty $const 1px m.$foo; }", parser, parser._parseRuleset.bind(parser));
 		assertNode("selector:active { property:value; nested:hover {}}", parser, parser._parseRuleset.bind(parser));
@@ -1021,7 +1021,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("Nested Ruleset", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode(
 			".class1 { $const: 1; .class { $const: 2; three: $const; const: 3; } one: $const; }",
 			parser,
@@ -1053,7 +1053,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("Selector Interpolation", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode(".#{$name} { }", parser, parser._parseRuleset.bind(parser));
 		assertNode(".#{$name}-foo { }", parser, parser._parseRuleset.bind(parser));
 		assertNode(".#{$name}-foo-3 { }", parser, parser._parseRuleset.bind(parser));
@@ -1079,7 +1079,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("Parent Selector", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("&:hover", parser, parser._parseSimpleSelector.bind(parser));
 		assertNode("&.float", parser, parser._parseSimpleSelector.bind(parser));
 		assertNode("&-bar", parser, parser._parseSimpleSelector.bind(parser));
@@ -1091,19 +1091,19 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("Selector Placeholder", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("%hover", parser, parser._parseSimpleSelector.bind(parser));
 		assertNode("a%float", parser, parser._parseSimpleSelector.bind(parser));
 	});
 
 	test("Map", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("(key1: 1px, key2: solid + px, key3: (2+3))", parser, parser._parseExpr.bind(parser));
 		assertNode("($key1 + 3: 1px)", parser, parser._parseExpr.bind(parser));
 	});
 
 	test("Url", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("url(foo())", parser, parser._parseURILiteral.bind(parser));
 		assertNode(
 			"url('data:image/svg+xml;utf8,%3Csvg%20fill%3D%22%23' + $color + 'foo')",
@@ -1138,7 +1138,7 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@font-face", function () {
-		const parser = new SCSSParser();
+		const parser = new SassParser();
 		assertNode("@font-face {}", parser, parser._parseFontFace.bind(parser));
 		assertNode("@font-face { src: url(http://test) }", parser, parser._parseFontFace.bind(parser));
 		assertNode("@font-face { font-style: normal; font-stretch: normal; }", parser, parser._parseFontFace.bind(parser));

@@ -3,21 +3,21 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 "use strict";
-import * as scssScanner from "./scssScanner";
-import { TokenType } from "./cssScanner";
+import * as scssScanner from "./sassScanner";
+import { ScannerOptions, TokenType } from "./cssScanner";
 import * as cssParser from "./cssParser";
 import * as nodes from "./cssNodes";
 
-import { SCSSParseError } from "./scssErrors";
+import { SassParseError } from "./sassErrors";
 import { ParseError } from "./cssErrors";
 
 /// <summary>
 /// A parser for scss
 /// http://sass-lang.com/documentation/file.SASS_REFERENCE.html
 /// </summary>
-export class SCSSParser extends cssParser.Parser {
-	public constructor() {
-		super(new scssScanner.SCSSScanner());
+export class SassParser extends cssParser.Parser {
+	public constructor({ dialect }: ScannerOptions = {}) {
+		super({ dialect, scanner: new scssScanner.SassScanner({ dialect }) });
 	}
 
 	public _parseStylesheetStatement(isNested: boolean = false): nodes.Node | null {
@@ -475,13 +475,13 @@ export class SCSSParser extends cssParser.Parser {
 			return this.finish(node, ParseError.VariableNameExpected, [TokenType.CurlyR]);
 		}
 		if (!this.acceptIdent("from")) {
-			return this.finish(node, SCSSParseError.FromExpected, [TokenType.CurlyR]);
+			return this.finish(node, SassParseError.FromExpected, [TokenType.CurlyR]);
 		}
 		if (!node.addChild(this._parseBinaryExpr())) {
 			return this.finish(node, ParseError.ExpressionExpected, [TokenType.CurlyR]);
 		}
 		if (!this.acceptIdent("to") && !this.acceptIdent("through")) {
-			return this.finish(node, SCSSParseError.ThroughOrToExpected, [TokenType.CurlyR]);
+			return this.finish(node, SassParseError.ThroughOrToExpected, [TokenType.CurlyR]);
 		}
 		if (!node.addChild(this._parseBinaryExpr())) {
 			return this.finish(node, ParseError.ExpressionExpected, [TokenType.CurlyR]);
@@ -508,7 +508,7 @@ export class SCSSParser extends cssParser.Parser {
 		}
 		this.finish(variables);
 		if (!this.acceptIdent("in")) {
-			return this.finish(node, SCSSParseError.InExpected, [TokenType.CurlyR]);
+			return this.finish(node, SassParseError.InExpected, [TokenType.CurlyR]);
 		}
 		if (!node.addChild(this._parseExpr())) {
 			return this.finish(node, ParseError.ExpressionExpected, [TokenType.CurlyR]);

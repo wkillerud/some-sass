@@ -8,7 +8,7 @@ import * as nodes from "./cssNodes";
 
 import * as l10n from "@vscode/l10n";
 
-export class SCSSIssueType implements nodes.IRule {
+export class SassIssueType implements nodes.IRule {
 	id: string;
 	message: string;
 
@@ -18,8 +18,8 @@ export class SCSSIssueType implements nodes.IRule {
 	}
 }
 
-export const SCSSParseError = {
-	FromExpected: new SCSSIssueType("scss-fromexpected", l10n.t("'from' expected")),
-	ThroughOrToExpected: new SCSSIssueType("scss-throughexpected", l10n.t("'through' or 'to' expected")),
-	InExpected: new SCSSIssueType("scss-fromexpected", l10n.t("'in' expected")),
+export const SassParseError = {
+	FromExpected: new SassIssueType("scss-fromexpected", l10n.t("'from' expected")),
+	ThroughOrToExpected: new SassIssueType("scss-throughexpected", l10n.t("'through' or 'to' expected")),
+	InExpected: new SassIssueType("scss-fromexpected", l10n.t("'in' expected")),
 };

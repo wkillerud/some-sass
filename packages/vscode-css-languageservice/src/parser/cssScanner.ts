@@ -219,11 +219,21 @@ staticUnitTable["cqb"] = TokenType.ContainerQueryLength;
 staticUnitTable["cqmin"] = TokenType.ContainerQueryLength;
 staticUnitTable["cqmax"] = TokenType.ContainerQueryLength;
 
+export type ScannerOptions = {
+	dialect?: "indented";
+};
+
 export class Scanner {
 	public stream: MultiLineStream = new MultiLineStream("");
 	public ignoreComment = true;
 	public ignoreWhitespace = true;
 	public inURL = false;
+
+	dialect;
+
+	constructor({ dialect }: ScannerOptions = {}) {
+		this.dialect = dialect;
+	}
 
 	public setSource(input: string): void {
 		this.stream = new MultiLineStream(input);

@@ -6,12 +6,12 @@
 import { suite, test } from "vitest";
 
 import { TextDocument } from "../../cssLanguageTypes";
-import { SCSSParser } from "../../parser/scssParser";
+import { SassParser } from "../../parser/sassParser";
 import { Rule, Rules } from "../../services/lintRules";
 import { assertEntries } from "../css/lint.test";
 
 function assertFontFace(input: string, ...rules: Rule[]): void {
-	let p = new SCSSParser();
+	let p = new SassParser();
 	let document = TextDocument.create("test://test/test.scss", "scss", 0, input);
 	let node = p.internalParse(input, p._parseFontFace)!;
 
@@ -19,7 +19,7 @@ function assertFontFace(input: string, ...rules: Rule[]): void {
 }
 
 function assertRuleSet(input: string, ...rules: Rule[]): void {
-	let p = new SCSSParser();
+	let p = new SassParser();
 	let document = TextDocument.create("test://test/test.scss", "scss", 0, input);
 	let node = p.internalParse(input, p._parseRuleset)!;
 	assertEntries(node, document, rules);

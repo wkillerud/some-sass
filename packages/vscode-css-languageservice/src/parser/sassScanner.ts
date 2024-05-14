@@ -33,7 +33,7 @@ export const SmallerEqualsOperator: TokenType = customTokenValue++;
 export const Ellipsis: TokenType = customTokenValue++;
 export const Module: TokenType = customTokenValue++;
 
-export class SCSSScanner extends Scanner {
+export class SassScanner extends Scanner {
 	protected scanNext(offset: number): IToken {
 		// scss variable
 		if (this.stream.advanceIfChar(_DLR)) {

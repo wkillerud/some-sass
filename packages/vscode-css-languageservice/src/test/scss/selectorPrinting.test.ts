@@ -5,12 +5,12 @@
 
 import { suite, test } from "vitest";
 
-import { SCSSParser } from "../../parser/scssParser";
+import { SassParser } from "../../parser/sassParser";
 import { assertSelector } from "../css/selectorPrinting.test";
 
 suite("SCSS - Selector Printing", () => {
 	test("simple selector", function () {
-		let p = new SCSSParser();
+		let p = new SassParser();
 		assertSelector(p, "o1 { }", "o1", "{o1}");
 		assertSelector(p, ".div { } ", ".div", "{[class=div]}");
 		assertSelector(p, "#div { } ", "#div", "{[id=div]}");
@@ -21,7 +21,7 @@ suite("SCSS - Selector Printing", () => {
 	});
 
 	test("nested selector", function () {
-		let p = new SCSSParser();
+		let p = new SassParser();
 		assertSelector(p, "o1 { e1 { } }", "e1", "{o1{…{e1}}}");
 		assertSelector(p, "o1 { e1.div { } }", "e1", "{o1{…{e1[class=div]}}}");
 		assertSelector(p, "o1 o2 { e1 { } }", "e1", "{o1{…{o2{…{e1}}}}}");
@@ -32,7 +32,7 @@ suite("SCSS - Selector Printing", () => {
 	});
 
 	test("referencing selector", function () {
-		let p = new SCSSParser();
+		let p = new SassParser();
 		assertSelector(p, "o1 { &:hover { }}", "&", "{o1[:hover=]}");
 		assertSelector(p, "o1 { &:hover & { }}", "&", "{o1[:hover=]{…{o1}}}");
 		assertSelector(p, "o1 { &__bar {}}", "&", "{o1__bar}");
@@ -41,7 +41,7 @@ suite("SCSS - Selector Printing", () => {
 	});
 
 	test("placeholders", function () {
-		let p = new SCSSParser();
+		let p = new SassParser();
 		assertSelector(p, "%o1 { e1 { } }", "e1", "{%o1{…{e1}}}");
 	});
 });

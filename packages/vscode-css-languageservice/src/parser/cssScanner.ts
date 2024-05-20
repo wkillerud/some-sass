@@ -94,8 +94,9 @@ export class MultiLineStream {
 		return this.position;
 	}
 
-	public goBackTo(pos: number): void {
+	public goBackTo(pos: number, depth = 0): void {
 		this.position = pos;
+		this.depth = depth;
 	}
 
 	public goBack(n: number): void {
@@ -233,7 +234,7 @@ staticUnitTable["cqmin"] = TokenType.ContainerQueryLength;
 staticUnitTable["cqmax"] = TokenType.ContainerQueryLength;
 
 export type ScannerOptions = {
-	dialect?: "indented";
+	syntax?: "indented";
 };
 
 export class Scanner {
@@ -242,11 +243,10 @@ export class Scanner {
 	public ignoreWhitespace = true;
 	public inURL = false;
 
-	previousToken: IToken | null = null;
-	dialect;
+	syntax;
 
-	constructor({ dialect }: ScannerOptions = {}) {
-		this.dialect = dialect;
+	constructor({ syntax }: ScannerOptions = {}) {
+		this.syntax = syntax;
 	}
 
 	public setSource(input: string): void {
@@ -260,7 +260,6 @@ export class Scanner {
 			type: type,
 			text: text || this.stream.substring(offset),
 		};
-		this.previousToken = token;
 		return token;
 	}
 
@@ -272,8 +271,8 @@ export class Scanner {
 		return this.stream.pos();
 	}
 
-	public goBackTo(pos: number): void {
-		this.stream.goBackTo(pos);
+	public goBackTo(pos: number, depth = 0): void {
+		this.stream.goBackTo(pos, depth);
 	}
 
 	public scanUnquotedString(): IToken | null {
@@ -426,6 +425,28 @@ export class Scanner {
 			return this.finishToken(offset, TokenType.SuffixOperator);
 		}
 
+		// indents and dedents for the indented syntax
+		if (this.syntax === "indented") {
+			let n = this.stream.advanceWhileChar((ch) => {
+				return ch === _NWL || ch === _LFD || ch === _CAR;
+			});
+			if (n > 0) {
+				n = this.stream.advanceWhileChar((ch) => {
+					return ch === _TAB || ch === _WSP;
+				});
+
+				if (n > this.stream.depth) {
+					this.stream.depth = n;
+					return this.finishToken(offset, TokenType.Indent);
+				} else if (n < this.stream.depth) {
+					this.stream.depth = n;
+					return this.finishToken(offset, TokenType.Dedent);
+				} else {
+					return this.finishToken(offset, TokenType.Newline);
+				}
+			}
+		}
+
 		// Delim
 		this.stream.nextChar();
 		return this.finishToken(offset, TokenType.Delim);
@@ -458,8 +479,8 @@ export class Scanner {
 					return false;
 				}
 
-				if (this.dialect === "indented") {
-					// in this dialect multiline comments are not allowed
+				if (this.syntax === "indented") {
+					// in this dialect multiline comments are notallowed
 					if (ch === _NWL || ch === _LFD || ch === _CAR) {
 						return false;
 					}

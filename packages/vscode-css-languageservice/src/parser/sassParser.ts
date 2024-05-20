@@ -16,8 +16,8 @@ import { ParseError } from "./cssErrors";
 /// http://sass-lang.com/documentation/file.SASS_REFERENCE.html
 /// </summary>
 export class SassParser extends cssParser.Parser {
-	public constructor({ dialect }: ScannerOptions = {}) {
-		super({ dialect, scanner: new scssScanner.SassScanner({ dialect }) });
+	public constructor({ syntax: dialect }: ScannerOptions = {}) {
+		super({ syntax: dialect, scanner: new scssScanner.SassScanner({ syntax: dialect }) });
 	}
 
 	public _parseStylesheetStatement(isNested: boolean = false): nodes.Node | null {
@@ -306,7 +306,7 @@ export class SassParser extends cssParser.Parser {
 			hasContent = true;
 			node.addChild(this._parsePrio());
 		}
-		if (this.dialect === "indented") {
+		if (this.syntax === "indented") {
 			if (this.peek(TokenType.Indent)) {
 				node.setNestedProperties(this._parseNestedProperties());
 			} else {

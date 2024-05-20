@@ -12,6 +12,7 @@ import { isDefined } from "../utils/objects";
 
 export interface IMark {
 	prev?: IToken;
+	depth: number;
 	curr: IToken;
 	pos: number;
 }
@@ -32,11 +33,11 @@ export class Parser {
 
 	private lastErrorToken?: IToken;
 
-	dialect;
+	syntax;
 
-	constructor({ scanner, dialect }: ParserOptions = {}) {
-		this.dialect = dialect;
-		this.scanner = scanner || new Scanner({ dialect });
+	constructor({ scanner, syntax: dialect }: ParserOptions = {}) {
+		this.syntax = dialect;
+		this.scanner = scanner || new Scanner({ syntax: dialect });
 		this.token = { type: TokenType.EOF, offset: -1, len: 0, text: "" };
 		this.prevToken = undefined!;
 	}
@@ -99,6 +100,7 @@ export class Parser {
 		return {
 			prev: this.prevToken,
 			curr: this.token,
+			depth: this.scanner.stream.depth,
 			pos: this.scanner.pos(),
 		};
 	}
@@ -293,6 +295,12 @@ export class Parser {
 	public _parseStylesheet(): nodes.Stylesheet {
 		const node = this.create(nodes.Stylesheet);
 
+		if (this.syntax === "indented") {
+			while (this.accept(TokenType.Newline)) {
+				// allow empty statements
+			}
+		}
+
 		while (node.addChild(this._parseStylesheetStart())) {
 			// Parse statements only valid at the beginning of stylesheets.
 		}
@@ -366,14 +374,21 @@ export class Parser {
 	}
 
 	public _tryParseRuleset(isNested: boolean): nodes.RuleSet | null {
-		const mark = this.mark();
+		let mark = this.mark();
 		if (this._parseSelector(isNested)) {
 			while (this.accept(TokenType.Comma) && this._parseSelector(isNested)) {
 				// loop
 			}
-			if (this.accept(TokenType.CurlyL) || (this.accept(TokenType.Newline) && this.accept(TokenType.Indent))) {
-				this.restoreAtMark(mark);
-				return this._parseRuleset(isNested);
+			if (this.syntax === "indented") {
+				if (this.accept(TokenType.Indent)) {
+					this.restoreAtMark(mark);
+					return this._parseRuleset(isNested);
+				}
+			} else {
+				if (this.accept(TokenType.CurlyL)) {
+					this.restoreAtMark(mark);
+					return this._parseRuleset(isNested);
+				}
 			}
 		}
 		this.restoreAtMark(mark);
@@ -421,10 +436,6 @@ export class Parser {
 	}
 
 	public _needsSemicolonAfter(node: nodes.Node): boolean {
-		if (this.dialect === "indented") {
-			return false;
-		}
-
 		switch (node.type) {
 			case nodes.NodeType.Keyframe:
 			case nodes.NodeType.ViewPort:
@@ -460,38 +471,62 @@ export class Parser {
 
 	public _parseDeclarations(parseDeclaration: () => nodes.Node | null): nodes.Declarations | null {
 		const node = this.create(nodes.Declarations);
-		if (!this.accept(TokenType.CurlyL) && !(this.accept(TokenType.Newline) && this.accept(TokenType.Indent))) {
-			return null;
-		}
 
-		if (this.dialect === "indented") {
+		if (this.syntax === "indented") {
+			if (!this.accept(TokenType.Indent)) {
+				return null;
+			}
 			while (this.accept(TokenType.Newline)) {
-				// accept empty statements/starting with comments
+				// accept empty statements
+			}
+		} else {
+			if (!this.accept(TokenType.CurlyL)) {
+				return null;
 			}
 		}
 
 		let decl = parseDeclaration();
 		while (node.addChild(decl)) {
-			if (this.peek(TokenType.CurlyR) || this.peek(TokenType.Dedent)) {
-				break;
+			if (this.syntax === "indented") {
+				if (this.peek(TokenType.Dedent)) {
+					break;
+				}
+				if (this._needsSemicolonAfter(decl) && !this.accept(TokenType.Newline)) {
+					if (!this.accept(TokenType.EOF)) {
+						return this.finish(node, ParseError.NewlineExpected, [TokenType.Newline, TokenType.Dedent]);
+					}
+				}
+				// We accepted newline token. Link it to declaration.
+				if (decl && this.prevToken && this.prevToken.type === TokenType.Newline) {
+					(decl as nodes.Declaration).semicolonPosition = this.prevToken.offset;
+				}
+				while (this.accept(TokenType.Newline)) {
+					// accept empty statements
+				}
+			} else {
+				if (this.peek(TokenType.CurlyR)) {
+					break;
+				}
+				if (this._needsSemicolonAfter(decl) && !this.accept(TokenType.SemiColon)) {
+					return this.finish(node, ParseError.SemiColonExpected, [TokenType.SemiColon, TokenType.CurlyR]);
+				}
+				// We accepted semicolon token. Link it to declaration.
+				if (decl && this.prevToken && this.prevToken.type === TokenType.SemiColon) {
+					(decl as nodes.Declaration).semicolonPosition = this.prevToken.offset;
+				}
+				while (this.accept(TokenType.SemiColon)) {
+					// accept empty statements
+				}
 			}
-			if (this._needsSemicolonAfter(decl) && !this.accept(TokenType.SemiColon)) {
-				return this.finish(node, ParseError.SemiColonExpected, [TokenType.SemiColon, TokenType.CurlyR]);
-			}
-			// We accepted semicolon token. Link it to declaration.
-			if (decl && this.prevToken && this.prevToken.type === TokenType.SemiColon) {
-				(decl as nodes.Declaration).semicolonPosition = this.prevToken.offset;
-			}
-			while (this.accept(TokenType.SemiColon)) {
-				// accept empty statements
-			}
+
 			decl = parseDeclaration();
 		}
 
-		if (this.dialect === "indented") {
+		if (this.syntax === "indented") {
 			while (this.accept(TokenType.Newline)) {
 				// accept empty statements
 			}
+			// don't raise an error of dedent expected if this is the end of the file
 			if (this.accept(TokenType.EOF)) {
 				return this.finish(node);
 			}
@@ -508,7 +543,7 @@ export class Parser {
 
 	public _parseBody<T extends nodes.BodyDeclaration>(node: T, parseDeclaration: () => nodes.Node | null): T {
 		if (!node.setDeclarations(this._parseDeclarations(parseDeclaration))) {
-			if (this.dialect === "indented") {
+			if (this.syntax === "indented") {
 				return this.finish(node, ParseError.IndentExpected, [TokenType.Dedent]);
 			}
 			return this.finish(node, ParseError.LeftCurlyExpected, [TokenType.CurlyR, TokenType.SemiColon]);
@@ -743,6 +778,12 @@ export class Parser {
 		this.consumeToken(); // charset
 		if (!this.accept(TokenType.String)) {
 			return this.finish(node, ParseError.IdentifierExpected);
+		}
+		if (this.syntax === "indented") {
+			if (this.accept(TokenType.SemiColon)) {
+				return this.finish(node, ParseError.UnexpectedSemicolon);
+			}
+			return this.finish(node);
 		}
 		if (!this.accept(TokenType.SemiColon)) {
 			return this.finish(node, ParseError.SemiColonExpected);

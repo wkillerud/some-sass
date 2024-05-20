@@ -83,29 +83,6 @@ export class SassScanner extends Scanner {
 			return this.finishToken(offset, Ellipsis);
 		}
 
-		// indents and dedents for the indented syntax
-		if (this.dialect === "indented") {
-			let n = this.stream.advanceWhileChar((ch) => {
-				return ch === _NWL || ch === _LFD || ch === _CAR;
-			});
-			if (n > 0) {
-				return this.finishToken(offset, TokenType.Newline);
-			}
-			if (this.previousToken && this.previousToken.type === TokenType.Newline) {
-				n = this.stream.advanceWhileChar((ch) => {
-					return ch === _TAB || ch === _WSP;
-				});
-
-				if (n > this.stream.depth) {
-					this.stream.depth = n;
-					return this.finishToken(offset, TokenType.Indent);
-				} else if (n < this.stream.depth) {
-					this.stream.depth = n;
-					return this.finishToken(offset, TokenType.Dedent);
-				}
-			}
-		}
-
 		return super.scanNext(offset);
 	}
 
@@ -127,7 +104,7 @@ export class SassScanner extends Scanner {
 	}
 
 	protected whitespace(): boolean {
-		if (this.dialect === "indented") {
+		if (this.syntax === "indented") {
 			// Whitespace is only considered trivial in this dialect if:
 			// - it is not a newline
 			// - it is not at the beginning of a line (i. e. is indentation)

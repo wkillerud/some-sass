@@ -284,9 +284,9 @@ export class SassParser extends cssParser.Parser {
 	}
 
 	public _parseDeclaration(stopTokens?: TokenType[]): nodes.Declaration | null {
-		const custonProperty = this._tryParseCustomPropertyDeclaration(stopTokens);
-		if (custonProperty) {
-			return custonProperty;
+		const customProperty = this._tryParseCustomPropertyDeclaration(stopTokens);
+		if (customProperty) {
+			return customProperty;
 		}
 
 		const node = <nodes.Declaration>this.create(nodes.Declaration);
@@ -306,15 +306,25 @@ export class SassParser extends cssParser.Parser {
 			hasContent = true;
 			node.addChild(this._parsePrio());
 		}
-		if (this.peek(TokenType.CurlyL)) {
-			node.setNestedProperties(this._parseNestedProperties());
-		} else {
-			if (!hasContent) {
-				return this.finish(node, ParseError.PropertyValueExpected);
+		if (this.dialect === "indented") {
+			if (this.peek(TokenType.Indent)) {
+				node.setNestedProperties(this._parseNestedProperties());
+			} else {
+				if (!hasContent) {
+					return this.finish(node, ParseError.PropertyValueExpected);
+				}
 			}
-		}
-		if (this.peek(TokenType.SemiColon)) {
-			node.semicolonPosition = this.token.offset; // not part of the declaration, but useful information for code assist
+		} else {
+			if (this.peek(TokenType.CurlyL)) {
+				node.setNestedProperties(this._parseNestedProperties());
+			} else {
+				if (!hasContent) {
+					return this.finish(node, ParseError.PropertyValueExpected);
+				}
+			}
+			if (this.peek(TokenType.SemiColon)) {
+				node.semicolonPosition = this.token.offset; // not part of the declaration, but useful information for code assist
+			}
 		}
 		return this.finish(node);
 	}

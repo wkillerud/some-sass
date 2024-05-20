@@ -73,7 +73,6 @@ export class MultiLineStream {
 	}
 
 	set depth(value: number) {
-		console.log(`depth ${value}`);
 		this._depth = value;
 	}
 
@@ -435,42 +434,16 @@ export class Scanner {
 	protected trivia(): IToken | null {
 		while (true) {
 			const offset = this.stream.pos();
-			if (this.dialect === "indented") {
-				// SassScanner needs to know the amount of whitespace right after a newline
-				// to figure out indents and dedents, so only advance here if the previous
-				// token is not a Newline.
-				if (this.previousToken && this.previousToken.type === TokenType.Newline) {
-					if (this.comment()) {
-						if (!this.ignoreComment) {
-							return this.finishToken(offset, TokenType.Comment);
-						}
-					}
-					return null;
-				}
-				const n = this.stream.advanceWhileChar((ch) => {
-					return ch === _WSP || ch === _TAB;
-				});
-				if (n > 0 && !this.ignoreWhitespace) {
+			if (this.whitespace()) {
+				if (!this.ignoreWhitespace) {
 					return this.finishToken(offset, TokenType.Whitespace);
-				} else if (this.comment()) {
-					if (!this.ignoreComment) {
-						return this.finishToken(offset, TokenType.Comment);
-					}
-				} else {
-					return null;
+				}
+			} else if (this.comment()) {
+				if (!this.ignoreComment) {
+					return this.finishToken(offset, TokenType.Comment);
 				}
 			} else {
-				if (this._whitespace()) {
-					if (!this.ignoreWhitespace) {
-						return this.finishToken(offset, TokenType.Whitespace);
-					}
-				} else if (this.comment()) {
-					if (!this.ignoreComment) {
-						return this.finishToken(offset, TokenType.Comment);
-					}
-				} else {
-					return null;
-				}
+				return null;
 			}
 		}
 	}
@@ -484,6 +457,14 @@ export class Scanner {
 					success = true;
 					return false;
 				}
+
+				if (this.dialect === "indented") {
+					// in this dialect multiline comments are not allowed
+					if (ch === _NWL || ch === _LFD || ch === _CAR) {
+						return false;
+					}
+				}
+
 				hot = ch === _MUL;
 				return true;
 			});
@@ -632,7 +613,7 @@ export class Scanner {
 		return hasContent;
 	}
 
-	private _whitespace(): boolean {
+	protected whitespace(): boolean {
 		const n = this.stream.advanceWhileChar((ch) => {
 			return ch === _WSP || ch === _TAB || ch === _NWL || ch === _LFD || ch === _CAR;
 		});

@@ -37,7 +37,7 @@ comment */ c
 `,
 			parser,
 			parser._parseStylesheet.bind(parser),
-			ParseError.WildcardExpected, // TODO: make one for comment closing? How's it done in CSS if it's missing?
+			ParseError.ColonExpected, // TODO: make one for comment closing? How's it done in CSS if it's missing?
 		);
 	});
 });

@@ -109,6 +109,46 @@ export class SassScanner extends Scanner {
 		return super.scanNext(offset);
 	}
 
+	protected trivia(): IToken | null {
+		while (true) {
+			const offset = this.stream.pos();
+			if (this.whitespace()) {
+				if (!this.ignoreWhitespace) {
+					return this.finishToken(offset, TokenType.Whitespace);
+				}
+			} else if (this.comment()) {
+				if (!this.ignoreComment) {
+					return this.finishToken(offset, TokenType.Comment);
+				}
+			} else {
+				return null;
+			}
+		}
+	}
+
+	protected whitespace(): boolean {
+		if (this.dialect === "indented") {
+			// Whitespace is only considered trivial in this dialect if:
+			// - it is not a newline
+			// - it is not at the beginning of a line (i. e. is indentation)
+			// Only advance the stream for _WSP and _TAB if the previous token is not a _NWL, _LFD or _CAR.
+
+			const prevChar = this.stream.lookbackChar(1);
+			if (prevChar === _NWL || prevChar === _LFD || prevChar === _CAR) {
+				return false;
+			}
+
+			const n = this.stream.advanceWhileChar((ch) => {
+				return ch === _WSP || ch === _TAB;
+			});
+			return n > 0;
+		}
+		const n = this.stream.advanceWhileChar((ch) => {
+			return ch === _WSP || ch === _TAB || ch === _NWL || ch === _LFD || ch === _CAR;
+		});
+		return n > 0;
+	}
+
 	protected comment(): boolean {
 		if (super.comment()) {
 			return true;

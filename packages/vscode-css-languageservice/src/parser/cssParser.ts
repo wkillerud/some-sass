@@ -371,7 +371,7 @@ export class Parser {
 			while (this.accept(TokenType.Comma) && this._parseSelector(isNested)) {
 				// loop
 			}
-			if (this.accept(TokenType.CurlyL)) {
+			if (this.accept(TokenType.CurlyL) || (this.accept(TokenType.Newline) && this.accept(TokenType.Indent))) {
 				this.restoreAtMark(mark);
 				return this._parseRuleset(isNested);
 			}
@@ -464,6 +464,12 @@ export class Parser {
 			return null;
 		}
 
+		if (this.dialect === "indented") {
+			while (this.accept(TokenType.Newline)) {
+				// accept empty statements/starting with comments
+			}
+		}
+
 		let decl = parseDeclaration();
 		while (node.addChild(decl)) {
 			if (this.peek(TokenType.CurlyR) || this.peek(TokenType.Dedent)) {
@@ -479,20 +485,12 @@ export class Parser {
 			while (this.accept(TokenType.SemiColon)) {
 				// accept empty statements
 			}
-			if (this.dialect === "indented") {
-				while (this.accept(TokenType.Newline)) {
-					// accept empty statements
-				}
-			}
 			decl = parseDeclaration();
 		}
 
 		if (this.dialect === "indented") {
-			if (this.accept(TokenType.EOF)) {
-				return this.finish(node);
-			}
-			if (!this.accept(TokenType.Newline)) {
-				return this.finish(node, ParseError.NewlineExpected, [TokenType.Dedent]);
+			while (this.accept(TokenType.Newline)) {
+				// accept empty statements
 			}
 			if (this.accept(TokenType.EOF)) {
 				return this.finish(node);

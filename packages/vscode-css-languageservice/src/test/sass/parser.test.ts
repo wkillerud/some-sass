@@ -1,6 +1,7 @@
-import { suite, test } from "vitest";
+import { suite, test, assert } from "vitest";
 import { ParseError } from "../../parser/cssErrors";
 import { SassParser } from "../../parser/sassParser";
+import * as nodes from "../../parser/cssNodes";
 import { assertError, assertNode } from "../css/parser.test";
 
 suite("Sass - Parser", () => {
@@ -217,6 +218,72 @@ comment */ c
 		assertNode(
 			`E.warning E#myid E:not(s)
   color: limegreen`,
+			parser,
+			parseStylesheet,
+		);
+	});
+
+	test("graceful handling of unknown rules", () => {
+		assertNode(`@unknown-rule`, parser, parseStylesheet);
+		assertNode(`@unknown-rule 'foo'`, parser, parseStylesheet);
+		assertNode(`@unknown-rule (foo)`, parser, parseStylesheet);
+		assertNode(
+			`@unknown-rule (foo)
+	.bar`,
+			parser,
+			parseStylesheet,
+		);
+		assertNode(
+			`@mskeyframes darkWordHighlight
+	from
+		background-color: inherit
+
+	to
+		background-color: rgba(83, 83, 83, 0.7)`,
+			parser,
+			parseStylesheet,
+		);
+		assertNode(
+			`foo
+	@unknown-rule`,
+			parser,
+			parseStylesheet,
+		);
+
+		assertError(`@unknown-rule (`, parser, parseStylesheet, ParseError.RightParenthesisExpected);
+		assertError(`@unknown-rule [foo`, parser, parseStylesheet, ParseError.RightSquareBracketExpected);
+		assertError(
+			`@unknown-rule
+	[foo`,
+			parser,
+			parseStylesheet,
+			ParseError.RightSquareBracketExpected,
+		);
+	});
+
+	test("unknown rules node ends properly", () => {
+		const node = assertNode(
+			`@unknown-rule (foo)
+	.bar
+		color: limegreen
+
+.foo
+	color: red`,
+			parser,
+			parseStylesheet,
+		);
+
+		const unknownAtRule = node.getChild(0)!;
+		assert.equal(unknownAtRule.type, nodes.NodeType.UnknownAtRule);
+		assert.equal(unknownAtRule.offset, 0);
+		assert.equal(node.getChild(0)!.length, 13);
+
+		assertNode(
+			`
+.foo
+	@apply p-4 bg-neutral-50
+	min-height: var(--space-14)
+`,
 			parser,
 			parseStylesheet,
 		);

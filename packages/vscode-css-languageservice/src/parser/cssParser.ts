@@ -325,7 +325,12 @@ export class Parser {
 						this.markError(node, ParseError.SemiColonExpected);
 					}
 				}
-				while (this.accept(TokenType.SemiColon) || this.accept(TokenType.CDO) || this.accept(TokenType.CDC)) {
+				while (
+					this.accept(TokenType.Newline) ||
+					this.accept(TokenType.SemiColon) ||
+					this.accept(TokenType.CDO) ||
+					this.accept(TokenType.CDC)
+				) {
 					// accept empty statements
 					hasMatch = true;
 					inRecovery = false;
@@ -731,6 +736,9 @@ export class Parser {
 				case TokenType.BadString: // fall through
 					break done;
 				case TokenType.EOF:
+					if (this.syntax === "indented") {
+						break;
+					}
 					// We shouldn't have reached the end of input, something is
 					// unterminated.
 					let error = ParseError.RightCurlyExpected;
@@ -1540,7 +1548,7 @@ export class Parser {
 					}
 					break;
 				case TokenType.EOF:
-					if (curlyDepth > 0) {
+					if (curlyDepth > 0 && this.syntax !== "indented") {
 						return this.finish(node, ParseError.RightCurlyExpected);
 					} else if (bracketsDepth > 0) {
 						return this.finish(node, ParseError.RightSquareBracketExpected);
@@ -1550,16 +1558,26 @@ export class Parser {
 						return this.finish(node);
 					}
 				case TokenType.CurlyL:
+				case TokenType.Indent:
 					curlyLCount++;
 					curlyDepth++;
 					break;
+				case TokenType.Dedent:
 				case TokenType.CurlyR:
-					curlyDepth--;
+					if (this.token.type === TokenType.Dedent) {
+						curlyDepth = this.scanner.stream.depth;
+					} else {
+						curlyDepth--;
+					}
+
 					// End of at-rule, consume CurlyR and return node
 					if (curlyLCount > 0 && curlyDepth === 0) {
 						this.consumeToken();
 
 						if (bracketsDepth > 0) {
+							if (this.syntax === "indented" && !this.accept(TokenType.EOF)) {
+								return this.finish(node, ParseError.DedentExpected);
+							}
 							return this.finish(node, ParseError.RightSquareBracketExpected);
 						} else if (parensDepth > 0) {
 							return this.finish(node, ParseError.RightParenthesisExpected);
@@ -1571,6 +1589,9 @@ export class Parser {
 						// this is the last declaration in the ruleset.
 						if (parensDepth === 0 && bracketsDepth === 0) {
 							break done;
+						}
+						if (this.syntax === "indented") {
+							return this.finish(node, ParseError.IndentExpected);
 						}
 						return this.finish(node, ParseError.LeftCurlyExpected);
 					}

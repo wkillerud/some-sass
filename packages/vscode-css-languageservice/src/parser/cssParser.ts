@@ -108,7 +108,7 @@ export class Parser {
 	public restoreAtMark(mark: IMark): void {
 		this.prevToken = mark.prev;
 		this.token = mark.curr;
-		this.scanner.goBackTo(mark.pos);
+		this.scanner.goBackTo(mark.pos, mark.depth);
 	}
 
 	public try(func: () => nodes.Node | null): nodes.Node | null {
@@ -181,14 +181,15 @@ export class Parser {
 
 	protected acceptUnquotedString(): boolean {
 		const pos = this.scanner.pos();
-		this.scanner.goBackTo(this.token.offset);
+		const depth = this.scanner.stream.depth;
+		this.scanner.goBackTo(this.token.offset, depth);
 		const unquoted = this.scanner.scanUnquotedString();
 		if (unquoted) {
 			this.token = unquoted;
 			this.consumeToken();
 			return true;
 		}
-		this.scanner.goBackTo(pos);
+		this.scanner.goBackTo(pos, depth);
 		return false;
 	}
 
@@ -476,6 +477,10 @@ export class Parser {
 			if (!this.accept(TokenType.Indent)) {
 				return null;
 			}
+			// What causes this extra redundant Indent token?
+			// while (this.accept(TokenType.Indent)) {
+			// 	// accept empty statements
+			// }
 			while (this.accept(TokenType.Newline)) {
 				// accept empty statements
 			}
@@ -614,7 +619,7 @@ export class Parser {
 		}
 
 		const mark = this.mark();
-		if (this.peek(TokenType.CurlyL)) {
+		if (this.peek(TokenType.CurlyL) || this.peek(TokenType.Indent)) {
 			// try to parse it as nested declaration
 			const propertySet = this.create(nodes.CustomPropertySet);
 			const declarations = this._parseDeclarations(this._parseRuleSetDeclaration.bind(this));
@@ -978,7 +983,7 @@ export class Parser {
 			}
 		}
 
-		if (!this.peek(TokenType.CurlyL)) {
+		if (!this.peek(TokenType.CurlyL) && !this.peek(TokenType.Indent)) {
 			this.restoreAtMark(pos);
 			return null;
 		}
@@ -1019,7 +1024,7 @@ export class Parser {
 		if (names) {
 			node.setNames(names);
 		}
-		if ((!names || names.getChildren().length === 1) && this.peek(TokenType.CurlyL)) {
+		if ((!names || names.getChildren().length === 1) && (this.peek(TokenType.CurlyL) || this.peek(TokenType.Indent))) {
 			return this._parseBody(node, this._parseLayerDeclaration.bind(this, isNested));
 		}
 		if (!this.accept(TokenType.SemiColon)) {
@@ -1235,7 +1240,7 @@ export class Parser {
 
 		while (parseExpression) {
 			if (!this.accept(TokenType.ParenthesisL)) {
-				return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL]);
+				return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 			}
 			if (this.peek(TokenType.ParenthesisL) || this.peekIdent("not")) {
 				// <media-condition>
@@ -1245,7 +1250,7 @@ export class Parser {
 			}
 			// not yet implemented: general enclosed
 			if (!this.accept(TokenType.ParenthesisR)) {
-				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL]);
+				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 			}
 			parseExpression = this.acceptIdent("and") || this.acceptIdent("or");
 		}
@@ -1358,7 +1363,7 @@ export class Parser {
 		const node = this.create(nodes.PageBoxMarginBox);
 
 		if (!this.acceptOneKeyword(languageFacts.pageBoxDirectives)) {
-			this.markError(node, ParseError.UnknownAtRule, [], [TokenType.CurlyL]);
+			this.markError(node, ParseError.UnknownAtRule, [], [TokenType.CurlyL, TokenType.Indent]);
 		}
 
 		return this._parseBody(node, this._parseRuleSetDeclaration.bind(this));
@@ -1390,7 +1395,7 @@ export class Parser {
 		const node = this.create(nodes.Document);
 		this.consumeToken(); // @-moz-document
 
-		this.resync([], [TokenType.CurlyL]); // ignore all the rules
+		this.resync([], [TokenType.CurlyL, TokenType.Indent]); // ignore all the rules
 		return this._parseBody(node, this._parseStylesheetStatement.bind(this));
 	}
 
@@ -1449,18 +1454,18 @@ export class Parser {
 				node.addChild(this._parseMediaFeature());
 			}
 			if (!this.accept(TokenType.ParenthesisR)) {
-				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL]);
+				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 			}
 		} else if (this.acceptIdent("style")) {
 			if (this.hasWhitespace() || !this.accept(TokenType.ParenthesisL)) {
-				return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL]);
+				return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 			}
 			node.addChild(this._parseStyleQuery());
 			if (!this.accept(TokenType.ParenthesisR)) {
-				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL]);
+				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 			}
 		} else {
-			return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL]);
+			return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 		}
 		return this.finish(node);
 	}
@@ -1498,10 +1503,10 @@ export class Parser {
 		if (this.accept(TokenType.ParenthesisL)) {
 			node.addChild(this._parseStyleQuery());
 			if (!this.accept(TokenType.ParenthesisR)) {
-				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL]);
+				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 			}
 		} else {
-			return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL]);
+			return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 		}
 		return this.finish(node);
 	}

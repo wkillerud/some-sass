@@ -67,7 +67,7 @@ comment */ c
 `,
 			parser,
 			parseStylesheet,
-			ParseError.ColonExpected,
+			ParseError.PropertyValueExpected,
 		);
 	});
 

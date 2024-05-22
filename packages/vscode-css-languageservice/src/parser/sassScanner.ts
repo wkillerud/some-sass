@@ -37,13 +37,14 @@ export const Module: TokenType = customTokenValue++;
 
 export class SassScanner extends Scanner {
 	protected scanNext(offset: number): IToken {
+		const depth = this.stream.depth;
 		// scss variable
 		if (this.stream.advanceIfChar(_DLR)) {
 			const content = ["$"];
 			if (this.ident(content)) {
 				return this.finishToken(offset, VariableName, content.join(""));
 			} else {
-				this.stream.goBackTo(offset);
+				this.stream.goBackTo(offset, depth);
 			}
 		}
 

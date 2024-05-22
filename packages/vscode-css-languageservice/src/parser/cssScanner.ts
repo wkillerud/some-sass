@@ -94,7 +94,7 @@ export class MultiLineStream {
 		return this.position;
 	}
 
-	public goBackTo(pos: number, depth = 0): void {
+	public goBackTo(pos: number, depth: number): void {
 		this.position = pos;
 		this.depth = depth;
 	}
@@ -271,7 +271,7 @@ export class Scanner {
 		return this.stream.pos();
 	}
 
-	public goBackTo(pos: number, depth = 0): void {
+	public goBackTo(pos: number, depth: number): void {
 		this.stream.goBackTo(pos, depth);
 	}
 
@@ -307,10 +307,11 @@ export class Scanner {
 	 */
 	public tryScanUnicode(): IToken | undefined {
 		const offset = this.stream.pos();
+		const depth = this.stream.depth;
 		if (!this.stream.eos() && this._unicodeRange()) {
 			return this.finishToken(offset, TokenType.UnicodeRange);
 		}
-		this.stream.goBackTo(offset);
+		this.stream.goBackTo(offset, depth);
 		return undefined;
 	}
 
@@ -651,6 +652,7 @@ export class Scanner {
 
 	protected ident(result: string[]): boolean {
 		const pos = this.stream.pos();
+		const depth = this.stream.depth;
 		const hasMinus = this._minus(result);
 		if (hasMinus) {
 			if (this._minus(result) /* -- */ || this._identFirstChar(result) || this._escape(result)) {
@@ -665,7 +667,7 @@ export class Scanner {
 			}
 			return true;
 		}
-		this.stream.goBackTo(pos);
+		this.stream.goBackTo(pos, depth);
 		return false;
 	}
 

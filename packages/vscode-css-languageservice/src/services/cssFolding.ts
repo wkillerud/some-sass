@@ -59,6 +59,7 @@ function computeFoldingRanges(document: TextDocument): FoldingRange[] {
 	while (token.type !== TokenType.EOF) {
 		switch (token.type) {
 			case TokenType.CurlyL:
+			case TokenType.Indent:
 			case InterpolationFunction: {
 				delimiterStack.push({ line: getStartLine(token), type: "brace", isStart: true });
 				break;

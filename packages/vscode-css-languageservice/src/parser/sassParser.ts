@@ -465,7 +465,7 @@ export class SassParser extends cssParser.Parser {
 		if (this.acceptKeyword("@else")) {
 			if (this.peekIdent("if")) {
 				node.setElseClause(this._internalParseIfStatement(parseStatement));
-			} else if (this.peek(TokenType.CurlyL)) {
+			} else if (this.peek(TokenType.CurlyL) || this.peek(TokenType.Indent)) {
 				const elseNode = <nodes.BodyDeclaration>this.create(nodes.ElseStatement);
 				this._parseBody(elseNode, parseStatement);
 				node.setElseClause(elseNode);
@@ -733,7 +733,7 @@ export class SassParser extends cssParser.Parser {
 		const node = <nodes.MixinContentDeclaration>this.create(nodes.MixinContentDeclaration);
 		if (this.acceptIdent("using")) {
 			if (!this.accept(TokenType.ParenthesisL)) {
-				return this.finish(node, ParseError.LeftParenthesisExpected, [TokenType.CurlyL]);
+				return this.finish(node, ParseError.LeftParenthesisExpected, [TokenType.CurlyL, TokenType.Indent]);
 			}
 			if (node.getParameters().addChild(this._parseParameterDeclaration())) {
 				while (this.accept(TokenType.Comma)) {
@@ -747,11 +747,11 @@ export class SassParser extends cssParser.Parser {
 			}
 
 			if (!this.accept(TokenType.ParenthesisR)) {
-				return this.finish(node, ParseError.RightParenthesisExpected, [TokenType.CurlyL]);
+				return this.finish(node, ParseError.RightParenthesisExpected, [TokenType.CurlyL, TokenType.Indent]);
 			}
 		}
 
-		if (this.peek(TokenType.CurlyL)) {
+		if (this.peek(TokenType.CurlyL) || this.peek(TokenType.Indent)) {
 			this._parseBody(node, this._parseMixinReferenceBodyStatement.bind(this));
 		}
 

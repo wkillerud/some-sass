@@ -1,6 +1,5 @@
 import { suite, test } from "vitest";
 import { ParseError } from "../../parser/cssErrors";
-import { SassParseError } from "../../parser/sassErrors";
 import { SassParser } from "../../parser/sassParser";
 import { assertError, assertNode } from "../css/parser.test";
 
@@ -14,6 +13,7 @@ suite("Sass - Parser", () => {
 
 	test("@charset", () => {
 		assertNode('@charset "demo"', parser, parseStylesheet);
+		assertError("@charset", parser, parseStylesheet, ParseError.IdentifierExpected);
 		assertError('@charset "demo";', parser, parseStylesheet, ParseError.UnexpectedSemicolon);
 	});
 
@@ -134,6 +134,89 @@ comment */ c
 	to
 		background-color: rgba(83, 83, 83, 0.7)
 `,
+			parser,
+			parseStylesheet,
+		);
+	});
+
+	test("@page", () => {
+		assertNode(
+			`
+@page
+	margin: 2.5cm
+`,
+			parser,
+			parseStylesheet,
+		);
+	});
+
+	test("@font-face", () => {
+		assertNode(
+			`
+@font-face
+	font-family: "Example Font"
+`,
+			parser,
+			parseStylesheet,
+		);
+	});
+
+	test("@namespace", () => {
+		assertNode(`@namespace "http://www.w3.org/1999/xhtml"`, parser, parseStylesheet);
+		assertNode(`@namespace pref url(http://test)`, parser, parseStylesheet);
+		assertError("@charset", parser, parseStylesheet, ParseError.IdentifierExpected);
+	});
+
+	test("@-moz-document", () => {
+		assertNode(
+			`
+@-moz-document url(http://test), url-prefix(http://www.w3.org/Style/)
+	body
+		color: purple
+		background: yellow
+`,
+			parser,
+			parseStylesheet,
+		);
+	});
+
+	test("attribute selectors", () => {
+		assertNode(
+			`E E[foo] E[foo="bar"] E[foo~="bar"] E[foo^="bar"] E[foo$="bar"] E[foo*="bar"] E[foo|="en"]
+  color: limegreen`,
+			parser,
+			parseStylesheet,
+		);
+		assertNode(
+			`input[type="submit"]
+  color: limegreen`,
+			parser,
+			parseStylesheet,
+		);
+	});
+
+	test("pseudo-class selectors", () => {
+		assertNode(
+			`E:root E:nth-child(n) E:nth-last-child(n) E:nth-of-type(n) E:nth-last-of-type(n) E:first-child E:last-child
+  color: limegreen`,
+			parser,
+			parseStylesheet,
+		);
+		assertNode(
+			`E:first-of-type E:last-of-type E:only-child E:only-of-type E:empty E:link E:visited E:active E:hover E:focus E:target E:lang(fr) E:enabled E:disabled E:checked
+  color: limegreen`,
+			parser,
+			parseStylesheet,
+		);
+		assertNode(
+			`E::first-line E::first-letter E::before E::after
+  color: limegreen`,
+			parser,
+			parseStylesheet,
+		);
+		assertNode(
+			`E.warning E#myid E:not(s)
+  color: limegreen`,
 			parser,
 			parseStylesheet,
 		);

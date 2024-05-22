@@ -895,8 +895,14 @@ export class SassParser extends cssParser.Parser {
 			}
 		}
 
-		if (!this.accept(TokenType.SemiColon) && !this.accept(TokenType.EOF)) {
-			return this.finish(node, ParseError.SemiColonExpected);
+		if (this.syntax === "indented") {
+			if (this.accept(TokenType.SemiColon)) {
+				return this.finish(node, ParseError.UnexpectedSemicolon);
+			}
+		} else {
+			if (!this.accept(TokenType.SemiColon) && !this.accept(TokenType.EOF)) {
+				return this.finish(node, ParseError.SemiColonExpected);
+			}
 		}
 
 		return this.finish(node);
@@ -974,8 +980,14 @@ export class SassParser extends cssParser.Parser {
 			}
 		}
 
-		if (!this.accept(TokenType.SemiColon) && !this.accept(TokenType.EOF)) {
-			return this.finish(node, ParseError.SemiColonExpected);
+		if (this.syntax === "indented") {
+			if (this.accept(TokenType.SemiColon)) {
+				return this.finish(node, ParseError.UnexpectedSemicolon);
+			}
+		} else {
+			if (!this.accept(TokenType.SemiColon) && !this.accept(TokenType.EOF)) {
+				return this.finish(node, ParseError.SemiColonExpected);
+			}
 		}
 
 		return this.finish(node);

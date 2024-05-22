@@ -316,7 +316,12 @@ export class Parser {
 					node.addChild(statement);
 					hasMatch = true;
 					inRecovery = false;
-					if (!this.peek(TokenType.EOF) && this._needsSemicolonAfter(statement) && !this.accept(TokenType.SemiColon)) {
+					if (
+						this.syntax !== "indented" &&
+						!this.peek(TokenType.EOF) &&
+						this._needsSemicolonAfter(statement) &&
+						!this.accept(TokenType.SemiColon)
+					) {
 						this.markError(node, ParseError.SemiColonExpected);
 					}
 				}
@@ -512,7 +517,7 @@ export class Parser {
 				if (this.peek(TokenType.CurlyR)) {
 					break;
 				}
-				if (this._needsSemicolonAfter(decl) && !this.accept(TokenType.SemiColon)) {
+				if (this.syntax !== "indented" && this._needsSemicolonAfter(decl) && !this.accept(TokenType.SemiColon)) {
 					return this.finish(node, ParseError.SemiColonExpected, [TokenType.SemiColon, TokenType.CurlyR]);
 				}
 				// We accepted semicolon token. Link it to declaration.
@@ -784,15 +789,13 @@ export class Parser {
 		if (!this.accept(TokenType.String)) {
 			return this.finish(node, ParseError.IdentifierExpected);
 		}
-		if (this.syntax === "indented") {
-			if (this.accept(TokenType.SemiColon)) {
-				return this.finish(node, ParseError.UnexpectedSemicolon);
-			}
-			return this.finish(node);
-		}
-		if (!this.accept(TokenType.SemiColon)) {
+
+		if (this.syntax === "indented" && this.accept(TokenType.SemiColon)) {
+			return this.finish(node, ParseError.UnexpectedSemicolon);
+		} else if (this.syntax !== "indented" && !this.accept(TokenType.SemiColon)) {
 			return this.finish(node, ParseError.SemiColonExpected);
 		}
+
 		return this.finish(node);
 	}
 
@@ -862,7 +865,9 @@ export class Parser {
 			}
 		}
 
-		if (!this.accept(TokenType.SemiColon)) {
+		if (this.syntax === "indented" && this.accept(TokenType.SemiColon)) {
+			return this.finish(node, ParseError.UnexpectedSemicolon);
+		} else if (this.syntax !== "indented" && !this.accept(TokenType.SemiColon)) {
 			return this.finish(node, ParseError.SemiColonExpected);
 		}
 
@@ -1027,7 +1032,9 @@ export class Parser {
 		if ((!names || names.getChildren().length === 1) && (this.peek(TokenType.CurlyL) || this.peek(TokenType.Indent))) {
 			return this._parseBody(node, this._parseLayerDeclaration.bind(this, isNested));
 		}
-		if (!this.accept(TokenType.SemiColon)) {
+		if (this.syntax === "indented" && this.accept(TokenType.SemiColon)) {
+			return this.finish(node, ParseError.UnexpectedSemicolon);
+		} else if (this.syntax !== "indented" && !this.accept(TokenType.SemiColon)) {
 			return this.finish(node, ParseError.SemiColonExpected);
 		}
 		return this.finish(node);

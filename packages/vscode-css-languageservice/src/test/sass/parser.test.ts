@@ -7,6 +7,8 @@ import { assertError, assertNode } from "../css/parser.test";
 suite("Sass - Parser", () => {
 	const parser = new SassParser({ syntax: "indented" });
 	const parseStylesheet = parser._parseStylesheet.bind(parser);
+	const parseKeyframeSelector = parser._parseKeyframeSelector.bind(parser);
+	const parseKeyframe = parser._parseKeyframe.bind(parser);
 
 	test("empty stylesheet", () => {
 		assertNode("", parser, parseStylesheet);
@@ -160,6 +162,31 @@ comment */ c
 			parser,
 			parseStylesheet,
 		);
+		assertNode(
+			`
+@font-face
+	src: url(http://test)
+`,
+			parser,
+			parseStylesheet,
+		);
+		assertNode(
+			`
+@font-face
+	font-style: normal
+	font-stretch: normal
+`,
+			parser,
+			parseStylesheet,
+		);
+		assertNode(
+			`
+@font-face
+	unicode-range: U+0021-007F
+`,
+			parser,
+			parseStylesheet,
+		);
 	});
 
 	test("@namespace", () => {
@@ -288,4 +315,230 @@ comment */ c
 			parseStylesheet,
 		);
 	});
+
+	test("stylesheet /panic/", () => {
+		assertError('- @import "foo"', parser, parseStylesheet, ParseError.RuleOrSelectorExpected);
+	});
+
+	test("@keyframe selector", () => {
+		assertNode(
+			`from
+	color: red`,
+			parser,
+			parseKeyframeSelector,
+		);
+		assertNode(
+			`to
+	color: blue`,
+			parser,
+			parseKeyframeSelector,
+		);
+		assertNode(
+			`0%
+	color: blue`,
+			parser,
+			parseKeyframeSelector,
+		);
+		assertNode(
+			`10%
+	color: purple`,
+			parser,
+			parseKeyframeSelector,
+		);
+		assertNode(
+			`cover 10%
+	color: purple`,
+			parser,
+			parseKeyframeSelector,
+		);
+		assertNode(
+			`100000%
+	color: purple`,
+			parser,
+			parseKeyframeSelector,
+		);
+		assertNode(
+			`from
+	width: 100
+	to: 10px`,
+			parser,
+			parseKeyframeSelector,
+		);
+		assertNode(
+			`from, to
+	width: 10px`,
+			parser,
+			parseKeyframeSelector,
+		);
+		assertNode(
+			`10%, to
+	width: 10px`,
+			parser,
+			parseKeyframeSelector,
+		);
+		assertNode(
+			`from, 20%
+	width: 10px`,
+			parser,
+			parseKeyframeSelector,
+		);
+		assertNode(
+			`10%, 20%
+	width: 10px`,
+			parser,
+			parseKeyframeSelector,
+		);
+		assertNode(
+			`cover 10%, exit 20%
+	width: 10px`,
+			parser,
+			parseKeyframeSelector,
+		);
+		assertNode(
+			`10%, exit 20%
+	width: 10px`,
+			parser,
+			parseKeyframeSelector,
+		);
+		assertNode(
+			`from, exit 20%
+	width: 10px`,
+			parser,
+			parseKeyframeSelector,
+		);
+		assertNode(
+			`cover 10%, to
+	width: 10px`,
+			parser,
+			parseKeyframeSelector,
+		);
+		assertNode(
+			`cover 10%, 20%
+	width: 10px`,
+			parser,
+			parseKeyframeSelector,
+		);
+	});
+
+	test("@keyframe", () => {
+		assertNode(
+			`@keyframes name
+	//`,
+			parser,
+			parseKeyframe,
+		);
+		assertNode(
+			`@-webkit-keyframes name
+	//`,
+			parser,
+			parseKeyframe,
+		);
+		assertNode(
+			`@-o-keyframes name
+	//`,
+			parser,
+			parseKeyframe,
+		);
+		assertNode(
+			`@-moz-keyframes name
+	//`,
+			parser,
+			parseKeyframe,
+		);
+		assertNode(
+			`@keyframes name
+	from
+		//
+	to
+		//`,
+			parser,
+			parseKeyframe,
+		);
+		assertNode(
+			`@keyframes name
+	from
+		//
+	80%
+		//
+	100%
+		//`,
+			parser,
+			parseKeyframe,
+		);
+		assertNode(
+			`@keyframes name
+	from
+		top: 0px
+	80%
+		top: 100px
+	100%
+		top: 50px`,
+			parser,
+			parseKeyframe,
+		);
+		assertNode(
+			`@keyframes name
+	from
+		top: 0px
+	70%, 80%
+		top: 100px
+	100%
+		top: 50px`,
+			parser,
+			parseKeyframe,
+		);
+		assertNode(
+			`@keyframes name
+	from
+		top: 0px
+		left: 1px
+		right: 2px`,
+			parser,
+			parseKeyframe,
+		);
+		assertNode(
+			`@keyframes name
+	exit 50%
+		top: 0px
+		left: 1px
+		right: 2px`,
+			parser,
+			parseKeyframe,
+		);
+
+		assertError("@keyframes )", parser, parseKeyframe, ParseError.IdentifierExpected);
+		assertError(
+			`@keyframes name
+	from, #123`,
+			parser,
+			parseKeyframe,
+			ParseError.DedentExpected, // Not as accurate as SCSS, but good enough
+		);
+		assertError(
+			`@keyframes name
+	10% from
+		top: 0px`,
+			parser,
+			parseKeyframe,
+			ParseError.DedentExpected,
+		);
+		assertError(
+			`@keyframes name
+	10% 20%
+		top: 0px`,
+			parser,
+			parseKeyframe,
+			ParseError.DedentExpected,
+		);
+		assertError(
+			`@keyframes name
+	from to
+		top: 0px`,
+			parser,
+			parseKeyframe,
+			ParseError.DedentExpected,
+		);
+	});
+
+	test.todo("@property");
 });

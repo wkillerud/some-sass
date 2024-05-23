@@ -9,6 +9,7 @@ suite("Sass - Parser", () => {
 	const parseStylesheet = parser._parseStylesheet.bind(parser);
 	const parseKeyframeSelector = parser._parseKeyframeSelector.bind(parser);
 	const parseKeyframe = parser._parseKeyframe.bind(parser);
+	const parseImport = parser._parseImport.bind(parser);
 
 	test("empty stylesheet", () => {
 		assertNode("", parser, parseStylesheet);
@@ -559,5 +560,60 @@ comment */ c
 			parseStylesheet,
 			ParseError.IdentifierExpected,
 		);
+	});
+
+	test("@container", () => {
+		assertNode(
+			`@container (width <= 150px)
+	#inner
+		background-color: skyblue`,
+			parser,
+			parseStylesheet,
+		);
+		assertNode(
+			`@container card (inline-size > 30em) and style(--responsive: true)
+	#inner
+		background-color: skyblue`,
+			parser,
+			parseStylesheet,
+		);
+		assertNode(
+			`
+@container card (inline-size > 30em)
+	@container style(--responsive: true)
+		#inner
+			background-color: skyblue`,
+			parser,
+			parseStylesheet,
+		);
+		assertNode(
+			`
+@container (min-width: 700px)
+	.card h2
+		font-size: max(1.5em, 1.23em + 2cqi)`,
+			parser,
+			parseStylesheet,
+		);
+	});
+
+	test("@import", () => {
+		assertNode(`@import "asdfasdf"`, parser, parseImport);
+		assertNode(`@ImPort "asdfasdf"`, parser, parseImport);
+		assertNode(`@import url(/css/screen.css) screen, projection`, parser, parseImport);
+		assertNode(`@import url('landscape.css') screen and (orientation:landscape)`, parser, parseImport);
+		assertNode(`@import url("/inc/Styles/full.css") (min-width: 940px)`, parser, parseImport);
+		assertNode(`@import url(style.css) screen and (min-width:600px)`, parser, parseImport);
+		assertNode(`@import url("./700.css") only screen and (max-width: 700px)`, parser, parseImport);
+		assertNode(`@import url("override.css") layer`, parser, parseImport);
+		assertNode(`@import url("tabs.css") layer(framework.component)`, parser, parseImport);
+		assertNode(`@import "mystyle.css" supports(display: flex)`, parser, parseImport);
+		assertNode(
+			`@import url("narrow.css") supports(display: flex) handheld and (max-width: 400px)`,
+			parser,
+			parseImport,
+		);
+		assertNode(`@import url("fallback-layout.css") supports(not (display: flex))`, parser, parseImport);
+
+		assertError(`@import`, parser, parseImport, ParseError.URIOrStringExpected);
 	});
 });

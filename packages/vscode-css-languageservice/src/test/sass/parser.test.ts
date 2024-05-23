@@ -10,6 +10,7 @@ suite("Sass - Parser", () => {
 	const parseKeyframeSelector = parser._parseKeyframeSelector.bind(parser);
 	const parseKeyframe = parser._parseKeyframe.bind(parser);
 	const parseImport = parser._parseImport.bind(parser);
+	const parseSupports = parser._parseSupports.bind(parser);
 
 	test("empty stylesheet", () => {
 		assertNode("", parser, parseStylesheet);
@@ -615,5 +616,73 @@ comment */ c
 		assertNode(`@import url("fallback-layout.css") supports(not (display: flex))`, parser, parseImport);
 
 		assertError(`@import`, parser, parseImport, ParseError.URIOrStringExpected);
+	});
+
+	test("@supports", () => {
+		assertNode(
+			`@supports ( display: flexbox )
+	body
+		display: flexbox`,
+			parser,
+			parseSupports,
+		);
+		assertNode(
+			`@supports not (display: flexbox)
+	.outline
+		box-shadow: 2px 2px 2px black /* unprefixed last */`,
+			parser,
+			parseSupports,
+		);
+		assertNode(
+			`@supports ( box-shadow: 2px 2px 2px black ) or ( -moz-box-shadow: 2px 2px 2px black ) or ( -webkit-box-shadow: 2px 2px 2px black )
+	.foo
+		color: red`,
+			parser,
+			parseSupports,
+		);
+		assertNode(
+			`@supports ((transition-property: color) or (animation-name: foo)) and (transform: rotate(10deg))
+	.foo
+		color: red`,
+			parser,
+			parseSupports,
+		);
+		assertNode(
+			`@supports ((display: flexbox))
+	.foo
+		color: red`,
+			parser,
+			parseSupports,
+		);
+		assertNode(
+			`@supports (display: flexbox !important)
+	.foo
+		color: red`,
+			parser,
+			parseSupports,
+		);
+		assertNode(
+			`@supports (column-width: 1rem) OR (-moz-column-width: 1rem) OR (-webkit-column-width: 1rem) oR (-x-column-width: 1rem)
+	.foo
+		color: limegreen`,
+			parser,
+			parseSupports,
+		);
+		assertNode(
+			`@supports not (--validValue: , 0 )
+	.foo
+		color: limegreen`,
+			parser,
+			parseSupports,
+		);
+
+		assertError(
+			`@supports display: flexbox
+	.foo
+		color: limegreen`,
+			parser,
+			parseSupports,
+			ParseError.LeftParenthesisExpected,
+		);
 	});
 });

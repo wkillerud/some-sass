@@ -1180,7 +1180,20 @@ name
 			parser,
 			parser._parseRuleset.bind(parser),
 		);
+		assertNode(
+			`name
+	--normal-text: {}`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
 
+		assertError(
+			`name
+	font-size: {}`,
+			parser,
+			parser._parseRuleset.bind(parser),
+			ParseError.PropertyValueExpected,
+		);
 		assertError(
 			`boo,
 	`,
@@ -1247,6 +1260,149 @@ foo
 			parser,
 			parser._parseRuleset.bind(parser),
 			ParseError.LeftSquareBracketExpected,
+		);
+	});
+
+	test("nested ruleset", () => {
+		assertNode(
+			`
+.foo
+	color: red
+	input
+		color: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+.foo
+	color: red
+	:focus
+		color: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+.foo
+	color: red
+	.bar
+		color: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+.foo
+	color: red
+	&:hover
+		color: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+.foo
+	color: red
+	+ .bar
+		color: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+.foo
+	color: red
+	foo:hover
+		color: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+.foo
+	color: red
+	@media screen
+		color: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+	});
+
+	test("nested ruleset 2", () => {
+		assertNode(
+			`
+.foo
+	.parent &
+		color: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+.foo
+	color: red
+	& > .bar, > .baz
+		color: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+.foo
+	& .bar & .baz & .hmm
+		color: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+.foo
+	color: red
+	:not(&)
+		color: blue
+	+ .bar + &
+		color: green`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+.foo
+	color: red
+	&
+		color: blue
+	&&
+		color: green`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+.foo
+	& :is(.bar, &.baz)
+		color: red`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+figure
+	> figcaption
+		background: hsl(0 0% 0% / 50%)
+		> p
+			font-size: .9rem`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+@layer base
+	html
+		& body
+			min-block-size: 100%`,
+			parser,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 });

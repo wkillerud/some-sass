@@ -1050,6 +1050,8 @@ comment */ c
 			parser._parseRuleset.bind(parser),
 		);
 
+		assertNode("foo|bar\n\t//", parser, parser._parseRuleset.bind(parser));
+
 		assertNode(
 			`name
 	foo: bar`,
@@ -1787,5 +1789,37 @@ figure
 			parser._parseRuleset.bind(parser),
 		);
 		assertNode(`.-#{module.$variable}\n\t//`, parser, parser._parseRuleset.bind(parser));
+	});
+
+	test("@at-root", () => {
+		assertNode(
+			`@mixin unify-parent($child)
+	@at-root f#{selector.unify(&, $child)}
+		color: f`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@at-root #main2 .some-class
+	padding-left: calc( #{$a-variable} + 8px)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@media print
+	.page
+		@at-root (without: media)
+			foo: bar`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@media print
+	.page
+		@at-root (with: rule)
+			foo: bar`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
 	});
 });

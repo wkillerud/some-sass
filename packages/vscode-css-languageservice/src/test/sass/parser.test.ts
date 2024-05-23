@@ -6,20 +6,15 @@ import { assertError, assertNode } from "../css/parser.test";
 
 suite("Sass - Parser", () => {
 	const parser = new SassParser({ syntax: "indented" });
-	const parseStylesheet = parser._parseStylesheet.bind(parser);
-	const parseKeyframeSelector = parser._parseKeyframeSelector.bind(parser);
-	const parseKeyframe = parser._parseKeyframe.bind(parser);
-	const parseImport = parser._parseImport.bind(parser);
-	const parseSupports = parser._parseSupports.bind(parser);
 
 	test("empty stylesheet", () => {
-		assertNode("", parser, parseStylesheet);
+		assertNode("", parser, parser._parseStylesheet.bind(parser));
 	});
 
 	test("@charset", () => {
-		assertNode('@charset "demo"', parser, parseStylesheet);
-		assertError("@charset", parser, parseStylesheet, ParseError.IdentifierExpected);
-		assertError('@charset "demo";', parser, parseStylesheet, ParseError.UnexpectedSemicolon);
+		assertNode('@charset "demo"', parser, parser._parseStylesheet.bind(parser));
+		assertError("@charset", parser, parser._parseStylesheet.bind(parser), ParseError.IdentifierExpected);
+		assertError('@charset "demo";', parser, parser._parseStylesheet.bind(parser), ParseError.UnexpectedSemicolon);
 	});
 
 	test("newline before at-rule", () => {
@@ -27,7 +22,7 @@ suite("Sass - Parser", () => {
 			`
 @charset "demo"`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 
@@ -38,7 +33,7 @@ suite("Sass - Parser", () => {
 	padding: 3em, 6em
 `,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 
@@ -48,7 +43,7 @@ suite("Sass - Parser", () => {
 	b: /* comment */ c
 `,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 
@@ -59,7 +54,7 @@ suite("Sass - Parser", () => {
 	b: c
 `,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 
@@ -71,7 +66,7 @@ line
 comment */ c
 `,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 			ParseError.PropertyValueExpected,
 		);
 	});
@@ -82,21 +77,21 @@ comment */ c
 	a
 		b: c`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 		assertNode(
 			`@media screen and (max-width: 400px)
 	@-ms-viewport
 		width: 320px`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 		assertNode(
 			`@-ms-viewport
 	width: 320px
 	height: 720px`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 
@@ -110,7 +105,7 @@ comment */ c
 	c: d
 `,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 
@@ -126,7 +121,7 @@ comment */ c
 	d: e
 `,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 
@@ -140,7 +135,7 @@ comment */ c
 		background-color: rgba(83, 83, 83, 0.7)
 `,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 
@@ -151,7 +146,7 @@ comment */ c
 	margin: 2.5cm
 `,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 
@@ -162,7 +157,7 @@ comment */ c
 	font-family: "Example Font"
 `,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 		assertNode(
 			`
@@ -170,7 +165,7 @@ comment */ c
 	src: url(http://test)
 `,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 		assertNode(
 			`
@@ -179,7 +174,7 @@ comment */ c
 	font-stretch: normal
 `,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 		assertNode(
 			`
@@ -187,14 +182,14 @@ comment */ c
 	unicode-range: U+0021-007F
 `,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 
 	test("@namespace", () => {
-		assertNode(`@namespace "http://www.w3.org/1999/xhtml"`, parser, parseStylesheet);
-		assertNode(`@namespace pref url(http://test)`, parser, parseStylesheet);
-		assertError("@charset", parser, parseStylesheet, ParseError.IdentifierExpected);
+		assertNode(`@namespace "http://www.w3.org/1999/xhtml"`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(`@namespace pref url(http://test)`, parser, parser._parseStylesheet.bind(parser));
+		assertError("@charset", parser, parser._parseStylesheet.bind(parser), ParseError.IdentifierExpected);
 	});
 
 	test("@-moz-document", () => {
@@ -206,7 +201,7 @@ comment */ c
 		background: yellow
 `,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 
@@ -215,13 +210,13 @@ comment */ c
 			`E E[foo] E[foo="bar"] E[foo~="bar"] E[foo^="bar"] E[foo$="bar"] E[foo*="bar"] E[foo|="en"]
   color: limegreen`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 		assertNode(
 			`input[type="submit"]
   color: limegreen`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 
@@ -230,37 +225,37 @@ comment */ c
 			`E:root E:nth-child(n) E:nth-last-child(n) E:nth-of-type(n) E:nth-last-of-type(n) E:first-child E:last-child
   color: limegreen`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 		assertNode(
 			`E:first-of-type E:last-of-type E:only-child E:only-of-type E:empty E:link E:visited E:active E:hover E:focus E:target E:lang(fr) E:enabled E:disabled E:checked
   color: limegreen`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 		assertNode(
 			`E::first-line E::first-letter E::before E::after
   color: limegreen`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 		assertNode(
 			`E.warning E#myid E:not(s)
   color: limegreen`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 
 	test("graceful handling of unknown rules", () => {
-		assertNode(`@unknown-rule`, parser, parseStylesheet);
-		assertNode(`@unknown-rule 'foo'`, parser, parseStylesheet);
-		assertNode(`@unknown-rule (foo)`, parser, parseStylesheet);
+		assertNode(`@unknown-rule`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(`@unknown-rule 'foo'`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(`@unknown-rule (foo)`, parser, parser._parseStylesheet.bind(parser));
 		assertNode(
 			`@unknown-rule (foo)
 	.bar`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 		assertNode(
 			`@mskeyframes darkWordHighlight
@@ -270,22 +265,27 @@ comment */ c
 	to
 		background-color: rgba(83, 83, 83, 0.7)`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 		assertNode(
 			`foo
 	@unknown-rule`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 
-		assertError(`@unknown-rule (`, parser, parseStylesheet, ParseError.RightParenthesisExpected);
-		assertError(`@unknown-rule [foo`, parser, parseStylesheet, ParseError.RightSquareBracketExpected);
+		assertError(`@unknown-rule (`, parser, parser._parseStylesheet.bind(parser), ParseError.RightParenthesisExpected);
+		assertError(
+			`@unknown-rule [foo`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.RightSquareBracketExpected,
+		);
 		assertError(
 			`@unknown-rule
 	[foo`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 			ParseError.RightSquareBracketExpected,
 		);
 	});
@@ -299,7 +299,7 @@ comment */ c
 .foo
 	color: red`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 
 		const unknownAtRule = node.getChild(0)!;
@@ -314,12 +314,12 @@ comment */ c
 	min-height: var(--space-14)
 `,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 
 	test("stylesheet /panic/", () => {
-		assertError('- @import "foo"', parser, parseStylesheet, ParseError.RuleOrSelectorExpected);
+		assertError('- @import "foo"', parser, parser._parseStylesheet.bind(parser), ParseError.RuleOrSelectorExpected);
 	});
 
 	test("@keyframe selector", () => {
@@ -327,98 +327,98 @@ comment */ c
 			`from
 	color: red`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 		assertNode(
 			`to
 	color: blue`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 		assertNode(
 			`0%
 	color: blue`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 		assertNode(
 			`10%
 	color: purple`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 		assertNode(
 			`cover 10%
 	color: purple`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 		assertNode(
 			`100000%
 	color: purple`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 		assertNode(
 			`from
 	width: 100
 	to: 10px`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 		assertNode(
 			`from, to
 	width: 10px`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 		assertNode(
 			`10%, to
 	width: 10px`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 		assertNode(
 			`from, 20%
 	width: 10px`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 		assertNode(
 			`10%, 20%
 	width: 10px`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 		assertNode(
 			`cover 10%, exit 20%
 	width: 10px`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 		assertNode(
 			`10%, exit 20%
 	width: 10px`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 		assertNode(
 			`from, exit 20%
 	width: 10px`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 		assertNode(
 			`cover 10%, to
 	width: 10px`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 		assertNode(
 			`cover 10%, 20%
 	width: 10px`,
 			parser,
-			parseKeyframeSelector,
+			parser._parseKeyframeSelector.bind(parser),
 		);
 	});
 
@@ -427,25 +427,25 @@ comment */ c
 			`@keyframes name
 	//`,
 			parser,
-			parseKeyframe,
+			parser._parseKeyframe.bind(parser),
 		);
 		assertNode(
 			`@-webkit-keyframes name
 	//`,
 			parser,
-			parseKeyframe,
+			parser._parseKeyframe.bind(parser),
 		);
 		assertNode(
 			`@-o-keyframes name
 	//`,
 			parser,
-			parseKeyframe,
+			parser._parseKeyframe.bind(parser),
 		);
 		assertNode(
 			`@-moz-keyframes name
 	//`,
 			parser,
-			parseKeyframe,
+			parser._parseKeyframe.bind(parser),
 		);
 		assertNode(
 			`@keyframes name
@@ -454,7 +454,7 @@ comment */ c
 	to
 		//`,
 			parser,
-			parseKeyframe,
+			parser._parseKeyframe.bind(parser),
 		);
 		assertNode(
 			`@keyframes name
@@ -465,7 +465,7 @@ comment */ c
 	100%
 		//`,
 			parser,
-			parseKeyframe,
+			parser._parseKeyframe.bind(parser),
 		);
 		assertNode(
 			`@keyframes name
@@ -476,7 +476,7 @@ comment */ c
 	100%
 		top: 50px`,
 			parser,
-			parseKeyframe,
+			parser._parseKeyframe.bind(parser),
 		);
 		assertNode(
 			`@keyframes name
@@ -487,7 +487,7 @@ comment */ c
 	100%
 		top: 50px`,
 			parser,
-			parseKeyframe,
+			parser._parseKeyframe.bind(parser),
 		);
 		assertNode(
 			`@keyframes name
@@ -496,7 +496,7 @@ comment */ c
 		left: 1px
 		right: 2px`,
 			parser,
-			parseKeyframe,
+			parser._parseKeyframe.bind(parser),
 		);
 		assertNode(
 			`@keyframes name
@@ -505,15 +505,15 @@ comment */ c
 		left: 1px
 		right: 2px`,
 			parser,
-			parseKeyframe,
+			parser._parseKeyframe.bind(parser),
 		);
 
-		assertError("@keyframes )", parser, parseKeyframe, ParseError.IdentifierExpected);
+		assertError("@keyframes )", parser, parser._parseKeyframe.bind(parser), ParseError.IdentifierExpected);
 		assertError(
 			`@keyframes name
 	from, #123`,
 			parser,
-			parseKeyframe,
+			parser._parseKeyframe.bind(parser),
 			ParseError.DedentExpected, // Not as accurate as SCSS, but good enough
 		);
 		assertError(
@@ -521,7 +521,7 @@ comment */ c
 	10% from
 		top: 0px`,
 			parser,
-			parseKeyframe,
+			parser._parseKeyframe.bind(parser),
 			ParseError.DedentExpected,
 		);
 		assertError(
@@ -529,7 +529,7 @@ comment */ c
 	10% 20%
 		top: 0px`,
 			parser,
-			parseKeyframe,
+			parser._parseKeyframe.bind(parser),
 			ParseError.DedentExpected,
 		);
 		assertError(
@@ -537,7 +537,7 @@ comment */ c
 	from to
 		top: 0px`,
 			parser,
-			parseKeyframe,
+			parser._parseKeyframe.bind(parser),
 			ParseError.DedentExpected,
 		);
 	});
@@ -549,7 +549,7 @@ comment */ c
 	inherits: false
 	initial-value: #c0ffee`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 
 		assertError(
@@ -558,7 +558,7 @@ comment */ c
 	inherits: false
 	initial-value: #c0ffee`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 			ParseError.IdentifierExpected,
 		);
 	});
@@ -569,14 +569,14 @@ comment */ c
 	#inner
 		background-color: skyblue`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 		assertNode(
 			`@container card (inline-size > 30em) and style(--responsive: true)
 	#inner
 		background-color: skyblue`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 		assertNode(
 			`
@@ -585,7 +585,7 @@ comment */ c
 		#inner
 			background-color: skyblue`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 		assertNode(
 			`
@@ -593,29 +593,37 @@ comment */ c
 	.card h2
 		font-size: max(1.5em, 1.23em + 2cqi)`,
 			parser,
-			parseStylesheet,
+			parser._parseStylesheet.bind(parser),
 		);
 	});
 
 	test("@import", () => {
-		assertNode(`@import "asdfasdf"`, parser, parseImport);
-		assertNode(`@ImPort "asdfasdf"`, parser, parseImport);
-		assertNode(`@import url(/css/screen.css) screen, projection`, parser, parseImport);
-		assertNode(`@import url('landscape.css') screen and (orientation:landscape)`, parser, parseImport);
-		assertNode(`@import url("/inc/Styles/full.css") (min-width: 940px)`, parser, parseImport);
-		assertNode(`@import url(style.css) screen and (min-width:600px)`, parser, parseImport);
-		assertNode(`@import url("./700.css") only screen and (max-width: 700px)`, parser, parseImport);
-		assertNode(`@import url("override.css") layer`, parser, parseImport);
-		assertNode(`@import url("tabs.css") layer(framework.component)`, parser, parseImport);
-		assertNode(`@import "mystyle.css" supports(display: flex)`, parser, parseImport);
+		assertNode(`@import "asdfasdf"`, parser, parser._parseImport.bind(parser));
+		assertNode(`@ImPort "asdfasdf"`, parser, parser._parseImport.bind(parser));
+		assertNode(`@import url(/css/screen.css) screen, projection`, parser, parser._parseImport.bind(parser));
+		assertNode(
+			`@import url('landscape.css') screen and (orientation:landscape)`,
+			parser,
+			parser._parseImport.bind(parser),
+		);
+		assertNode(`@import url("/inc/Styles/full.css") (min-width: 940px)`, parser, parser._parseImport.bind(parser));
+		assertNode(`@import url(style.css) screen and (min-width:600px)`, parser, parser._parseImport.bind(parser));
+		assertNode(`@import url("./700.css") only screen and (max-width: 700px)`, parser, parser._parseImport.bind(parser));
+		assertNode(`@import url("override.css") layer`, parser, parser._parseImport.bind(parser));
+		assertNode(`@import url("tabs.css") layer(framework.component)`, parser, parser._parseImport.bind(parser));
+		assertNode(`@import "mystyle.css" supports(display: flex)`, parser, parser._parseImport.bind(parser));
 		assertNode(
 			`@import url("narrow.css") supports(display: flex) handheld and (max-width: 400px)`,
 			parser,
-			parseImport,
+			parser._parseImport.bind(parser),
 		);
-		assertNode(`@import url("fallback-layout.css") supports(not (display: flex))`, parser, parseImport);
+		assertNode(
+			`@import url("fallback-layout.css") supports(not (display: flex))`,
+			parser,
+			parser._parseImport.bind(parser),
+		);
 
-		assertError(`@import`, parser, parseImport, ParseError.URIOrStringExpected);
+		assertError(`@import`, parser, parser._parseImport.bind(parser), ParseError.URIOrStringExpected);
 	});
 
 	test("@supports", () => {
@@ -624,56 +632,56 @@ comment */ c
 	body
 		display: flexbox`,
 			parser,
-			parseSupports,
+			parser._parseSupports.bind(parser),
 		);
 		assertNode(
 			`@supports not (display: flexbox)
 	.outline
 		box-shadow: 2px 2px 2px black /* unprefixed last */`,
 			parser,
-			parseSupports,
+			parser._parseSupports.bind(parser),
 		);
 		assertNode(
 			`@supports ( box-shadow: 2px 2px 2px black ) or ( -moz-box-shadow: 2px 2px 2px black ) or ( -webkit-box-shadow: 2px 2px 2px black )
 	.foo
 		color: red`,
 			parser,
-			parseSupports,
+			parser._parseSupports.bind(parser),
 		);
 		assertNode(
 			`@supports ((transition-property: color) or (animation-name: foo)) and (transform: rotate(10deg))
 	.foo
 		color: red`,
 			parser,
-			parseSupports,
+			parser._parseSupports.bind(parser),
 		);
 		assertNode(
 			`@supports ((display: flexbox))
 	.foo
 		color: red`,
 			parser,
-			parseSupports,
+			parser._parseSupports.bind(parser),
 		);
 		assertNode(
 			`@supports (display: flexbox !important)
 	.foo
 		color: red`,
 			parser,
-			parseSupports,
+			parser._parseSupports.bind(parser),
 		);
 		assertNode(
 			`@supports (column-width: 1rem) OR (-moz-column-width: 1rem) OR (-webkit-column-width: 1rem) oR (-x-column-width: 1rem)
 	.foo
 		color: limegreen`,
 			parser,
-			parseSupports,
+			parser._parseSupports.bind(parser),
 		);
 		assertNode(
 			`@supports not (--validValue: , 0 )
 	.foo
 		color: limegreen`,
 			parser,
-			parseSupports,
+			parser._parseSupports.bind(parser),
 		);
 
 		assertError(
@@ -681,8 +689,207 @@ comment */ c
 	.foo
 		color: limegreen`,
 			parser,
-			parseSupports,
+			parser._parseSupports.bind(parser),
 			ParseError.LeftParenthesisExpected,
 		);
+	});
+
+	test("@media", () => {
+		assertNode(
+			`@media asdsa
+	.foo
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@meDia asdsa
+	.foo
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@meDia somename, othername2
+	.foo
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media only screen and (max-width:850px)
+	.foo
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media all and (min-width:500px)
+	.foo
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media screen and (color), projection and (color)
+	.foo
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media not screen and (device-aspect-ratio: 16/9)
+	.foo
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media print and (min-resolution: 300dpi)
+	.foo
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media print and (min-resolution: 118dpcm)
+	.foo
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media print
+	@page
+		margin: 10%
+	blockquote, pre
+		page-break-inside: avoid`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media print
+	body:before
+		page-break-inside: avoid`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media not (-moz-os-version: windows-win7)
+	body
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media not (not (-moz-os-version: windows-win7))
+	body
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media (height > 600px)
+	body
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media (height < 600px)
+	body
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media (height <= 600px)
+	body
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media (400px <= width <= 700px)
+	body
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media (400px >= width >= 700px)
+	body
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media screen and (750px <= width < 900px)
+	body
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+
+		assertError(
+			`@media somename othername2
+	body
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+			ParseError.IndentExpected,
+		);
+		assertError(
+			`@media not, screen
+	body
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+			ParseError.MediaQueryExpected,
+		);
+		assertError(
+			`@media not screen and foo
+	body
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+			ParseError.LeftParenthesisExpected,
+		);
+		assertError(
+			`@media not screen and ()
+	body
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+			ParseError.IdentifierExpected,
+		);
+		assertError(
+			`@media not screen and (color:)
+	body
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+			ParseError.TermExpected,
+		);
+		assertError(
+			`@media not screen and (color:#fff
+	body
+		color: black`,
+			parser,
+			parser._parseMedia.bind(parser),
+			ParseError.RightParenthesisExpected,
+		);
+	});
+
+	test("media query list", () => {
+		assertNode("somename", parser, parser._parseMediaQueryList.bind(parser));
+		assertNode("somename, othername", parser, parser._parseMediaQueryList.bind(parser));
+		assertNode("not all and (monochrome)", parser, parser._parseMediaQueryList.bind(parser));
+	});
+
+	test("medium", function () {
+		assertNode("somename", parser, parser._parseMedium.bind(parser));
+		assertNode("-asdas", parser, parser._parseMedium.bind(parser));
+		assertNode("-asda34s", parser, parser._parseMedium.bind(parser));
 	});
 });

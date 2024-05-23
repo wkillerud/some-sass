@@ -540,5 +540,24 @@ comment */ c
 		);
 	});
 
-	test.todo("@property");
+	test("@property", () => {
+		assertNode(
+			`@property --my-color
+	syntax: '<color>'
+	inherits: false
+	initial-value: #c0ffee`,
+			parser,
+			parseStylesheet,
+		);
+
+		assertError(
+			`@property
+	syntax: '<color>'
+	inherits: false
+	initial-value: #c0ffee`,
+			parser,
+			parseStylesheet,
+			ParseError.IdentifierExpected,
+		);
+	});
 });

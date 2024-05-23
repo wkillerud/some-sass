@@ -1189,4 +1189,64 @@ name
 			ParseError.SelectorExpected,
 		);
 	});
+
+	test("ruleset /Panic/", () => {
+		assertError(
+			`
+foo
+	bar:`,
+			parser,
+			parser._parseRuleset.bind(parser),
+			ParseError.PropertyValueExpected,
+		);
+		assertError(
+			`
+foo
+	bar:
+	far: 12em`,
+			parser,
+			parser._parseRuleset.bind(parser),
+			ParseError.PropertyValueExpected,
+		);
+		assertError(
+			`
+foo
+	bar`,
+			parser,
+			parser._parseRuleset.bind(parser),
+			ParseError.ColonExpected,
+		);
+		assertError(
+			`
+foo
+	--too-minimal:`,
+			parser,
+			parser._parseRuleset.bind(parser),
+			ParseError.PropertyValueExpected,
+		);
+		assertError(
+			`
+foo
+	--double-important: red !important !important`,
+			parser,
+			parser._parseRuleset.bind(parser),
+			ParseError.NewlineExpected,
+		);
+		assertError(
+			`
+foo
+	--unbalanced-parens: not)()(cool`,
+			parser,
+			parser._parseRuleset.bind(parser),
+			ParseError.LeftParenthesisExpected,
+		);
+		assertError(
+			`
+foo
+	--unbalanced-parens: not][][cool`,
+			parser,
+			parser._parseRuleset.bind(parser),
+			ParseError.LeftSquareBracketExpected,
+		);
+	});
 });

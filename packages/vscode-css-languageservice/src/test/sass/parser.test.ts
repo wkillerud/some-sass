@@ -887,9 +887,179 @@ comment */ c
 		assertNode("not all and (monochrome)", parser, parser._parseMediaQueryList.bind(parser));
 	});
 
-	test("medium", function () {
+	test("medium", () => {
 		assertNode("somename", parser, parser._parseMedium.bind(parser));
 		assertNode("-asdas", parser, parser._parseMedium.bind(parser));
 		assertNode("-asda34s", parser, parser._parseMedium.bind(parser));
+	});
+
+	test("@page", () => {
+		assertNode(
+			`@page : name
+	some: "asdf"`,
+			parser,
+			parser._parsePage.bind(parser),
+		);
+		assertNode(
+			`@page :left, :right
+	some: "asdf"`,
+			parser,
+			parser._parsePage.bind(parser),
+		);
+		assertNode(
+			`@page : name
+	some: "asdf" !important
+	some: "asdf" !important`,
+			parser,
+			parser._parsePage.bind(parser),
+		);
+		assertNode(
+			`@page rotated
+	size: landscape`,
+			parser,
+			parser._parsePage.bind(parser),
+		);
+		assertNode(
+			`@page :left
+	margin-left: 4cm
+	margin-right: 3cm`,
+			parser,
+			parser._parsePage.bind(parser),
+		);
+		assertNode(
+			`@page
+	@top-right-corner
+		content: url(foo.png)
+		border: solid green`,
+			parser,
+			parser._parsePage.bind(parser),
+		);
+		assertNode(
+			`@page
+	@top-left-corner
+		content: " "
+		border: solid green
+	@bottom-right-corner
+		content: counter(page)
+		border: solid green`,
+			parser,
+			parser._parsePage.bind(parser),
+		);
+
+		assertError(
+			`@page
+	@top-left-corner foo
+		content: " "
+		border: solid green`,
+			parser,
+			parser._parsePage.bind(parser),
+			ParseError.IndentExpected,
+		);
+		assertError(
+			`@page :
+	@top-left-corner foo
+		content: " "
+		border: solid green`,
+			parser,
+			parser._parsePage.bind(parser),
+			ParseError.IdentifierExpected,
+		);
+		assertError(
+			`@page :left,
+	@top-left-corner foo
+		content: " "
+		border: solid green`,
+			parser,
+			parser._parsePage.bind(parser),
+			ParseError.IdentifierExpected,
+		);
+	});
+
+	test("@layer", () => {
+		assertNode(
+			`@layer utilities
+	.padding-sm
+		padding: .5rem`,
+			parser,
+			parser._parseLayer.bind(parser),
+		);
+		assertNode(`@layer utilities`, parser, parser._parseLayer.bind(parser));
+		assertNode(`@layer theme, layout, utilities`, parser, parser._parseLayer.bind(parser));
+		assertNode(
+			`@layer framework
+	@layer layout
+		.padding-sm
+			padding: .5rem`,
+			parser,
+			parser._parseLayer.bind(parser),
+		);
+		assertNode(
+			`@layer framework.layout
+	@keyframes slide-left
+		from
+			foo: bar
+		to
+			foo: baz`,
+			parser,
+			parser._parseLayer.bind(parser),
+		);
+
+		assertNode(
+			`@media (min-width: 30em)
+	@layer layout
+		.padding-sm
+			padding: .5rem`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+
+		assertError(`@layer theme. layout`, parser, parser._parseLayer.bind(parser), ParseError.IdentifierExpected);
+	});
+
+	test("operator", () => {
+		assertNode("/", parser, parser._parseOperator.bind(parser));
+		assertNode("*", parser, parser._parseOperator.bind(parser));
+		assertNode("+", parser, parser._parseOperator.bind(parser));
+		assertNode("-", parser, parser._parseOperator.bind(parser));
+	});
+
+	test("combinator", () => {
+		assertNode("+", parser, parser._parseCombinator.bind(parser));
+		assertNode("+  ", parser, parser._parseCombinator.bind(parser));
+		assertNode(">  ", parser, parser._parseCombinator.bind(parser));
+		assertNode(">", parser, parser._parseCombinator.bind(parser));
+		assertNode(">>>", parser, parser._parseCombinator.bind(parser));
+		assertNode("/deep/", parser, parser._parseCombinator.bind(parser));
+		assertNode(
+			`:host >>> .data-table
+	width: 100%`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+
+		assertError(
+			`:host >> .data-table
+	width: 100%`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.IndentExpected,
+		);
+	});
+
+	test("unary_operator", () => {
+		assertNode("-", parser, parser._parseUnaryOperator.bind(parser));
+		assertNode("+", parser, parser._parseUnaryOperator.bind(parser));
+	});
+
+	test("property", () => {
+		assertNode("asdsa", parser, parser._parseProperty.bind(parser));
+		assertNode("asdsa334", parser, parser._parseProperty.bind(parser));
+
+		assertNode("--color", parser, parser._parseProperty.bind(parser));
+		assertNode("--primary-font", parser, parser._parseProperty.bind(parser));
+		assertNode("-color", parser, parser._parseProperty.bind(parser));
+		assertNode("somevar", parser, parser._parseProperty.bind(parser));
+		assertNode("some--let", parser, parser._parseProperty.bind(parser));
+		assertNode("somevar--", parser, parser._parseProperty.bind(parser));
 	});
 });

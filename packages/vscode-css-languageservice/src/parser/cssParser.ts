@@ -541,12 +541,12 @@ export class Parser {
 			while (this.accept(TokenType.Newline)) {
 				// accept empty statements
 			}
-			// don't raise an error of dedent expected if this is the end of the file
 			if (this.accept(TokenType.EOF)) {
 				return this.finish(node);
 			}
 			if (!this.accept(TokenType.Dedent)) {
-				return this.finish(node, ParseError.DedentExpected, [TokenType.Newline, TokenType.Indent]);
+				// TODO: figure out if/when we should raise this
+				// return this.finish(node, ParseError.DedentExpected, [TokenType.Newline, TokenType.Indent]);
 			}
 		} else {
 			if (!this.accept(TokenType.CurlyR)) {

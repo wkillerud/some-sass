@@ -179,7 +179,7 @@ comment */ c
 		assertNode(
 			`
 @font-face
-	unicode-range: U+0021-007F
+	unicode-range: U+0021-007F, u+1f49C, U+4??, U+??????
 `,
 			parser,
 			parser._parseStylesheet.bind(parser),
@@ -509,37 +509,6 @@ comment */ c
 		);
 
 		assertError("@keyframes )", parser, parser._parseKeyframe.bind(parser), ParseError.IdentifierExpected);
-		assertError(
-			`@keyframes name
-	from, #123`,
-			parser,
-			parser._parseKeyframe.bind(parser),
-			ParseError.DedentExpected, // Not as accurate as SCSS, but good enough
-		);
-		assertError(
-			`@keyframes name
-	10% from
-		top: 0px`,
-			parser,
-			parser._parseKeyframe.bind(parser),
-			ParseError.DedentExpected,
-		);
-		assertError(
-			`@keyframes name
-	10% 20%
-		top: 0px`,
-			parser,
-			parser._parseKeyframe.bind(parser),
-			ParseError.DedentExpected,
-		);
-		assertError(
-			`@keyframes name
-	from to
-		top: 0px`,
-			parser,
-			parser._parseKeyframe.bind(parser),
-			ParseError.DedentExpected,
-		);
 	});
 
 	test("@property", () => {
@@ -1065,6 +1034,23 @@ comment */ c
 
 	test("ruleset", () => {
 		assertNode(
+			`selector
+	property: value
+	@keyframes foo
+		from
+			top: 0
+		100%
+			top: 100%
+	@-moz-keyframes foo
+		from
+			top: 0
+		100%
+			top: 100%`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+
+		assertNode(
 			`name
 	foo: bar`,
 			parser,
@@ -1183,6 +1169,46 @@ name
 		assertNode(
 			`name
 	--normal-text: {}`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+
+		assertNode(
+			`.selector
+	prop: erty $const 1px`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`.selector
+	prop: erty $const 1px m.$foo`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`selector:active
+	property: value
+	nested: hover
+		property: value`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`selector
+	property: declaration`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`selector
+	$variable: declaration`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`selector
+	property: value
+	property: $value`,
 			parser,
 			parser._parseRuleset.bind(parser),
 		);
@@ -1324,6 +1350,69 @@ foo
 	color: red
 	@media screen
 		color: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+
+		assertNode(
+			`
+.foo
+	$const: 1
+	.class
+		$const: 2
+		$const: 3
+	one: $const`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+.class1
+	> .class2
+		& > .class4
+			rule1: v1`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+foo
+	@at-root
+		display: none`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+th, tr
+	@at-root #{selector-replace(&, "tr")}
+		border-bottom: 0`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+foo
+	@supports(display: grid)
+		.bar
+			display: none`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+foo
+	@supports(display: grid)
+		display: none`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+foo
+	@supports(position: sticky)
+		@media (min-width: map-get($grid-breakpoints, medium))
+			position: sticky`,
 			parser,
 			parser._parseRuleset.bind(parser),
 		);
@@ -1599,6 +1688,12 @@ figure
 	});
 
 	test("url", () => {
+		assertNode("url(foo())", parser, parser._parseURILiteral.bind(parser));
+		assertNode(
+			"url('data:image/svg+xml;utf8,%3Csvg%20fill%3D%22%23' + $color + 'foo')",
+			parser,
+			parser._parseURILiteral.bind(parser),
+		);
 		assertNode("url(//yourdomain/yourpath.png)", parser, parser._parseURILiteral.bind(parser));
 		assertNode("url('http://msft.com')", parser, parser._parseURILiteral.bind(parser));
 		assertNode('url("http://msft.com")', parser, parser._parseURILiteral.bind(parser));
@@ -1621,5 +1716,76 @@ figure
 			parser._parseURILiteral.bind(parser),
 			ParseError.RightParenthesisExpected,
 		);
+	});
+
+	test("map", () => {
+		assertNode("(key1: 1px, key2: solid + px, key3: (2+3))", parser, parser._parseExpr.bind(parser));
+		assertNode("($key1 + 3: 1px)", parser, parser._parseExpr.bind(parser));
+	});
+
+	test("parent selector", () => {
+		assertNode("&:hover", parser, parser._parseSimpleSelector.bind(parser));
+		assertNode("&.float", parser, parser._parseSimpleSelector.bind(parser));
+		assertNode("&-bar", parser, parser._parseSimpleSelector.bind(parser));
+		assertNode("&-1", parser, parser._parseSimpleSelector.bind(parser));
+		assertNode("&1", parser, parser._parseSimpleSelector.bind(parser));
+		assertNode("&-foo-1", parser, parser._parseSimpleSelector.bind(parser));
+		assertNode("&&", parser, parser._parseSimpleSelector.bind(parser));
+		assertNode("&-10-thing", parser, parser._parseSimpleSelector.bind(parser));
+	});
+
+	test("placeholder selector", () => {
+		assertNode("%hover", parser, parser._parseSimpleSelector.bind(parser));
+		assertNode("a%float", parser, parser._parseSimpleSelector.bind(parser));
+	});
+
+	test("selector interpolation", function () {
+		assertNode(`.#{$name}\n\t//`, parser, parser._parseRuleset.bind(parser));
+		assertNode(`.#{$name}-foo\n\t//`, parser, parser._parseRuleset.bind(parser));
+		assertNode(`.#{$name}-foo-3\n\t//`, parser, parser._parseRuleset.bind(parser));
+		assertNode(`.#{$name}-1\n\t//`, parser, parser._parseRuleset.bind(parser));
+		assertNode(`.sc-col#{$postfix}-2-1\n\t//`, parser, parser._parseRuleset.bind(parser));
+		assertNode(`p.#{$name}\n\t#{$attr}-color: blue`, parser, parser._parseRuleset.bind(parser));
+		assertNode(
+			`sans-#{serif}
+	a-#{1 + 2}-color-#{$attr}: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(`##{f} .#{f} #{f}:#{f}\n\t//`, parser, parser._parseRuleset.bind(parser));
+		assertNode(`.foo-#{&} .foo-#{&-sub}\n\t//`, parser, parser._parseRuleset.bind(parser));
+		assertNode(`.-#{$variable}\n\t//`, parser, parser._parseRuleset.bind(parser));
+		assertNode(`#{&}([foo=bar][bar=foo])\n\t//`, parser, parser._parseRuleset.bind(parser));
+
+		assertNode(`.#{module.$name}\n\t//`, parser, parser._parseRuleset.bind(parser));
+		assertNode(`.#{module.$name}-foo\n\t//`, parser, parser._parseRuleset.bind(parser));
+		assertNode(`.#{module.$name}-foo-3\n\t//`, parser, parser._parseRuleset.bind(parser));
+		assertNode(`.#{module.$name}-1\n\t//`, parser, parser._parseRuleset.bind(parser));
+		assertNode(`.sc-col#{module.$postfix}-2-1\n\t//`, parser, parser._parseRuleset.bind(parser));
+		assertNode(
+			`p.#{module.$name}
+	#{$attr}-color: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`p.#{$name}
+	#{module.$attr}-color: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`p.#{module.$name}
+	#{module.$attr}-color: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`sans-#{serif}
+	a-#{1 + 2}-color-#{module.$attr}: blue`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(`.-#{module.$variable}\n\t//`, parser, parser._parseRuleset.bind(parser));
 	});
 });

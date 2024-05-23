@@ -2,7 +2,7 @@ import { suite, test, assert } from "vitest";
 import { ParseError } from "../../parser/cssErrors";
 import { SassParser } from "../../parser/sassParser";
 import * as nodes from "../../parser/cssNodes";
-import { assertError, assertNode } from "../css/parser.test";
+import { assertError, assertFunction, assertNoNode, assertNode } from "../css/parser.test";
 
 suite("Sass - Parser", () => {
 	const parser = new SassParser({ syntax: "indented" });
@@ -1403,6 +1403,223 @@ figure
 			min-block-size: 100%`,
 			parser,
 			parser._parseStylesheet.bind(parser),
+		);
+	});
+
+	test("selector", () => {
+		assertNode("asdsa", parser, parser._parseSelector.bind(parser));
+		assertNode("asdsa + asdas", parser, parser._parseSelector.bind(parser));
+		assertNode("asdsa + asdas + name", parser, parser._parseSelector.bind(parser));
+		assertNode("asdsa + asdas + name", parser, parser._parseSelector.bind(parser));
+		assertNode("name #id#anotherid", parser, parser._parseSelector.bind(parser));
+		assertNode("name.far .boo", parser, parser._parseSelector.bind(parser));
+		assertNode("name .name .zweitername", parser, parser._parseSelector.bind(parser));
+		assertNode("*", parser, parser._parseSelector.bind(parser));
+		assertNode("#id", parser, parser._parseSelector.bind(parser));
+		assertNode("far.boo", parser, parser._parseSelector.bind(parser));
+		assertNode("::slotted(div)::after", parser, parser._parseSelector.bind(parser)); // 35076
+	});
+
+	test("attrib", () => {
+		assertNode("[name]", parser, parser._parseAttrib.bind(parser));
+		assertNode("[name = name2]", parser, parser._parseAttrib.bind(parser));
+		assertNode("[name ~= name3]", parser, parser._parseAttrib.bind(parser));
+		assertNode("[name~=name3]", parser, parser._parseAttrib.bind(parser));
+		assertNode("[name |= name3]", parser, parser._parseAttrib.bind(parser));
+		assertNode('[name |= "this is a striiiing"]', parser, parser._parseAttrib.bind(parser));
+		assertNode('[href*="insensitive" i]', parser, parser._parseAttrib.bind(parser));
+		assertNode('[href*="sensitive" S]', parser, parser._parseAttrib.bind(parser));
+
+		// Single namespace
+		assertNode("[namespace|name]", parser, parser._parseAttrib.bind(parser));
+		assertNode("[name-space|name = name2]", parser, parser._parseAttrib.bind(parser));
+		assertNode("[name_space|name ~= name3]", parser, parser._parseAttrib.bind(parser));
+		assertNode("[name0spae|name~=name3]", parser, parser._parseAttrib.bind(parser));
+		assertNode('[NameSpace|name |= "this is a striiiing"]', parser, parser._parseAttrib.bind(parser));
+		assertNode("[name\\*space|name |= name3]", parser, parser._parseAttrib.bind(parser));
+		assertNode("[*|name]", parser, parser._parseAttrib.bind(parser));
+	});
+
+	test("pseudo", () => {
+		assertNode(":some", parser, parser._parsePseudo.bind(parser));
+		assertNode(":some(thing)", parser, parser._parsePseudo.bind(parser));
+		assertNode(":nth-child(12)", parser, parser._parsePseudo.bind(parser));
+		assertNode(":nth-child(1n)", parser, parser._parsePseudo.bind(parser));
+		assertNode(":nth-child(-n+3)", parser, parser._parsePseudo.bind(parser));
+		assertNode(":nth-child(2n+1)", parser, parser._parsePseudo.bind(parser));
+		assertNode(":nth-child(2n+1 of .foo)", parser, parser._parsePseudo.bind(parser));
+		assertNode(':nth-child(2n+1 of .foo > bar, :not(*) ~ [other="value"])', parser, parser._parsePseudo.bind(parser));
+		assertNode(":lang(it)", parser, parser._parsePseudo.bind(parser));
+		assertNode(":not(.class)", parser, parser._parsePseudo.bind(parser));
+		assertNode(":not(:disabled)", parser, parser._parsePseudo.bind(parser));
+		assertNode(":not(#foo)", parser, parser._parsePseudo.bind(parser));
+		assertNode("::slotted(*)", parser, parser._parsePseudo.bind(parser)); // #35076
+		assertNode("::slotted(div:hover)", parser, parser._parsePseudo.bind(parser)); // #35076
+		assertNode(":global(.output ::selection)", parser, parser._parsePseudo.bind(parser)); // #49010
+		assertNode(":matches(:hover, :focus)", parser, parser._parsePseudo.bind(parser)); // #49010
+		assertNode(":host([foo=bar][bar=foo])", parser, parser._parsePseudo.bind(parser)); // #49589
+		assertNode(":has(> .test)", parser, parser._parsePseudo.bind(parser)); // #250
+		assertNode(":has(~ .test)", parser, parser._parsePseudo.bind(parser)); // #250
+		assertNode(":has(+ .test)", parser, parser._parsePseudo.bind(parser)); // #250
+		assertNode(":has(~ div .test)", parser, parser._parsePseudo.bind(parser)); // #250
+		assertError("::", parser, parser._parsePseudo.bind(parser), ParseError.IdentifierExpected);
+		assertError(":: foo", parser, parser._parsePseudo.bind(parser), ParseError.IdentifierExpected);
+		assertError(":nth-child(1n of)", parser, parser._parsePseudo.bind(parser), ParseError.SelectorExpected);
+	});
+
+	test("declaration", () => {
+		assertNode('name : "this is a string" !important', parser, parser._parseDeclaration.bind(parser));
+		assertNode('name : "this is a string"', parser, parser._parseDeclaration.bind(parser));
+		assertNode("property:12", parser, parser._parseDeclaration.bind(parser));
+		assertNode("-vendor-property: 12", parser, parser._parseDeclaration.bind(parser));
+		assertNode("font-size: 12px", parser, parser._parseDeclaration.bind(parser));
+		assertNode("color : #888 /4", parser, parser._parseDeclaration.bind(parser));
+		assertNode(
+			"filter : progid:DXImageTransform.Microsoft.Shadow(color=#000000,direction=45)",
+			parser,
+			parser._parseDeclaration.bind(parser),
+		);
+		assertNode(
+			"filter : progid: DXImageTransform.Microsoft.DropShadow(offx=2, offy=1, color=#000000)",
+			parser,
+			parser._parseDeclaration.bind(parser),
+		);
+		assertNode("font-size: 12px", parser, parser._parseDeclaration.bind(parser));
+		assertNode("*background: #f00 /* IE 7 and below */", parser, parser._parseDeclaration.bind(parser));
+		assertNode("_background: #f60 /* IE 6 and below */", parser, parser._parseDeclaration.bind(parser));
+		assertNode(
+			"background-image: linear-gradient(to right, silver, white 50px, white calc(100% - 50px), silver)",
+			parser,
+			parser._parseDeclaration.bind(parser),
+		);
+		assertNode(
+			"grid-template-columns: [first nav-start] 150px [main-start] 1fr [last]",
+			parser,
+			parser._parseDeclaration.bind(parser),
+		);
+		assertNode(
+			"grid-template-columns: repeat(4, 10px [col-start] 250px [col-end]) 10px",
+			parser,
+			parser._parseDeclaration.bind(parser),
+		);
+		assertNode(
+			"grid-template-columns: [a] auto [b] minmax(min-content, 1fr) [b c d] repeat(2, [e] 40px)",
+			parser,
+			parser._parseDeclaration.bind(parser),
+		);
+		assertNode("grid-template: [foo] 10px / [bar] 10px", parser, parser._parseDeclaration.bind(parser));
+		assertNode(
+			`grid-template: 'left1 footer footer' 1fr [end] / [ini] 1fr [info-start] 2fr 1fr [end]`,
+			parser,
+			parser._parseDeclaration.bind(parser),
+		);
+		assertNode(`content: "("counter(foo) ")"`, parser, parser._parseDeclaration.bind(parser));
+		assertNode(`content: 'Hello\\0A''world'`, parser, parser._parseDeclaration.bind(parser));
+	});
+
+	test("term", () => {
+		assertNode('"asdasd"', parser, parser._parseTerm.bind(parser));
+		assertNode("name", parser, parser._parseTerm.bind(parser));
+		assertNode("#FFFFFF", parser, parser._parseTerm.bind(parser));
+		assertNode('url("this is a url")', parser, parser._parseTerm.bind(parser));
+		assertNode("+324", parser, parser._parseTerm.bind(parser));
+		assertNode("-45", parser, parser._parseTerm.bind(parser));
+		assertNode("+45", parser, parser._parseTerm.bind(parser));
+		assertNode("-45%", parser, parser._parseTerm.bind(parser));
+		assertNode("-45mm", parser, parser._parseTerm.bind(parser));
+		assertNode("-45em", parser, parser._parseTerm.bind(parser));
+		assertNode('"asdsa"', parser, parser._parseTerm.bind(parser));
+		assertNode("faa", parser, parser._parseTerm.bind(parser));
+		assertNode('url("this is a striiiiing")', parser, parser._parseTerm.bind(parser));
+		assertNode("#FFFFFF", parser, parser._parseTerm.bind(parser));
+		assertNode("name(asd)", parser, parser._parseTerm.bind(parser));
+		assertNode("calc(50% + 20px)", parser, parser._parseTerm.bind(parser));
+		assertNode("calc(50% + (100%/3 - 2*1em - 2*1px))", parser, parser._parseTerm.bind(parser));
+		assertNoNode(
+			"%('repetitions: %S file: %S', 1 + 2, \"directory/file.less\")",
+			parser,
+			parser._parseTerm.bind(parser),
+		); // less syntax
+		assertNoNode('~"ms:alwaysHasItsOwnSyntax.For.Stuff()"', parser, parser._parseTerm.bind(parser)); // less syntax
+		assertNode("U+002?-0199", parser, parser._parseTerm.bind(parser));
+		assertNoNode("U+002?-01??", parser, parser._parseTerm.bind(parser));
+		assertNoNode("U+00?0;", parser, parser._parseTerm.bind(parser));
+		assertNoNode("U+0XFF;", parser, parser._parseTerm.bind(parser));
+	});
+
+	test("function", () => {
+		assertNode('name( "bla" )', parser, parser._parseFunction.bind(parser));
+		assertNode("name( name )", parser, parser._parseFunction.bind(parser));
+		assertNode("name( -500mm )", parser, parser._parseFunction.bind(parser));
+		assertNode("\u060frf()", parser, parser._parseFunction.bind(parser));
+		assertNode("über()", parser, parser._parseFunction.bind(parser));
+
+		assertNoNode("über ()", parser, parser._parseFunction.bind(parser));
+		assertNoNode("%()", parser, parser._parseFunction.bind(parser));
+		assertNoNode("% ()", parser, parser._parseFunction.bind(parser));
+
+		assertFunction("let(--color)", parser, parser._parseFunction.bind(parser));
+		assertFunction("let(--color, somevalue)", parser, parser._parseFunction.bind(parser));
+		assertFunction("let(--variable1, --variable2)", parser, parser._parseFunction.bind(parser));
+		assertFunction("let(--variable1, let(--variable2))", parser, parser._parseFunction.bind(parser));
+		assertFunction("fun(value1, value2)", parser, parser._parseFunction.bind(parser));
+		assertFunction("fun(value1,)", parser, parser._parseFunction.bind(parser));
+	});
+
+	test("test token prio", () => {
+		assertNode("!important", parser, parser._parsePrio.bind(parser));
+		assertNode("!/*demo*/important", parser, parser._parsePrio.bind(parser));
+		assertNode("! /*demo*/ important", parser, parser._parsePrio.bind(parser));
+		assertNode("! /*dem o*/  important", parser, parser._parsePrio.bind(parser));
+	});
+
+	test("hexcolor", () => {
+		assertNode("#FFF", parser, parser._parseHexColor.bind(parser));
+		assertNode("#FFFF", parser, parser._parseHexColor.bind(parser));
+		assertNode("#FFFFFF", parser, parser._parseHexColor.bind(parser));
+		assertNode("#FFFFFFFF", parser, parser._parseHexColor.bind(parser));
+	});
+
+	test("test class", () => {
+		assertNode(".faa", parser, parser._parseClass.bind(parser));
+		assertNode("faa", parser, parser._parseElementName.bind(parser));
+		assertNode("*", parser, parser._parseElementName.bind(parser));
+		assertNode(".faa42", parser, parser._parseClass.bind(parser));
+	});
+
+	test("prio", () => {
+		assertNode("!important", parser, parser._parsePrio.bind(parser));
+	});
+
+	test("expr", () => {
+		assertNode("45,5px", parser, parser._parseExpr.bind(parser));
+		assertNode(" 45 , 5px ", parser, parser._parseExpr.bind(parser));
+		assertNode("5/6", parser, parser._parseExpr.bind(parser));
+		assertNode("36mm, -webkit-calc(100%-10px)", parser, parser._parseExpr.bind(parser));
+	});
+
+	test("url", () => {
+		assertNode("url(//yourdomain/yourpath.png)", parser, parser._parseURILiteral.bind(parser));
+		assertNode("url('http://msft.com')", parser, parser._parseURILiteral.bind(parser));
+		assertNode('url("http://msft.com")', parser, parser._parseURILiteral.bind(parser));
+		assertNode('url( "http://msft.com")', parser, parser._parseURILiteral.bind(parser));
+		assertNode('url(\t"http://msft.com")', parser, parser._parseURILiteral.bind(parser));
+		assertNode('url("")', parser, parser._parseURILiteral.bind(parser));
+		assertNode('uRL("")', parser, parser._parseURILiteral.bind(parser));
+		assertNode('URL("")', parser, parser._parseURILiteral.bind(parser));
+		assertNode("url(http://msft.com)", parser, parser._parseURILiteral.bind(parser));
+		assertNode("url()", parser, parser._parseURILiteral.bind(parser));
+		assertError(
+			'url("http://msft.com"',
+			parser,
+			parser._parseURILiteral.bind(parser),
+			ParseError.RightParenthesisExpected,
+		);
+		assertError(
+			"url(http://msft.com')",
+			parser,
+			parser._parseURILiteral.bind(parser),
+			ParseError.RightParenthesisExpected,
 		);
 	});
 });

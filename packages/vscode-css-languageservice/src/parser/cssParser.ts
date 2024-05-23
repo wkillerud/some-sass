@@ -410,6 +410,10 @@ export class Parser {
 		const node = this.create(nodes.RuleSet);
 		const selectors = node.getSelectors();
 
+		while (this.accept(TokenType.Newline)) {
+			// accept empty statements
+		}
+
 		if (!selectors.addChild(this._parseSelector(isNested))) {
 			return null;
 		}
@@ -487,10 +491,6 @@ export class Parser {
 			if (!this.accept(TokenType.Indent)) {
 				return null;
 			}
-			// What causes this extra redundant Indent token?
-			// while (this.accept(TokenType.Indent)) {
-			// 	// accept empty statements
-			// }
 			while (this.accept(TokenType.Newline)) {
 				// accept empty statements
 			}
@@ -737,7 +737,7 @@ export class Parser {
 					break done;
 				case TokenType.EOF:
 					if (this.syntax === "indented") {
-						break;
+						break done;
 					}
 					// We shouldn't have reached the end of input, something is
 					// unterminated.

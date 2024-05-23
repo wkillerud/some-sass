@@ -1062,4 +1062,131 @@ comment */ c
 		assertNode("some--let", parser, parser._parseProperty.bind(parser));
 		assertNode("somevar--", parser, parser._parseProperty.bind(parser));
 	});
+
+	test("ruleset", () => {
+		assertNode(
+			`name
+	foo: bar`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+
+name
+	foo: "asdfasdf"`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`
+
+name
+	foo : "asdfasdf" !important`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`*
+	foo: bar`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`.far
+	foo: bar`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`boo
+	foo: bar`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`.far #boo
+	foo: bar`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`name
+	foo: bar
+	baz: bar`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+
+		assertError(
+			`name
+	--minimal:`,
+			parser,
+			parser._parseRuleset.bind(parser),
+			ParseError.PropertyValueExpected,
+		);
+		assertNode(
+			`name
+	--minimal:
+
+	other
+		padding: 1rem`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`name
+	--normal-text: red yellow green`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`name
+	--normal-text: red !important`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+
+		assertError(
+			`name
+	--nested:
+		color: green`, // not supported in indented
+			parser,
+			parser._parseRuleset.bind(parser),
+			ParseError.IdentifierExpected,
+		);
+
+		assertNode(
+			`name
+	--normal-text: this()is()ok()`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`name
+	--normal-text: this[]is[]ok[]`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`name
+	--normal-text: ([{{[]()()}[]{}}])()`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
+			`name
+	--normal-text: , 0 0`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+
+		assertError(
+			`boo,
+	`,
+			parser,
+			parser._parseRuleset.bind(parser),
+			ParseError.SelectorExpected,
+		);
+	});
 });

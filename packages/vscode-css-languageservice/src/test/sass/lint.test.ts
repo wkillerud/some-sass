@@ -25,7 +25,7 @@ function assertRuleSet(input: string, ...rules: Rule[]): void {
 	assertEntries(node, document, rules);
 }
 
-suite("SCSS - Lint", () => {
+suite("Sass - Lint", () => {
 	test("empty ruleset", function () {
 		assertRuleSet("selector { color: red; nested {} }", Rules.EmptyRuleSet);
 	});

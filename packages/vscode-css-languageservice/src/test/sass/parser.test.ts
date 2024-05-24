@@ -1034,6 +1034,16 @@ comment */ c
 
 	test("ruleset", () => {
 		assertNode(
+			`
+.foo
+	font:
+		family: Arial
+		size: 20px
+	color: #ff0000`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+		assertNode(
 			`selector
 	property: value
 	@keyframes foo
@@ -1134,16 +1144,13 @@ name
 			parser,
 			parser._parseRuleset.bind(parser),
 		);
-
-		assertError(
+		assertNode(
 			`name
 	--nested:
-		color: green`, // not supported in indented
+		color: green`,
 			parser,
 			parser._parseRuleset.bind(parser),
-			ParseError.IdentifierExpected,
 		);
-
 		assertNode(
 			`name
 	--normal-text: this()is()ok()`,
@@ -2078,5 +2085,66 @@ figure
 			parser,
 			parser._parseStylesheet.bind(parser),
 		);
+	});
+
+	test("@content", () => {
+		assertNode("@content", parser, parser._parseMixinContent.bind(parser));
+		assertNode("@content($type)", parser, parser._parseMixinContent.bind(parser));
+	});
+
+	test("@mixin", () => {
+		assertNode(
+			`@mixin large-text
+	font:
+		family: Arial
+		size: 20px
+	color: #ff0000`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@mixin double-border($color, $width: 1in)
+	color: black`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@mixin box-shadow($shadows...)
+	-moz-box-shadow: $shadows`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@mixin apply-to-ie6-only
+	* html
+		@content`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(`@mixin #{foo}($color)\n\t//`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(
+			`@mixin foo ($i:4)
+	size: $i
+	@include wee ($i - 1)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(`@mixin foo ($i,)\n\t//`, parser, parser._parseStylesheet.bind(parser));
+
+		assertError(`@mixin $1\n\t//`, parser, parser._parseStylesheet.bind(parser), ParseError.IdentifierExpected);
+		assertError(`@mixin foo() i\n\t//`, parser, parser._parseStylesheet.bind(parser), ParseError.IndentExpected);
+		assertError(
+			`@mixin foo(1)\n\t//`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.RightParenthesisExpected,
+		);
+		assertError(
+			`@mixin foo($color = 9)\n\t//`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.RightParenthesisExpected,
+		);
+		assertError(`@mixin foo($color)`, parser, parser._parseStylesheet.bind(parser), ParseError.IndentExpected);
 	});
 });

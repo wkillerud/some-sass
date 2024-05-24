@@ -1861,7 +1861,7 @@ export class Parser {
 		const pos = this.mark();
 		const node = this.createNode(nodes.NodeType.PseudoSelector);
 		this.consumeToken(); // Colon
-		if (this.hasWhitespace()) {
+		if (this.hasWhitespace() || this.peek(TokenType.Indent)) {
 			this.restoreAtMark(pos);
 			return null;
 		}

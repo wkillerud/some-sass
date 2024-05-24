@@ -72,6 +72,123 @@ comment */ c
 		);
 	});
 
+	test("stylesheet", () => {
+		assertNode(`$color: #F5F5F5`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(
+			`$color: #F5F5F5
+$color: #F5F5F5`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`$color: #F5F5F5
+$color: #F5F5F5
+$color: #F5F5F5`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(`$color: #F5F5F5 !important`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(
+			`#main
+	width: 97%
+	p, div
+		a
+			font-weight: bold`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`a
+	&:hover
+		color: red`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`fo
+	font: 2px/3px
+		family: fantasy`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`.foo
+	bar:
+		yoo: fantasy`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`selector
+	propsuffix:
+		nested: 1px
+	rule: 1px
+	nested.selector
+		foo: 1
+	nested:selector
+		foo: 2`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`legend
+	foo
+		a:s
+	margin-top: 0
+	margin-bottom: #123
+	margin-top:s(1)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@mixin keyframe
+	@keyframes name
+		@content`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@include keyframe
+	10%
+		top: 3px`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`.class
+	&--sub-class-with-ampersand
+		color: red`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertError(
+			`fo
+	font: 2px/3px
+		family`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.ColonExpected,
+		);
+
+		assertNode(
+			`legend
+	foo
+		a:s
+	margin-top:0
+	margin-bottom:#123
+	margin-top:m.s(1)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@include module.keyframe
+	10%
+		top: 3px`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+	});
+
 	test("@media", () => {
 		assertNode(
 			`@media screen, projection
@@ -2651,5 +2768,403 @@ figure
 			parser._parseStylesheet.bind(parser),
 			ParseError.UnknownKeyword,
 		);
+	});
+
+	test("@forward", () => {
+		assertNode('@forward "test"', parser, parser._parseForward.bind(parser));
+		assertNode('@forward "test" as foo-*', parser, parser._parseForward.bind(parser));
+		assertNode('@forward "test" hide this', parser, parser._parseForward.bind(parser));
+		assertNode('@forward "test" hide $that', parser, parser._parseForward.bind(parser));
+		assertNode('@forward "test" hide this $that', parser, parser._parseForward.bind(parser));
+		assertNode('@forward "test" hide this, $that', parser, parser._parseForward.bind(parser));
+		assertNode('@forward "abstracts/functions" show px-to-rem, theme-color', parser, parser._parseForward.bind(parser));
+		assertNode('@forward "test" show this', parser, parser._parseForward.bind(parser));
+		assertNode('@forward "test" show $that', parser, parser._parseForward.bind(parser));
+		assertNode('@forward "test" show this $that', parser, parser._parseForward.bind(parser));
+		assertNode('@forward "test" as foo-* show this $that', parser, parser._parseForward.bind(parser));
+
+		assertError("@forward", parser, parser._parseForward.bind(parser), ParseError.StringLiteralExpected);
+		assertError('@forward "test" as', parser, parser._parseForward.bind(parser), ParseError.IdentifierExpected);
+		assertError('@forward "test" as foo-', parser, parser._parseForward.bind(parser), ParseError.WildcardExpected);
+		assertError('@forward "test" as foo- *', parser, parser._parseForward.bind(parser), ParseError.WildcardExpected);
+		assertError(
+			'@forward "test" show',
+			parser,
+			parser._parseForward.bind(parser),
+			ParseError.IdentifierOrVariableExpected,
+		);
+		assertError(
+			'@forward "test" hide',
+			parser,
+			parser._parseForward.bind(parser),
+			ParseError.IdentifierOrVariableExpected,
+		);
+
+		assertNode(
+			'@forward "test" with (  $black: #222 !default,  $border-radius: 0.1rem !default )',
+			parser,
+			parser._parseForward.bind(parser),
+		);
+		assertNode(
+			'@forward "../forms.scss" as components-* with ( $field-border: false )',
+			parser,
+			parser._parseForward.bind(parser),
+		); // #145108
+
+		assertNode(
+			`@use "lib"
+@forward "test"`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@forward "test"
+@forward "lib"`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`$test: "test"
+@forward "test"`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+	});
+
+	test("@use", () => {
+		assertNode('@use "test"', parser, parser._parseUse.bind(parser));
+		assertNode('@use "test" as foo', parser, parser._parseUse.bind(parser));
+		assertNode('@use "test" as *', parser, parser._parseUse.bind(parser));
+		assertNode('@use "test" with ($foo: "test", $bar: 1)', parser, parser._parseUse.bind(parser));
+		assertNode('@use "test" as foo with ($foo: "test", $bar: 1)', parser, parser._parseUse.bind(parser));
+
+		assertError("@use", parser, parser._parseUse.bind(parser), ParseError.StringLiteralExpected);
+		assertError('@use "test" foo', parser, parser._parseUse.bind(parser), ParseError.UnknownKeyword);
+		assertError('@use "test" as', parser, parser._parseUse.bind(parser), ParseError.IdentifierOrWildcardExpected);
+		assertError('@use "test" with', parser, parser._parseUse.bind(parser), ParseError.LeftParenthesisExpected);
+		assertError('@use "test" with ($foo)', parser, parser._parseUse.bind(parser), ParseError.VariableValueExpected);
+		assertError('@use "test" with ("bar")', parser, parser._parseUse.bind(parser), ParseError.VariableNameExpected);
+		assertError(
+			'@use "test" with ($foo: 1, "bar")',
+			parser,
+			parser._parseUse.bind(parser),
+			ParseError.VariableNameExpected,
+		);
+		assertError(
+			'@use "test" with ($foo: "bar"',
+			parser,
+			parser._parseUse.bind(parser),
+			ParseError.RightParenthesisExpected,
+		);
+
+		assertNode(
+			`@forward "test"
+@use "lib"`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@use "test"
+@use "lib"`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`$test: "test"
+@use "lib"`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+	});
+
+	test("@container", () => {
+		assertNode(
+			`@container (min-width: #{$minWidth})
+	.scss-interpolation
+		line-height: 10cqh`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`.item-icon
+	@container (max-height: 100px)
+		.item-icon
+			display: none`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`:root
+	@container (max-height: 100px)
+		display: none`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+	});
+
+	test("@layer", () => {
+		assertNode("@layer #{$layer}\n\t", parser, parser._parseLayer.bind(parser));
+	});
+
+	test("@import", () => {
+		assertNode('@import "test.css"', parser, parser._parseImport.bind(parser));
+		assertNode('@import url("test.css")', parser, parser._parseImport.bind(parser));
+		assertNode('@import "test.css", "bar.css"', parser, parser._parseImport.bind(parser));
+		assertNode('@import "test.css", "bar.css" screen, projection', parser, parser._parseImport.bind(parser));
+		assertNode(
+			`foo
+	@import "test.css"`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+
+		assertError(
+			'@import "test.css" "bar.css"',
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.MediaQueryExpected,
+		);
+		assertError('@import "test.css", screen', parser, parser._parseImport.bind(parser), ParseError.URIOrStringExpected);
+		assertError("@import", parser, parser._parseImport.bind(parser), ParseError.URIOrStringExpected);
+		assertNode('@import url("override.css") layer', parser, parser._parseStylesheet.bind(parser));
+	});
+
+	test("declaration", () => {
+		assertNode("border: thin solid 1px", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: $color", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: blue", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: (20 / $const)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: (20 / 20 + $const)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: func($red)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: func($red) !important", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: desaturate($red, 10%)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: desaturate(16, 10%)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("color: $base-color + #111", parser, parser._parseDeclaration.bind(parser));
+		assertNode("color: 100% / 2 + $ref", parser, parser._parseDeclaration.bind(parser));
+		assertNode("border: ($width * 2) solid black", parser, parser._parseDeclaration.bind(parser));
+		assertNode("property: $class", parser, parser._parseDeclaration.bind(parser));
+		assertNode("prop-erty: fnc($t, 10%)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("width: (1em + 2em) * 3", parser, parser._parseDeclaration.bind(parser));
+		assertNode("color: #010203 + #040506", parser, parser._parseDeclaration.bind(parser));
+		assertNode('font-family: sans- + "serif"', parser, parser._parseDeclaration.bind(parser));
+		assertNode("margin: 3px + 4px auto", parser, parser._parseDeclaration.bind(parser));
+		assertNode("color: hsl(0, 100%, 50%)", parser, parser._parseDeclaration.bind(parser));
+		assertNode(
+			"color: hsl($hue: 0, $saturation: 100%, $lightness: 50%)",
+			parser,
+			parser._parseDeclaration.bind(parser),
+		);
+		assertNode("foo: if($value == 'default', flex-gutter(), $value)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("foo: if(true, !important, null)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("color: selector-replace(&, 1)", parser, parser._parseDeclaration.bind(parser));
+
+		assertNode("dummy: module.$color", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: (20 / module.$const)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: (20 / 20 + module.$const)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: module.func($red)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: module.func($red) !important", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: module.desaturate($red, 10%)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: desaturate(module.$red, 10%)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: module.desaturate(module.$red, 10%)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("dummy: module.desaturate(16, 10%)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("color: module.$base-color + #111", parser, parser._parseDeclaration.bind(parser));
+		assertNode("color: 100% / 2 + module.$ref", parser, parser._parseDeclaration.bind(parser));
+		assertNode("border: (module.$width * 2) solid black", parser, parser._parseDeclaration.bind(parser));
+		assertNode("property: module.$class", parser, parser._parseDeclaration.bind(parser));
+		assertNode("prop-erty: module.fnc($t, 10%)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("prop-erty: fnc(module.$t, 10%)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("prop-erty: module.fnc(module.$t, 10%)", parser, parser._parseDeclaration.bind(parser));
+		assertNode("width: (1em + 2em) * 3", parser, parser._parseDeclaration.bind(parser));
+		assertNode("color: #010203 + #040506", parser, parser._parseDeclaration.bind(parser));
+		assertNode('font-family: sans- + "serif"', parser, parser._parseDeclaration.bind(parser));
+		assertNode("margin: 3px + 4px auto", parser, parser._parseDeclaration.bind(parser));
+		assertNode("color: color.hsl(0, 100%, 50%)", parser, parser._parseDeclaration.bind(parser));
+		assertNode(
+			"color: color.hsl($hue: 0, $saturation: 100%, $lightness: 50%)",
+			parser,
+			parser._parseDeclaration.bind(parser),
+		);
+		assertNode(
+			"foo: if(module.$value == 'default', flex-gutter(), $value)",
+			parser,
+			parser._parseDeclaration.bind(parser),
+		);
+		assertNode(
+			"foo: if($value == 'default', module.flex-gutter(), $value)",
+			parser,
+			parser._parseDeclaration.bind(parser),
+		);
+		assertNode(
+			"foo: if($value == 'default', flex-gutter(), module.$value)",
+			parser,
+			parser._parseDeclaration.bind(parser),
+		);
+		assertNode(
+			"foo: if(module.$value == 'default', module.flex-gutter(), $value)",
+			parser,
+			parser._parseDeclaration.bind(parser),
+		);
+		assertNode(
+			"foo: if($value == 'default', module.flex-gutter(), module.$value)",
+			parser,
+			parser._parseDeclaration.bind(parser),
+		);
+		assertNode(
+			"foo: if(module.$value == 'default', module.flex-gutter(), module.$value)",
+			parser,
+			parser._parseDeclaration.bind(parser),
+		);
+		assertNode("color: selector.replace(&, 1)", parser, parser._parseDeclaration.bind(parser));
+
+		assertError("fo = 8", parser, parser._parseDeclaration.bind(parser), ParseError.ColonExpected);
+		assertError("fo:", parser, parser._parseDeclaration.bind(parser), ParseError.PropertyValueExpected);
+		assertError("color: hsl($hue: 0,", parser, parser._parseDeclaration.bind(parser), ParseError.ExpressionExpected);
+		assertError(
+			"color: hsl($hue: 0",
+			parser,
+			parser._parseDeclaration.bind(parser),
+			ParseError.RightParenthesisExpected,
+		);
+	});
+
+	test("interpolation", () => {
+		assertNode("--#{module.$propname}: some-value", parser, parser._parseDeclaration.bind(parser));
+	});
+
+	test("operators", () => {
+		assertNode(">=", parser, parser._parseOperator.bind(parser));
+		assertNode(">", parser, parser._parseOperator.bind(parser));
+		assertNode("<", parser, parser._parseOperator.bind(parser));
+		assertNode("<=", parser, parser._parseOperator.bind(parser));
+		assertNode("==", parser, parser._parseOperator.bind(parser));
+		assertNode("!=", parser, parser._parseOperator.bind(parser));
+		assertNode("and", parser, parser._parseOperator.bind(parser));
+		assertNode("+", parser, parser._parseOperator.bind(parser));
+		assertNode("-", parser, parser._parseOperator.bind(parser));
+		assertNode("*", parser, parser._parseOperator.bind(parser));
+		assertNode("/", parser, parser._parseOperator.bind(parser));
+		assertNode("%", parser, parser._parseOperator.bind(parser));
+		assertNode("not", parser, parser._parseUnaryOperator.bind(parser));
+	});
+
+	test("expressions", () => {
+		assertNode("($const + 20)", parser, parser._parseExpr.bind(parser));
+		assertNode("($const - 20)", parser, parser._parseExpr.bind(parser));
+		assertNode("($const * 20)", parser, parser._parseExpr.bind(parser));
+		assertNode("($const / 20)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 + $const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 - $const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 * $const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 / $const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 / 20 + $const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 + 20 + $const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 + 20 + 20 + $const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 + 20 + 20 + 20 + $const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 + 20 + $const + 20 + 20 + $const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 + 20)", parser, parser._parseExpr.bind(parser));
+		assertNode("($var1 + $var2)", parser, parser._parseExpr.bind(parser));
+		assertNode("(($const + 5) * 2)", parser, parser._parseExpr.bind(parser));
+		assertNode("(($const + (5 + 2)) * 2)", parser, parser._parseExpr.bind(parser));
+		assertNode("($const + ((5 + 2) * 2))", parser, parser._parseExpr.bind(parser));
+		assertNode("$color", parser, parser._parseExpr.bind(parser));
+		assertNode("$color, $color", parser, parser._parseExpr.bind(parser));
+		assertNode("$color, 42%", parser, parser._parseExpr.bind(parser));
+		assertNode("$color, 42%, $color", parser, parser._parseExpr.bind(parser));
+		assertNode("$color - ($color + 10%)", parser, parser._parseExpr.bind(parser));
+		assertNode("($base + $filler)", parser, parser._parseExpr.bind(parser));
+		assertNode("(100% / 2 + $filler)", parser, parser._parseExpr.bind(parser));
+		assertNode("100% / 2 + $filler", parser, parser._parseExpr.bind(parser));
+		assertNode("not ($v and $b) or $c", parser, parser._parseExpr.bind(parser));
+
+		assertNode("(module.$const + 20)", parser, parser._parseExpr.bind(parser));
+		assertNode("(module.$const - 20)", parser, parser._parseExpr.bind(parser));
+		assertNode("(module.$const * 20)", parser, parser._parseExpr.bind(parser));
+		assertNode("(module.$const / 20)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 + module.$const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 - module.$const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 * module.$const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 / module.$const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 + 20 + module.$const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 + 20 + 20 + module.$const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 + 20 + 20 + 20 + module.$const)", parser, parser._parseExpr.bind(parser));
+		assertNode("(20 + 20 + module.$const + 20 + 20 + module.$const)", parser, parser._parseExpr.bind(parser));
+		assertNode("($var1 + module.$var2)", parser, parser._parseExpr.bind(parser));
+		assertNode("(module.$var1 + $var2)", parser, parser._parseExpr.bind(parser));
+		assertNode("(module.$var1 + module.$var2)", parser, parser._parseExpr.bind(parser));
+		assertNode("((module.$const + 5) * 2)", parser, parser._parseExpr.bind(parser));
+		assertNode("((module.$const + (5 + 2)) * 2)", parser, parser._parseExpr.bind(parser));
+		assertNode("(module.$const + ((5 + 2) * 2))", parser, parser._parseExpr.bind(parser));
+		assertNode("module.$color", parser, parser._parseExpr.bind(parser));
+		assertNode("module.$color, $color", parser, parser._parseExpr.bind(parser));
+		assertNode("$color, module.$color", parser, parser._parseExpr.bind(parser));
+		assertNode("module.$color, module.$color", parser, parser._parseExpr.bind(parser));
+		assertNode("module.$color, 42%", parser, parser._parseExpr.bind(parser));
+		assertNode("module.$color, 42%, $color", parser, parser._parseExpr.bind(parser));
+		assertNode("$color, 42%, module.$color", parser, parser._parseExpr.bind(parser));
+		assertNode("module.$color, 42%, module.$color", parser, parser._parseExpr.bind(parser));
+		assertNode("module.$color - ($color + 10%)", parser, parser._parseExpr.bind(parser));
+		assertNode("$color - (module.$color + 10%)", parser, parser._parseExpr.bind(parser));
+		assertNode("module.$color - (module.$color + 10%)", parser, parser._parseExpr.bind(parser));
+		assertNode("(module.$base + $filler)", parser, parser._parseExpr.bind(parser));
+		assertNode("($base + module.$filler)", parser, parser._parseExpr.bind(parser));
+		assertNode("(module.$base + module.$filler)", parser, parser._parseExpr.bind(parser));
+		assertNode("(100% / 2 + module.$filler)", parser, parser._parseExpr.bind(parser));
+		assertNode("100% / 2 + module.$filler", parser, parser._parseExpr.bind(parser));
+		assertNode("not (module.$v and $b) or $c", parser, parser._parseExpr.bind(parser));
+		assertNode("not ($v and module.$b) or $c", parser, parser._parseExpr.bind(parser));
+		assertNode("not ($v and $b) or module.$c", parser, parser._parseExpr.bind(parser));
+		assertNode("not (module.$v and module.$b) or $c", parser, parser._parseExpr.bind(parser));
+		assertNode("not (module.$v and $b) or module.$c", parser, parser._parseExpr.bind(parser));
+		assertNode("not ($v and module.$b) or module.$c", parser, parser._parseExpr.bind(parser));
+		assertNode("not (module.$v and module.$b) or module.$c", parser, parser._parseExpr.bind(parser));
+		assertNode("not module.$v", parser, parser._parseExpr.bind(parser));
+
+		assertError("(20 + 20", parser, parser._parseExpr.bind(parser), ParseError.RightParenthesisExpected);
+	});
+
+	test("variable declaration", () => {
+		assertNode("$color: #F5F5F5", parser, parser._parseVariableDeclaration.bind(parser));
+		assertNode("$color: 0", parser, parser._parseVariableDeclaration.bind(parser));
+		assertNode("$color: 255", parser, parser._parseVariableDeclaration.bind(parser));
+		assertNode("$color: 25.5", parser, parser._parseVariableDeclaration.bind(parser));
+		assertNode("$color: 25px", parser, parser._parseVariableDeclaration.bind(parser));
+		assertNode("$color: 25.5px !default", parser, parser._parseVariableDeclaration.bind(parser));
+		assertNode("$text-color: green !global", parser, parser._parseVariableDeclaration.bind(parser));
+		assertNode(
+			'$_RESOURCES: append($_RESOURCES, "clean") !global',
+			parser,
+			parser._parseVariableDeclaration.bind(parser),
+		);
+		assertNode("$footer-height: 40px !default !global", parser, parser._parseVariableDeclaration.bind(parser));
+		assertNode(
+			'$primary-font: "wf_SegoeUI","Segoe UI","Segoe","Segoe WP"',
+			parser,
+			parser._parseVariableDeclaration.bind(parser),
+		);
+		assertNode("$color: red !important", parser, parser._parseVariableDeclaration.bind(parser));
+
+		assertError("$color: red !def", parser, parser._parseVariableDeclaration.bind(parser), ParseError.UnknownKeyword);
+		assertError(
+			"$color : !default",
+			parser,
+			parser._parseVariableDeclaration.bind(parser),
+			ParseError.VariableValueExpected,
+		);
+		assertError("$color !default", parser, parser._parseVariableDeclaration.bind(parser), ParseError.ColonExpected);
+	});
+
+	test("variable", () => {
+		assertNode("$color", parser, parser._parseVariable.bind(parser));
+		assertNode("$co42lor", parser, parser._parseVariable.bind(parser));
+		assertNode("$-co42lor", parser, parser._parseVariable.bind(parser));
+	});
+
+	test("module variable", () => {
+		assertNode("module.$color", parser, parser._parseModuleMember.bind(parser));
+		assertNode("module.$co42lor", parser, parser._parseModuleMember.bind(parser));
+		assertNode("module.$-co42lor", parser, parser._parseModuleMember.bind(parser));
+		assertNode("module.function()", parser, parser._parseModuleMember.bind(parser));
+
+		assertError("module.", parser, parser._parseModuleMember.bind(parser), ParseError.IdentifierOrVariableExpected);
 	});
 });

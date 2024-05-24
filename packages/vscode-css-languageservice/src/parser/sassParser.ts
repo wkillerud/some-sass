@@ -851,7 +851,7 @@ export class SassParser extends cssParser.Parser {
 			return this.finish(node, ParseError.StringLiteralExpected);
 		}
 
-		if (!this.peek(TokenType.SemiColon) && !this.peek(TokenType.EOF)) {
+		if (!this.peek(TokenType.SemiColon) && !this.peek(TokenType.Newline) && !this.peek(TokenType.EOF)) {
 			if (!this.peekRegExp(TokenType.Ident, /as|with/)) {
 				return this.finish(node, ParseError.UnknownKeyword);
 			}

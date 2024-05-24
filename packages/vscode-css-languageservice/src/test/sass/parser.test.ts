@@ -1822,4 +1822,100 @@ figure
 			parser._parseStylesheet.bind(parser),
 		);
 	});
+
+	test("@function", () => {
+		assertNode(
+			`@function grid-width($n)
+	@return $n * $grid-width + ($n - 1) * $gutter-width`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@function grid-width($n: 1, $e)
+	@return 0`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@function foo($total, $a)
+	@for $i from 0 to $total
+		//
+	@return $grid`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@function foo()
+	@if (unit($a) == "%") and ($i == ($total - 1))
+		@return 0
+	@return 1`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@function is-even($int)
+	@if $int%2 == 0
+		@return true
+	@return false`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@function bar ($i)
+	@if $i > 0
+		@return $i * bar($i - 1)
+	@return 1`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@function foo($a,)
+	//`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+
+		assertError(
+			`@function foo
+	//`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.LeftParenthesisExpected,
+		);
+		assertError(
+			`@function
+	//`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.IdentifierExpected,
+		);
+		assertError(
+			`@function foo($a $b)
+	//`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.RightParenthesisExpected,
+		);
+		assertError(
+			`@function foo($a
+	//`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.RightParenthesisExpected,
+		);
+		assertError(
+			`@function foo($a...)
+	@return`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.ExpressionExpected,
+		);
+		assertError(
+			`@function foo($a:)
+	//`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.VariableValueExpected,
+		);
+	});
 });

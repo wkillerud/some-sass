@@ -924,7 +924,6 @@ suite("SCSS - Parser", () => {
 	});
 
 	test("@function", function () {
-		// 👆👆👆 you are here, going up 👆👆👆
 		const parser = new SassParser();
 		assertNode(
 			"@function grid-width($n) { @return $n * $grid-width + ($n - 1) * $gutter-width; }",

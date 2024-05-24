@@ -1918,4 +1918,165 @@ figure
 			ParseError.VariableValueExpected,
 		);
 	});
+
+	test("@include", () => {
+		assertNode(
+			`p
+	@include double-border(blue)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`.shadows
+	@include box-shadow(0px 4px 5px #666, 2px 6px 10px #999)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`$values: #ff0000, #00ff00, #0000ff
+
+.primary
+	@include colors($values...)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(`@include colors(this("styles")...)`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(
+			`.test
+	@include fontsize(16px, 21px !important)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`p
+	@include apply-to-ie6-only
+		#logo
+			background-image: url(/logo.gif)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`p
+	@include foo($values,)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`p
+	@include foo($values,)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+
+		assertError(
+			`p
+	@include double-border($values blue`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.RightParenthesisExpected,
+		);
+		assertError(
+			`p
+	@include`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.IdentifierExpected,
+		);
+		assertError(
+			`p
+	@include foo($values`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.RightParenthesisExpected,
+		);
+		assertError(
+			`p
+	@include foo($values,`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.ExpressionExpected,
+		);
+
+		assertNode(
+			`p
+	@include lib.double-border(blue)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`.shadows
+	@include lib.box-shadow(0px 4px 5px #666, 2px 6px 10px #999)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`$values: #ff0000, #00ff00, #0000ff
+.primary
+	@include lib.colors($values...)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`.primary
+	@include colors(lib.$values...)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`.primary
+	@include lib.colors(lib.$values...)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(`@include lib.colors(this("styles")...)`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(`@include colors(lib.this("styles")...)`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(`@include lib.colors(lib.this("styles")...)`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(
+			`.test
+	@include lib.fontsize(16px, 21px !important)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`p
+	@include lib.apply-to-ie6-only
+		#logo
+			background-image: url(/logo.gif)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`p
+	@include lib.foo($values,)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`p
+	@include foo(lib.$values,)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`p
+	@include lib.foo(m.$values,)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+
+		assertError(
+			`p
+	@include foo.($values)`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.IdentifierExpected,
+		);
+
+		assertNode(
+			`@include rtl("left") using ($dir)
+	margin-#{$dir}: 10px`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+	});
 });

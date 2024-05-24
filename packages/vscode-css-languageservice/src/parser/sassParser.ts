@@ -723,7 +723,7 @@ export class SassParser extends cssParser.Parser {
 			}
 		}
 
-		if (this.peekIdent("using") || this.peek(TokenType.CurlyL)) {
+		if (this.peekIdent("using") || this.peek(TokenType.CurlyL) || this.peek(TokenType.Indent)) {
 			node.setContent(this._parseMixinContentDeclaration());
 		}
 		return this.finish(node);

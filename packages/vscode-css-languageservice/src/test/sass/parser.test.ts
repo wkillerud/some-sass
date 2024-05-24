@@ -3,6 +3,7 @@ import { ParseError } from "../../parser/cssErrors";
 import { SassParser } from "../../parser/sassParser";
 import * as nodes from "../../parser/cssNodes";
 import { assertError, assertFunction, assertNoNode, assertNode } from "../css/parser.test";
+import { SassParseError } from "../../parser/sassErrors";
 
 suite("Sass - Parser", () => {
 	const parser = new SassParser({ syntax: "indented" });
@@ -2146,5 +2147,88 @@ figure
 			ParseError.RightParenthesisExpected,
 		);
 		assertError(`@mixin foo($color)`, parser, parser._parseStylesheet.bind(parser), ParseError.IndentExpected);
+	});
+
+	test("@while", () => {
+		assertNode(
+			`@while $i < 0
+	.item-#{$i}
+		width: 2em * $i
+	$i: $i - 2`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+		);
+		assertError(`@while\n\t//`, parser, parser._parseRuleSetDeclaration.bind(parser), ParseError.ExpressionExpected);
+		assertError(`@while $i != 4`, parser, parser._parseRuleSetDeclaration.bind(parser), ParseError.IndentExpected);
+	});
+
+	test("@each", () => {
+		assertNode(`@each $i in 1, 2, 3\n\t`, parser, parser._parseRuleSetDeclaration.bind(parser));
+		assertNode(`@each $i in 1 2 3\n\t`, parser, parser._parseRuleSetDeclaration.bind(parser));
+		assertNode(
+			`@each $animal, $color, $cursor in (puma, black, default), (egret, white, move)\n\t`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+		);
+		assertError(
+			`@each i in 4\n\t`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+			ParseError.VariableNameExpected,
+		);
+		assertError(`@each $i from 4\n\t`, parser, parser._parseRuleSetDeclaration.bind(parser), SassParseError.InExpected);
+		assertError(`@each $i in\n\t`, parser, parser._parseRuleSetDeclaration.bind(parser), ParseError.ExpressionExpected);
+		assertError(
+			`@each $animal,  in (1, 1, 1), (2, 2, 2)\n\t`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+			ParseError.VariableNameExpected,
+		);
+	});
+
+	test("@for", () => {
+		assertNode(
+			`@for $i from 1 to 5
+	.item-#{$i}
+		width: 2em * $i`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+		);
+		assertNode(`@for $k from 1 + $x through 5 + $x\n\t`, parser, parser._parseRuleSetDeclaration.bind(parser));
+		assertError(
+			`@for i from 0 to 4\n\t`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+			ParseError.VariableNameExpected,
+		);
+		assertError(`@for $i to 4\n\t`, parser, parser._parseRuleSetDeclaration.bind(parser), SassParseError.FromExpected);
+		assertError(
+			`@for $i from 0 by 4\n\t`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+			SassParseError.ThroughOrToExpected,
+		);
+		assertError(
+			`@for $i from\n\t`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+			ParseError.ExpressionExpected,
+		);
+		assertError(
+			`@for $i from 0 to\n\t`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+			ParseError.ExpressionExpected,
+		);
+		assertNode(
+			`@for $i from 1 through 60
+	$s: $i + "%"`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+		);
+
+		assertNode(`@for $k from 1 + m.$x through 5 + $x\n\t`, parser, parser._parseRuleSetDeclaration.bind(parser));
+		assertNode(`@for $k from 1 + $x through 5 + m.$x\n\t`, parser, parser._parseRuleSetDeclaration.bind(parser));
+		assertNode(`@for $k from 1 + m.$x through 5 + m.$x\n\t`, parser, parser._parseRuleSetDeclaration.bind(parser));
 	});
 });

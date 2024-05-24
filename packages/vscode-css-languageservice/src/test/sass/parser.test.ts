@@ -512,6 +512,52 @@ comment */ c
 		assertError("@keyframes )", parser, parser._parseKeyframe.bind(parser), ParseError.IdentifierExpected);
 	});
 
+	test("@keyframes sass", () => {
+		assertNode(
+			`@keyframes name
+	@content`,
+			parser,
+			parser._parseKeyframe.bind(parser),
+		);
+		assertNode(
+			`@keyframes name
+	@for $i from 0 through $steps
+		#{$i * (100%/$steps)}
+			transform: $rotate $translate`,
+			parser,
+			parser._parseKeyframe.bind(parser),
+		);
+		assertNode(
+			`@keyframes test-keyframe
+	@for $i from 1 through 60
+		$s: ($i * 100) / 60 + "%"`,
+			parser,
+			parser._parseKeyframe.bind(parser),
+		);
+
+		assertNode(
+			`@keyframes name
+	@for $i from 0 through m.$steps
+		#{$i * (100%/$steps)}
+			transform: $rotate $translate`,
+			parser,
+			parser._parseKeyframe.bind(parser),
+		);
+		assertNode(
+			`@keyframes name
+	@function bar()
+		@return 1`,
+			parser,
+			parser._parseKeyframe.bind(parser),
+		);
+		assertNode(
+			`@keyframes name
+	@include keyframe-mixin()`,
+			parser,
+			parser._parseKeyframe.bind(parser),
+		);
+	});
+
 	test("@property", () => {
 		assertNode(
 			`@property --my-color
@@ -848,6 +894,129 @@ comment */ c
 			parser,
 			parser._parseMedia.bind(parser),
 			ParseError.RightParenthesisExpected,
+		);
+	});
+
+	test("@media sass", () => {
+		assertNode(
+			`@media screen
+	.sidebar
+		@media (orientation: landscape)
+			width: 500px`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(`@media #{$media} and ($feature: $value)\n\t`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(`@media only screen and #{$query}\n\t`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(
+			`foo
+	bar
+		@media screen and (orientation: landscape)
+			color: red`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(`@media screen and (nth($query, 1): nth($query, 2))\n\t`, parser, parser._parseMedia.bind(parser));
+		assertNode(
+			`.something
+	@media (max-width: 760px)
+		> .test
+			color: blue`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`.something
+	@media (max-width: 760px)
+		~ div
+			display: block`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`.something
+	@media (max-width: 760px)
+		+ div
+			display: block`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@media (max-width: 760px)
+	+ div
+		display: block`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(`@media (height <= 600px)\n\t`, parser, parser._parseMedia.bind(parser));
+		assertNode(`@media (height >= 600px)\n\t`, parser, parser._parseMedia.bind(parser));
+
+		assertNode(`@media #{layout.$media} and ($feature: $value)\n\t`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(`@media #{$media} and (layout.$feature: $value)\n\t`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(`@media #{$media} and ($feature: layout.$value)\n\t`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(
+			`@media #{layout.$media} and (layout.$feature: $value)\n\t`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@media #{$media} and (layout.$feature: layout.$value)\n\t`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@media #{layout.$media} and (layout.$feature: layout.$value)\n\t`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(`@media screen and (list.nth($query, 1): nth($query, 2))\n\t`, parser, parser._parseMedia.bind(parser));
+		assertNode(`@media screen and (nth(list.$query, 1): nth($query, 2))\n\t`, parser, parser._parseMedia.bind(parser));
+		assertNode(`@media screen and (nth($query, 1): list.nth($query, 2))\n\t`, parser, parser._parseMedia.bind(parser));
+		assertNode(`@media screen and (nth($query, 1): nth(list.$query, 2))\n\t`, parser, parser._parseMedia.bind(parser));
+		assertNode(
+			`@media screen and (list.nth(list.$query, 1): nth($query, 2))\n\t`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media screen and (list.nth($query, 1): list.nth($query, 2))\n\t`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media screen and (list.nth($query, 1): nth(list.$query, 2))\n\t`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media screen and (nth(list.$query, 1): list.nth($query, 2))\n\t`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media screen and (nth(list.$query, 1): nth(list.$query, 2))\n\t`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media screen and (nth($query, 1): list.nth(list.$query, 2))\n\t`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media screen and (list.nth(list.$query, 1): list.nth($query, 2))\n\t`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media screen and (nth(list.$query, 1): list.nth(list.$query, 2))\n\t`,
+			parser,
+			parser._parseMedia.bind(parser),
+		);
+		assertNode(
+			`@media screen and (list.nth(list.$query, 1): list.nth(list.$query, 2))\n\t`,
+			parser,
+			parser._parseMedia.bind(parser),
 		);
 	});
 
@@ -2365,6 +2534,122 @@ figure
 	@error "sdssd"`,
 			parser,
 			parser._parseStylesheet.bind(parser),
+		);
+	});
+
+	test("@debug", () => {
+		assertNode(`@debug test`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(
+			`foo
+	@debug 1 + 4
+	nested
+		@warn 1 4`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@if $foo == 1
+	@debug 1 + 4`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@function setStyle($map, $object, $style)
+	@warn "The key ´#{$object} is not available in the map."
+	@return null`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+	});
+
+	test("@extend", () => {
+		assertNode(
+			`.themable
+	@extend %theme`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`foo
+	@extend .error
+	border-width: 3px`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`a.important
+	@extend .notice !optional`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`.hoverlink
+	@extend a:hover`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`.seriousError
+	@extend .error
+	@extend .attention`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`#context a%extreme
+	color: blue
+.notice
+	@extend %extreme`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@media print
+	.error
+		color: red
+	.seriousError
+		@extend .error`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@mixin error($a: false)
+	@extend .#{$a}
+	@extend ##{$a}`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`.foo
+	@extend .text-center, .uppercase`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`.foo
+	@extend .text-center, .uppercase, `,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`.foo
+	@extend .text-center, .uppercase !optional `,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertError(
+			`.hoverlink
+	@extend`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.SelectorExpected,
+		);
+		assertError(
+			`.hoverlink
+	@extend %extreme !default`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.UnknownKeyword,
 		);
 	});
 });

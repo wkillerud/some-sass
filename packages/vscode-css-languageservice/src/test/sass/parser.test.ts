@@ -2231,4 +2231,140 @@ figure
 		assertNode(`@for $k from 1 + $x through 5 + m.$x\n\t`, parser, parser._parseRuleSetDeclaration.bind(parser));
 		assertNode(`@for $k from 1 + m.$x through 5 + m.$x\n\t`, parser, parser._parseRuleSetDeclaration.bind(parser));
 	});
+
+	test("@if", () => {
+		assertNode(
+			`@if 1 + 1 == 2
+	border: 1px solid`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+		);
+		assertNode(
+			`@if 5 < 3
+	border: 2px dotted`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+		);
+		assertNode(
+			`@if null
+	border: 3px double`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+		);
+		assertNode(
+			`@if 1 <= $const
+	border: 3px
+@else
+	border: 4px`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+		);
+		assertNode(
+			`@if 1 >= (1 + $foo)
+	border: 3px
+@else if 1 + 1 == 2
+	border: 4px`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+		);
+		assertNode(
+			`p
+	@if $i == 1
+		x: 3px
+	@else if $i == 1
+		x: 4px
+	@else
+		x: 4px`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@if (index($_RESOURCES, "clean") != null)
+	@error "sdssd"`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@if $i == 1
+	p
+		x: 3px`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertError(
+			`@if
+	border: 1px solid`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+			ParseError.ExpressionExpected,
+		);
+
+		assertNode(
+			`@if 1 <= m.$const
+	border: 3px
+@else
+	border: 4px`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+		);
+		assertNode(
+			`@if 1 >= (1 + m.$foo)
+	border: 3px
+@else if 1 + 1 == 2
+	border: 4px`,
+			parser,
+			parser._parseRuleSetDeclaration.bind(parser),
+		);
+		assertNode(
+			`p
+	@if m.$i == 1
+		x: 3px
+	@else if $i == 1
+		x: 4px
+	@else
+		x: 4px`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`p
+	@if $i == 1
+		x: 3px
+	@else if m.$i == 1
+		x: 4px
+	@else
+		x: 4px`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`p
+	@if m.$i == 1
+		x: 3px
+	@else if m.$i == 1
+		x: 4px
+	@else
+		x: 4px`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@if (list.index($_RESOURCES, "clean") != null)
+	@error "sdssd"`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@if (index(m.$_RESOURCES, "clean") != null)
+	@error "sdssd"`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+		assertNode(
+			`@if (list.index(m.$_RESOURCES, "clean") != null)
+	@error "sdssd"`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+	});
 });

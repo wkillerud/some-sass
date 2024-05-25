@@ -35,11 +35,16 @@ export class Parser {
 
 	syntax;
 
-	constructor({ scanner, syntax: dialect }: ParserOptions = {}) {
-		this.syntax = dialect;
-		this.scanner = scanner || new Scanner({ syntax: dialect });
+	constructor({ scanner, syntax }: ParserOptions = {}) {
+		this.syntax = syntax;
+		this.scanner = scanner || new Scanner({ syntax });
 		this.token = { type: TokenType.EOF, offset: -1, len: 0, text: "" };
 		this.prevToken = undefined!;
+	}
+
+	public configure({ syntax }: Pick<ParserOptions, "syntax">): void {
+		this.syntax = syntax;
+		this.scanner.configure({ syntax });
 	}
 
 	public peekIdent(text: string): boolean {
@@ -257,6 +262,9 @@ export class Parser {
 
 	public parseStylesheet(textDocument: TextDocument): nodes.Stylesheet {
 		const versionId = textDocument.version;
+		const syntax = textDocument.languageId === "sass" ? "indented" : "scss";
+		this.configure({ syntax });
+
 		const text = textDocument.getText();
 		const textProvider = (offset: number, length: number) => {
 			if (textDocument.version !== versionId) {

@@ -12,7 +12,7 @@ import { CSSDataManager } from "../../languageFacts/dataManager";
 
 const cssDataManager = new CSSDataManager({ useDefaultDataProvider: true });
 
-function elementToString(element: selectorPrinting.Element): string {
+export function elementToString(element: selectorPrinting.Element): string {
 	let label = element.findAttribute("name") || "";
 	let attributes = element.attributes && element.attributes.filter((a) => a.name !== "name");
 	if (attributes && attributes.length > 0) {

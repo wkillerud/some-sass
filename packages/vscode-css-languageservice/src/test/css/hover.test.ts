@@ -6,13 +6,13 @@
 "use strict";
 
 import { suite, test, assert } from "vitest";
-import { Hover, TextDocument, getCSSLanguageService, getSCSSLanguageService } from "../../cssLanguageService";
+import { Hover, TextDocument, getCSSLanguageService, getSassLanguageService } from "../../cssLanguageService";
 import { HoverSettings } from "../../cssLanguageTypes";
 
 function assertHover(value: string, expected: Hover, languageId = "css", hoverSettings?: HoverSettings): void {
 	let offset = value.indexOf("|");
 	value = value.substr(0, offset) + value.substr(offset + 1);
-	const ls = languageId === "css" ? getCSSLanguageService() : getSCSSLanguageService();
+	const ls = languageId === "css" ? getCSSLanguageService() : getSassLanguageService();
 
 	const document = TextDocument.create(`test://foo/bar.${languageId}`, languageId, 1, value);
 	const hoverResult = ls.doHover(document, document.positionAt(offset), ls.parseStylesheet(document), hoverSettings);

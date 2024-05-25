@@ -22,7 +22,7 @@ import {
 	Command,
 	MarkupContent,
 	MixinReferenceCompletionContext,
-	getSCSSLanguageService,
+	getSassLanguageService,
 	ICSSDataProvider,
 	newCSSDataProvider,
 } from "../../cssLanguageService";
@@ -135,7 +135,7 @@ export async function testCompletionFor(
 	const lsOptions = { fileSystemProvider: getFsProvider() };
 	let ls;
 	if (lang === "scss") {
-		ls = getSCSSLanguageService(lsOptions);
+		ls = getSassLanguageService(lsOptions);
 	} else {
 		ls = getCSSLanguageService(lsOptions);
 	}

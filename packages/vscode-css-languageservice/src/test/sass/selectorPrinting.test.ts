@@ -3,10 +3,34 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { suite, test } from "vitest";
-
+import { suite, test, assert } from "vitest";
+import { TextDocument } from "../../cssLanguageTypes";
+import * as nodes from "../../parser/cssNodes";
 import { SassParser } from "../../parser/sassParser";
-import { assertSelector } from "../css/selectorPrinting.test";
+import * as selectorPrinting from "../../services/selectorPrinting";
+import { elementToString } from "../css/selectorPrinting.test";
+
+function doParse(p: SassParser, input: string, selectorName: string): nodes.Selector | null {
+	let ext = p.syntax === "indented" ? "sass" : "scss";
+	let document = TextDocument.create(`test://test/test.${ext}`, ext, 0, input);
+	let styleSheet = p.parseStylesheet(document);
+
+	let node = nodes.getNodeAtOffset(styleSheet, input.indexOf(selectorName));
+	if (!node) {
+		return null;
+	}
+	return <nodes.Selector>node.findParent(nodes.NodeType.Selector);
+}
+
+export function assertSelector(p: SassParser, input: string, selectorName: string, expected: string): void {
+	let selector = doParse(p, input, selectorName);
+	assert.ok(selector);
+
+	let element = selectorPrinting.selectorToElement(selector!);
+	assert.ok(element);
+
+	assert.equal(elementToString(element!), expected);
+}
 
 suite("SCSS - Selector Printing", () => {
 	test("simple selector", function () {

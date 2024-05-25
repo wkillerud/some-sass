@@ -12,7 +12,7 @@ import { CSSCodeActions } from "./services/cssCodeActions";
 import { CSSValidation } from "./services/cssValidation";
 
 import { SassParser } from "./parser/sassParser";
-import { SCSSCompletion } from "./services/scssCompletion";
+import { SassCompletion } from "./services/sassCompletion";
 import { getFoldingRanges } from "./services/cssFolding";
 
 import {
@@ -49,7 +49,7 @@ import {
 import { CSSDataManager } from "./languageFacts/dataManager";
 import { CSSDataProvider } from "./languageFacts/dataProvider";
 import { getSelectionRanges } from "./services/cssSelectionRange";
-import { SCSSNavigation } from "./services/scssNavigation";
+import { SassNavigation } from "./services/sassNavigation";
 import { cssData } from "./data/webCustomData";
 
 export type Stylesheet = {};
@@ -183,15 +183,15 @@ export function getCSSLanguageService(
 	);
 }
 
-export function getSCSSLanguageService(
+export function getSassLanguageService(
 	options: LanguageServiceOptions = defaultLanguageServiceOptions,
 ): LanguageService {
 	const cssDataManager = new CSSDataManager(options);
 	return createFacade(
 		new SassParser(),
-		new SCSSCompletion(options, cssDataManager),
+		new SassCompletion(options, cssDataManager),
 		new CSSHover(options && options.clientCapabilities, cssDataManager),
-		new SCSSNavigation(options && options.fileSystemProvider),
+		new SassNavigation(options && options.fileSystemProvider),
 		new CSSCodeActions(cssDataManager),
 		new CSSValidation(cssDataManager),
 		cssDataManager,

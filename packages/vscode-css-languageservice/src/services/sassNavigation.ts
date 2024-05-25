@@ -10,7 +10,7 @@ import * as nodes from "../parser/cssNodes";
 import { URI, Utils } from "vscode-uri";
 import { startsWith } from "../utils/strings";
 
-export class SCSSNavigation extends CSSNavigation {
+export class SassNavigation extends CSSNavigation {
 	constructor(fileSystemProvider: FileSystemProvider | undefined) {
 		super(fileSystemProvider, true);
 	}

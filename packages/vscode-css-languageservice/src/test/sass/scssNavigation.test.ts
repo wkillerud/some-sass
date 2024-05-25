@@ -18,7 +18,7 @@ import {
 	assertDocumentSymbols,
 } from "../css/navigation.test";
 import {
-	getSCSSLanguageService,
+	getSassLanguageService,
 	TextDocument,
 	SymbolKind,
 	LanguageSettings,
@@ -30,7 +30,7 @@ import { getFsProvider } from "../testUtil/fsProvider";
 import { getDocumentContext } from "../testUtil/documentContext";
 
 function getSCSSLS() {
-	return getSCSSLanguageService({ fileSystemProvider: getFsProvider() });
+	return getSassLanguageService({ fileSystemProvider: getFsProvider() });
 }
 
 function aliasSettings(): LanguageSettings {
@@ -44,7 +44,7 @@ function aliasSettings(): LanguageSettings {
 	};
 }
 
-async function assertDynamicLinks(
+export async function assertDynamicLinks(
 	docUri: string,
 	input: string,
 	expected: StylesheetDocumentLink[],
@@ -62,7 +62,7 @@ async function assertDynamicLinks(
 	assert.deepEqual(links, expected);
 }
 
-async function assertNoDynamicLinks(docUri: string, input: string, extecedTarget: string | undefined) {
+export async function assertNoDynamicLinks(docUri: string, input: string, extecedTarget: string | undefined) {
 	const ls = getSCSSLS();
 	const document = TextDocument.create(docUri, "scss", 0, input);
 

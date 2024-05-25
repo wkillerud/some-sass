@@ -28,7 +28,7 @@ interface IFunctionInfo {
 
 const sassDocumentationName = l10n.t("Sass documentation");
 
-export class SCSSCompletion extends CSSCompletion {
+export class SassCompletion extends CSSCompletion {
 	private static variableDefaults: { [key: string]: string } = {
 		$red: "1",
 		$green: "2",
@@ -329,8 +329,8 @@ export class SCSSCompletion extends CSSCompletion {
 	constructor(lsServiceOptions: LanguageServiceOptions, cssDataManager: CSSDataManager) {
 		super("$", lsServiceOptions, cssDataManager);
 
-		addReferencesToDocumentation(SCSSCompletion.scssModuleLoaders);
-		addReferencesToDocumentation(SCSSCompletion.scssModuleBuiltIns);
+		addReferencesToDocumentation(SassCompletion.scssModuleLoaders);
+		addReferencesToDocumentation(SassCompletion.scssModuleBuiltIns);
 	}
 
 	protected isImportPathParent(type: nodes.NodeType): boolean {
@@ -341,7 +341,7 @@ export class SCSSCompletion extends CSSCompletion {
 		const parentType = importPathNode.getParent()!.type;
 
 		if (parentType === nodes.NodeType.Forward || parentType === nodes.NodeType.Use) {
-			for (let p of SCSSCompletion.scssModuleBuiltIns) {
+			for (let p of SassCompletion.scssModuleBuiltIns) {
 				const item: CompletionItem = {
 					label: p.label,
 					documentation: p.documentation,
@@ -358,7 +358,7 @@ export class SCSSCompletion extends CSSCompletion {
 	private createReplaceFunction() {
 		let tabStopCounter = 1;
 		return (_match: string, p1: string) => {
-			return "\\" + p1 + ": ${" + tabStopCounter++ + ":" + (SCSSCompletion.variableDefaults[p1] || "") + "}";
+			return "\\" + p1 + ": ${" + tabStopCounter++ + ":" + (SassCompletion.variableDefaults[p1] || "") + "}";
 		};
 	}
 
@@ -392,7 +392,7 @@ export class SCSSCompletion extends CSSCompletion {
 		isNested: boolean,
 		result: CompletionList,
 	): CompletionList {
-		this.createFunctionProposals(SCSSCompletion.selectorFuncs, null, true, result);
+		this.createFunctionProposals(SassCompletion.selectorFuncs, null, true, result);
 		return super.getCompletionsForSelector(ruleSet, isNested, result);
 	}
 
@@ -401,7 +401,7 @@ export class SCSSCompletion extends CSSCompletion {
 		existingNode: nodes.Node,
 		result: CompletionList,
 	): CompletionList {
-		let functions = SCSSCompletion.builtInFuncs;
+		let functions = SassCompletion.builtInFuncs;
 		if (entry) {
 			functions = functions.filter((f) => !f.type || !entry.restrictions || entry.restrictions.indexOf(f.type) !== -1);
 		}
@@ -410,7 +410,7 @@ export class SCSSCompletion extends CSSCompletion {
 	}
 
 	protected getColorProposals(entry: IPropertyData, existingNode: nodes.Node, result: CompletionList): CompletionList {
-		this.createFunctionProposals(SCSSCompletion.colorProposals, existingNode, false, result);
+		this.createFunctionProposals(SassCompletion.colorProposals, existingNode, false, result);
 		return super.getColorProposals(entry, existingNode, result);
 	}
 
@@ -438,7 +438,7 @@ export class SCSSCompletion extends CSSCompletion {
 	}
 
 	public getCompletionForAtDirectives(result: CompletionList): CompletionList {
-		result.items.push(...SCSSCompletion.scssAtDirectives);
+		result.items.push(...SassCompletion.scssAtDirectives);
 		return result;
 	}
 
@@ -450,7 +450,7 @@ export class SCSSCompletion extends CSSCompletion {
 	}
 
 	public getCompletionForModuleLoaders(result: CompletionList): CompletionList {
-		result.items.push(...SCSSCompletion.scssModuleLoaders);
+		result.items.push(...SassCompletion.scssModuleLoaders);
 		return result;
 	}
 }

@@ -234,7 +234,7 @@ staticUnitTable["cqmin"] = TokenType.ContainerQueryLength;
 staticUnitTable["cqmax"] = TokenType.ContainerQueryLength;
 
 export type ScannerOptions = {
-	syntax?: "indented";
+	syntax?: "indented" | "scss";
 };
 
 export class Scanner {
@@ -246,6 +246,10 @@ export class Scanner {
 	syntax;
 
 	constructor({ syntax }: ScannerOptions = {}) {
+		this.syntax = syntax;
+	}
+
+	public configure({ syntax }: ScannerOptions): void {
 		this.syntax = syntax;
 	}
 

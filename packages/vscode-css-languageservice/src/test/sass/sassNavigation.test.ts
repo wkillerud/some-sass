@@ -8,7 +8,6 @@ import { suite, test, assert } from "vitest";
 
 import * as nodes from "../../parser/cssNodes";
 import {
-	assertSymbolsInScope,
 	assertScopesAndSymbols,
 	assertHighlights,
 	assertColorSymbols,
@@ -16,6 +15,7 @@ import {
 	newRange,
 	getTestResource,
 	assertDocumentSymbols,
+	createScope,
 } from "../css/navigation.test";
 import {
 	getSassLanguageService,
@@ -79,60 +79,252 @@ export async function assertNoDynamicLinks(docUri: string, input: string, extece
 	}
 }
 
+export function assertSymbolsInScope(
+	lang: "scss" | "sass",
+	input: string,
+	offset: number,
+	...selections: { name: string; type: nodes.ReferenceType }[]
+): void {
+	const ls = getSCSSLS();
+	const global = createScope(ls, input, lang);
+
+	const scope = global.findScope(offset)!;
+
+	const getErrorMessage = function (name: string) {
+		let all = "symbol " + name + " not found. In scope: ";
+		scope.getSymbols().forEach((sym) => {
+			all += sym.name + " ";
+		});
+		return all;
+	};
+
+	for (let i = 0; i < selections.length; i++) {
+		const selection = selections[i];
+		const sym = scope.getSymbol(selection.name, selection.type) || global.getSymbol(selection.name, selection.type);
+		assert.ok(!!sym, getErrorMessage(selection.name));
+	}
+}
+
 suite("SCSS - Navigation", () => {
 	suite("Scopes and Symbols", () => {
 		test("symbols in scopes", () => {
 			const ls = getSCSSLS();
-			assertSymbolsInScope(ls, "$var: iable;", 0, { name: "$var", type: nodes.ReferenceType.Variable });
-			assertSymbolsInScope(ls, "$var: iable;", 11, { name: "$var", type: nodes.ReferenceType.Variable });
+			assertSymbolsInScope("scss", "$var: iable;", 0, { name: "$var", type: nodes.ReferenceType.Variable });
+			assertSymbolsInScope("scss", "$var: iable;", 11, { name: "$var", type: nodes.ReferenceType.Variable });
 			assertSymbolsInScope(
-				ls,
+				"scss",
 				"$var: iable; .class { $color: blue; }",
 				11,
 				{ name: "$var", type: nodes.ReferenceType.Variable },
 				{ name: ".class", type: nodes.ReferenceType.Rule },
 			);
-			assertSymbolsInScope(ls, "$var: iable; .class { $color: blue; }", 22, {
+			assertSymbolsInScope("scss", "$var: iable; .class { $color: blue; }", 22, {
 				name: "$color",
 				type: nodes.ReferenceType.Variable,
 			});
-			assertSymbolsInScope(ls, "$var: iable; .class { $color: blue; }", 36, {
+			assertSymbolsInScope("scss", "$var: iable; .class { $color: blue; }", 36, {
 				name: "$color",
 				type: nodes.ReferenceType.Variable,
 			});
 
-			assertSymbolsInScope(ls, '@namespace "x"; @mixin mix() {}', 0, { name: "mix", type: nodes.ReferenceType.Mixin });
-			assertSymbolsInScope(ls, "@mixin mix { @mixin nested() {} }", 12, {
+			assertSymbolsInScope("scss", '@namespace "x"; @mixin mix() {}', 0, {
+				name: "mix",
+				type: nodes.ReferenceType.Mixin,
+			});
+			assertSymbolsInScope("scss", "@mixin mix { @mixin nested() {} }", 12, {
 				name: "nested",
 				type: nodes.ReferenceType.Mixin,
 			});
-			assertSymbolsInScope(ls, "@mixin mix () { @mixin nested() {} }", 13);
+			assertSymbolsInScope("scss", "@mixin mix () { @mixin nested() {} }", 13);
+		});
+
+		test("Sass symbols in scopes", () => {
+			assertSymbolsInScope("sass", "$var: iable", 0, { name: "$var", type: nodes.ReferenceType.Variable });
+			assertSymbolsInScope("sass", "$var: iable", 11, { name: "$var", type: nodes.ReferenceType.Variable });
+			assertSymbolsInScope(
+				"sass",
+				`$var: iable
+.class
+	$color: blue`,
+				11,
+				{ name: "$var", type: nodes.ReferenceType.Variable },
+				{ name: ".class", type: nodes.ReferenceType.Rule },
+			);
+			assertSymbolsInScope(
+				"sass",
+				`$var: iable
+.class
+	$color: blue`,
+				22,
+				{
+					name: "$color",
+					type: nodes.ReferenceType.Variable,
+				},
+			);
+			assertSymbolsInScope(
+				"sass",
+				`$var: iable
+.class
+	$color: blue`,
+				32,
+				{
+					name: "$color",
+					type: nodes.ReferenceType.Variable,
+				},
+			);
+
+			assertSymbolsInScope(
+				"sass",
+				`@namespace "x"
+@mixin mix()
+	content: "hello"`,
+				0,
+				{
+					name: "mix",
+					type: nodes.ReferenceType.Mixin,
+				},
+			);
+			assertSymbolsInScope(
+				"sass",
+				`@mixin mix
+	@mixin nested()
+		content: "hello"`,
+				12,
+				{
+					name: "nested",
+					type: nodes.ReferenceType.Mixin,
+				},
+			);
+			assertSymbolsInScope(
+				"sass",
+				`@mixin mix()
+	@mixin nested()
+		content: "hello"`,
+				13,
+			);
 		});
 
 		test("scopes and symbols", () => {
 			const ls = getSCSSLS();
-			assertScopesAndSymbols(ls, "$var1: 1; $var2: 2; .foo { $var3: 3; }", "$var1,$var2,.foo,[$var3]");
+			assertScopesAndSymbols(ls, "$var1: 1; $var2: 2; .foo { $var3: 3; }", "$var1,$var2,.foo,[$var3]", "scss");
 			assertScopesAndSymbols(
 				ls,
 				"@mixin mixin1 { $var0: 1} @mixin mixin2($var1) { $var3: 3 }",
 				"mixin1,mixin2,[$var0],[$var1,$var3]",
+				"scss",
 			);
-			assertScopesAndSymbols(ls, "a b { $var0: 1; c { d { } } }", "[$var0,c,[d,[]]]");
-			assertScopesAndSymbols(ls, "@function a($p1: 1, $p2: 2) { $v1: 3; @return $v1; }", "a,[$p1,$p2,$v1]");
+			assertScopesAndSymbols(ls, "a b { $var0: 1; c { d { } } }", "[$var0,c,[d,[]]]", "scss");
+			assertScopesAndSymbols(ls, "@function a($p1: 1, $p2: 2) { $v1: 3; @return $v1; }", "a,[$p1,$p2,$v1]", "scss");
 			assertScopesAndSymbols(
 				ls,
 				"$var1: 3; @if $var1 == 2 { $var2: 1; } @else { $var2: 2; $var3: 2;} ",
 				"$var1,[$var2],[$var2,$var3]",
+				"scss",
 			);
 			assertScopesAndSymbols(
 				ls,
 				"@if $var1 == 2 { $var2: 1; } @else if $var1 == 2 { $var3: 2; } @else { $var3: 2; } ",
 				"[$var2],[$var3],[$var3]",
+				"scss",
 			);
-			assertScopesAndSymbols(ls, "$var1: 3; @while $var1 < 2 { #rule { a: b; } }", "$var1,[#rule,[]]");
-			assertScopesAndSymbols(ls, "$i:0; @each $name in f1, f2, f3  { $i:$i+1; }", "$i,[$name,$i]");
-			assertScopesAndSymbols(ls, "$i:0; @for $x from $i to 5  { }", "$i,[$x]");
-			assertScopesAndSymbols(ls, "@each $i, $j, $k in f1, f2, f3  { }", "[$i,$j,$k]");
+			assertScopesAndSymbols(ls, "$var1: 3; @while $var1 < 2 { #rule { a: b; } }", "$var1,[#rule,[]]", "scss");
+			assertScopesAndSymbols(ls, "$i:0; @each $name in f1, f2, f3  { $i:$i+1; }", "$i,[$name,$i]", "scss");
+			assertScopesAndSymbols(ls, "$i:0; @for $x from $i to 5  { }", "$i,[$x]", "scss");
+			assertScopesAndSymbols(ls, "@each $i, $j, $k in f1, f2, f3  { }", "[$i,$j,$k]", "scss");
+		});
+
+		test("Sass scopes and symbols", () => {
+			const ls = getSCSSLS();
+			assertScopesAndSymbols(
+				ls,
+				`$var1: 1
+$var2: 2
+.foo
+	$var3: 3`,
+				"$var1,$var2,.foo,[$var3]",
+				"sass",
+			);
+			assertScopesAndSymbols(
+				ls,
+				`@mixin mixin1
+	$var0: 1
+@mixin mixin2($var1)
+	$var3: 3`,
+				"mixin1,mixin2,[$var0],[$var1,$var3]",
+				"sass",
+			);
+			assertScopesAndSymbols(
+				ls,
+				`a b
+	$var0: 1
+	c
+		d
+			//`,
+				"[$var0,c,[d,[]]]",
+				"sass",
+			);
+			assertScopesAndSymbols(
+				ls,
+				`@function a($p1: 1, $p2: 2)
+	$v1: 3
+	@return $v1`,
+				"a,[$p1,$p2,$v1]",
+				"sass",
+			);
+			assertScopesAndSymbols(
+				ls,
+				`$var1: 3
+@if $var1 == 2
+	$var2: 1
+@else
+	$var2: 2
+	$var3: 2`,
+				"$var1,[$var2],[$var2,$var3]",
+				"sass",
+			);
+			assertScopesAndSymbols(
+				ls,
+				`@if $var1 == 2
+	$var2: 1
+@else if $var1 == 2
+	$var3: 2
+@else
+	$var3: 2`,
+				"[$var2],[$var3],[$var3]",
+				"sass",
+			);
+			assertScopesAndSymbols(
+				ls,
+				`$var1: 3
+@while $var1 < 2
+	#rule
+		a: b`,
+				"$var1,[#rule,[]]",
+				"sass",
+			);
+			assertScopesAndSymbols(
+				ls,
+				`$i:0
+@each $name in f1, f2, f3
+	$i:$i+1`,
+				"$i,[$name,$i]",
+				"sass",
+			);
+			assertScopesAndSymbols(
+				ls,
+				`$i:0
+@for $x from $i to 5
+	//`,
+				"$i,[$x]",
+				"sass",
+			);
+			assertScopesAndSymbols(
+				ls,
+				`@each $i, $j, $k in f1, f2, f3
+	//`,
+				"[$i,$j,$k]",
+				"sass",
+			);
 		});
 	});
 

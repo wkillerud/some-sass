@@ -33,8 +33,8 @@ import { URI } from "vscode-uri";
 import { getFsProvider } from "../testUtil/fsProvider";
 import { getDocumentContext } from "../testUtil/documentContext";
 
-export function assertScopesAndSymbols(ls: LanguageService, input: string, expected: string): void {
-	const global = createScope(ls, input);
+export function assertScopesAndSymbols(ls: LanguageService, input: string, expected: string, lang = "css"): void {
+	const global = createScope(ls, input, lang);
 	assert.equal(scopeToString(global), expected);
 }
 
@@ -217,8 +217,8 @@ function assertNoErrors(stylesheet: Stylesheet): void {
 	}
 }
 
-function createScope(ls: LanguageService, input: string): Scope {
-	const document = TextDocument.create("test://test/test.css", "css", 0, input);
+export function createScope(ls: LanguageService, input: string, lang = "css"): Scope {
+	const document = TextDocument.create(`test://test/test.${lang}`, `${lang}`, 0, input);
 
 	const styleSheet = ls.parseStylesheet(document),
 		global = new GlobalScope(),

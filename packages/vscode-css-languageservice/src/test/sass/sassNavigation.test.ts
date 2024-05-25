@@ -428,6 +428,283 @@ $var2: 2
 				"$multiplier",
 			);
 		});
+
+		test("Sass mark highlights", () => {
+			const ls = getSCSSLS();
+
+			assertHighlights(ls, "$var1: 1\n$var2: /**/$var1", "$var1", 2, 1, undefined, "sass");
+			assertHighlights(
+				ls,
+				`$var1: 1
+ls
+	$var2: /**/$var1`,
+				"/**/",
+				2,
+				1,
+				"$var1",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`r1
+	$var1: 1
+	p1: $var1
+r2,r3
+	$var1: 1
+	p1: /**/$var1 + $var1`,
+				"/**/",
+				3,
+				1,
+				"$var1",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`.r1
+	r1: 1em
+r2
+	r1: 2em
+	@extend /**/.r1`,
+				"/**/",
+				2,
+				1,
+				".r1",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`/**/%r1
+	r1: 1em
+r2
+	r1: 2em
+	@extend %r1`,
+				"/**/",
+				2,
+				1,
+				"%r1",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`@mixin r1
+	r1: $p1
+r2
+	r2: 2em
+	@include /**/r1`,
+				"/**/",
+				2,
+				1,
+				"r1",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`@mixin r1($p1)
+	r1: $p1
+r2
+	r2: 2em
+	@include /**/r1(2px)`,
+				"/**/",
+				2,
+				1,
+				"r1",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`$p1: 1
+@mixin r1($p1: $p1)
+	r1: $p1
+r2
+	r2: 2em
+	@include /**/r1`,
+				"/**/",
+				2,
+				1,
+				"r1",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`/**/$p1: 1
+@mixin r1($p1: $p1)
+	r1: $p1`,
+				"/**/",
+				2,
+				1,
+				"$p1",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`$p1 : 1
+@mixin r1($p1)
+	r1: /**/$p1`,
+				"/**/",
+				2,
+				1,
+				"$p1",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`/**/$p1 : 1
+@mixin r1($p1)
+	r1: $p1
+`,
+				"/**/",
+				1,
+				1,
+				"$p1",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`$p1 : 1
+@mixin r1(/**/$p1)
+	r1: $p1`,
+				"/**/",
+				2,
+				1,
+				"$p1",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`$p1 : 1
+@function r1($p1, $p2: /**/$p1)
+	@return $p1 + $p1 + $p2`,
+				"/**/",
+				2,
+				1,
+				"$p1",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`$p1 : 1
+@function r1($p1, /**/$p2: $p1)
+	@return $p1 + $p2 + $p2`,
+				"/**/",
+				3,
+				1,
+				"$p2",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`@function r1($p1, $p2)
+	@return $p1 + $p2
+@function r2()
+	@return /**/r1(1, 2)`,
+				"/**/",
+				2,
+				1,
+				"r1",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`@function /**/r1($p1, $p2)
+	@return $p1 + $p2
+@function r2()
+	@return r1(1, 2)
+ls
+	x: r2()`,
+				"/**/",
+				2,
+				1,
+				"r1",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`@function r1($p1, $p2)
+	@return $p1 + $p2
+@function r2()
+	@return r1(/**/$p1 : 1, $p2 : 2)
+ls
+	x: r2()`,
+				"/**/",
+				3,
+				1,
+				"$p1",
+				"sass",
+			);
+
+			assertHighlights(
+				ls,
+				`@mixin /*here*/foo
+	display: inline
+foo
+	@include foo`,
+				"/*here*/",
+				2,
+				1,
+				"foo",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`@mixin foo
+	display: inline
+foo
+	@include /*here*/foo`,
+				"/*here*/",
+				2,
+				1,
+				"foo",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`@mixin foo
+	display: inline
+/*here*/foo
+	@include foo`,
+				"/*here*/",
+				1,
+				1,
+				"foo",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`@function /*here*/foo($i)
+	@return $i*$i
+#foo
+	width: foo(2)`,
+				"/*here*/",
+				2,
+				1,
+				"foo",
+				"sass",
+			);
+			assertHighlights(
+				ls,
+				`@function foo($i)
+	@return $i*$i
+#foo
+	width: /*here*/foo(2)`,
+				"/*here*/",
+				2,
+				1,
+				"foo",
+				"sass",
+			);
+
+			assertHighlights(
+				ls,
+				`.text
+	@include mixins.responsive using ($multiplier)
+		font-size: /*here*/$multiplier * 10px`,
+				"/*here*/$",
+				2,
+				1,
+				"$multiplier",
+				"sass",
+			);
+		});
 	});
 
 	suite("Links", () => {
@@ -1434,12 +1711,51 @@ $var2: 2
 				{ name: "<undefined>", kind: SymbolKind.Method, range: newRange(0, 9), selectionRange: newRange(0, 0) },
 			]);
 		});
+
+		test("sass document symbols", () => {
+			const ls = getSCSSLS();
+
+			// Incomplete Mixin
+			assertDocumentSymbols(
+				ls,
+				"@mixin foo\n\t",
+				[
+					{
+						name: "foo",
+						kind: SymbolKind.Method,
+						range: Range.create(Position.create(0, 0), Position.create(1, 1)),
+						selectionRange: newRange(7, 10),
+					},
+				],
+				"sass",
+			);
+			assertDocumentSymbols(
+				ls,
+				"@mixin \n\t",
+				[{ name: "<undefined>", kind: SymbolKind.Method, range: newRange(0, 6), selectionRange: newRange(0, 0) }],
+				"sass",
+			);
+		});
 	});
 
 	suite("Color", () => {
 		test("color symbols", () => {
 			const ls = getSCSSLS();
 			assertColorSymbols(ls, "$colors: (blue: $blue,indigo: $indigo)"); // issue #47209
+		});
+
+		test("Sass color symbols", () => {
+			// map names are not colors
+			const ls = getSCSSLS();
+			const document = TextDocument.create(
+				"test://test/test.sass",
+				"sass",
+				0,
+				"$colors: (blue: $blue,indigo: $indigo)",
+			);
+			const stylesheet = ls.parseStylesheet(document);
+			const result = ls.findDocumentColors(document, stylesheet);
+			assert.deepEqual(result, []);
 		});
 	});
 });

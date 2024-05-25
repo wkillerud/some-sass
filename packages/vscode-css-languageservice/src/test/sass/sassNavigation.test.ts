@@ -23,6 +23,8 @@ import {
 	SymbolKind,
 	LanguageSettings,
 	StylesheetDocumentLink,
+	Range,
+	Position,
 } from "../../cssLanguageService";
 import * as path from "path";
 import { URI } from "vscode-uri";
@@ -54,7 +56,7 @@ export async function assertDynamicLinks(
 	if (settings) {
 		ls.configure(settings);
 	}
-	const document = TextDocument.create(docUri, "scss", 0, input);
+	const document = TextDocument.create(docUri, docUri.endsWith(".sass") ? "sass" : "scss", 0, input);
 
 	const stylesheet = ls.parseStylesheet(document);
 
@@ -64,7 +66,7 @@ export async function assertDynamicLinks(
 
 export async function assertNoDynamicLinks(docUri: string, input: string, extecedTarget: string | undefined) {
 	const ls = getSCSSLS();
-	const document = TextDocument.create(docUri, "scss", 0, input);
+	const document = TextDocument.create(docUri, docUri.endsWith(".sass") ? "sass" : "scss", 0, input);
 
 	const stylesheet = ls.parseStylesheet(document);
 
@@ -245,12 +247,21 @@ suite("SCSS - Navigation", () => {
 			};
 
 			await assertNoDynamicLinks(getDocumentUri("./index.scss"), `@import 'foo'`, getDocumentUri("foo"));
-
 			await assertNoDynamicLinks(getDocumentUri("./index.scss"), `@import './foo'`, getDocumentUri("foo"));
-
 			await assertNoDynamicLinks(getDocumentUri("./index.scss"), `@import './_foo'`, getDocumentUri("_foo"));
-
 			await assertNoDynamicLinks(getDocumentUri("./index.scss"), `@import './foo-baz'`, getDocumentUri("foo-baz"));
+		});
+
+		test("Invalid Sass partial file links", async () => {
+			const fixtureRoot = path.resolve(__dirname, "../../../src/test/sass/linkFixture/non-existent");
+			const getDocumentUri = (relativePath: string) => {
+				return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
+			};
+
+			await assertNoDynamicLinks(getDocumentUri("./index.sass"), `@import 'foo'`, getDocumentUri("foo"));
+			await assertNoDynamicLinks(getDocumentUri("./index.sass"), `@import './foo'`, getDocumentUri("foo"));
+			await assertNoDynamicLinks(getDocumentUri("./index.sass"), `@import './_foo'`, getDocumentUri("_foo"));
+			await assertNoDynamicLinks(getDocumentUri("./index.sass"), `@import './foo-baz'`, getDocumentUri("foo-baz"));
 		});
 
 		test("SCSS partial file dynamic links", async () => {
@@ -262,29 +273,57 @@ suite("SCSS - Navigation", () => {
 			await assertDynamicLinks(getDocumentUri("./noUnderscore/index.scss"), `@import 'foo'`, [
 				{ range: newRange(8, 13), target: getDocumentUri("./noUnderscore/foo.scss"), type: nodes.NodeType.Import },
 			]);
-
 			await assertDynamicLinks(getDocumentUri("./underscore/index.scss"), `@import 'foo'`, [
 				{ range: newRange(8, 13), target: getDocumentUri("./underscore/_foo.scss"), type: nodes.NodeType.Import },
 			]);
-
 			await assertDynamicLinks(getDocumentUri("./underscore/index.scss"), `@import 'foo.scss'`, [
 				{ range: newRange(8, 18), target: getDocumentUri("./underscore/_foo.scss"), type: nodes.NodeType.Import },
 			]);
-
 			await assertDynamicLinks(getDocumentUri("./both/index.scss"), `@import 'foo'`, [
 				{ range: newRange(8, 13), target: getDocumentUri("./both/foo.scss"), type: nodes.NodeType.Import },
 			]);
-
 			await assertDynamicLinks(getDocumentUri("./both/index.scss"), `@import '_foo'`, [
 				{ range: newRange(8, 14), target: getDocumentUri("./both/_foo.scss"), type: nodes.NodeType.Import },
 			]);
-
 			await assertDynamicLinks(getDocumentUri("./index/index.scss"), `@import 'foo'`, [
 				{ range: newRange(8, 13), target: getDocumentUri("./index/foo/index.scss"), type: nodes.NodeType.Import },
 			]);
-
 			await assertDynamicLinks(getDocumentUri("./index/index.scss"), `@import 'bar'`, [
 				{ range: newRange(8, 13), target: getDocumentUri("./index/bar/_index.scss"), type: nodes.NodeType.Import },
+			]);
+		});
+
+		test("Sass partial file dynamic links", async () => {
+			const fixtureRoot = path.resolve(__dirname, "../../../src/test/sass/linkFixture");
+			const getDocumentUri = (relativePath: string) => {
+				return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
+			};
+
+			await assertDynamicLinks(getDocumentUri("./underscore/index.sass"), `@import 'bar'`, [
+				{ range: newRange(8, 13), target: getDocumentUri("./underscore/_bar.sass"), type: nodes.NodeType.Import },
+			]);
+			await assertDynamicLinks(getDocumentUri("./underscore/index.sass"), `@import 'bar.sass'`, [
+				{ range: newRange(8, 18), target: getDocumentUri("./underscore/_bar.sass"), type: nodes.NodeType.Import },
+			]);
+			await assertDynamicLinks(getDocumentUri("./both/index.sass"), `@import 'bar'`, [
+				{ range: newRange(8, 13), target: getDocumentUri("./both/bar.sass"), type: nodes.NodeType.Import },
+			]);
+			await assertDynamicLinks(getDocumentUri("./both/index.sass"), `@import '_bar'`, [
+				{ range: newRange(8, 14), target: getDocumentUri("./both/_bar.sass"), type: nodes.NodeType.Import },
+			]);
+			await assertDynamicLinks(getDocumentUri("./indented-index/index.sass"), `@import "foo"`, [
+				{
+					range: newRange(8, 13),
+					target: getDocumentUri("./indented-index/foo/index.sass"),
+					type: nodes.NodeType.Import,
+				},
+			]);
+			await assertDynamicLinks(getDocumentUri("./indented-index/index.sass"), `@import "bar"`, [
+				{
+					range: newRange(8, 13),
+					target: getDocumentUri("./indented-index/bar/_index.sass"),
+					type: nodes.NodeType.Import,
+				},
 			]);
 		});
 
@@ -297,7 +336,6 @@ suite("SCSS - Navigation", () => {
 				[{ range: newRange(8, 17), target: "test://test/foo.css", type: nodes.NodeType.Import }],
 				"scss",
 			);
-
 			await assertLinks(ls, `@import 'foo.scss' print;`, [
 				{ range: newRange(8, 18), target: "test://test/foo.scss", type: nodes.NodeType.Import },
 			]);
@@ -307,10 +345,35 @@ suite("SCSS - Navigation", () => {
 				[{ range: newRange(8, 32), target: "http://foo.com/foo.css", type: nodes.NodeType.Import }],
 				"scss",
 			);
-
 			await assertLinks(ls, `@import url("foo.css") print;`, [
 				{ range: newRange(12, 21), target: "test://test/foo.css" },
 			]);
+		});
+
+		test("Sass straight links", async () => {
+			const ls = getSCSSLS();
+
+			await assertLinks(
+				ls,
+				`@import 'foo.css'`,
+				[{ range: newRange(8, 17), target: "test://test/foo.css", type: nodes.NodeType.Import }],
+				"sass",
+			);
+			await assertLinks(ls, `@import 'foo.sass' print`, [
+				{ range: newRange(8, 18), target: "test://test/foo.sass", type: nodes.NodeType.Import },
+			]);
+			await assertLinks(
+				ls,
+				`@import 'http://foo.com/foo.css'`,
+				[{ range: newRange(8, 32), target: "http://foo.com/foo.css", type: nodes.NodeType.Import }],
+				"sass",
+			);
+			await assertLinks(
+				ls,
+				`@import url("foo.css") print`,
+				[{ range: newRange(12, 21), target: "test://test/foo.css" }],
+				"sass",
+			);
 		});
 
 		test("SCSS aliased links", async function () {
@@ -356,6 +419,52 @@ suite("SCSS - Navigation", () => {
 			);
 		});
 
+		test("Sass aliased links", async function () {
+			const fixtureRoot = path.resolve(__dirname, "../../../src/test/sass/linkFixture");
+			const getDocumentUri = (relativePath: string) => {
+				return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
+			};
+
+			const settings: LanguageSettings = {
+				importAliases: {
+					"@SassStylesheet": "/src/assets/styles.sass",
+					"@NoUnderscoreDir/": "/noUnderscore/",
+					"@UnderscoreDir/": "/underscore/",
+					"@BothDir/": "/both/",
+				},
+			};
+			const ls = getSCSSLS();
+			ls.configure(settings);
+
+			await assertLinks(ls, '@import "@SassStylesheet"', [
+				{ range: newRange(8, 25), target: "test://test/src/assets/styles.sass", type: nodes.NodeType.Import },
+			]);
+			await assertDynamicLinks(
+				getDocumentUri("./"),
+				`@import '@NoUnderscoreDir/bar'`,
+				[{ range: newRange(8, 30), target: getDocumentUri("./noUnderscore/bar.sass"), type: nodes.NodeType.Import }],
+				settings,
+			);
+			await assertDynamicLinks(
+				getDocumentUri("./"),
+				`@import '@UnderscoreDir/bar'`,
+				[{ range: newRange(8, 28), target: getDocumentUri("./underscore/_bar.sass"), type: nodes.NodeType.Import }],
+				settings,
+			);
+			await assertDynamicLinks(
+				getDocumentUri("./"),
+				`@import '@BothDir/bar'`,
+				[{ range: newRange(8, 22), target: getDocumentUri("./both/bar.sass"), type: nodes.NodeType.Import }],
+				settings,
+			);
+			await assertDynamicLinks(
+				getDocumentUri("./"),
+				`@import '@BothDir/_bar'`,
+				[{ range: newRange(8, 23), target: getDocumentUri("./both/_bar.sass"), type: nodes.NodeType.Import }],
+				settings,
+			);
+		});
+
 		test("SCSS module file links", async () => {
 			const fixtureRoot = path.resolve(__dirname, "../../../src/test/sass/linkFixture/module");
 			const getDocumentUri = (relativePath: string) => {
@@ -371,11 +480,9 @@ suite("SCSS - Navigation", () => {
 					namespace: "f",
 				},
 			]);
-
 			await assertDynamicLinks(getDocumentUri("./index.scss"), `@use 'sass:math' as *;`, [
 				{ range: newRange(5, 16), type: nodes.NodeType.Use, as: "*", target: "sass:math" },
 			]);
-
 			await assertDynamicLinks(getDocumentUri("./index.scss"), `@forward './foo' hide $private;`, [
 				{
 					range: newRange(9, 16),
@@ -384,7 +491,6 @@ suite("SCSS - Navigation", () => {
 					hide: ["$private"],
 				},
 			]);
-
 			await assertDynamicLinks(getDocumentUri("./index.scss"), `@forward './foo' show $public;`, [
 				{
 					range: newRange(9, 16),
@@ -393,7 +499,6 @@ suite("SCSS - Navigation", () => {
 					show: ["$public"],
 				},
 			]);
-
 			await assertDynamicLinks(getDocumentUri("./index.scss"), `@forward './foo' as foo-*;`, [
 				{
 					range: newRange(9, 16),
@@ -402,7 +507,6 @@ suite("SCSS - Navigation", () => {
 					as: "foo-",
 				},
 			]);
-
 			await assertDynamicLinks(getDocumentUri("./index.scss"), `@forward './foo' as foo-* hide $private;`, [
 				{
 					range: newRange(9, 16),
@@ -412,12 +516,72 @@ suite("SCSS - Navigation", () => {
 					hide: ["$private"],
 				},
 			]);
-
 			await assertDynamicLinks(getDocumentUri("./index.scss"), `@use 'sass:math';`, [
 				{ range: newRange(5, 16), type: nodes.NodeType.Use, namespace: "math", target: "sass:math" },
 			]);
 			await assertNoDynamicLinks(
 				getDocumentUri("./index.scss"),
+				`@use './non-existent'`,
+				getDocumentUri("non-existent"),
+			);
+		});
+
+		test("Sass module file links", async () => {
+			const fixtureRoot = path.resolve(__dirname, "../../../src/test/sass/linkFixture/module");
+			const getDocumentUri = (relativePath: string) => {
+				return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
+			};
+
+			await assertDynamicLinks(getDocumentUri("./index.sass"), `@use './bar' as f`, [
+				{
+					range: newRange(5, 12),
+					target: getDocumentUri("./bar.sass"),
+					type: nodes.NodeType.Use,
+					as: "f",
+					namespace: "f",
+				},
+			]);
+			await assertDynamicLinks(getDocumentUri("./index.sass"), `@use 'sass:math' as *`, [
+				{ range: newRange(5, 16), type: nodes.NodeType.Use, as: "*", target: "sass:math" },
+			]);
+			await assertDynamicLinks(getDocumentUri("./index.sass"), `@forward './bar' hide $private`, [
+				{
+					range: newRange(9, 16),
+					target: getDocumentUri("./bar.sass"),
+					type: nodes.NodeType.Forward,
+					hide: ["$private"],
+				},
+			]);
+			await assertDynamicLinks(getDocumentUri("./index.sass"), `@forward './bar' show $public`, [
+				{
+					range: newRange(9, 16),
+					target: getDocumentUri("./bar.sass"),
+					type: nodes.NodeType.Forward,
+					show: ["$public"],
+				},
+			]);
+			await assertDynamicLinks(getDocumentUri("./index.sass"), `@forward './bar' as bar-*`, [
+				{
+					range: newRange(9, 16),
+					target: getDocumentUri("./bar.sass"),
+					type: nodes.NodeType.Forward,
+					as: "bar-",
+				},
+			]);
+			await assertDynamicLinks(getDocumentUri("./index.sass"), `@forward './bar' as bar-* hide $private`, [
+				{
+					range: newRange(9, 16),
+					target: getDocumentUri("./bar.sass"),
+					type: nodes.NodeType.Forward,
+					as: "bar-",
+					hide: ["$private"],
+				},
+			]);
+			await assertDynamicLinks(getDocumentUri("./index.sass"), `@use 'sass:math'`, [
+				{ range: newRange(5, 16), type: nodes.NodeType.Use, namespace: "math", target: "sass:math" },
+			]);
+			await assertNoDynamicLinks(
+				getDocumentUri("./index.sass"),
 				`@use './non-existent'`,
 				getDocumentUri("non-existent"),
 			);
@@ -435,6 +599,27 @@ suite("SCSS - Navigation", () => {
 				`#navigation { background: #3d3d3d url(gantry-media://gradient-overlay.png); }`,
 				[{ range: newRange(38, 73), target: "gantry-media://gradient-overlay.png" }],
 				"scss",
+			);
+		});
+
+		test("Sass empty path", async () => {
+			const ls = getSCSSLS();
+
+			/**
+			 * https://github.com/microsoft/vscode/issues/79215
+			 * No valid path — gradient-verlay.png is authority and path is ''
+			 */
+			await assertLinks(
+				ls,
+				`#navigation
+	background: #3d3d3d url(gantry-media://gradient-overlay.png)`,
+				[
+					{
+						range: Range.create(Position.create(1, 25), Position.create(1, 60)),
+						target: "gantry-media://gradient-overlay.png",
+					},
+				],
+				"sass",
 			);
 		});
 
@@ -516,6 +701,101 @@ suite("SCSS - Navigation", () => {
 					},
 				],
 				"scss",
+				testUri,
+				workspaceFolder,
+			);
+		});
+
+		test("Sass node module resolving", async function () {
+			let ls = getSCSSLS();
+			let testUri = getTestResource("about.sass");
+			let workspaceFolder = getTestResource("");
+
+			await assertLinks(
+				ls,
+				`html
+	background-image: url("~foo/hello.html")`,
+				[
+					{
+						range: Range.create(Position.create(1, 23), Position.create(1, 40)),
+						target: getTestResource("node_modules/foo/hello.html"),
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`html
+	background-image: url("foo/hello.html")`,
+				[
+					{
+						range: Range.create(Position.create(1, 23), Position.create(1, 39)),
+						target: getTestResource("node_modules/foo/hello.html"),
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use '@foo/bar/baz'`,
+				[
+					{
+						range: newRange(5, 19),
+						target: getTestResource("node_modules/@foo/bar/_baz.scss"),
+						type: nodes.NodeType.Use,
+						namespace: "baz",
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use '@foo/bar'`,
+				[
+					{
+						range: newRange(5, 15),
+						target: getTestResource("node_modules/@foo/bar/_index.scss"),
+						type: nodes.NodeType.Use,
+						namespace: "bar",
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				'@import "green/d"',
+				[{ range: newRange(8, 17), target: getTestResource("green/d.scss"), type: nodes.NodeType.Import }],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				'@import "./green/d"',
+				[{ range: newRange(8, 19), target: getTestResource("green/d.scss"), type: nodes.NodeType.Import }],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				'@import "green/e"',
+				[
+					{
+						range: newRange(8, 17),
+						target: getTestResource("node_modules/green/_e.scss"),
+						type: nodes.NodeType.Import,
+					},
+				],
+				"sass",
 				testUri,
 				workspaceFolder,
 			);
@@ -720,6 +1000,233 @@ suite("SCSS - Navigation", () => {
 				testUri,
 				workspaceFolder,
 			);
+		});
+
+		test("Sass node package resolving", async () => {
+			let ls = getSCSSLS();
+			let testUri = getTestResource("about.sass");
+			let workspaceFolder = getTestResource("");
+			await assertLinks(
+				ls,
+				`@use "pkg:bar-indented"`,
+				[
+					{
+						namespace: "bar-indented",
+						range: newRange(5, 23),
+						target: getTestResource("node_modules/bar-indented/styles/index.sass"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:bar-indented/colors"`,
+				[
+					{
+						namespace: "colors",
+						range: newRange(5, 30),
+						target: getTestResource("node_modules/bar-indented/styles/colors.sass"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:bar-indented/colors.sass"`,
+				[
+					{
+						namespace: "colors",
+						range: newRange(5, 35),
+						target: getTestResource("node_modules/bar-indented/styles/colors.sass"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:@foo/foo"`,
+				[
+					{
+						namespace: "foo",
+						range: newRange(5, 19),
+						target: getTestResource("node_modules/@foo/foo/styles/index.sass"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:@foo/foo/colors"`,
+				[
+					{
+						namespace: "colors",
+						range: newRange(5, 26),
+						target: getTestResource("node_modules/@foo/foo/styles/colors.sass"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:@foo/foo/colors.sass"`,
+				[
+					{
+						namespace: "colors",
+						range: newRange(5, 31),
+						target: getTestResource("node_modules/@foo/foo/styles/colors.sass"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:@foo/foo/button"`,
+				[
+					{
+						namespace: "button",
+						range: newRange(5, 26),
+						target: getTestResource("node_modules/@foo/foo/styles/button.sass"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:@foo/foo/button.sass"`,
+				[
+					{
+						namespace: "button",
+						range: newRange(5, 31),
+						target: getTestResource("node_modules/@foo/foo/styles/button.sass"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:root-indented"`,
+				[
+					{
+						namespace: "root-indented",
+						range: newRange(5, 24),
+						target: getTestResource("node_modules/root-indented/styles/index.sass"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:root-style-indented"`,
+				[
+					{
+						namespace: "root-style-indented",
+						range: newRange(5, 30),
+						target: getTestResource("node_modules/root-style-indented/styles/index.sass"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:bar-pattern-indented/anything"`,
+				[
+					{
+						namespace: "anything",
+						range: newRange(5, 40),
+						target: getTestResource("node_modules/bar-pattern-indented/styles/anything.sass"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:bar-pattern-indented/anything.sass"`,
+				[
+					{
+						namespace: "anything",
+						range: newRange(5, 45),
+						target: getTestResource("node_modules/bar-pattern-indented/styles/anything.sass"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
+				`@use "pkg:bar-pattern-indented/theme/dark.sass"`,
+				[
+					{
+						namespace: "dark",
+						range: newRange(5, 47),
+						target: getTestResource("node_modules/bar-pattern-indented/styles/theme/dark.sass"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"sass",
+				testUri,
+				workspaceFolder,
+			);
+		});
+
+		test("links between Sass and SCSS", async () => {
+			const fixtureRoot = path.resolve(__dirname, "../../../src/test/sass/linkFixture/module");
+			const getDocumentUri = (relativePath: string) => {
+				return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
+			};
+
+			// scss using sass
+			await assertDynamicLinks(getDocumentUri("./index.scss"), `@use './bar'`, [
+				{
+					range: newRange(5, 12),
+					target: getDocumentUri("./bar.sass"),
+					type: nodes.NodeType.Use,
+					namespace: "bar",
+				},
+			]);
+			// sass using scss
+			await assertDynamicLinks(getDocumentUri("./index.sass"), `@use './foo'`, [
+				{
+					range: newRange(5, 12),
+					target: getDocumentUri("./foo.scss"),
+					type: nodes.NodeType.Use,
+					namespace: "foo",
+				},
+			]);
 		});
 	});
 

@@ -45,6 +45,7 @@ type DocumentSymbolCollector = (
 const startsWithSchemeRegex = /^\w+:\/\//;
 const startsWithData = /^data:/;
 const startsWithSass = /^sass:/;
+const sassExt = /\.s[ac]ss$/;
 
 export class CSSNavigation {
 	protected defaultSettings?: AliasSettings;
@@ -646,30 +647,34 @@ export class CSSNavigation {
 					if (packageJson.exports) {
 						if (!subpath) {
 							// look for the default/index export
-							const entry =
+							const entry: string =
 								// @ts-expect-error If ['.'] is a string this just produces undefined
 								packageJson.exports["."]["sass"] ||
 								// @ts-expect-error If ['.'] is a string this just produces undefined
 								packageJson.exports["."]["style"] ||
 								// @ts-expect-error If ['.'] is a string this just produces undefined
 								packageJson.exports["."]["default"];
-							// the 'default' entry can be whatever, typically .js – confirm it looks like `scss`
-							if (entry && entry.endsWith(".scss")) {
+							// the 'default' entry can be whatever, typically .js – confirm it looks like `scss` or `sass`
+							if (entry && entry.match(sassExt)) {
 								const entryPath = joinPath(modulePath, entry);
 								return entryPath;
 							}
 						} else {
-							// The import string may be with or without .scss.
+							// The import string may be with or without a file extension.
 							// Likewise the exports entry. Look up both paths.
 							// However, they need to be relative (start with ./).
-							const lookupSubpath = subpath.endsWith(".scss") ? `./${subpath.replace(".scss", "")}` : `./${subpath}`;
-							const lookupSubpathScss = subpath.endsWith(".scss") ? `./${subpath}` : `./${subpath}.scss`;
-							const subpathObject = packageJson.exports[lookupSubpathScss] || packageJson.exports[lookupSubpath];
+							const lookupSubpath = subpath.match(sassExt) ? `./${subpath.replace(sassExt, "")}` : `./${subpath}`;
+							const lookupSubpathScss = subpath.match(sassExt) ? `./${subpath}` : `./${subpath}.scss`;
+							const lookupSubpathSass = subpath.match(sassExt) ? `./${subpath}` : `./${subpath}.sass`;
+							const subpathObject =
+								packageJson.exports[lookupSubpathScss] ||
+								packageJson.exports[lookupSubpathSass] ||
+								packageJson.exports[lookupSubpath];
 							if (subpathObject) {
 								// @ts-expect-error If subpathObject is a string this just produces undefined
 								const entry = subpathObject["sass"] || subpathObject["styles"] || subpathObject["default"];
-								// the 'default' entry can be whatever, typically .js – confirm it looks like `scss`
-								if (entry && entry.endsWith(".scss")) {
+								// the 'default' entry can be whatever, typically .js – confirm it looks like `scss` or `sass`
+								if (entry && entry.match(sassExt)) {
 									const entryPath = joinPath(modulePath, entry);
 									return entryPath;
 								}
@@ -680,14 +685,14 @@ export class CSSNavigation {
 									if (!maybePattern.includes("*")) {
 										continue;
 									}
-									// Patterns may also be without `.scss` on the left side, so compare without on both sides
-									const re = new RegExp(maybePattern.replace("./", "\\./").replace(".scss", "").replace("*", "(.+)"));
+									// Patterns may also be without a file extension on the left side, so compare without on both sides
+									const re = new RegExp(maybePattern.replace("./", "\\./").replace(sassExt, "").replace("*", "(.+)"));
 									const match = re.exec(lookupSubpath);
 									if (match) {
 										// @ts-expect-error If subpathObject is a string this just produces undefined
-										const entry = subpathObject["sass"] || subpathObject["styles"] || subpathObject["default"];
-										// the 'default' entry can be whatever, typically .js – confirm it looks like `scss`
-										if (entry && entry.endsWith(".scss")) {
+										const entry: string = subpathObject["sass"] || subpathObject["styles"] || subpathObject["default"];
+										// the 'default' entry can be whatever, typically .js – confirm it looks like `scss` or `sass`
+										if (entry && entry.match(sassExt)) {
 											// The right-hand side of a subpath pattern is also a pattern.
 											// Replace the pattern with the match from our regexp capture group above.
 											const expandedPattern = entry.replace("*", match[1]);

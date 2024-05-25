@@ -54,17 +54,20 @@ function toPathVariations(target: string): DocumentUri[] {
 		return [target];
 	}
 
-	// If a link is like a/, try resolving a/index.scss and a/_index.scss
+	// If a link is like a/, try resolving a/index.scss and a/_index.scss, and likewise for .sass
 	if (target.endsWith("/")) {
-		return [target + "index.scss", target + "_index.scss"];
+		return [target + "index.scss", target + "_index.scss", target + "index.sass", target + "_index.sass"];
 	}
 
-	const targetUri = URI.parse(target.replace(/\.scss$/, ""));
+	const targetUri = URI.parse(target.replace(/\.s[ac]ss$/, ""));
 	const basename = Utils.basename(targetUri);
 	const dirname = Utils.dirname(targetUri);
 	if (basename.startsWith("_")) {
 		// No variation for links such as _a
-		return [Utils.joinPath(dirname, basename + ".scss").toString(true)];
+		return [
+			Utils.joinPath(dirname, basename + ".scss").toString(true),
+			Utils.joinPath(dirname, basename + ".sass").toString(true),
+		];
 	}
 
 	return [
@@ -72,6 +75,10 @@ function toPathVariations(target: string): DocumentUri[] {
 		Utils.joinPath(dirname, "_" + basename + ".scss").toString(true),
 		target + "/index.scss",
 		target + "/_index.scss",
+		Utils.joinPath(dirname, basename + ".sass").toString(true),
+		Utils.joinPath(dirname, "_" + basename + ".sass").toString(true),
+		target + "/index.sass",
+		target + "/_index.sass",
 		Utils.joinPath(dirname, basename + ".css").toString(true),
 	];
 }

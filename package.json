@@ -37,7 +37,7 @@
 		"@nx/webpack": "18.3.4",
 		"@swc-node/register": "1.9.1",
 		"@swc/core": "1.4.17",
-		"@swc/helpers": "0.5.2",
+		"@swc/helpers": "0.5.11",
 		"@types/node": "20.12.8",
 		"@types/vscode": "1.86.0",
 		"@types/webpack-env": "1.18.4",

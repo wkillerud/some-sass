@@ -25,8 +25,9 @@ nx reads [conventional commits][conventional] to determine what the new versions
 To start a new release:
 
 1. Get the latest `main` branch with `git checkout main && git pull`.
-2. Run `npx nx release --skip-publish`.
-3. Push the changes and tags with `git push && git push --tags`.
+2. Run `npm clean-install`.
+3. Run `npm run release`.
+4. Push the changes and tags with `git push && git push --tags`.
 
 GitHub Actions is configured to do the actual publishing when there are new tags.
 

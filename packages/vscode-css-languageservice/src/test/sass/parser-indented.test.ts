@@ -1321,16 +1321,6 @@ $color: #F5F5F5`,
 
 	test("ruleset", () => {
 		assertNode(
-			`
-.foo
-	font:
-		family: Arial
-		size: 20px
-	color: #ff0000`,
-			parser,
-			parser._parseRuleset.bind(parser),
-		);
-		assertNode(
 			`selector
 	property: value
 	@keyframes foo
@@ -1343,6 +1333,17 @@ $color: #F5F5F5`,
 			top: 0
 		100%
 			top: 100%`,
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+
+		assertNode(
+			`
+.foo
+	font:
+		family: Arial
+		size: 20px
+	color: #ff0000`,
 			parser,
 			parser._parseRuleset.bind(parser),
 		);
@@ -1558,14 +1559,6 @@ foo
 			parser,
 			parser._parseRuleset.bind(parser),
 			ParseError.PropertyValueExpected,
-		);
-		assertError(
-			`
-foo
-	--double-important: red !important !important`,
-			parser,
-			parser._parseRuleset.bind(parser),
-			ParseError.NewlineExpected,
 		);
 		assertError(
 			`

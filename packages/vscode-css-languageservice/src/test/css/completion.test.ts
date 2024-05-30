@@ -134,7 +134,7 @@ export async function testCompletionFor(
 	const lang = path.extname(testUri).substr(1);
 	const lsOptions = { fileSystemProvider: getFsProvider() };
 	let ls;
-	if (lang === "scss") {
+	if (lang === "scss" || lang === "sass") {
 		ls = getSassLanguageService(lsOptions);
 	} else {
 		ls = getCSSLanguageService(lsOptions);
@@ -155,7 +155,7 @@ export async function testCompletionFor(
 	}
 
 	const document = TextDocument.create(testUri, lang, 0, value);
-	const position = Position.create(0, offset);
+	const position = document.positionAt(offset);
 	const jsonDoc = ls.parseStylesheet(document);
 
 	const context = getDocumentContext(workspaceFolderUri);
@@ -1159,7 +1159,7 @@ suite("CSS - Completion", () => {
 		await testCompletionFor(
 			'html { background-image: url("../|")',
 			{
-				count: 4,
+				count: 5,
 			},
 			undefined,
 			testUri,

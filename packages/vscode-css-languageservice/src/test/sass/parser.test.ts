@@ -1001,6 +1001,15 @@ suite("SCSS - Parser", () => {
 		assertNode("@media print { .page {  @at-root (with: rule) { } } }", parser, parser._parseStylesheet.bind(parser));
 	});
 
+	test("debug", () => {
+		const parser = new SassParser();
+		assertNode(
+			"selector { property: value; @keyframes foo {} @-moz-keyframes foo {}}",
+			parser,
+			parser._parseRuleset.bind(parser),
+		);
+	});
+
 	test("Ruleset", function () {
 		const parser = new SassParser();
 		assertNode(".selector { prop: erty $const 1px; }", parser, parser._parseRuleset.bind(parser));

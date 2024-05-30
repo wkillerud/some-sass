@@ -324,12 +324,7 @@ export class Parser {
 					node.addChild(statement);
 					hasMatch = true;
 					inRecovery = false;
-					if (
-						this.syntax !== "indented" &&
-						!this.peek(TokenType.EOF) &&
-						this._needsSemicolonAfter(statement) &&
-						!this.accept(TokenType.SemiColon)
-					) {
+					if (!this.peek(TokenType.EOF) && this._needsSemicolonAfter(statement) && !this.accept(TokenType.SemiColon)) {
 						this.markError(node, ParseError.SemiColonExpected);
 					}
 				}
@@ -459,6 +454,9 @@ export class Parser {
 	}
 
 	public _needsSemicolonAfter(node: nodes.Node): boolean {
+		if (this.syntax === "indented") {
+			return false;
+		}
 		switch (node.type) {
 			case nodes.NodeType.Keyframe:
 			case nodes.NodeType.ViewPort:
@@ -514,15 +512,6 @@ export class Parser {
 				if (this.peek(TokenType.Dedent)) {
 					break;
 				}
-				if (this._needsSemicolonAfter(decl) && !this.accept(TokenType.Newline)) {
-					if (!this.accept(TokenType.EOF)) {
-						return this.finish(node, ParseError.NewlineExpected, [TokenType.Newline, TokenType.Dedent]);
-					}
-				}
-				// We accepted newline token. Link it to declaration.
-				if (decl && this.prevToken && this.prevToken.type === TokenType.Newline) {
-					(decl as nodes.Declaration).semicolonPosition = this.prevToken.offset;
-				}
 				while (this.accept(TokenType.Newline)) {
 					// accept empty statements
 				}
@@ -530,8 +519,8 @@ export class Parser {
 				if (this.peek(TokenType.CurlyR)) {
 					break;
 				}
-				if (this.syntax !== "indented" && this._needsSemicolonAfter(decl) && !this.accept(TokenType.SemiColon)) {
-					return this.finish(node, ParseError.SemiColonExpected, [TokenType.SemiColon, TokenType.CurlyR]);
+				if (this._needsSemicolonAfter(decl) && !this.accept(TokenType.SemiColon)) {
+					return this.finish(node, ParseError.SemiColonExpected, [TokenType.SemiColon, TokenType.CurlyR]); // It's this resync! It consumes stuff up until the syncToken. Need something similar for indented.
 				}
 				// We accepted semicolon token. Link it to declaration.
 				if (decl && this.prevToken && this.prevToken.type === TokenType.SemiColon) {
@@ -546,15 +535,14 @@ export class Parser {
 		}
 
 		if (this.syntax === "indented") {
-			while (this.accept(TokenType.Newline)) {
-				// accept empty statements
-			}
 			if (this.accept(TokenType.EOF)) {
 				return this.finish(node);
 			}
+			if (this.peek(TokenType.AtKeyword)) {
+				return this.finish(node);
+			}
 			if (!this.accept(TokenType.Dedent)) {
-				// TODO: figure out if/when we should raise this
-				// return this.finish(node, ParseError.DedentExpected, [TokenType.Newline, TokenType.Indent]);
+				return this.finish(node, ParseError.DedentExpected, [TokenType.Newline, TokenType.Indent, TokenType.EOF]);
 			}
 		} else {
 			if (!this.accept(TokenType.CurlyR)) {
@@ -745,7 +733,7 @@ export class Parser {
 					break done;
 				case TokenType.EOF:
 					if (this.syntax === "indented") {
-						break done;
+						return this.finish(node);
 					}
 					// We shouldn't have reached the end of input, something is
 					// unterminated.
@@ -1551,6 +1539,7 @@ export class Parser {
 		done: while (true) {
 			switch (this.token.type) {
 				case TokenType.SemiColon:
+				case TokenType.Newline:
 					if (isTopLevel()) {
 						break done;
 					}
@@ -1583,9 +1572,6 @@ export class Parser {
 						this.consumeToken();
 
 						if (bracketsDepth > 0) {
-							if (this.syntax === "indented" && !this.accept(TokenType.EOF)) {
-								return this.finish(node, ParseError.DedentExpected);
-							}
 							return this.finish(node, ParseError.RightSquareBracketExpected);
 						} else if (parensDepth > 0) {
 							return this.finish(node, ParseError.RightParenthesisExpected);

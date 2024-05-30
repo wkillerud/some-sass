@@ -70,9 +70,9 @@ export class PathCompletionParticipant implements ICompletionParticipant {
 					documentContext,
 				);
 
-				if (document.languageId === "scss") {
+				if (document.languageId === "scss" || document.languageId === "sass") {
 					suggestions.forEach((s) => {
-						if (startsWith(s.label, "_") && endsWith(s.label, ".scss")) {
+						if (startsWith(s.label, "_") && (endsWith(s.label, ".scss") || endsWith(s.label, ".sass"))) {
 							if (s.textEdit) {
 								s.textEdit.newText = s.label.slice(1, -5);
 							} else {

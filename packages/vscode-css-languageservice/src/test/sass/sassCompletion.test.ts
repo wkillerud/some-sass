@@ -22,7 +22,7 @@ function testCompletionFor(
 	return testCSSCompletionFor(value, expected, settings, testUri, workspaceFolderUri);
 }
 
-suite("SCSS - Completions", () => {
+suite("Sass - Completions", () => {
 	test("stylesheet", async () => {
 		await testCompletionFor("$i: 0; body { width: |", {
 			items: [{ label: "$i", documentation: "0" }],
@@ -115,6 +115,243 @@ suite("SCSS - Completions", () => {
 		});
 	});
 
+	test("Sass stylesheet", async () => {
+		await testCompletionFor(
+			`$i: 0
+body
+	width: |`,
+			{
+				items: [{ label: "$i", documentation: "0" }],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		await testCompletionFor(
+			`@for $i from 1 through 3
+	.item-#{|}
+		width: 2em * $i`,
+			{
+				items: [{ label: "$i" }],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		await testCompletionFor(
+			`.foo
+	background-color: d|`,
+			{
+				items: [
+					{
+						label: "darken",
+						resultText: `.foo
+	background-color: darken(\\$color: \${1:#000000}, \\$amount: \${2:0})`,
+					},
+					{ label: "desaturate" },
+				],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		await testCompletionFor(
+			`@function foo($x, $y)
+	@return $x + $y
+.foo
+	background-color: f|`,
+			{
+				items: [
+					{
+						label: "foo",
+						resultText: `@function foo($x, $y)
+	@return $x + $y
+.foo
+	background-color: foo(\${1:$x}, \${2:$y})`,
+					},
+				],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		await testCompletionFor(
+			`@mixin mixin($a: 1, $b)
+		content: $|`,
+			{
+				items: [
+					{ label: "$a", documentation: "1", detail: "argument from 'mixin'" },
+					{ label: "$b", documentation: null, detail: "argument from 'mixin'" },
+				],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		await testCompletionFor(
+			`@mixin mixin($a: 1, $b)
+	content: $a + $b
+@include m|`,
+			{
+				items: [
+					{
+						label: "mixin",
+						resultText: `@mixin mixin($a: 1, $b)
+	content: $a + $b
+@include mixin(\${1:$a}, \${2:$b})`,
+					},
+				],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		await testCompletionFor(
+			"di| span",
+			{
+				items: [{ label: "div" }, { label: "display", notAvailable: true }],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		await testCompletionFor(
+			`span
+	di|`,
+			{
+				items: [{ notAvailable: true, label: "div" }, { label: "display" }],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		await testCompletionFor(
+			`.foo
+	.|`,
+			{
+				items: [{ label: ".foo" }],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		// issue microsoft/vscode#17726
+		await testCompletionFor(
+			`.foo
+	&:|`,
+			{
+				items: [
+					{
+						label: ":last-of-type",
+						resultText: `.foo
+	&:last-of-type`,
+					},
+				],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		await testCompletionFor(
+			`.foo
+	&:l|`,
+			{
+				items: [
+					{
+						label: ":last-of-type",
+						resultText: `.foo
+	&:last-of-type`,
+					},
+				],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		// issue microsoft/vscode#109185
+		await testCompletionFor(
+			`.test
+	&::|`,
+			{
+				items: [
+					{
+						label: ":hover",
+						resultText: `.test
+	&:hover`,
+					},
+					{
+						label: "::after",
+						resultText: `.test
+	&::after`,
+					},
+				],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		// issue microsoft/vscode#33911
+		await testCompletionFor(
+			`@include media('ddd')
+	dis| &:not(:first-child)`,
+			{
+				items: [{ label: "display" }],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		// issue 43876
+		await testCompletionFor(
+			`.foo
+
+@mixin bar
+	@extend |`,
+			{
+				items: [{ label: ".foo" }],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		await testCompletionFor(
+			`.foo
+
+@mixin bar
+	@extend fo|`,
+			{
+				items: [{ label: ".foo" }],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		// issue 76572
+		await testCompletionFor(
+			`.foo
+	mask: no|`,
+			{
+				items: [{ label: "round" }],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		// issue 76507
+		await testCompletionFor(
+			`.foo
+	.foobar
+		.foobar2
+			outline-color: blue
+			cool
+		|
+		.fokzlb
+
+		.baaaa
+			counter - reset: unset`,
+			{
+				items: [{ label: "display" }],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+		await testCompletionFor(
+			`div
+	&:hover
+
+	|`,
+			{
+				items: [{ label: "display" }],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
+	});
+
 	test("suggestParticipants", async () => {
 		await testCompletionFor(`html { @include | }`, {
 			participant: {
@@ -171,14 +408,59 @@ suite("SCSS - Completions", () => {
 		});
 
 		await testCompletionFor(".foo { | }", allAtProposals);
+		await testCompletionFor(
+			`.foo
+	|`,
+			allAtProposals,
+			undefined,
+			"test://test/test.sass",
+		);
 
 		await testCompletionFor(`@for $i from 1 through 3 { .item-#{$i} { width: 2em * $i; } } @|`, allAtProposals);
+		await testCompletionFor(
+			`@for $i from 1 through 3
+	.item-#{$i}
+		width: 2em * $i
+@|`,
+			allAtProposals,
+			undefined,
+			"test://test/test.sass",
+		);
 
 		await testCompletionFor(".foo { @if $a = 5 { } @| }", allAtProposals);
+		await testCompletionFor(
+			`.foo
+	@if $a = 5
+
+	@|`,
+			allAtProposals,
+			undefined,
+			"test://test/test.sass",
+		);
+
 		await testCompletionFor(".foo { @debug 10em + 22em; @| }", allAtProposals);
+		await testCompletionFor(
+			`.foo
+	@debug 10em + 22em
+	@|`,
+			allAtProposals,
+			undefined,
+			"test://test/test.sass",
+		);
+
 		await testCompletionFor(".foo { @if $a = 5 { } @f| }", {
 			items: [{ label: "@for" }],
 		});
+		await testCompletionFor(
+			`.foo
+	@if $a = 5
+	@f|`,
+			{
+				items: [{ label: "@for" }],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
 	});
 
 	suite("Modules", async () => {
@@ -203,6 +485,18 @@ suite("SCSS - Completions", () => {
 					{ label: "@forward", notAvailable: true },
 				],
 			});
+			await testCompletionFor(
+				`.foo
+	@|`,
+				{
+					items: [
+						{ label: "@use", notAvailable: true },
+						{ label: "@forward", notAvailable: true },
+					],
+				},
+				undefined,
+				"test://test/test.sass",
+			);
 
 			const builtIns = {
 				items: [
@@ -282,12 +576,27 @@ suite("SCSS - Completions", () => {
 				{ label: "inherit", sortText: undefined },
 			],
 		});
+		await testCompletionFor(
+			`.foo
+	text-decoration: |`,
+			{
+				items: [
+					// Enum come before everything
+					{ label: "dashed", sortText: " " },
+					// Others come later
+					{ label: "aqua", sortText: undefined },
+					{ label: "inherit", sortText: undefined },
+				],
+			},
+			undefined,
+			"test://test/test.sass",
+		);
 	});
 
 	const testFixturesPath = path.join(__dirname, "../../../test");
 
 	/**
-	 * For SCSS, `@import 'foo';` can be used for importing partial file `_foo.scss`
+	 * For Sass, `@import 'foo';` can be used for importing partial file `_foo.scss`
 	 */
 	test("SCSS @import Path completion", async function () {
 		const testCSSUri = URI.file(path.resolve(testFixturesPath, "pathCompletionFixtures/about/about.css")).toString(
@@ -321,6 +630,42 @@ suite("SCSS - Completions", () => {
 			},
 			undefined,
 			testSCSSUri,
+			workspaceFolderUri,
+		);
+	});
+
+	test("Sass @import Path completion", async function () {
+		const testCSSUri = URI.file(path.resolve(testFixturesPath, "pathCompletionFixtures/about/about.css")).toString(
+			true,
+		);
+		const workspaceFolderUri = URI.file(path.resolve(testFixturesPath)).toString(true);
+
+		/**
+		 * We are in a CSS file, so no special treatment for SCSS partial files
+		 */
+		await testCSSCompletionFor(
+			`@import '../sass/|'`,
+			{
+				items: [
+					{ label: "main.sass", resultText: `@import '../sass/main.sass'` },
+					{ label: "_foo.sass", resultText: `@import '../sass/_foo.sass'` },
+				],
+			},
+			undefined,
+			testCSSUri,
+			workspaceFolderUri,
+		);
+
+		const testSassUri = URI.file(path.resolve(testFixturesPath, "pathCompletionFixtures/sass/main.sass")).toString(
+			true,
+		);
+		await testCompletionFor(
+			`@import './|'`,
+			{
+				items: [{ label: "_foo.sass", resultText: `@import './foo'` }],
+			},
+			undefined,
+			testSassUri,
 			workspaceFolderUri,
 		);
 	});

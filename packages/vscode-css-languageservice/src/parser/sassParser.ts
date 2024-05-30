@@ -607,7 +607,7 @@ export class SassParser extends cssParser.Parser {
 		this.consumeToken();
 
 		if (!node.setIdentifier(this._parseIdent([nodes.ReferenceType.Mixin]))) {
-			return this.finish(node, ParseError.IdentifierExpected, [TokenType.CurlyR]);
+			return this.finish(node, ParseError.IdentifierExpected, [TokenType.CurlyR, TokenType.Dedent]);
 		}
 
 		if (this.accept(TokenType.ParenthesisL)) {

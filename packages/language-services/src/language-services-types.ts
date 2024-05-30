@@ -226,6 +226,11 @@ export interface EditorSettings {
 	 * An older editor setting in VS Code. If both this and {@link indentSize} is set, only `indentSize` will be used.
 	 */
 	tabSize?: number;
+	/**
+	 * Controls the max number of color decorators that can be rendered in an editor at once.
+	 * @default 500
+	 */
+	colorDecoratorsLimit?: number;
 }
 
 export interface AliasSettings {

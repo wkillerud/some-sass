@@ -348,6 +348,15 @@ export abstract class LanguageFeature {
 				if (!newDocument) {
 					return null;
 				}
+
+				if (newDocument.uri === document.uri) {
+					const definitionOffset = document.offsetAt(definition.range.start);
+					if (definitionOffset === variable.offset) {
+						// break early if we're looking up ourselves
+						return null;
+					}
+				}
+
 				return await this.internalFindValue(
 					newDocument,
 					definition.range.start,

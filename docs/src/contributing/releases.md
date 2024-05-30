@@ -31,6 +31,19 @@ To start a new release:
 
 GitHub Actions is configured to do the actual publishing when there are new tags.
 
+#### Troubleshooting
+
+##### nx errors when it tries to make GitHub Releases
+
+Draft a [new release](https://github.com/wkillerud/some-sass/releases/new) manually. Choose the tag that was just created and hit Generate release notes.
+
+##### nx doesn't bump the VS Code extension
+
+- Wait for the latest language server to be published to npm, then update the dependency manually.
+- Bump the version number of the extension.
+- Commit the changes and run `git tag some-sass@<version from package.json>`.
+- Run `git push && git push --tags`.
+
 ### Manual fallback
 
 For `npm` packages:

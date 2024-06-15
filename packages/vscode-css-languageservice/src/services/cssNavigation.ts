@@ -653,7 +653,7 @@ export class CSSNavigation {
 								packageJson.exports["."]["style"] ||
 								// @ts-expect-error If ['.'] is a string this just produces undefined
 								packageJson.exports["."]["default"];
-							// the 'default' entry can be whatever, typically .js – confirm it looks like `scss`
+							// the 'default' entry can be whatever, typically .js – confirm it looks like `scss`
 							if (entry && entry.endsWith(".scss")) {
 								const entryPath = joinPath(modulePath, entry);
 								return entryPath;
@@ -668,7 +668,7 @@ export class CSSNavigation {
 							if (subpathObject) {
 								// @ts-expect-error If subpathObject is a string this just produces undefined
 								const entry = subpathObject["sass"] || subpathObject["styles"] || subpathObject["default"];
-								// the 'default' entry can be whatever, typically .js – confirm it looks like `scss`
+								// the 'default' entry can be whatever, typically .js – confirm it looks like `scss`
 								if (entry && entry.endsWith(".scss")) {
 									const entryPath = joinPath(modulePath, entry);
 									return entryPath;
@@ -686,7 +686,7 @@ export class CSSNavigation {
 									if (match) {
 										// @ts-expect-error If subpathObject is a string this just produces undefined
 										const entry = subpathObject["sass"] || subpathObject["styles"] || subpathObject["default"];
-										// the 'default' entry can be whatever, typically .js – confirm it looks like `scss`
+										// the 'default' entry can be whatever, typically .js – confirm it looks like `scss`
 										if (entry && entry.endsWith(".scss")) {
 											// The right-hand side of a subpath pattern is also a pattern.
 											// Replace the pattern with the match from our regexp capture group above.

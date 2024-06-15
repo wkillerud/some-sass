@@ -134,6 +134,42 @@ test("should suggest symbol from a different document via @use when in @return",
 	assert.ok(items.find((annotation) => annotation.label === "$primary"));
 });
 
+test("should not suggest symbols from a module used by the one we use", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument(
+		['@use "./three";', "$primary: limegreen;"],
+		{
+			uri: "one.scss",
+		},
+	);
+	const two = fileSystemProvider.createDocument(
+		['@use "./one";', "@function test() { @return one."],
+		{
+			uri: "two.scss",
+		},
+	);
+	const three = fileSystemProvider.createDocument(
+		["@function three() { @return 3; }"],
+		{
+			uri: "three.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(three);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 31));
+	assert.notOk(items.find((annotation) => annotation.label === "three"));
+	assert.ok(items.find((annotation) => annotation.label === "$primary"));
+});
+
 test("should suggest symbol from a different document via @use when in @if", async () => {
 	ls.configure({
 		completionSettings: {

@@ -60,7 +60,6 @@
 		"releaseTagPattern": "{projectName}@{version}",
 		"changelog": {
 			"projectChangelogs": {
-				"createRelease": "github",
 				"renderOptions": {
 					"authors": false
 				}

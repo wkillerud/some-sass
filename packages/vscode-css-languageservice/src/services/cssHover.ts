@@ -65,6 +65,7 @@ export class CSSHover {
 				const matches = node.getText().match(regex);
 				flagOpts = {
 					isMedia: true,
+					// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 					text: matches?.[0]!,
 				};
 			}

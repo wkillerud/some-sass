@@ -52,6 +52,7 @@ import { getSelectionRanges } from "./services/cssSelectionRange";
 import { SCSSNavigation } from "./services/scssNavigation";
 import { cssData } from "./data/webCustomData";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export type Stylesheet = {};
 
 export { TokenType, IToken, Scanner } from "./parser/cssScanner";

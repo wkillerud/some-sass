@@ -28,21 +28,19 @@ To start a new release:
 2. Run `npm clean-install`.
 3. Run `npm run release`.
 4. Push the changes and tags with `git push && git push --tags`.
+5. Create a [new GitHub release](https://github.com/wkillerud/some-sass/releases/new?title=some-sass-language-server@x.y.z) for the latest tag.
 
 GitHub Actions is configured to do the actual publishing when there are new tags.
 
-#### Troubleshooting
+Once the language server has been published to npm:
 
-##### nx errors when it tries to make GitHub Releases
+1. Update the dependency manually in `vscode-extension/package.json`.
+2. Bump the version number of the extension.
+3. Run `npm install` to update the lockfile.
+4. Commit the changes and run `git tag some-sass@<version from package.json>`.
+5. Run `git push && git push --tags`.
 
-Draft a [new release](https://github.com/wkillerud/some-sass/releases/new) manually. Choose the tag that was just created and hit Generate release notes.
-
-##### nx doesn't bump the VS Code extension
-
-- Wait for the latest language server to be published to npm, then update the dependency manually.
-- Bump the version number of the extension.
-- Commit the changes and run `git tag some-sass@<version from package.json>`.
-- Run `git push && git push --tags`.
+For the extension, GitHub Actions is configured to do the actual publishing (including GitHub release) when there are new tags.
 
 ### Manual fallback
 

@@ -1,3 +1,10 @@
+## 1.0.2 (2024-06-15)
+
+
+### 🩹 Fixes
+
+- read setting for maximum color decorators ([25d276b5](https://github.com/wkillerud/some-sass/commit/25d276b5))
+
 ## 1.0.1 (2024-05-01)
 
 

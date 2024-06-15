@@ -1,3 +1,15 @@
+## 1.2.5 (2024-06-15)
+
+
+### 🩹 Fixes
+
+- read setting for maximum color decorators ([25d276b5](https://github.com/wkillerud/some-sass/commit/25d276b5))
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.0.4
+
 ## 1.2.4 (2024-05-30)
 
 This was a version bump only for some-sass-language-server to align it with other projects, there were no code changes.

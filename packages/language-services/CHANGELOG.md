@@ -1,3 +1,17 @@
+## 1.0.4 (2024-06-15)
+
+
+### 🩹 Fixes
+
+- read setting for maximum color decorators ([25d276b5](https://github.com/wkillerud/some-sass/commit/25d276b5))
+
+- off-by-one for the start of namespace traversal ([#171](https://github.com/wkillerud/some-sass/pull/171))
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 1.0.2
+
 ## 1.0.3 (2024-05-30)
 
 

@@ -949,16 +949,24 @@ export class DoComplete extends LanguageFeature {
 		const items: CompletionItem[] = [];
 
 		const label = `${prefix}${symbol.name}`;
-		const filterText = namespace
-			? `${namespace !== "*" ? namespace : ""}.${prefix}${symbol.name}`
-			: symbol.name;
+		let filterText = symbol.name;
+		if (namespace) {
+			if (namespace === "*") {
+				filterText = `${prefix}${symbol.name}`;
+			} else {
+				filterText = `${namespace}.${prefix}${symbol.name}`;
+			}
+		}
 
 		const isEmbedded = this.isEmbedded(initialDocument);
-		const insertText = namespace
-			? namespace !== "*" && !isEmbedded
-				? `.${prefix}${symbol.name}`
-				: `${prefix}${symbol.name}`
-			: symbol.name;
+		let insertText = symbol.name;
+		if (namespace) {
+			if (namespace === "*" || isEmbedded) {
+				insertText = `${prefix}${symbol.name}`;
+			} else {
+				insertText = `.${prefix}${symbol.name}`;
+			}
+		}
 
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
 

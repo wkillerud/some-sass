@@ -1001,9 +1001,12 @@ test("should suggest symbol from a different document via @use with wildcard ali
 		},
 	});
 
-	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
-		uri: "one.scss",
-	});
+	const one = fileSystemProvider.createDocument(
+		["$primary: limegreen;", "@function one() { @return 1; }"],
+		{
+			uri: "one.scss",
+		},
+	);
 	const two = fileSystemProvider.createDocument(
 		['@use "./one" as *;', ".a { color: "],
 		{
@@ -1016,11 +1019,7 @@ test("should suggest symbol from a different document via @use with wildcard ali
 	ls.parseStylesheet(two);
 
 	const { items } = await ls.doComplete(two, Position.create(1, 12));
-	assert.notEqual(
-		0,
-		items.length,
-		"Expected to find a completion item for $primary",
-	);
+	assert.notEqual(2, items.length, "Expected to find two completion items");
 	assert.deepStrictEqual(
 		items.find((annotation) => annotation.label === "$primary"),
 		{
@@ -1030,6 +1029,26 @@ test("should suggest symbol from a different document via @use with wildcard ali
 			insertText: undefined,
 			kind: CompletionItemKind.Color,
 			label: "$primary",
+			sortText: undefined,
+			tags: [],
+		},
+	);
+	assert.deepStrictEqual(
+		items.find((annotation) => annotation.label === "one"),
+		{
+			documentation: {
+				kind: "markdown",
+				value:
+					"```scss\n@function one()\n```\n____\nFunction declared in one.scss",
+			},
+			filterText: "one",
+			insertText: "one()",
+			insertTextFormat: InsertTextFormat.Snippet,
+			kind: CompletionItemKind.Function,
+			label: "one",
+			labelDetails: {
+				detail: "()",
+			},
 			sortText: undefined,
 			tags: [],
 		},

@@ -30,22 +30,99 @@ function assertRanges(content: string, expected: (number | string)[][]): void {
 
 suite("Sass SelectionRange", () => {
 	test("basic", () => {
+		assertRanges(`.foo\n\t|color: blue`, [
+			[6, "color"],
+			[6, "color: blue"],
+			[4, `\n\tcolor: blue`],
+			[0, `.foo\n\tcolor: blue`],
+		]);
+		assertRanges(`.foo\n\tc|olor: blue`, [
+			[6, "color"],
+			[6, "color: blue"],
+			[4, `\n\tcolor: blue`],
+			[0, `.foo\n\tcolor: blue`],
+		]);
+		assertRanges(`.foo\n\tcolor|: blue`, [
+			[6, "color"],
+			[6, "color: blue"],
+			[4, `\n\tcolor: blue`],
+			[0, `.foo\n\tcolor: blue`],
+		]);
+		assertRanges(`.foo\n\tcolor: |blue`, [
+			[13, "blue"],
+			[6, "color: blue"],
+			[4, `\n\tcolor: blue`],
+			[0, `.foo\n\tcolor: blue`],
+		]);
+		assertRanges(`.foo\n\tcolor: b|lue`, [
+			[13, "blue"],
+			[6, "color: blue"],
+			[4, `\n\tcolor: blue`],
+			[0, `.foo\n\tcolor: blue`],
+		]);
+		assertRanges(`.foo\n\tcolor: blue|`, [
+			[13, "blue"],
+			[6, "color: blue"],
+			[4, `\n\tcolor: blue`],
+			[0, `.foo\n\tcolor: blue`],
+		]);
+
+		assertRanges(`.|foo\n\tcolor: blue`, [
+			[1, `foo`],
+			[0, `.foo`],
+			[0, `.foo\n\tcolor: blue`],
+		]);
+		assertRanges(`.fo|o\n\tcolor: blue`, [
+			[1, `foo`],
+			[0, `.foo`],
+			[0, `.foo\n\tcolor: blue`],
+		]);
+
+		assertRanges(`.foo|\n\tcolor: blue`, [
+			[4, `\n\tcolor: blue`],
+			[0, `.foo\n\tcolor: blue`],
+		]);
+	});
+
+	test("multiple values", () => {
 		assertRanges(
 			`.foo
-	|color: blue`,
+	font-family: '|Courier New', Courier, monospace`,
 			[
-				[6, "color"],
-				[6, "color: blue"],
-				[
-					4,
-					`
-	color: blue`,
-				],
-				[
-					0,
-					`.foo
-	color: blue`,
-				],
+				[19, `'Courier New'`],
+				[19, `'Courier New', Courier, monospace`],
+				[6, `font-family: 'Courier New', Courier, monospace`],
+				[4, `\n\tfont-family: 'Courier New', Courier, monospace`],
+				[0, `.foo\n\tfont-family: 'Courier New', Courier, monospace`],
+			],
+		);
+	});
+
+	test("edge behavior for declaration", () => {
+		assertRanges(
+			`.foo|
+	`,
+			[
+				[4, "\n\t"],
+				[0, ".foo\n\t"],
+			],
+		);
+		assertRanges(
+			`.foo
+	color: red
+|`,
+			[
+				[4, "\n\tcolor: red\n"],
+				[0, ".foo\n\tcolor: red\n"],
+			],
+		);
+		assertRanges(
+			`.foo
+	|
+`,
+			[
+				[4, "\n\t\n"],
+				[0, ".foo\n\t\n"],
 			],
 		);
 	});

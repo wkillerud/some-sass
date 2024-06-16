@@ -669,4 +669,113 @@ body
 			workspaceFolderUri,
 		);
 	});
+
+	suite("CSS completions", () => {
+		// test a subset of CSS completions in indented syntax to confirm things are working
+		test("stylesheet", async () => {
+			await testCompletionFor(
+				`| `,
+				{
+					items: [
+						{ label: "@import", resultText: "@import " },
+						{ label: "@keyframes", resultText: "@keyframes " },
+						{ label: "div", resultText: "div " },
+					],
+				},
+				undefined,
+				"test://test/test.sass",
+			);
+			await testCompletionFor(
+				`| body `,
+				{
+					items: [
+						{ label: "@import", resultText: "@import body " },
+						{ label: "@keyframes", resultText: "@keyframes body " },
+						{ label: "html", resultText: "html body " },
+					],
+				},
+				undefined,
+				"test://test/test.sass",
+			);
+		});
+
+		test("selectors", async () => {
+			await testCompletionFor(
+				"a:h| ",
+				{
+					items: [
+						{ label: ":hover", resultText: "a:hover " },
+						{ label: "::after", resultText: "a::after " },
+					],
+				},
+				undefined,
+				"test://test/test.sass",
+			);
+		});
+
+		test("properties", async () => {
+			await testCompletionFor(
+				`body
+	|`,
+				{
+					items: [
+						{
+							label: "display",
+							resultText: `body
+	display: `,
+						},
+						{
+							label: "background",
+							resultText: `body
+	background: `,
+						},
+					],
+				},
+				undefined,
+				"test://test/test.sass",
+			);
+		});
+
+		test("variables", async () => {
+			await testCompletionFor(
+				`:root
+	--myvar: red
+
+body
+	color: |`,
+				{
+					items: [
+						{
+							label: "--myvar",
+							resultText: `:root
+	--myvar: red
+
+body
+	color: var(--myvar)`,
+						},
+					],
+				},
+				undefined,
+				"test://test/test.sass",
+			);
+		});
+	});
+
+	test("no semicolon, even if configured to for (S)CSS", async () => {
+		await testCompletionFor(
+			`.foo
+	p|`,
+			{
+				items: [
+					{
+						label: "position",
+						resultText: `.foo
+	position: $0`,
+					},
+				],
+			},
+			{ completion: { triggerPropertyValueCompletion: true, completePropertyWithSemicolon: true } },
+			"test://test/test.sass",
+		);
+	});
 });

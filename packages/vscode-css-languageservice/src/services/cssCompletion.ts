@@ -275,13 +275,23 @@ export class CSSCompletion {
 			}
 			// Empty .selector { | } case
 			if (!declaration && completePropertyWithSemicolon) {
-				insertText += "$0;";
+				if (this.textDocument.languageId === "sass") {
+					// Semicolons are syntax errors in indented
+					insertText += "$0";
+				} else {
+					insertText += "$0;";
+				}
 			}
 
 			// Cases such as .selector { p; } or .selector { p:; }
 			if (declaration && !declaration.semicolonPosition) {
 				if (completePropertyWithSemicolon && this.offset >= this.textDocument.offsetAt(range.end)) {
-					insertText += "$0;";
+					if (this.textDocument.languageId === "sass") {
+						// Semicolons are syntax errors in indented
+						insertText += "$0";
+					} else {
+						insertText += "$0;";
+					}
 				}
 			}
 

@@ -9,7 +9,7 @@ import { suite, test, assert } from "vitest";
 import { Hover, TextDocument, getCSSLanguageService, getSassLanguageService } from "../../cssLanguageService";
 import { HoverSettings } from "../../cssLanguageTypes";
 
-function assertHover(value: string, expected: Hover, languageId = "css", hoverSettings?: HoverSettings): void {
+export function assertHover(value: string, expected: Hover, languageId = "css", hoverSettings?: HoverSettings): void {
 	let offset = value.indexOf("|");
 	value = value.substr(0, offset) + value.substr(offset + 1);
 	const ls = languageId === "css" ? getCSSLanguageService() : getSassLanguageService();

@@ -47,8 +47,11 @@ export function getSelectionRanges(
 			// The `{ }` part of `.a { }`
 			if (currNode.type === NodeType.Declarations) {
 				if (offset > currNode.offset && offset < currNode.end) {
-					// Return `{ }` and the range inside `{` and `}`
-					result.push([currNode.offset + 1, currNode.end - 1]);
+					// not sure there's a useful equivalent for indented that we can provide consistently (offset + depth could work, but Node doesn't have its depth)
+					if (document.languageId !== "sass") {
+						// Return `{ }` and the range inside `{` and `}`
+						result.push([currNode.offset + 1, currNode.end - 1]);
+					}
 				}
 			}
 

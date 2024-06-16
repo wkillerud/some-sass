@@ -1,4 +1,4 @@
-import { getSCSSLanguageService } from "@somesass/vscode-css-languageservice";
+import { getSassLanguageService } from "@somesass/vscode-css-languageservice";
 import { CodeActions } from "./features/code-actions";
 import { DoComplete } from "./features/do-complete";
 import { DoDiagnostics } from "./features/do-diagnostics";
@@ -53,37 +53,52 @@ class LanguageServiceImpl implements LanguageService {
 	#findSymbols: FindSymbols;
 
 	constructor(options: LanguageServiceOptions) {
-		const scssLs = getSCSSLanguageService({
+		const sassLs = getSassLanguageService({
 			clientCapabilities: options.clientCapabilities,
 			fileSystemProvider: mapFsProviders(options.fileSystemProvider),
 		});
 
 		const cache = new LanguageServerCache({
-			scssLs,
+			sassLs,
 			...options.languageModelCache,
 		});
 		this.#cache = cache;
-		this.#codeActions = new CodeActions(this, options, { scssLs, cache });
-		this.#doComplete = new DoComplete(this, options, { scssLs, cache });
-		this.#doDiagnostics = new DoDiagnostics(this, options, { scssLs, cache });
-		this.#doHover = new DoHover(this, options, { scssLs, cache });
-		this.#doRename = new DoRename(this, options, { scssLs, cache });
-		this.#doSignatureHelp = new DoSignatureHelp(this, options, {
-			scssLs,
+		this.#codeActions = new CodeActions(this, options, {
+			sassLs,
 			cache,
 		});
-		this.#findColors = new FindColors(this, options, { scssLs, cache });
-		this.#findDefinition = new FindDefinition(this, options, { scssLs, cache });
+		this.#doComplete = new DoComplete(this, options, { sassLs, cache });
+		this.#doDiagnostics = new DoDiagnostics(this, options, {
+			sassLs,
+			cache,
+		});
+		this.#doHover = new DoHover(this, options, { sassLs, cache });
+		this.#doRename = new DoRename(this, options, { sassLs, cache });
+		this.#doSignatureHelp = new DoSignatureHelp(this, options, {
+			sassLs,
+			cache,
+		});
+		this.#findColors = new FindColors(this, options, { sassLs, cache });
+		this.#findDefinition = new FindDefinition(this, options, {
+			sassLs,
+			cache,
+		});
 		this.#findDocumentHighlights = new FindDocumentHighlights(this, options, {
-			scssLs,
+			sassLs,
 			cache,
 		});
 		this.#findDocumentLinks = new FindDocumentLinks(this, options, {
-			scssLs,
+			sassLs,
 			cache,
 		});
-		this.#findReferences = new FindReferences(this, options, { scssLs, cache });
-		this.#findSymbols = new FindSymbols(this, options, { scssLs, cache });
+		this.#findReferences = new FindReferences(this, options, {
+			sassLs,
+			cache,
+		});
+		this.#findSymbols = new FindSymbols(this, options, {
+			sassLs,
+			cache,
+		});
 	}
 
 	configure(configuration: LanguageServiceConfiguration): void {

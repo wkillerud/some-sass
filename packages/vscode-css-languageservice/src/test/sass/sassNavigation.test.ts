@@ -1735,6 +1735,47 @@ foo
 				[{ name: "<undefined>", kind: SymbolKind.Method, range: newRange(0, 6), selectionRange: newRange(0, 0) }],
 				"sass",
 			);
+
+			assertDocumentSymbols(
+				ls,
+				`$name: "value"
+@mixin mixin($a: 1, $b)
+	line-height: $a
+	color: $b
+@function function($a: 1, $b)
+	@return $a * $b
+%placeholder
+	color: blue`,
+				[
+					{
+						kind: SymbolKind.Variable,
+						name: "$name",
+						range: Range.create(Position.create(0, 0), Position.create(0, 14)),
+						selectionRange: Range.create(Position.create(0, 0), Position.create(0, 5)),
+					},
+					{
+						detail: "($a: 1, $b)",
+						kind: SymbolKind.Method,
+						name: "mixin",
+						range: Range.create(Position.create(1, 0), Position.create(4, 0)),
+						selectionRange: Range.create(Position.create(1, 7), Position.create(1, 12)),
+					},
+					{
+						detail: "($a: 1, $b)",
+						kind: SymbolKind.Function,
+						name: "function",
+						range: Range.create(Position.create(4, 0), Position.create(6, 0)),
+						selectionRange: Range.create(Position.create(4, 10), Position.create(4, 18)),
+					},
+					{
+						kind: SymbolKind.Class,
+						name: "%placeholder",
+						range: Range.create(Position.create(6, 0), Position.create(7, 12)),
+						selectionRange: Range.create(Position.create(6, 0), Position.create(6, 12)),
+					},
+				],
+				"sass",
+			);
 		});
 	});
 

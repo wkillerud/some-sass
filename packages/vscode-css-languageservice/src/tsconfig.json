@@ -8,8 +8,7 @@
 		"strict": true,
 		"stripInternal": true,
 		"outDir": "../lib/umd",
-		"lib": [
-			"es2020"
-		]
-	}
+		"lib": ["es2020"]
+	},
+	"exclude": ["./test/"]
 }

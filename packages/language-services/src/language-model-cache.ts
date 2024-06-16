@@ -32,11 +32,11 @@ const defaultCacheEvictInterval = 0; // default off to not leave an interval run
 export class LanguageModelCache {
 	#languageModels: LanguageModels = {};
 	#nModels = 0;
-	#options: LanguageModelCacheOptions & { scssLs: VSCodeLanguageService };
+	#options: LanguageModelCacheOptions & { sassLs: VSCodeLanguageService };
 	#cleanupInterval: NodeJS.Timeout | undefined = undefined;
 
 	constructor(
-		options: LanguageModelCacheOptions & { scssLs: VSCodeLanguageService },
+		options: LanguageModelCacheOptions & { sassLs: VSCodeLanguageService },
 	) {
 		this.#options = {
 			maxEntries: 10_000,
@@ -75,7 +75,7 @@ export class LanguageModelCache {
 			languageModelInfo.cTime = Date.now();
 			return languageModelInfo.languageModel;
 		}
-		const languageModel = this.#options.scssLs.parseStylesheet(
+		const languageModel = this.#options.sassLs.parseStylesheet(
 			document,
 		) as Node;
 		let sassdoc: ParseResult[] = [];
@@ -167,7 +167,7 @@ export class LanguageModelCache {
 	onDocumentChanged(document: TextDocument) {
 		const version = document.version;
 		const languageId = document.languageId;
-		const languageModel = this.#options.scssLs.parseStylesheet(
+		const languageModel = this.#options.sassLs.parseStylesheet(
 			document,
 		) as Node;
 		let sassdoc: ParseResult[] = [];

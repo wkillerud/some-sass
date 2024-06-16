@@ -25,7 +25,7 @@ import { asDollarlessVariable } from "./utils/sass";
 
 export type LanguageFeatureInternal = {
 	cache: LanguageModelCache;
-	scssLs: VSCodeLanguageService;
+	sassLs: VSCodeLanguageService;
 };
 
 type FindOptions = {
@@ -84,11 +84,11 @@ export abstract class LanguageFeature {
 					false,
 			},
 		};
-		this._internal.scssLs.configure(configuration);
+		this._internal.sassLs.configure(configuration);
 	}
 
 	protected getUpstreamLanguageServer(): VSCodeLanguageService {
-		return this._internal.scssLs;
+		return this._internal.sassLs;
 	}
 
 	protected getDocumentContext() {

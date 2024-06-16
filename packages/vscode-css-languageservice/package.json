@@ -34,7 +34,7 @@
 	},
 	"scripts": {
 		"build": "npm run compile && npm run compile-esm",
-		"compile": "tsc -p ./src && npm run lint",
+		"compile": "tsc -p ./src/tsconfig.json && npm run lint",
 		"compile-esm": "tsc -p ./src/tsconfig.esm.json",
 		"clean": "rimraf lib",
 		"watch": "tsc -w -p ./src",

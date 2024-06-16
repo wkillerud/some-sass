@@ -40,7 +40,7 @@ import { applySassDoc } from "../utils/sassdoc";
 const reNewSassdocBlock = /\/\/\/\s?$/;
 const reSassdocLine = /\/\/\/\s/;
 const reSassDotExt = /\.s(a|c)ss$/;
-const rePrivate = /^\$?[_].*$/;
+const rePrivate = /^\$?[-_].*$/;
 
 const reReturn = /^.*@return/;
 const reEach = /^.*@each .+ in /;

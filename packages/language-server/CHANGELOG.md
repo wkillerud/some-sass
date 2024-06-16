@@ -1,3 +1,15 @@
+## 1.2.6 (2024-06-16)
+
+
+### 🩹 Fixes
+
+- update language server for completions bugfix
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.0.5
+
 ## 1.2.5 (2024-06-15)
 
 

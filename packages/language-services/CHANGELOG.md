@@ -1,3 +1,21 @@
+## 1.0.5 (2024-06-16)
+
+
+### 🩹 Fixes
+
+- update language server for completions bugfix
+
+- hide private symbols with - prefix
+
+- only suggest from current namespace
+
+- for wildcard use, omit . for functions in filtertext
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 1.0.3
+
 ## 1.0.4 (2024-06-15)
 
 

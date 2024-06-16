@@ -1,3 +1,10 @@
+## 1.0.3 (2024-06-16)
+
+
+### 🩹 Fixes
+
+- update language server for completions bugfix
+
 ## 1.0.2 (2024-06-15)
 
 

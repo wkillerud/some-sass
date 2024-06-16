@@ -585,6 +585,7 @@ export class DoComplete extends LanguageFeature {
 		}
 
 		const links = await this.ls.findDocumentLinks(document);
+		let start: TextDocument | undefined = undefined;
 		for (const link of links) {
 			if (
 				link.target &&
@@ -603,19 +604,21 @@ export class DoComplete extends LanguageFeature {
 							return items;
 						}
 					}
+				} else {
+					start = this.cache.getDocument(link.target);
 				}
 				break;
 			}
 		}
 
-		if (items.length > 0) {
+		if (!start) {
 			return items;
 		}
 
 		const result = await this.findCompletionsInWorkspace(
 			document,
 			context,
-			document,
+			start,
 		);
 		return result;
 	}
@@ -721,6 +724,7 @@ export class DoComplete extends LanguageFeature {
 				return items;
 			},
 			start,
+			{ lazy: false, depth: 1 },
 		);
 		return result;
 	}

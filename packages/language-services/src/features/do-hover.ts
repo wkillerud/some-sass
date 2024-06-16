@@ -277,7 +277,7 @@ export class DoHover extends LanguageFeature {
 		const result = {
 			kind: MarkupKind.Markdown,
 			value: [
-				"```scss",
+				document.languageId === "sass" ? "```sass" : "```scss",
 				`@function ${maybePrefixedName}${symbol.detail || "()"}`,
 				"```",
 			].join("\n"),
@@ -305,7 +305,7 @@ export class DoHover extends LanguageFeature {
 		const result = {
 			kind: MarkupKind.Markdown,
 			value: [
-				"```scss",
+				document.languageId === "sass" ? "```sass" : "```scss",
 				`@mixin ${maybePrefixedName}${symbol.detail || "()"}`,
 				"```",
 			].join("\n"),
@@ -331,7 +331,11 @@ export class DoHover extends LanguageFeature {
 	): Hover {
 		const result = {
 			kind: MarkupKind.Markdown,
-			value: ["```scss", symbol.name, "```"].join("\n"),
+			value: [
+				document.languageId === "sass" ? "```sass" : "```scss",
+				symbol.name,
+				"```",
+			].join("\n"),
 		};
 
 		const sassdoc = applySassDoc(symbol);
@@ -358,8 +362,8 @@ export class DoHover extends LanguageFeature {
 		const result = {
 			kind: MarkupKind.Markdown,
 			value: [
-				"```scss",
-				`${maybePrefixedName}: ${value};${
+				document.languageId === "sass" ? "```sass" : "```scss",
+				`${maybePrefixedName}: ${value}${document.languageId === "sass" ? "" : ";"}${
 					value !== rawValue ? ` // via ${rawValue}` : ""
 				}`,
 				"```",

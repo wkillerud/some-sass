@@ -32,6 +32,17 @@ export function assertColor(
 	isColor = expected !== null,
 ): void {
 	let document = TextDocument.create("test://test/test.css", "css", 0, text);
+	assertColor2(parser, document, selection, expected, isColor);
+}
+
+export function assertColor2(
+	parser: Parser,
+	document: TextDocument,
+	selection: string,
+	expected: Color | null,
+	isColor = expected !== null,
+) {
+	const text = document.getText();
 	let stylesheet = parser.parseStylesheet(document);
 	assert.equal(nodes.ParseErrorCollector.entries(stylesheet).length, 0, "compile errors");
 

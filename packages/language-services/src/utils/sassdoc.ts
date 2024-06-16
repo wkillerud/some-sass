@@ -157,7 +157,12 @@ export function applySassDoc(symbol: SassDocumentSymbol): string {
 				description += ` ${example.description}`;
 			}
 
-			description += ["\n", "```scss", example.code, "```"].join("\n");
+			description += [
+				"\n",
+				`\`\`\`${example.type || "scss"}`,
+				example.code,
+				"```",
+			].join("\n");
 		}
 	}
 

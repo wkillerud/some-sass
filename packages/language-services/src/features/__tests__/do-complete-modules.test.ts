@@ -170,6 +170,39 @@ test("should not suggest symbols from a module used by the one we use", async ()
 	assert.ok(items.find((annotation) => annotation.label === "$primary"));
 });
 
+test("should only suggest symbols from the current namespace, not others being used", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument(
+		['@use "./two";', '@use "./three";', "@function test() { @return two."],
+		{
+			uri: "one.scss",
+		},
+	);
+	const two = fileSystemProvider.createDocument("$two: 2;", {
+		uri: "two.scss",
+	});
+	const three = fileSystemProvider.createDocument(
+		["@function three() { @return 3; }"],
+		{
+			uri: "three.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(three);
+
+	const { items } = await ls.doComplete(one, Position.create(2, 31));
+	assert.notOk(items.find((annotation) => annotation.label === "three"));
+	assert.ok(items.find((annotation) => annotation.label === "$two"));
+});
+
 test("should not suggest private symbols from the current namespace", async () => {
 	ls.configure({
 		completionSettings: {

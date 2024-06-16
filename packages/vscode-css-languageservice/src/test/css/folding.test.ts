@@ -8,7 +8,7 @@
 import { suite, test, assert } from "vitest";
 import { TextDocument, FoldingRange, FoldingRangeKind, getCSSLanguageService } from "../../cssLanguageService";
 
-function assertRanges(
+export function assertRanges(
 	lines: string[],
 	expected: FoldingRange[],
 	languageId = "css",

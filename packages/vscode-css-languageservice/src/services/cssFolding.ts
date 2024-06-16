@@ -27,6 +27,8 @@ function computeFoldingRanges(document: TextDocument): FoldingRange[] {
 		switch (document.languageId) {
 			case "scss":
 				return new SassScanner();
+			case "sass":
+				return new SassScanner({ syntax: "indented" });
 			default:
 				return new Scanner();
 		}
@@ -56,7 +58,7 @@ function computeFoldingRanges(document: TextDocument): FoldingRange[] {
 
 	let token = scanner.scan();
 	let prevToken: IToken | null = null;
-	while (token.type !== TokenType.EOF) {
+	done: while (true) {
 		switch (token.type) {
 			case TokenType.CurlyL:
 			case TokenType.Indent:
@@ -64,10 +66,20 @@ function computeFoldingRanges(document: TextDocument): FoldingRange[] {
 				delimiterStack.push({ line: getStartLine(token), type: "brace", isStart: true });
 				break;
 			}
+			case TokenType.EOF:
+			case TokenType.Dedent:
 			case TokenType.CurlyR: {
+				// for indented EOF can fill the same role as CurlyR, but we don't want that to be the case for (S)CSS
+				if (token.type === TokenType.EOF && scanner.syntax !== "indented") {
+					break done;
+				}
+
 				if (delimiterStack.length !== 0) {
 					const prevDelimiter = popPrevStartDelimiterOfType(delimiterStack, "brace");
 					if (!prevDelimiter) {
+						if (token.type === TokenType.EOF) {
+							break done;
+						}
 						break;
 					}
 
@@ -92,6 +104,12 @@ function computeFoldingRanges(document: TextDocument): FoldingRange[] {
 							});
 						}
 					}
+				} else {
+					// There might be several Indents we should create ranges from,
+					// so only break out here if the stack is empty.
+					if (token.type === TokenType.EOF) {
+						break done;
+					}
 				}
 				break;
 			}
@@ -112,7 +130,11 @@ function computeFoldingRanges(document: TextDocument): FoldingRange[] {
 					const matches = token.text.match(/^\s*\/\*\s*(#region|#endregion)\b\s*(.*?)\s*\*\//);
 					if (matches) {
 						return commentRegionMarkerToDelimiter(matches[1]);
-					} else if (document.languageId === "scss" || document.languageId === "less") {
+					} else if (
+						document.languageId === "scss" ||
+						document.languageId === "sass" ||
+						document.languageId === "less"
+					) {
 						const matches = token.text.match(/^\s*\/\/\s*(#region|#endregion)\b\s*(.*?)\s*/);
 						if (matches) {
 							return commentRegionMarkerToDelimiter(matches[1]);

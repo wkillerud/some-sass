@@ -4,7 +4,7 @@ import {
 } from "@somesass/language-services";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
-import { getSCSSRegionsDocument } from "./utils/embedded";
+import { getSassRegionsDocument } from "./utils/embedded";
 
 export default class WorkspaceScanner {
 	#ls: LanguageService;
@@ -63,9 +63,15 @@ export default class WorkspaceScanner {
 
 		try {
 			const content = await this.#fs.readFile(uri);
+			const uriString = uri.toString();
 
-			const document = getSCSSRegionsDocument(
-				TextDocument.create(uri.toString(), "scss", 1, content),
+			const document = getSassRegionsDocument(
+				TextDocument.create(
+					uriString,
+					uriString.endsWith(".sass") ? "sass" : "scss",
+					1,
+					content,
+				),
 			);
 			if (!document) return;
 

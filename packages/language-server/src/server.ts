@@ -22,7 +22,7 @@ import type { FileSystemProvider } from "./file-system";
 import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";
 import { defaultSettings, IEditorSettings, ISettings } from "./settings";
-import { getSCSSRegionsDocument } from "./utils/embedded";
+import { getSassRegionsDocument } from "./utils/embedded";
 import WorkspaceScanner from "./workspace-scanner";
 
 export class SomeSassServer {
@@ -167,7 +167,7 @@ export class SomeSassServer {
 				);
 
 				const files = await fileSystemProvider.findFiles(
-					"**/*.{scss,svelte,astro,vue}",
+					"**/*.{scss,sass,svelte,astro,vue}",
 					settings.scannerExclude,
 				);
 
@@ -264,7 +264,7 @@ export class SomeSassServer {
 		this.connection.onCompletion(async (params) => {
 			if (!ls) return null;
 
-			const document = getSCSSRegionsDocument(
+			const document = getSassRegionsDocument(
 				documents.get(params.textDocument.uri),
 				params.position,
 			);
@@ -277,7 +277,7 @@ export class SomeSassServer {
 		this.connection.onHover((params) => {
 			if (!ls) return null;
 
-			const document = getSCSSRegionsDocument(
+			const document = getSassRegionsDocument(
 				documents.get(params.textDocument.uri),
 				params.position,
 			);
@@ -290,7 +290,7 @@ export class SomeSassServer {
 		this.connection.onSignatureHelp(async (params) => {
 			if (!ls) return null;
 
-			const document = getSCSSRegionsDocument(
+			const document = getSassRegionsDocument(
 				documents.get(params.textDocument.uri),
 				params.position,
 			);
@@ -303,7 +303,7 @@ export class SomeSassServer {
 		this.connection.onDefinition((params) => {
 			if (!ls) return null;
 
-			const document = getSCSSRegionsDocument(
+			const document = getSassRegionsDocument(
 				documents.get(params.textDocument.uri),
 				params.position,
 			);
@@ -316,7 +316,7 @@ export class SomeSassServer {
 		this.connection.onDocumentHighlight((params) => {
 			if (!ls) return null;
 
-			const document = getSCSSRegionsDocument(
+			const document = getSassRegionsDocument(
 				documents.get(params.textDocument.uri),
 				params.position,
 			);
@@ -333,7 +333,7 @@ export class SomeSassServer {
 		this.connection.onDocumentLinks((params) => {
 			if (!ls) return null;
 
-			const document = getSCSSRegionsDocument(
+			const document = getSassRegionsDocument(
 				documents.get(params.textDocument.uri),
 			);
 			if (!document) return null;
@@ -349,7 +349,7 @@ export class SomeSassServer {
 		this.connection.onReferences(async (params) => {
 			if (!ls) return null;
 
-			const document = getSCSSRegionsDocument(
+			const document = getSassRegionsDocument(
 				documents.get(params.textDocument.uri),
 				params.position,
 			);
@@ -373,7 +373,7 @@ export class SomeSassServer {
 		this.connection.onCodeAction(async (params) => {
 			if (!ls) return null;
 
-			const document = getSCSSRegionsDocument(
+			const document = getSassRegionsDocument(
 				documents.get(params.textDocument.uri),
 			);
 			if (!document) return null;
@@ -415,7 +415,7 @@ export class SomeSassServer {
 		this.connection.onPrepareRename(async (params) => {
 			if (!ls) return null;
 
-			const document = getSCSSRegionsDocument(
+			const document = getSassRegionsDocument(
 				documents.get(params.textDocument.uri),
 				params.position,
 			);
@@ -428,7 +428,7 @@ export class SomeSassServer {
 		this.connection.onRenameRequest(async (params) => {
 			if (!ls) return null;
 
-			const document = getSCSSRegionsDocument(
+			const document = getSassRegionsDocument(
 				documents.get(params.textDocument.uri),
 				params.position,
 			);
@@ -445,7 +445,7 @@ export class SomeSassServer {
 		this.connection.onDocumentColor(async (params) => {
 			if (!ls) return null;
 
-			const document = getSCSSRegionsDocument(
+			const document = getSassRegionsDocument(
 				documents.get(params.textDocument.uri),
 			);
 			if (!document) return null;
@@ -461,7 +461,7 @@ export class SomeSassServer {
 		this.connection.onColorPresentation((params) => {
 			if (!ls) return null;
 
-			const document = getSCSSRegionsDocument(
+			const document = getSassRegionsDocument(
 				documents.get(params.textDocument.uri),
 			);
 			if (!document) return null;

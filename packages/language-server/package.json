@@ -1,9 +1,11 @@
 {
 	"name": "some-sass-language-server",
 	"version": "1.2.3",
-	"description": "LSP server for SCSS. Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
+	"description": "LSP server for Sass. Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
 	"keywords": [
+		"sass",
 		"scss",
+		"sass-indented",
 		"lsp",
 		"language-server-protocol"
 	],

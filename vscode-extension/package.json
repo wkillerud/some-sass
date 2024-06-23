@@ -1,6 +1,6 @@
 {
 	"name": "some-sass",
-	"displayName": "Some Sass: extended support for SCSS and SassDoc",
+	"displayName": "Some Sass: extended support for Sass and SassDoc",
 	"description": "Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
 	"version": "3.1.4",
 	"private": true,
@@ -17,6 +17,7 @@
 	},
 	"keywords": [
 		"scss",
+		"sass",
 		"sassdoc",
 		"autocompletion",
 		"intellisense",
@@ -27,6 +28,7 @@
 	],
 	"activationEvents": [
 		"onLanguage:scss",
+		"onLanguage:sass",
 		"onLanguage:vue",
 		"onLanguage:svelte",
 		"onLanguage:astro",

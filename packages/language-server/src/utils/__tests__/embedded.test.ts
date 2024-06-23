@@ -3,9 +3,9 @@ import { Position } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
 	isFileWhereScssCanBeEmbedded,
-	getSCSSRegions,
-	getSCSSContent,
-	getSCSSRegionsDocument,
+	getSassRegions,
+	getSassContent,
+	getSassRegionsDocument,
 } from "../embedded";
 
 describe("Utils/VueSvelte", () => {
@@ -64,97 +64,102 @@ describe("Utils/VueSvelte", () => {
 
 	it("getSCSSRegions", () => {
 		assert.deepStrictEqual(
-			getSCSSRegions('<style sdad lang="scss" afsaf sdd></style>'),
-			[[34, 34]],
+			getSassRegions('<style sdad lang="scss" afsaf sdd></style>'),
+			[{ type: "scss", range: [34, 34] }],
 		);
 		assert.deepStrictEqual(
-			getSCSSRegions('<style lang="scss" scoped></style>'),
-			[[26, 26]],
+			getSassRegions('<style lang="scss" scoped></style>'),
+			[{ type: "scss", range: [26, 26] }],
 		);
 		assert.deepStrictEqual(
-			getSCSSRegions('<style lang="scss" module></style>'),
-			[[26, 26]],
+			getSassRegions('<style lang="scss" module></style>'),
+			[{ type: "scss", range: [26, 26] }],
 		);
-		assert.deepStrictEqual(getSCSSRegions('<style lang="scss"></style>'), [
-			[19, 19],
+		assert.deepStrictEqual(getSassRegions('<style lang="scss"></style>'), [
+			{ type: "scss", range: [19, 19] },
 		]);
-		assert.deepStrictEqual(getSCSSRegions("<style lang='scss'></style>"), [
-			[19, 19],
+		assert.deepStrictEqual(getSassRegions("<style lang='scss'></style>"), [
+			{ type: "scss", range: [19, 19] },
 		]);
-		assert.deepStrictEqual(getSCSSRegions('<style type="text/scss"></style>'), [
-			[24, 24],
+		assert.deepStrictEqual(getSassRegions('<style type="text/scss"></style>'), [
+			{ type: "scss", range: [24, 24] },
 		]);
 
 		assert.deepStrictEqual(
-			getSCSSRegions(
+			getSassRegions(
 				"<template><p>style lang='scss'</p></template><script></script></script><style lang='scss'></style>",
 			),
-			[[90, 90]],
+			[{ type: "scss", range: [90, 90] }],
 		);
 		assert.deepStrictEqual(
-			getSCSSRegions(
+			getSassRegions(
 				"<template><p>style lang='scss'</p></template><script></script></script>\n<style lang='scss'></style>",
 			),
-			[[91, 91]],
+			[{ type: "scss", range: [91, 91] }],
 		);
 		assert.deepStrictEqual(
-			getSCSSRegions(
+			getSassRegions(
 				"<template><p>style lang='scss'</p></template><script></script></script>\n<style lang='scss'>\n</style>",
 			),
-			[[91, 92]],
+			[{ type: "scss", range: [91, 92] }],
 		);
 		assert.deepStrictEqual(
-			getSCSSRegions(
+			getSassRegions(
 				"<template><p>style lang='scss'</p></template><script></script></script>\n<style lang='scss'>a { color: white; }</style>",
 			),
-			[[91, 110]],
+			[{ type: "scss", range: [91, 110] }],
 		);
 
 		assert.deepStrictEqual(
-			getSCSSRegions(
+			getSassRegions(
 				"<template><p>style lang='scss'</p></template><script></script></script><style lang='scss'>a { color: white; }</style><style lang='scss' module>a { color: white; }</style>\n",
 			),
 			[
-				[90, 109],
-				[143, 162],
+				{ type: "scss", range: [90, 109] },
+				{ type: "scss", range: [143, 162] },
 			],
 		);
 		assert.deepStrictEqual(
-			getSCSSRegions(
+			getSassRegions(
 				"<template><p>style lang='scss'</p></template><script></script></script><style lang='scss'>a { color: white; }</style><style lang='scss' module>a { color: white; }</style>\n\n<style lang='scss' module=\"a\">a { color: white; }</style>",
 			),
 			[
-				[90, 109],
-				[143, 162],
-				[202, 221],
+				{ type: "scss", range: [90, 109] },
+				{ type: "scss", range: [143, 162] },
+				{ type: "scss", range: [202, 221] },
 			],
 		);
 
-		assert.deepStrictEqual(getSCSSRegions('<style lang="sass"></style>'), []);
-		assert.deepStrictEqual(getSCSSRegions('<style lang="stylus"></style>'), []);
+		assert.deepStrictEqual(getSassRegions('<style lang="sass"></style>'), [
+			{ type: "sass", range: [19, 19] },
+		]);
+		assert.deepStrictEqual(getSassRegions('<style type="sass"></style>'), [
+			{ type: "sass", range: [19, 19] },
+		]);
+		assert.deepStrictEqual(getSassRegions('<style lang="stylus"></style>'), []);
 		assert.deepStrictEqual(
-			getSCSSRegions('<style lang="sass" scoped></style>'),
-			[],
+			getSassRegions('<style lang="sass" scoped></style>'),
+			[{ type: "sass", range: [26, 26] }],
 		);
-		assert.deepStrictEqual(getSCSSRegions("<style></style>"), []);
-		assert.deepStrictEqual(getSCSSRegions('<style>lang="scss"</style>'), []);
+		assert.deepStrictEqual(getSassRegions("<style></style>"), []);
+		assert.deepStrictEqual(getSassRegions('<style>lang="scss"</style>'), []);
 	});
 
 	it("getSCSSContent", () => {
 		assert.strictEqual(
-			getSCSSContent("sadja|sio|fuioaf", [[5, 10]]),
+			getSassContent("sadja|sio|fuioaf", [{ type: "scss", range: [5, 10] }]),
 			"     |sio|      ",
 		);
 		assert.strictEqual(
-			getSCSSContent("sadja|sio|fuio^af^", [
-				[5, 10],
-				[14, 18],
+			getSassContent("sadja|sio|fuio^af^", [
+				{ type: "scss", range: [5, 10] },
+				{ type: "scss", range: [14, 18] },
 			]),
 			"     |sio|    ^af^",
 		);
 
 		assert.strictEqual(
-			getSCSSContent(
+			getSassContent(
 				"<template><p>style lang='scss'</p></template><script></script></script><style lang='scss'> a\n { color: white;  }</style>",
 			),
 			`${" ".repeat(90)} a\n { color: white;  }${" ".repeat(8)}`,
@@ -169,7 +174,7 @@ describe("Utils/VueSvelte", () => {
 			"",
 		);
 		assert.strictEqual(
-			getSCSSRegionsDocument(exSCSSDocument, Position.create(0, 0)),
+			getSassRegionsDocument(exSCSSDocument, Position.create(0, 0)),
 			exSCSSDocument,
 		);
 
@@ -187,29 +192,29 @@ describe("Utils/VueSvelte", () => {
 		`,
 		);
 		assert.notDeepEqual(
-			getSCSSRegionsDocument(exVueDocument, Position.create(2, 15)),
+			getSassRegionsDocument(exVueDocument, Position.create(2, 15)),
 			exVueDocument,
 		);
 		assert.deepStrictEqual(
-			getSCSSRegionsDocument(exVueDocument, Position.create(2, 15)),
+			getSassRegionsDocument(exVueDocument, Position.create(2, 15)),
 			null,
 		);
 
 		assert.notDeepEqual(
-			getSCSSRegionsDocument(exVueDocument, Position.create(5, 15)),
+			getSassRegionsDocument(exVueDocument, Position.create(5, 15)),
 			exVueDocument,
 		);
 		assert.notDeepEqual(
-			getSCSSRegionsDocument(exVueDocument, Position.create(5, 15)),
+			getSassRegionsDocument(exVueDocument, Position.create(5, 15)),
 			null,
 		);
 
 		assert.notDeepEqual(
-			getSCSSRegionsDocument(exVueDocument, Position.create(6, 9)),
+			getSassRegionsDocument(exVueDocument, Position.create(6, 9)),
 			exVueDocument,
 		);
 		assert.deepStrictEqual(
-			getSCSSRegionsDocument(exVueDocument, Position.create(6, 9)),
+			getSassRegionsDocument(exVueDocument, Position.create(6, 9)),
 			null,
 		);
 	});

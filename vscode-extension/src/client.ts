@@ -38,6 +38,7 @@ export function createLanguageClientOptions(
 ): LanguageClientOptions {
 	let documentSelector: DocumentSelector = [
 		{ scheme: "untitled", language: "scss" },
+		{ scheme: "untitled", language: "sass" },
 		{ scheme: "untitled", language: "vue" },
 		{ scheme: "untitled", language: "svelte" },
 		{ scheme: "untitled", language: "astro" },
@@ -53,14 +54,17 @@ export function createLanguageClientOptions(
 
 		documentSelector = [
 			{ scheme: "file", language: "scss", pattern },
+			{ scheme: "file", language: "sass", pattern },
 			{ scheme: "file", language: "vue", pattern },
 			{ scheme: "file", language: "svelte", pattern },
 			{ scheme: "file", language: "astro", pattern },
 			{ scheme: "vscode-vfs", language: "scss", pattern },
+			{ scheme: "vscode-vfs", language: "sass", pattern },
 			{ scheme: "vscode-vfs", language: "vue", pattern },
 			{ scheme: "vscode-vfs", language: "svelte", pattern },
 			{ scheme: "vscode-vfs", language: "astro", pattern },
 			{ scheme: "vscode-test-web", language: "scss", pattern: webPattern },
+			{ scheme: "vscode-test-web", language: "sass", pattern: webPattern },
 			{ scheme: "vscode-test-web", language: "vue", pattern: webPattern },
 			{ scheme: "vscode-test-web", language: "svelte", pattern: webPattern },
 			{ scheme: "vscode-test-web", language: "astro", pattern: webPattern },
@@ -75,7 +79,7 @@ export function createLanguageClientOptions(
 				? workspace.createFileSystemWatcher({
 						baseUri: currentWorkspace.uri,
 						base: currentWorkspace.uri.fsPath,
-						pattern: "**/*.{scss,vue,svelte,astro}",
+						pattern: "**/*.{scss,sass,vue,svelte,astro}",
 					})
 				: undefined,
 		},

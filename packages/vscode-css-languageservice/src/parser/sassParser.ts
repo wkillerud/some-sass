@@ -45,9 +45,21 @@ export class SassParser extends cssParser.Parser {
 		const node = <nodes.Import>this.create(nodes.Import);
 		this.consumeToken();
 
-		if (!node.addChild(this._parseURILiteral()) && !node.addChild(this._parseStringLiteral())) {
-			return this.finish(node, ParseError.URIOrStringExpected);
+		if (this.syntax === "indented") {
+			// For indented syntax quotes are optional for @import
+			if (
+				!node.addChild(this._parseURILiteral()) &&
+				!node.addChild(this._parseStringLiteral()) &&
+				!node.addChild(this.acceptUnquotedString())
+			) {
+				return this.finish(node, ParseError.URIOrStringExpected);
+			}
+		} else {
+			if (!node.addChild(this._parseURILiteral()) && !node.addChild(this._parseStringLiteral())) {
+				return this.finish(node, ParseError.URIOrStringExpected);
+			}
 		}
+
 		while (this.accept(TokenType.Comma)) {
 			if (!node.addChild(this._parseURILiteral()) && !node.addChild(this._parseStringLiteral())) {
 				return this.finish(node, ParseError.URIOrStringExpected);

@@ -290,6 +290,9 @@ export class CSSNavigation {
 				const rawText = candidate.getText();
 				if (startsWith(rawText, `'`) || startsWith(rawText, `"`)) {
 					collect(candidate);
+				} else if (document.languageId === "sass" && candidate.type === nodes.NodeType.StringLiteral) {
+					// In the Sass indented syntax the string quotes are optional for @import
+					collect(candidate);
 				}
 				return false;
 			}

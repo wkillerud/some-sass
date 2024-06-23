@@ -762,6 +762,20 @@ foo
 			]);
 		});
 
+		test("Sass @import without string quotes", async () => {
+			const fixtureRoot = path.resolve(__dirname, "../../../src/test/sass/linkFixture");
+			const getDocumentUri = (relativePath: string) => {
+				return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
+			};
+
+			await assertDynamicLinks(getDocumentUri("./both/index.sass"), `@import nested/bar`, [
+				{ range: newRange(8, 18), target: getDocumentUri("./both/nested/bar.sass"), type: nodes.NodeType.Import },
+			]);
+			await assertDynamicLinks(getDocumentUri("./both/index.sass"), `@import bar`, [
+				{ range: newRange(8, 11), target: getDocumentUri("./both/bar.sass"), type: nodes.NodeType.Import },
+			]);
+		});
+
 		test("Sass partial file dynamic links", async () => {
 			const fixtureRoot = path.resolve(__dirname, "../../../src/test/sass/linkFixture");
 			const getDocumentUri = (relativePath: string) => {

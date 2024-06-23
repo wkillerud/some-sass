@@ -184,18 +184,19 @@ export class Parser {
 		return this.finish(node);
 	}
 
-	protected acceptUnquotedString(): boolean {
+	protected acceptUnquotedString(): nodes.Node | null {
 		const pos = this.scanner.pos();
 		const depth = this.scanner.stream.depth;
 		this.scanner.goBackTo(this.token.offset, depth);
 		const unquoted = this.scanner.scanUnquotedString();
 		if (unquoted) {
+			let node = this.createNode(nodes.NodeType.StringLiteral);
 			this.token = unquoted;
 			this.consumeToken();
-			return true;
+			return this.finish(node);
 		}
 		this.scanner.goBackTo(pos, depth);
-		return false;
+		return null;
 	}
 
 	public resync(resyncTokens: TokenType[] | undefined, resyncStopTokens: TokenType[] | undefined): boolean {
@@ -2028,7 +2029,7 @@ export class Parser {
 	}
 
 	public _parseStringLiteral(): nodes.Node | null {
-		if (!this.peek(TokenType.String) && !this.peek(TokenType.BadString)) {
+		if (!this.peek(TokenType.String) && !this.peek(TokenType.BadString) && !this.peek(TokenType.UnquotedString)) {
 			return null;
 		}
 		const node = this.createNode(nodes.NodeType.StringLiteral);

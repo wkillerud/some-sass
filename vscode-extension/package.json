@@ -40,6 +40,39 @@
 	"browser": "./dist/browser-client.js",
 	"main": "./dist/node-client.js",
 	"contributes": {
+		"languages": [
+			{
+				"id": "sass",
+				"aliases": [
+					"Sass",
+					"sass-indented"
+				],
+				"extensions": [
+					".sass",
+					".sass.erb"
+				],
+				"configuration": "./sass.configuration.json"
+			},
+			{
+				"id": "sass.hover",
+				"extensions": [
+					".sass.hover"
+				],
+				"configuration": "./sass.configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "sass",
+				"scopeName": "source.sass",
+				"path": "./syntaxes/sass.tmLanguage.json"
+			},
+			{
+				"language": "sass.hover",
+				"scopeName": "source.sass.hover",
+				"path": "./syntaxes/sass.hover.highlighting.json"
+			}
+		],
 		"configuration": {
 			"properties": {
 				"somesass.scannerDepth": {

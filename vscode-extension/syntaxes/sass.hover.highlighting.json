@@ -1,0 +1,43 @@
+{
+  "fileTypes": ["sass.hover"],
+  "name": "Sass Hover",
+  "patterns": [
+    {
+      "match": "(Path)",
+      "name": "entity.name.function"
+    },
+    {
+      "match": "([A-z\\/-]+): (.*)",
+      "name": "meta.path",
+      "captures": {
+        "1": {
+          "name": "variable"
+        },
+        "2": {
+          "name": "entity.name.type"
+        }
+      }
+    },
+    {
+      "match": "([A-z\\/-]+)",
+      "name": "meta.path",
+      "captures": {
+        "1": {
+          "name": "keyword.control"
+        }
+      }
+    },
+    {
+      "begin": "\\.([A-z-]+)",
+      "end": "\\n|[\\t ]",
+      "name": "meta.extension",
+      "captures": {
+        "1": {
+          "name": "keyword.other"
+        }
+      }
+    }
+  ],
+
+  "scopeName": "source.sass.hover"
+}

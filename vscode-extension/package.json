@@ -112,7 +112,7 @@
 		"@types/mocha": "10.0.6",
 		"@types/vscode": "1.86.0",
 		"@vscode/test-electron": "2.4.0",
-		"@vscode/test-web": "0.0.54",
+		"@vscode/test-web": "0.0.56",
 		"assert": "2.1.0",
 		"mocha": "10.4.0",
 		"shx": "0.3.4"

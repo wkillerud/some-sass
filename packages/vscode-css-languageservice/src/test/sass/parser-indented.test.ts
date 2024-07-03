@@ -2367,6 +2367,30 @@ figure
 		);
 	});
 
+	// https://sass-lang.com/documentation/at-rules/mixin/#indented-mixin-syntax
+	// This is discouraged in the documentation. Consider not supporting if
+	// implementation is complex (i. e. at-rule parsing can't be patched easily
+	// to consider these valid)
+	suite.skip("shorthand mixin syntax", () => {
+		test("@include shorthand (+)", () => {
+			assertNode(
+				`p
+		+double-border(blue)`,
+				parser,
+				parser._parseStylesheet.bind(parser),
+			);
+		});
+
+		test("@mixin shorthand (=)", () => {
+			assertNode(
+				`=double-border($color)
+		color: $color`,
+				parser,
+				parser._parseStylesheet.bind(parser),
+			);
+		});
+	});
+
 	test("@content", () => {
 		assertNode("@content", parser, parser._parseMixinContent.bind(parser));
 		assertNode("@content($type)", parser, parser._parseMixinContent.bind(parser));

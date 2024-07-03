@@ -67,6 +67,15 @@ export class DoHover extends LanguageFeature {
 					type = SymbolKind.Method;
 				}
 				if (type === null) {
+					if (document.languageId === "sass") {
+						// We are probably hovering over a CSS identifier
+						// and want to defer this to vscode-css-languageservice's hover handler
+						return this.getUpstreamLanguageServer().doHover(
+							document,
+							position,
+							stylesheet,
+						);
+					}
 					return null;
 				}
 				if (node) {

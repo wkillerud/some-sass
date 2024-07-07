@@ -172,7 +172,7 @@ suite("Sass SelectionRange", () => {
 		&.lol
 			color: yellow
 
-`,
+	`,
 				],
 				[
 					18,
@@ -182,7 +182,7 @@ suite("Sass SelectionRange", () => {
 		&.lol
 			color: yellow
 
-`,
+	`,
 				],
 				[
 					4,

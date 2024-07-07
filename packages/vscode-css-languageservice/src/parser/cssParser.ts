@@ -507,6 +507,8 @@ export class Parser {
 			}
 		}
 
+		let initialDepth = this.scanner.stream.depth;
+
 		let decl = parseDeclaration();
 		while (node.addChild(decl)) {
 			if (this.syntax === "indented") {
@@ -532,7 +534,7 @@ export class Parser {
 				}
 			}
 
-			if (this.syntax === "indented" && this.scanner.stream.depth === 0) {
+			if (this.syntax === "indented" && this.scanner.stream.depth < initialDepth) {
 				// For the indented syntax we might not get the same number of
 				// dedents as we get indents. If the depth is zero at this point
 				// we should drop out so we don't end up adding a ruleset as a

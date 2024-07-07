@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { LanguageService as VSCodeLanguageService } from "@somesass/vscode-css-languageservice";
-import { ParseResult, parseSync } from "scss-sassdoc-parser";
+import { ParseResult, parseSync } from "sassdoc-parser";
 import {
 	TextDocument,
 	Stylesheet,

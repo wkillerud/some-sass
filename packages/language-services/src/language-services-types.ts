@@ -27,7 +27,7 @@ import {
 	FoldingRangeKind,
 	SelectionRange,
 } from "@somesass/vscode-css-languageservice";
-import type { ParseResult } from "scss-sassdoc-parser";
+import type { ParseResult } from "sassdoc-parser";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
 	Range,

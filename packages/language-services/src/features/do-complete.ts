@@ -1,6 +1,6 @@
 import { getNodeAtOffset } from "@somesass/vscode-css-languageservice";
 import ColorDotJS from "colorjs.io";
-import { ParseResult } from "scss-sassdoc-parser";
+import { ParseResult } from "sassdoc-parser";
 import { SassBuiltInModule, sassBuiltInModules } from "../facts/sass";
 import { sassDocAnnotations } from "../facts/sassdoc";
 import { LanguageFeature } from "../language-feature";

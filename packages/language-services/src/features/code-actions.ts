@@ -49,29 +49,44 @@ export class CodeActions extends LanguageFeature {
 			),
 		);
 
-		const onlyNonWhitespace = preceedingOnLine.trimStart();
-		const lastIndent = preceedingOnLine.length - onlyNonWhitespace.length;
+		const preceeding = preceedingOnLine.trimStart();
+		const lastIndent = preceedingOnLine.length - preceeding.length;
 		const indent = preceedingOnLine.substring(0, lastIndent);
 
 		const lines = getLinesFromText(selectedText);
 		const eol =
 			lines.length > 1 ? getEOL(selectedText) : getEOL(document.getText());
 
-		const newLines = [
-			`${indent}@function _function() {`,
-			`${indent}${indentText(
-				`@return ${lines
-					.map((line, index) =>
-						index === 0 ? line : indentText(line, this.configuration),
-					)
-					.join(eol)}`,
-				this.configuration,
-			)}${selectedText.endsWith(";") ? "" : ";"}`,
-			`${indent}}`,
-			`${indent}${onlyNonWhitespace}_function()${
-				selectedText.endsWith(";") ? ";" : ""
-			}`,
-		].join(eol);
+		let newLines: string;
+		if (document.languageId === "sass") {
+			newLines = [
+				`${indent}@function _function()`,
+				`${indent}${indentText(
+					`@return ${lines
+						.map((line, index) =>
+							index === 0 ? line : indentText(line, this.configuration),
+						)
+						.join(eol)}`,
+					this.configuration,
+				)}`,
+				`${indent}${preceeding}_function()`,
+			].join(eol);
+		} else {
+			const semi = selectedText.endsWith(";");
+			newLines = [
+				`${indent}@function _function() {`,
+				`${indent}${indentText(
+					`@return ${lines
+						.map((line, index) =>
+							index === 0 ? line : indentText(line, this.configuration),
+						)
+						.join(eol)}`,
+					this.configuration,
+				)}${semi ? "" : ";"}`,
+				`${indent}}`,
+				`${indent}${preceeding}_function()${semi ? ";" : ""}`,
+			].join(eol);
+		}
 
 		const workspaceEdit: WorkspaceEdit = {
 			documentChanges: [
@@ -122,19 +137,35 @@ export class CodeActions extends LanguageFeature {
 		const eol =
 			lines.length > 1 ? getEOL(selectedText) : getEOL(document.getText());
 
-		const newLines = [
-			"@mixin _mixin {",
-			...lines.map((line, index) =>
-				line
-					? indentText(
-							index === 0 ? `${indent}${line}` : line,
-							this.configuration,
-						)
-					: line,
-			),
-			`${indent}}`,
-			`${indent}@include _mixin;`,
-		].join(eol);
+		let newLines: string;
+		if (document.languageId === "sass") {
+			newLines = [
+				"@mixin _mixin",
+				...lines.map((line, index) =>
+					line
+						? indentText(
+								index === 0 ? `${indent}${line}` : line,
+								this.configuration,
+							)
+						: line,
+				),
+				`${indent}@include _mixin`,
+			].join(eol);
+		} else {
+			newLines = [
+				"@mixin _mixin {",
+				...lines.map((line, index) =>
+					line
+						? indentText(
+								index === 0 ? `${indent}${line}` : line,
+								this.configuration,
+							)
+						: line,
+				),
+				`${indent}}`,
+				`${indent}@include _mixin;`,
+			].join(eol);
+		}
 
 		const workspaceEdit: WorkspaceEdit = {
 			documentChanges: [
@@ -161,7 +192,7 @@ export class CodeActions extends LanguageFeature {
 		document: TextDocument,
 		range: Range,
 	): CodeAction {
-		const selectedText = document.getText(range);
+		const selected = document.getText(range);
 		const preceedingOnLine = document.getText(
 			Range.create(
 				Position.create(range.start.line, 0),
@@ -169,17 +200,21 @@ export class CodeActions extends LanguageFeature {
 			),
 		);
 
-		const onlyNonWhitespace = preceedingOnLine.trimStart();
-		const lastIndent = preceedingOnLine.length - onlyNonWhitespace.length;
+		const preceeding = preceedingOnLine.trimStart();
+		const lastIndent = preceedingOnLine.length - preceeding.length;
 		const indent = preceedingOnLine.substring(0, lastIndent);
 
 		const eol = getEOL(document.getText());
 
-		const newLines = `${indent}$_variable: ${
-			selectedText.endsWith(";") ? selectedText : `${selectedText};`
-		}${eol}${indent}${onlyNonWhitespace}${
-			selectedText.endsWith(";") ? "$_variable;" : "$_variable"
-		}`;
+		let newLines: string;
+		if (document.languageId === "sass") {
+			newLines = `${indent}$_variable: ${selected}${eol}${indent}${preceeding}$_variable`;
+		} else {
+			const semi = selected.endsWith(";");
+			newLines = `${indent}$_variable: ${selected}${semi ? "" : ";"}${eol}${indent}${preceeding}$_variable${
+				semi ? ";" : ""
+			}`;
+		}
 
 		const workspaceEdit: WorkspaceEdit = {
 			documentChanges: [

@@ -532,6 +532,15 @@ export class Parser {
 				}
 			}
 
+			if (this.syntax === "indented" && this.scanner.stream.depth === 0) {
+				// For the indented syntax we might not get the same number of
+				// dedents as we get indents. If the depth is zero at this point
+				// we should drop out so we don't end up adding a ruleset as a
+				// child of another ruleset when in reality it's a direct child
+				// of Stylesheet.
+				return this.finish(node);
+			}
+
 			decl = parseDeclaration();
 		}
 

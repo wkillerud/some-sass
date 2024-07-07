@@ -6,7 +6,7 @@
 import { suite, test, assert } from "vitest";
 import { getSassLanguageService, TextDocument, SelectionRange } from "../../cssLanguageService";
 
-function assertRanges(content: string, expected: (number | string)[][]): void {
+function assertRanges(content: string, expected: (number | string)[][], stylesheetchildren?: number): void {
 	let message = `${content} gives selection range:\n`;
 
 	const offset = content.indexOf("|");
@@ -15,7 +15,11 @@ function assertRanges(content: string, expected: (number | string)[][]): void {
 	const ls = getSassLanguageService();
 
 	const document = TextDocument.create("test://foo/bar.sass", "sass", 1, content);
-	const actualRanges = ls.getSelectionRanges(document, [document.positionAt(offset)], ls.parseStylesheet(document));
+	const stylesheet = ls.parseStylesheet(document);
+	if (typeof stylesheetchildren === "number") {
+		assert.equal(stylesheet.children.length, stylesheetchildren);
+	}
+	const actualRanges = ls.getSelectionRanges(document, [document.positionAt(offset)], stylesheet);
 	assert.equal(actualRanges.length, 1);
 	const offsetPairs: [number, string][] = [];
 	let curr: SelectionRange | undefined = actualRanges[0];
@@ -124,6 +128,26 @@ suite("Sass SelectionRange", () => {
 				[4, "\n\t\n"],
 				[0, ".foo\n\t\n"],
 			],
+		);
+	});
+
+	test("stops in time for next declaration when there's nesting", () => {
+		assertRanges(
+			`.foo
+	color: red|
+	&.bar
+		color: blue
+
+.baz
+	color: green`,
+			[
+				[13, "red"],
+				[6, "color: red"],
+				[4, "\n\tcolor: red\n\t&.bar\n\t\tcolor: blue\n\n"],
+				[0, ".foo\n\tcolor: red\n\t&.bar\n\t\tcolor: blue\n\n"],
+				[0, ".foo\n\tcolor: red\n\t&.bar\n\t\tcolor: blue\n\n.baz\n\tcolor: green"],
+			],
+			2,
 		);
 	});
 });

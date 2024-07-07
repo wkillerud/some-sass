@@ -432,19 +432,19 @@ export class Scanner {
 
 		// indents and dedents for the indented syntax
 		if (this.syntax === "indented") {
-			let n = this.stream.advanceWhileChar((ch) => {
+			let newlines = this.stream.advanceWhileChar((ch) => {
 				return ch === _NWL || ch === _LFD || ch === _CAR;
 			});
-			if (n > 0) {
-				n = this.stream.advanceWhileChar((ch) => {
+			if (newlines > 0) {
+				let depth = this.stream.advanceWhileChar((ch) => {
 					return ch === _TAB || ch === _WSP;
 				});
 
-				if (n > this.stream.depth) {
-					this.stream.depth = n;
+				if (depth > this.stream.depth) {
+					this.stream.depth = depth;
 					return this.finishToken(offset, TokenType.Indent);
-				} else if (n < this.stream.depth) {
-					this.stream.depth = n;
+				} else if (depth < this.stream.depth) {
+					this.stream.depth = depth;
 					return this.finishToken(offset, TokenType.Dedent);
 				} else {
 					return this.finishToken(offset, TokenType.Newline);

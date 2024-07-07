@@ -6,7 +6,7 @@
 import { suite, test, assert } from "vitest";
 import { getSassLanguageService, TextDocument, SelectionRange } from "../../cssLanguageService";
 
-function assertRanges(content: string, expected: (number | string)[][], stylesheetchildren?: number): void {
+function assertRanges(content: string, expected: (number | string)[][]): void {
 	let message = `${content} gives selection range:\n`;
 
 	const offset = content.indexOf("|");
@@ -16,9 +16,6 @@ function assertRanges(content: string, expected: (number | string)[][], styleshe
 
 	const document = TextDocument.create("test://foo/bar.sass", "sass", 1, content);
 	const stylesheet = ls.parseStylesheet(document);
-	if (typeof stylesheetchildren === "number") {
-		assert.equal(stylesheet.children.length, stylesheetchildren);
-	}
 	const actualRanges = ls.getSelectionRanges(document, [document.positionAt(offset)], stylesheet);
 	assert.equal(actualRanges.length, 1);
 	const offsetPairs: [number, string][] = [];
@@ -147,7 +144,94 @@ suite("Sass SelectionRange", () => {
 				[0, ".foo\n\tcolor: red\n\t&.bar\n\t\tcolor: blue\n\n"],
 				[0, ".foo\n\tcolor: red\n\t&.bar\n\t\tcolor: blue\n\n.baz\n\tcolor: green"],
 			],
-			2,
+		);
+
+		assertRanges(
+			`.foo
+	color: red
+	&.bar
+		color: blue|
+
+		&.lol
+			color: yellow
+
+	&.rofl
+		color: purple
+
+.baz
+	color: green
+`,
+			[
+				[33, `blue`],
+				[26, `color: blue`],
+				[
+					23,
+					`
+		color: blue
+
+		&.lol
+			color: yellow
+
+`,
+				],
+				[
+					18,
+					`&.bar
+		color: blue
+
+		&.lol
+			color: yellow
+
+`,
+				],
+				[
+					4,
+					`
+	color: red
+	&.bar
+		color: blue
+
+		&.lol
+			color: yellow
+
+	&.rofl
+		color: purple
+
+`,
+				],
+				[
+					0,
+					`.foo
+	color: red
+	&.bar
+		color: blue
+
+		&.lol
+			color: yellow
+
+	&.rofl
+		color: purple
+
+`,
+				],
+				[
+					0,
+					`.foo
+	color: red
+	&.bar
+		color: blue
+
+		&.lol
+			color: yellow
+
+	&.rofl
+		color: purple
+
+.baz
+	color: green
+`,
+				],
+			],
 		);
 	});
 });

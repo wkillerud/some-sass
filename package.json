@@ -11,6 +11,7 @@
 		"prepare": "husky",
 		"postinstall": "patch-package",
 		"build": "nx run-many -t build",
+		"preclean": "nx reset",
 		"clean": "nx run-many -t clean",
 		"coverage": "nx run-many -t coverage",
 		"dev": "echo Watching workspace for changes... && nx watch --all -- nx run \\$NX_PROJECT_NAME:build",

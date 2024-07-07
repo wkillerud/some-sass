@@ -83,7 +83,7 @@ This language server is designed to run alongside the [VS Code CSS language serv
 			</th>
 			<td>Color picker for CSS colors</td>
 			<td>✅</td>
-			<td></td>
+			<td>✅</td>
 		</tr>
 		<tr>
 			<th rowspan="4">
@@ -93,7 +93,7 @@ This language server is designed to run alongside the [VS Code CSS language serv
 			</th>
 			<td>CSS completions</td>
 			<td>✅</td>
-			<td></td>
+			<td>✅ (for indented)</td>
 		</tr>
 		<tr>
 			<td>SCSS same-document completions</td>
@@ -133,7 +133,7 @@ This language server is designed to run alongside the [VS Code CSS language serv
 			</th>
 			<td>CSS colors</td>
 			<td>✅</td>
-			<td></td>
+			<td>✅</td>
 		</tr>
 		<tr>
 			<td>SCSS variable colors</td>
@@ -148,7 +148,7 @@ This language server is designed to run alongside the [VS Code CSS language serv
 			</th>
 			<td>Highlight references in document</td>
 			<td>✅</td>
-			<td></td>
+			<td>✅</td>
 		</tr>
 		<tr>
 			<th rowspan="1">
@@ -158,7 +158,7 @@ This language server is designed to run alongside the [VS Code CSS language serv
 			</th>
 			<td>Navigate to linked document</td>
 			<td>✅</td>
-			<td></td>
+			<td>✅</td>
 		</tr>
 		<tr>
 			<th rowspan="1">
@@ -168,7 +168,7 @@ This language server is designed to run alongside the [VS Code CSS language serv
 			</th>
 			<td>Go to symbol in document</td>
 			<td>✅</td>
-			<td></td>
+			<td>✅ (for indented)</td>
 		</tr>
 		<tr>
 			<th rowspan="1">
@@ -178,7 +178,7 @@ This language server is designed to run alongside the [VS Code CSS language serv
 			</th>
 			<td>Code block folding</td>
 			<td>✅</td>
-			<td></td>
+			<td>✅</td>
 		</tr>
 		<tr>
 			<th rowspan="1">
@@ -198,7 +198,7 @@ This language server is designed to run alongside the [VS Code CSS language serv
 			</th>
 			<td>CSS hover info</td>
 			<td>✅</td>
-			<td></td>
+			<td>✅ (for indented)</td>
 		</tr>
 		<tr>
 			<td>SCSS hover info</td>
@@ -228,7 +228,7 @@ This language server is designed to run alongside the [VS Code CSS language serv
 			</th>
 			<td>CSS references</td>
 			<td>✅</td>
-			<td></td>
+			<td>✅ (for indented)</td>
 		</tr>
 		<tr>
 			<td>SCSS references</td>
@@ -258,7 +258,7 @@ This language server is designed to run alongside the [VS Code CSS language serv
 			</th>
 			<td>Ranges for expand/shrink selection</td>
 			<td>✅</td>
-			<td></td>
+			<td>✅</td>
 		</tr>
 		<tr>
 			<th rowspan="1">

@@ -23,6 +23,9 @@ import {
 	Marker,
 	CompletionSettings as VSCodeCompletionSettings,
 	StylesheetDocumentLink,
+	FoldingRange,
+	FoldingRangeKind,
+	SelectionRange,
 } from "@somesass/vscode-css-languageservice";
 import type { ParseResult } from "scss-sassdoc-parser";
 import { TextDocument } from "vscode-languageserver-textdocument";
@@ -60,6 +63,7 @@ import {
 	VersionedTextDocumentIdentifier,
 } from "vscode-languageserver-types";
 import { URI, Utils } from "vscode-uri";
+import { FoldingRangeContext } from "./features/folding-ranges";
 
 /**
  * The root of the abstract syntax tree.
@@ -133,6 +137,14 @@ export interface LanguageService {
 		range: Range,
 		context?: CodeActionContext,
 	): Promise<CodeAction[]>;
+	getFoldingRanges(
+		document: TextDocument,
+		context?: FoldingRangeContext,
+	): Promise<FoldingRange[]>;
+	getSelectionRanges(
+		document: TextDocument,
+		positions: Position[],
+	): Promise<SelectionRange[]>;
 	hasCached(uri: URI): boolean;
 	/**
 	 * Utility function to reparse an updated document.
@@ -393,4 +405,7 @@ export {
 	IToken,
 	Module,
 	Marker,
+	FoldingRange,
+	FoldingRangeKind,
+	SelectionRange,
 };

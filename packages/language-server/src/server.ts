@@ -115,6 +115,8 @@ export class SomeSassServer {
 					},
 					renameProvider: { prepareProvider: true },
 					colorProvider: {},
+					foldingRangeProvider: true,
+					selectionRangeProvider: true,
 				},
 			};
 		});
@@ -498,6 +500,30 @@ export class SomeSassServer {
 				params.color,
 				params.range,
 			);
+			return result;
+		});
+
+		this.connection.onFoldingRanges(async (params) => {
+			if (!ls) return null;
+
+			const document = getSassRegionsDocument(
+				documents.get(params.textDocument.uri),
+			);
+			if (!document) return null;
+
+			const result = await ls.getFoldingRanges(document);
+			return result;
+		});
+
+		this.connection.onSelectionRanges(async (params) => {
+			if (!ls) return null;
+
+			const document = getSassRegionsDocument(
+				documents.get(params.textDocument.uri),
+			);
+			if (!document) return null;
+
+			const result = await ls.getSelectionRanges(document, params.positions);
 			return result;
 		});
 

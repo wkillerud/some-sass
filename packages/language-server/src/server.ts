@@ -40,6 +40,7 @@ export class SomeSassServer {
 		let workspaceScanner: WorkspaceScanner | undefined = undefined;
 		let fileSystemProvider: FileSystemProvider | undefined = undefined;
 		let clientCapabilities: ClientCapabilities | undefined = undefined;
+		let initialScan: Promise<void> | null = null;
 
 		// Create a simple text document manager. The text document manager
 		// _supports full document sync only
@@ -119,67 +120,84 @@ export class SomeSassServer {
 		});
 
 		this.connection.onInitialized(async () => {
+			this.connection.console.debug(
+				`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> received`,
+			);
 			try {
-				this.connection.console.debug(
-					`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> received`,
-				);
+				initialScan = new Promise<void>((resolve, reject) => {
+					Promise.all([
+						this.connection.workspace.getConfiguration("somesass"),
+						this.connection.workspace.getConfiguration("editor"),
+					]).then(
+						([somesassConfiguration, editorConfiguration]: [
+							Partial<ISettings>,
+							Partial<IEditorSettings>,
+						]) => {
+							const settings: ISettings = {
+								...defaultSettings,
+								...somesassConfiguration,
+							};
 
-				const somesassConfiguration: Partial<ISettings> =
-					await this.connection.workspace.getConfiguration("somesass");
-				const editorConfiguration: Partial<IEditorSettings> =
-					await this.connection.workspace.getConfiguration("editor");
+							const editorSettings: IEditorSettings = {
+								insertSpaces: false,
+								indentSize: undefined,
+								tabSize: 2,
+								...editorConfiguration,
+							};
 
-				const settings: ISettings = {
-					...defaultSettings,
-					...somesassConfiguration,
-				};
+							if (
+								!ls ||
+								!clientCapabilities ||
+								!workspaceRoot ||
+								!fileSystemProvider
+							) {
+								return reject(
+									new Error(
+										"Got onInitialized without onInitialize readying up all required globals",
+									),
+								);
+							}
 
-				const editorSettings: IEditorSettings = {
-					insertSpaces: false,
-					indentSize: undefined,
-					tabSize: 2,
-					...editorConfiguration,
-				};
+							ls.configure({
+								editorSettings,
+								workspaceRoot,
+							});
 
-				if (
-					!ls ||
-					!clientCapabilities ||
-					!workspaceRoot ||
-					!fileSystemProvider
-				) {
-					throw new Error(
-						"Got onInitialized without onInitialize readying up all required globals",
+							this.connection.console.debug(
+								`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> scanning workspace for files`,
+							);
+
+							return fileSystemProvider
+								.findFiles(
+									"**/*.{scss,sass,svelte,astro,vue}",
+									settings.scannerExclude,
+								)
+								.then((files) => {
+									this.connection.console.debug(
+										`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> found ${files.length} files, starting parse`,
+									);
+
+									workspaceScanner = new WorkspaceScanner(
+										ls!,
+										fileSystemProvider!,
+										{
+											scannerDepth: settings.scannerDepth,
+											scanImportedFiles: settings.scanImportedFiles,
+										},
+									);
+
+									return workspaceScanner.scan(files);
+								})
+								.then((promises) => {
+									this.connection.console.debug(
+										`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> parsed ${promises.length} files`,
+									);
+									resolve();
+								});
+						},
 					);
-				}
-
-				ls.configure({
-					editorSettings,
-					workspaceRoot,
 				});
-
-				workspaceScanner = new WorkspaceScanner(ls, fileSystemProvider, {
-					scannerDepth: settings.scannerDepth,
-					scanImportedFiles: settings.scanImportedFiles,
-				});
-
-				this.connection.console.debug(
-					`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> scanning workspace for files`,
-				);
-
-				const files = await fileSystemProvider.findFiles(
-					"**/*.{scss,sass,svelte,astro,vue}",
-					settings.scannerExclude,
-				);
-
-				this.connection.console.debug(
-					`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> found ${files.length} files, starting parse`,
-				);
-
-				await workspaceScanner.scan(files);
-
-				this.connection.console.debug(
-					`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> parsed ${files.length} files`,
-				);
+				await initialScan;
 			} catch (error) {
 				this.connection.console.log(String(error));
 			}
@@ -313,7 +331,7 @@ export class SomeSassServer {
 			return result;
 		});
 
-		this.connection.onDocumentHighlight((params) => {
+		this.connection.onDocumentHighlight(async (params) => {
 			if (!ls) return null;
 
 			const document = getSassRegionsDocument(
@@ -323,6 +341,9 @@ export class SomeSassServer {
 			if (!document) return null;
 
 			try {
+				if (initialScan) {
+					await initialScan;
+				}
 				const result = ls.findDocumentHighlights(document, params.position);
 				return result;
 			} catch {
@@ -330,7 +351,7 @@ export class SomeSassServer {
 			}
 		});
 
-		this.connection.onDocumentLinks((params) => {
+		this.connection.onDocumentLinks(async (params) => {
 			if (!ls) return null;
 
 			const document = getSassRegionsDocument(
@@ -339,6 +360,9 @@ export class SomeSassServer {
 			if (!document) return null;
 
 			try {
+				if (initialScan) {
+					await initialScan;
+				}
 				const result = ls.findDocumentLinks(document);
 				return result;
 			} catch {
@@ -451,6 +475,9 @@ export class SomeSassServer {
 			if (!document) return null;
 
 			try {
+				if (initialScan) {
+					await initialScan;
+				}
 				const information = await ls.findColors(document);
 				return information;
 			} catch {

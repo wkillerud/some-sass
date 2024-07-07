@@ -21,9 +21,9 @@ export default class WorkspaceScanner {
 		this.#settings = settings;
 	}
 
-	public async scan(files: URI[]): Promise<void> {
+	public async scan(files: URI[]): Promise<void[]> {
 		// Populate the cache for the new language services
-		await Promise.all(
+		return Promise.all(
 			files.map((uri) => {
 				if (
 					this.#settings.scanImportedFiles &&
@@ -32,7 +32,7 @@ export default class WorkspaceScanner {
 					// If we scan imported files (which we do by default), don't include partials in the initial scan.
 					// This way we can be reasonably sure that we scan whatever index files there are _before_ we scan
 					// partials which may or may not have been forwarded with a prefix.
-					return;
+					return Promise.resolve();
 				}
 				return this.parse(uri);
 			}),

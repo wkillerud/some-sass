@@ -234,4 +234,36 @@ suite("Sass SelectionRange", () => {
 			],
 		);
 	});
+
+	test("handles :root and css variables", () => {
+		assertRanges(
+			`:root
+	--myvar: red
+
+body
+	color: --myvar|`,
+			[
+				[34, `--myvar`],
+				[27, `color: --myvar`],
+				[
+					25,
+					`
+	color: --myvar`,
+				],
+				[
+					21,
+					`body
+	color: --myvar`,
+				],
+				[
+					0,
+					`:root
+	--myvar: red
+
+body
+	color: --myvar`,
+				],
+			],
+		);
+	});
 });

@@ -1,10 +1,7 @@
-import * as path from "path";
 import { suite, test } from "vitest";
 
-import { Position, InsertTextFormat, CompletionItemKind, LanguageSettings } from "../../cssLanguageService";
+import { LanguageSettings } from "../../cssLanguageService";
 import { testCompletionFor as testCSSCompletionFor, ExpectedCompetions } from "../css/completion.test";
-import { newRange } from "../css/navigation.test";
-import { URI } from "vscode-uri";
 
 function testCompletionFor(
 	value: string,

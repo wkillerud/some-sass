@@ -1411,7 +1411,7 @@ name
 			parser._parseRuleset.bind(parser),
 			ParseError.PropertyValueExpected,
 		);
-		assertNode(
+		assertError(
 			`name
 	--minimal:
 
@@ -1419,6 +1419,7 @@ name
 		padding: 1rem`,
 			parser,
 			parser._parseRuleset.bind(parser),
+			ParseError.PropertyValueExpected,
 		);
 		assertNode(
 			`name

@@ -959,9 +959,13 @@ export class CSSCompletion {
 
 				// complete next property
 				return this.getCompletionsForDeclarationProperty(null, result);
-			} else if (this.textDocument.languageId === "sass" && this.offset > declaration.offset + declaration.length) {
-				// complete next property
-				return this.getCompletionsForDeclarationProperty(null, result);
+			} else if (this.textDocument.languageId === "sass") {
+				let declBeforeOffsetHasValue = Boolean(declaration.getChild(1));
+				let isNextDeclaration = this.offset > declaration.offset + declaration.length && declBeforeOffsetHasValue;
+				if (isNextDeclaration) {
+					// complete next property
+					return this.getCompletionsForDeclarationProperty(null, result);
+				}
 			}
 
 			if (declaration instanceof nodes.Declaration) {

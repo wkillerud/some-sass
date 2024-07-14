@@ -694,6 +694,12 @@ export class Parser {
 		let bracketsDepth = 0;
 		done: while (true) {
 			switch (this.token.type) {
+				case TokenType.Dedent:
+				case TokenType.Newline: {
+					if (this.syntax === "indented") {
+						break done;
+					}
+				}
 				case TokenType.SemiColon:
 					// A semicolon only ends things if we're not inside a delimitor.
 					if (isTopLevel()) {

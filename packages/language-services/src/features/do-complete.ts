@@ -315,22 +315,27 @@ export class DoComplete extends LanguageFeature {
 				}
 			}
 
-			return result;
+			if (result.items.length === 0 && document.languageId === "sass") {
+				// If we don't have any suggestions, maybe upstream does.
+				// Only do this for indented. We make the assumption that
+				// VS Code CSS language server is running and provides
+				// suggestions in this case.
+				const upstreamResult = await upstreamLs.doComplete2(
+					document,
+					position,
+					stylesheet,
+					this.getDocumentContext(),
+					{
+						...this.configuration.completionSettings,
+						triggerPropertyValueCompletion:
+							this.configuration.completionSettings
+								?.triggerPropertyValueCompletion || false,
+					},
+				);
+				return upstreamResult;
+			}
 
-			// // If we don't have any suggestions, maybe upstream does
-			// const upstreamResult = await upstreamLs.doComplete2(
-			// 	document,
-			// 	position,
-			// 	stylesheet,
-			// 	this.getDocumentContext(),
-			// 	{
-			// 		...this.configuration.completionSettings,
-			// 		triggerPropertyValueCompletion:
-			// 			this.configuration.completionSettings
-			// 				?.triggerPropertyValueCompletion || false,
-			// 	},
-			// );
-			// return upstreamResult;
+			return result;
 		}
 
 		const upstreamResult = await upstreamLs.doComplete2(

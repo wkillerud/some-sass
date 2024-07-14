@@ -959,6 +959,9 @@ export class CSSCompletion {
 
 				// complete next property
 				return this.getCompletionsForDeclarationProperty(null, result);
+			} else if (this.textDocument.languageId === "sass" && this.offset > declaration.offset + declaration.length) {
+				// complete next property
+				return this.getCompletionsForDeclarationProperty(null, result);
 			}
 
 			if (declaration instanceof nodes.Declaration) {

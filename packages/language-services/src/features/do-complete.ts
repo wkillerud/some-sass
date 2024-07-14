@@ -142,7 +142,10 @@ export class DoComplete extends LanguageFeature {
 					result.items.push(...items);
 				}
 
-				prevToken = token;
+				if (token.type !== TokenType.Newline) {
+					// ignore newlines in the logic
+					prevToken = token;
+				}
 				token = scanner.scan();
 			}
 

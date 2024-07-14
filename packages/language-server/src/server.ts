@@ -96,6 +96,9 @@ export class SomeSassServer {
 
 							// For placeholder completion
 							"%",
+
+							// For namespaced completions
+							".",
 						],
 					},
 					signatureHelpProvider: {
@@ -163,6 +166,14 @@ export class SomeSassServer {
 							ls.configure({
 								editorSettings,
 								workspaceRoot,
+								completionSettings: {
+									suggestAllFromOpenDocument:
+										settings.suggestAllFromOpenDocument,
+									suggestFromUseOnly: settings.suggestFromUseOnly,
+									suggestionStyle: settings.suggestionStyle,
+									suggestFunctionsInStringContextAfterSymbols:
+										settings.suggestFunctionsInStringContextAfterSymbols,
+								},
 							});
 
 							this.connection.console.debug(

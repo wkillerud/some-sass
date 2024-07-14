@@ -343,7 +343,7 @@ body
 			`div
 	&:hover
 
-	|`,
+		|`,
 			{
 				items: [{ label: "display" }],
 			},

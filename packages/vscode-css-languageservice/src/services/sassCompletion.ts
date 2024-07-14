@@ -180,7 +180,7 @@ export class SassCompletion extends CSSCompletion {
 		{ func: "call($name, $args…)", desc: l10n.t("Dynamically calls a Sass function.") },
 	];
 
-	private static scssAtDirectives = [
+	private static scssAtDirectives: CompletionItem[] = [
 		{
 			label: "@extend",
 			documentation: l10n.t("Inherits the styles of another selector."),

@@ -553,6 +553,10 @@ export class Parser {
 			if (this.peek(TokenType.AtKeyword)) {
 				return this.finish(node);
 			}
+			// nesting
+			if (this.peekDelim("&")) {
+				return this.finish(node);
+			}
 			if (!this.accept(TokenType.Dedent)) {
 				return this.finish(node, ParseError.DedentExpected, [TokenType.Newline, TokenType.Indent, TokenType.EOF]);
 			}

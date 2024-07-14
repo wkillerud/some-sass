@@ -40,7 +40,6 @@ import { applySassDoc } from "../utils/sassdoc";
 const reNewSassdocBlock = /\/\/\/\s?$/;
 const reSassdocLine = /\/\/\/\s/;
 const reSassDotExt = /\.s(a|c)ss$/;
-const reScssDotExt = /\.scss$/;
 const rePrivate = /^\$?[_].*$/;
 
 const reReturn = /^.*@return/;
@@ -226,6 +225,7 @@ export class DoComplete extends LanguageFeature {
 			const items = await this.doNamespaceCompletion(document, context);
 			if (items.length > 0) {
 				result.items.push(...items);
+				return result;
 			}
 		}
 
@@ -757,20 +757,20 @@ export class DoComplete extends LanguageFeature {
 		const dotExt = initialDocument.uri.slice(
 			Math.max(0, initialDocument.uri.lastIndexOf(".")),
 		);
-		const skipDot = !dotExt.match(reScssDotExt);
+		const isEmbedded = !dotExt.match(reSassDotExt);
 		let insertText: string | undefined;
 		let filterText: string | undefined;
 
 		if (namespace && namespace !== "*") {
 			insertText = currentWord.endsWith(".")
-				? `${skipDot ? "" : "."}${label}`
-				: skipDot
+				? `${isEmbedded || dotExt === ".sass" ? "" : "."}${label}`
+				: isEmbedded
 					? asDollarlessVariable(label)
 					: label;
 
 			filterText = currentWord.endsWith(".") ? `${namespace}.${label}` : label;
-		} else if (dotExt === ".vue" || dotExt === ".astro") {
-			// In Vue and Astro files, the $ does not get replaced by the suggestion,
+		} else if (dotExt === ".vue" || dotExt === ".astro" || dotExt === ".sass") {
+			// In these languages the $ does not get replaced by the suggestion,
 			// so exclude it from the insertText.
 			insertText = asDollarlessVariable(label);
 		}

@@ -213,33 +213,6 @@ Function declared in timing.scss`,
 				sortText: undefined,
 				tags: [],
 			},
-			{
-				documentation: {
-					kind: "markdown",
-					value: `\`\`\`scss
-@function timing($mode)
-\`\`\`
-____
-Get a timing value for use in animations.
-
-
-@param "sonic" | "link" | "homer" | "snorlax"\`mode\` - The timing you want
-
-@return String - the timing value in ms
-____
-Function declared in timing.scss`,
-				},
-				filterText: "timing",
-				insertText: 'timing(${1|"sonic","link","homer","snorlax"|})',
-				insertTextFormat: 2,
-				kind: 3,
-				label: "timing",
-				labelDetails: {
-					detail: "($mode)",
-				},
-				sortText: undefined,
-				tags: [],
-			},
 		],
 	});
 });

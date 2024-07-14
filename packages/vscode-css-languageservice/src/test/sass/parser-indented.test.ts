@@ -3185,4 +3185,20 @@ figure
 
 		assertError("module.", parser, parser._parseModuleMember.bind(parser), ParseError.IdentifierOrVariableExpected);
 	});
+
+	test("custom property stops in time", () => {
+		assertNode(
+			`@use "variables"
+@use "mixins"
+
+:root
+	--myvar: variables.$altFontFamily
+	@include mixins.clearfix
+
+body
+	color: red`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+	});
 });

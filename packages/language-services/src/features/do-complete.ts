@@ -40,6 +40,7 @@ import { applySassDoc } from "../utils/sassdoc";
 const reNewSassdocBlock = /\/\/\/\s?$/;
 const reSassdocLine = /\/\/\/\s/;
 const reSassDotExt = /\.s(a|c)ss$/;
+const reScssDotExt = /\.scss$/;
 const rePrivate = /^\$?[_].*$/;
 
 const reReturn = /^.*@return/;
@@ -756,14 +757,14 @@ export class DoComplete extends LanguageFeature {
 		const dotExt = initialDocument.uri.slice(
 			Math.max(0, initialDocument.uri.lastIndexOf(".")),
 		);
-		const isEmbedded = !dotExt.match(reSassDotExt);
+		const skipDot = !dotExt.match(reScssDotExt);
 		let insertText: string | undefined;
 		let filterText: string | undefined;
 
 		if (namespace && namespace !== "*") {
 			insertText = currentWord.endsWith(".")
-				? `${isEmbedded ? "" : "."}${label}`
-				: isEmbedded
+				? `${skipDot ? "" : "."}${label}`
+				: skipDot
 					? asDollarlessVariable(label)
 					: label;
 
@@ -820,9 +821,10 @@ export class DoComplete extends LanguageFeature {
 			: symbol.name;
 
 		const isEmbedded = this.isEmbedded(initialDocument);
-
+		const includeDot =
+			namespace !== "*" && !isEmbedded && initialDocument.languageId !== "sass";
 		const insertText = namespace
-			? namespace !== "*" && !isEmbedded
+			? includeDot
 				? `.${prefix}${symbol.name}`
 				: `${prefix}${symbol.name}`
 			: symbol.name;
@@ -940,8 +942,10 @@ export class DoComplete extends LanguageFeature {
 			: symbol.name;
 
 		const isEmbedded = this.isEmbedded(initialDocument);
+		const includeDot =
+			namespace !== "*" && !isEmbedded && initialDocument.languageId !== "sass";
 		const insertText = namespace
-			? namespace !== "*" && !isEmbedded
+			? includeDot
 				? `.${prefix}${symbol.name}`
 				: `${prefix}${symbol.name}`
 			: symbol.name;
@@ -1020,9 +1024,9 @@ export class DoComplete extends LanguageFeature {
 			// be replaced (except when we're embedded in Vue, Svelte or Astro).
 			// Example result: .floor(${1:number})
 			const isEmbedded = this.isEmbedded(document);
-
+			const includeDot = isEmbedded && document.languageId !== "sass";
 			const insertText = context.currentWord.includes(".")
-				? `${isEmbedded ? "" : "."}${name}${
+				? `${includeDot ? "" : "."}${name}${
 						signature ? `(${parameterSnippet})` : ""
 					}`
 				: name;

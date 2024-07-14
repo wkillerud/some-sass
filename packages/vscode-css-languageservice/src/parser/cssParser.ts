@@ -661,7 +661,10 @@ export class Parser {
 		const expression = this._parseExpr();
 		if (expression && !expression.isErroneous(true)) {
 			this._parsePrio();
-			if (this.peekOne(...(stopTokens || []), TokenType.SemiColon, TokenType.EOF)) {
+			if (
+				this.peekOne(...(stopTokens || []), TokenType.SemiColon, TokenType.EOF) ||
+				(this.syntax === "indented" && this.peekOne(...(stopTokens || []), TokenType.Newline, TokenType.Dedent))
+			) {
 				node.setValue(expression);
 				if (this.peek(TokenType.SemiColon)) {
 					node.semicolonPosition = this.token.offset; // not part of the declaration, but useful information for code assist
@@ -755,7 +758,7 @@ export class Parser {
 					break done;
 				case TokenType.EOF:
 					if (this.syntax === "indented") {
-						return this.finish(node);
+						break done;
 					}
 					// We shouldn't have reached the end of input, something is
 					// unterminated.

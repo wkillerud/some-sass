@@ -623,14 +623,18 @@ export class SassParser extends cssParser.Parser {
 	}
 
 	public _parseMixinDeclaration(): nodes.Node | null {
-		if (!this.peekKeyword("@mixin")) {
+		if (!this.peekKeyword("@mixin") && !this.peek(TokenType.AtMixinShort)) {
 			return null;
 		}
 
+		let declarationType = this.token.type;
 		const node = <nodes.MixinDeclaration>this.create(nodes.MixinDeclaration);
 		this.consumeToken();
 
-		if (!node.setIdentifier(this._parseIdent([nodes.ReferenceType.Mixin]))) {
+		if (
+			!node.setIdentifier(this._parseIdent([nodes.ReferenceType.Mixin])) &&
+			declarationType !== TokenType.AtMixinShort
+		) {
 			return this.finish(node, ParseError.IdentifierExpected, [TokenType.CurlyR, TokenType.Dedent]);
 		}
 

@@ -35,6 +35,12 @@ export class SassParser extends cssParser.Parser {
 				super._parseStylesheetAtStatement(isNested)
 			);
 		}
+		if (this.peek(TokenType.AtMixinShort)) {
+			return this._parseMixinDeclaration();
+		}
+		if (this.peek(TokenType.AtIncludeShort)) {
+			return this._parseMixinReference();
+		}
 		return this._parseRuleset(true) || this._parseVariableDeclaration();
 	}
 
@@ -287,6 +293,12 @@ export class SassParser extends cssParser.Parser {
 				this._parseContainer(true) || // nested @container
 				this._parseRuleSetDeclarationAtStatement()
 			);
+		}
+		if (this.peek(TokenType.AtMixinShort)) {
+			return this._parseMixinDeclaration();
+		}
+		if (this.peek(TokenType.AtIncludeShort)) {
+			return this._parseMixinReference();
 		}
 		return (
 			this._parseVariableDeclaration() || // variable declaration
@@ -687,16 +699,17 @@ export class SassParser extends cssParser.Parser {
 	}
 
 	public _parseMixinReference(): nodes.Node | null {
-		if (!this.peekKeyword("@include")) {
+		if (!this.peekKeyword("@include") && !this.peek(TokenType.AtIncludeShort)) {
 			return null;
 		}
 
+		let referenceType = this.token.type;
 		const node = <nodes.MixinReference>this.create(nodes.MixinReference);
 		this.consumeToken();
 
 		// Could be module or mixin identifier, set as mixin as default.
 		const firstIdent = this._parseIdent([nodes.ReferenceType.Mixin]);
-		if (!node.setIdentifier(firstIdent)) {
+		if (!node.setIdentifier(firstIdent) && referenceType !== TokenType.AtIncludeShort) {
 			return this.finish(node, ParseError.IdentifierExpected, [TokenType.CurlyR]);
 		}
 
@@ -706,7 +719,9 @@ export class SassParser extends cssParser.Parser {
 
 			const moduleToken = <nodes.Module>this.create(nodes.Module);
 			// Re-purpose first matched ident as identifier for module token.
-			firstIdent.referenceTypes = [nodes.ReferenceType.Module];
+			if (firstIdent) {
+				firstIdent.referenceTypes = [nodes.ReferenceType.Module];
+			}
 			moduleToken.setIdentifier(firstIdent);
 
 			// Override identifier with second ident.

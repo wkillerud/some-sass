@@ -2372,11 +2372,20 @@ figure
 	// This is discouraged in the documentation. Consider not supporting if
 	// implementation is complex (i. e. at-rule parsing can't be patched easily
 	// to consider these valid)
-	suite.skip("shorthand mixin syntax", () => {
+	suite("shorthand mixin syntax", () => {
 		test("@include shorthand (+)", () => {
 			assertNode(
 				`p
 		+double-border(blue)`,
+				parser,
+				parser._parseStylesheet.bind(parser),
+			);
+		});
+
+		test("@include shorthand (+) for module", () => {
+			assertNode(
+				`p
+		+foo.double-border(blue)`,
 				parser,
 				parser._parseStylesheet.bind(parser),
 			);

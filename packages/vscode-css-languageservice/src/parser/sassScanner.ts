@@ -22,6 +22,7 @@ const _LAN = "<".charCodeAt(0);
 const _RAN = ">".charCodeAt(0);
 const _DOT = ".".charCodeAt(0);
 const _ATS = "@".charCodeAt(0);
+const _PLS = "+".charCodeAt(0);
 
 let customTokenValue = TokenType.CustomToken;
 
@@ -82,6 +83,25 @@ export class SassScanner extends Scanner {
 		// ellipis
 		if (this.stream.advanceIfChars([_DOT, _DOT, _DOT])) {
 			return this.finishToken(offset, Ellipsis);
+		}
+
+		if (this.syntax === "indented") {
+			if (this.stream.advanceIfChar(_PLS)) {
+				let content: string[] = [];
+				if (this.ident(content)) {
+					return this.finishToken(offset, TokenType.AtIncludeShort, content.join(""));
+				} else {
+					this.stream.goBackTo(offset, depth);
+				}
+			}
+			if (this.stream.advanceIfChar(_EQS)) {
+				let content: string[] = [];
+				if (this.ident(content)) {
+					return this.finishToken(offset, TokenType.AtMixinShort, content.join(""));
+				} else {
+					this.stream.goBackTo(offset, depth);
+				}
+			}
 		}
 
 		return super.scanNext(offset);

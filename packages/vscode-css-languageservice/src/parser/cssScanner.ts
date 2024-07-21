@@ -7,6 +7,8 @@
 export enum TokenType {
 	Ident,
 	AtKeyword,
+	AtIncludeShort,
+	AtMixinShort,
 	String,
 	BadString,
 	UnquotedString,

@@ -14,7 +14,20 @@ import {
 
 export class DoDiagnostics extends LanguageFeature {
 	async doDiagnostics(document: TextDocument): Promise<Diagnostic[]> {
-		return this.doDeprecationDiagnostics(document);
+		return Promise.all([
+			this.doDeprecationDiagnostics(document),
+			this.doUpstreamDiagnostics(document),
+		]).then((diagnostics) => diagnostics.flatMap((diagnostic) => diagnostic));
+	}
+
+	private async doUpstreamDiagnostics(document: TextDocument) {
+		const stylesheet = this.ls.parseStylesheet(document);
+		const diagnostics = this.getUpstreamLanguageServer().doValidation(
+			document,
+			stylesheet,
+			{ validate: true },
+		);
+		return diagnostics;
 	}
 
 	private async doDeprecationDiagnostics(

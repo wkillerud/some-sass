@@ -78,6 +78,8 @@ export class MultiLineStream {
 		this._depth = value;
 	}
 
+	indentation: "tabs" | "spaces" | undefined = undefined;
+
 	constructor(source: string) {
 		this.source = source;
 		this.len = source.length;
@@ -439,7 +441,23 @@ export class Scanner {
 			});
 			if (newlines > 0) {
 				let depth = this.stream.advanceWhileChar((ch) => {
-					return ch === _TAB || ch === _WSP;
+					// Make a note the first time we enchounter either _TAB or _WSP.
+					// Whichever comes first is treated as the correct, expected
+					// kind of indentation. Mixing between the two is not allowed
+					// in the indented syntax.
+					if (!this.stream.indentation && ch === _TAB) {
+						this.stream.indentation = "tabs";
+					}
+					if (!this.stream.indentation && ch === _WSP) {
+						this.stream.indentation = "spaces";
+					}
+					if (this.stream.indentation === "tabs") {
+						return ch === _TAB;
+					}
+					if (this.stream.indentation === "spaces") {
+						return ch === _WSP;
+					}
+					return false;
 				});
 
 				if (depth > this.stream.depth) {

@@ -130,11 +130,7 @@ function computeFoldingRanges(document: TextDocument): FoldingRange[] {
 					const matches = token.text.match(/^\s*\/\*\s*(#region|#endregion)\b\s*(.*?)\s*\*\//);
 					if (matches) {
 						return commentRegionMarkerToDelimiter(matches[1]);
-					} else if (
-						document.languageId === "scss" ||
-						document.languageId === "sass" ||
-						document.languageId === "less"
-					) {
+					} else if (document.languageId === "scss" || document.languageId === "sass") {
 						const matches = token.text.match(/^\s*\/\/\s*(#region|#endregion)\b\s*(.*?)\s*/);
 						if (matches) {
 							return commentRegionMarkerToDelimiter(matches[1]);

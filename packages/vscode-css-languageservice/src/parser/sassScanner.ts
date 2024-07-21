@@ -21,7 +21,7 @@ const _BNG = "!".charCodeAt(0);
 const _LAN = "<".charCodeAt(0);
 const _RAN = ">".charCodeAt(0);
 const _DOT = ".".charCodeAt(0);
-const _ATS = "@".charCodeAt(0);
+const _MUL = "*".charCodeAt(0);
 const _PLS = "+".charCodeAt(0);
 
 let customTokenValue = TokenType.CustomToken;
@@ -148,9 +148,93 @@ export class SassScanner extends Scanner {
 	}
 
 	protected comment(): boolean {
+		if (this.syntax === "indented") {
+			// For comments in indented, any content that is indented
+			// after opening a comment is considered part of that comment,
+			// even if the line doesn't start with the usual comment
+			// syntax.
+			// https://sass-lang.com/documentation/syntax/comments/#in-sass
+
+			if (this.stream.advanceIfChars([_FSL, _MUL]) || (!this.inURL && this.stream.advanceIfChars([_FSL, _FSL]))) {
+				let depth = this.stream.depth,
+					kind = this.stream.lookbackChar(1),
+					hot = false,
+					success = false,
+					mark = this.stream.pos();
+
+				scan: do {
+					this.stream.advanceWhileChar((ch) => {
+						if (kind === _MUL && hot && ch === _FSL) {
+							// Stop if a CSS-style comment is manually closed with */
+							success = true;
+							return false;
+						}
+
+						hot = false;
+
+						// Accept all characters up until a new line.
+						switch (ch) {
+							case _NWL:
+							case _CAR:
+							case _LFD: {
+								// In the case of a newline we need to see if the next line is indented.
+								// If it is, keep advancing the stream.
+								mark = this.stream.pos();
+								return false;
+							}
+							case _MUL: {
+								hot = true;
+								return true;
+							}
+							default:
+								return true;
+						}
+					});
+
+					if (success) {
+						break scan;
+					}
+
+					if (this.stream.eos()) {
+						return true;
+					}
+
+					this.stream.advanceIfChar(_NWL); // only the one line, blank line == end of comment
+					this.stream.advanceIfChar(_CAR);
+					this.stream.advanceIfChar(_LFD);
+
+					let commentDepth = this.stream.advanceWhileChar((ch) => {
+						return ch === _WSP || ch === _TAB;
+					});
+
+					if (commentDepth > depth) {
+						continue;
+					} else if (commentDepth === depth) {
+						// If there's no indentation at this point, we require comment syntax
+						if (!this.stream.advanceIfChars([_FSL, _FSL]) && !this.stream.advanceIfChars([_MUL])) {
+							this.stream.goBackTo(mark, depth);
+							break scan;
+						}
+					} else {
+						this.stream.goBackTo(mark, depth);
+						break scan;
+					}
+				} while (true);
+
+				if (success) {
+					this.stream.advance(1);
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+
 		if (super.comment()) {
 			return true;
 		}
+
 		if (!this.inURL && this.stream.advanceIfChars([_FSL, _FSL])) {
 			this.stream.advanceWhileChar((ch: number) => {
 				switch (ch) {

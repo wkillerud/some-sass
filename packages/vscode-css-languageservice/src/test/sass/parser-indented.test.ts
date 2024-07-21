@@ -4,6 +4,9 @@ import { SassParser } from "../../parser/sassParser";
 import * as nodes from "../../parser/cssNodes";
 import { assertError, assertFunction, assertNoNode, assertNode } from "../css/parser.test";
 import { SassParseError } from "../../parser/sassErrors";
+import { getSassLanguageService, TextDocument } from "../../cssLanguageService";
+import { getFsProvider } from "../testUtil/fsProvider";
+import { getDocumentContext } from "../testUtil/documentContext";
 
 suite("Sass - Parser", () => {
 	const parser = new SassParser({ syntax: "indented" });
@@ -48,10 +51,10 @@ suite("Sass - Parser", () => {
 		);
 	});
 
-	test("Sass comment", () => {
+	test("Sass single-line silent comment", () => {
 		assertNode(
 			`a
-	// single-line comment
+	// single-line silent comment
 	b: c
 `,
 			parser,
@@ -59,17 +62,62 @@ suite("Sass - Parser", () => {
 		);
 	});
 
-	test("Multi-line CSS comment should error", () => {
-		assertError(
+	test("Sass multi-line silent comment", () => {
+		assertNode(
 			`a
-	b: /* multi
-line
-comment */ c
+	// multi-line
+		silent
+		comment
+	b: c
 `,
 			parser,
 			parser._parseStylesheet.bind(parser),
-			ParseError.PropertyValueExpected,
 		);
+	});
+
+	test("Sass multi-line comment", () => {
+		assertNode(
+			`a
+	/* multi-line
+		comment
+	b: c
+`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+	});
+
+	test("Sass multi-line comment included also in compressed mode", () => {
+		assertNode(
+			`a
+	/*! multi-line
+		comment
+	b: c
+`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+	});
+
+	test("Sass multi-line comment stops at the expected location", async () => {
+		let input = `/*!
+ * Bootstrap Responsive v2.3.2
+ *
+ * Copyright 2012 Twitter, Inc
+ * Licensed under the Apache License v2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Designed and built with all the love in the world @twitter by @mdo and @fat.
+
+@import variables
+`;
+		let document = TextDocument.create(`test://test/test.sass`, "sass", 0, input);
+
+		let node = assertNode(input, parser, parser._parseStylesheet.bind(parser));
+
+		let ls = getSassLanguageService({ fileSystemProvider: getFsProvider() });
+		let links = await ls.findDocumentLinks2(document, node, getDocumentContext());
+		assert.equal(links.length, 1);
 	});
 
 	test("stylesheet", () => {

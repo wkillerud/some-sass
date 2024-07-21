@@ -504,13 +504,6 @@ export class Scanner {
 					return false;
 				}
 
-				if (this.syntax === "indented") {
-					// in this dialect multiline comments are notallowed
-					if (ch === _NWL || ch === _LFD || ch === _CAR) {
-						return false;
-					}
-				}
-
 				hot = ch === _MUL;
 				return true;
 			});

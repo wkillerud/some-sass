@@ -869,7 +869,7 @@ export class Parser {
 			}
 		}
 
-		if (!this.peek(TokenType.SemiColon) && !this.peek(TokenType.EOF)) {
+		if (!this.peek(TokenType.SemiColon) && !this.peek(TokenType.EOF) && !this.peek(TokenType.Newline)) {
 			node.setMedialist(this._parseMediaQueryList());
 		}
 
@@ -1431,7 +1431,25 @@ export class Parser {
 		const node = this.create(nodes.Document);
 		this.consumeToken(); // @-moz-document
 
-		this.resync([], [TokenType.CurlyL, TokenType.Indent]); // ignore all the rules
+		// ignore all the rules, start back up again at first { (SCSS) or new line (indented)
+		const _NWL = "\n".charCodeAt(0);
+		const _CAR = "\r".charCodeAt(0);
+		const _LFD = "\f".charCodeAt(0);
+		const _CUL = "{".charCodeAt(0);
+
+		this.scanner.stream.advanceWhileChar((ch) => {
+			switch (ch) {
+				case _CUL:
+				case _NWL:
+				case _CAR:
+				case _LFD:
+					return false;
+				default:
+					return true;
+			}
+		});
+		this.consumeToken();
+
 		return this._parseBody(node, this._parseStylesheetStatement.bind(this));
 	}
 

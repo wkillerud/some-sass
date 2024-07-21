@@ -295,7 +295,7 @@ export class SassParser extends cssParser.Parser {
 			);
 		}
 		if (this.peek(TokenType.AtMixinShort)) {
-			return this._parseMixinDeclaration();
+			return this._parseMixinDeclaration(); // nested shorthand @mixin
 		}
 		if (this.peek(TokenType.AtIncludeShort)) {
 			return this._parseMixinReference();
@@ -631,11 +631,17 @@ export class SassParser extends cssParser.Parser {
 		const node = <nodes.MixinDeclaration>this.create(nodes.MixinDeclaration);
 		this.consumeToken();
 
-		if (
-			!node.setIdentifier(this._parseIdent([nodes.ReferenceType.Mixin])) &&
-			declarationType !== TokenType.AtMixinShort
-		) {
-			return this.finish(node, ParseError.IdentifierExpected, [TokenType.CurlyR, TokenType.Dedent]);
+		if (!node.setIdentifier(this._parseIdent([nodes.ReferenceType.Mixin]))) {
+			if (declarationType === TokenType.AtMixinShort) {
+				let ident = <nodes.Identifier>this.create(nodes.Identifier);
+				ident.referenceTypes = [nodes.ReferenceType.Mixin];
+				ident.isCustomProperty = false;
+				ident.offset = node.offset + 1;
+				ident.length = node.length - 1;
+				node.setIdentifier(ident);
+			} else {
+				return this.finish(node, ParseError.IdentifierExpected, [TokenType.CurlyR, TokenType.Dedent]);
+			}
 		}
 
 		if (this.accept(TokenType.ParenthesisL)) {
@@ -712,9 +718,18 @@ export class SassParser extends cssParser.Parser {
 		this.consumeToken();
 
 		// Could be module or mixin identifier, set as mixin as default.
-		const firstIdent = this._parseIdent([nodes.ReferenceType.Mixin]);
-		if (!node.setIdentifier(firstIdent) && referenceType !== TokenType.AtIncludeShort) {
-			return this.finish(node, ParseError.IdentifierExpected, [TokenType.CurlyR]);
+		let firstIdent = this._parseIdent([nodes.ReferenceType.Mixin]);
+		if (!node.setIdentifier(firstIdent)) {
+			if (referenceType === TokenType.AtIncludeShort) {
+				firstIdent = <nodes.Identifier>this.create(nodes.Identifier);
+				firstIdent.referenceTypes = [nodes.ReferenceType.Mixin];
+				firstIdent.isCustomProperty = false;
+				firstIdent.offset = node.offset + 1;
+				firstIdent.length = node.length - 1;
+				node.setIdentifier(firstIdent);
+			} else {
+				return this.finish(node, ParseError.IdentifierExpected, [TokenType.CurlyR]);
+			}
 		}
 
 		// Is a module accessor.
@@ -723,9 +738,7 @@ export class SassParser extends cssParser.Parser {
 
 			const moduleToken = <nodes.Module>this.create(nodes.Module);
 			// Re-purpose first matched ident as identifier for module token.
-			if (firstIdent) {
-				firstIdent.referenceTypes = [nodes.ReferenceType.Module];
-			}
+			firstIdent.referenceTypes = [nodes.ReferenceType.Module];
 			moduleToken.setIdentifier(firstIdent);
 
 			// Override identifier with second ident.

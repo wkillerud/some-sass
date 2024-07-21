@@ -266,4 +266,44 @@ body
 			],
 		);
 	});
+
+	test("handles multiple shorthand mixin declarations", () => {
+		assertRanges(
+			`=size($height, $width)
+	width: $width|
+	height: $height
+
+=square($size)
+	+size($size, $size)`,
+			[
+				[31, `$width`],
+				[24, `width: $width`],
+				[
+					22,
+					`
+	width: $width
+	height: $height
+
+`,
+				],
+				[
+					0,
+					`=size($height, $width)
+	width: $width
+	height: $height
+
+`,
+				],
+				[
+					0,
+					`=size($height, $width)
+	width: $width
+	height: $height
+
+=square($size)
+	+size($size, $size)`,
+				],
+			],
+		);
+	});
 });

@@ -2399,6 +2399,19 @@ figure
 				parser._parseStylesheet.bind(parser),
 			);
 		});
+
+		test("multiple shorthand declarations", () => {
+			assertNode(
+				`=size($height, $width)
+  width: $width
+  height: $height
+
+=square($size)
+  +size($size, $size)`,
+				parser,
+				parser._parseStylesheet.bind(parser),
+			);
+		});
 	});
 
 	test("@content", () => {

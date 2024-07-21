@@ -550,7 +550,7 @@ export class Parser {
 			if (this.accept(TokenType.EOF)) {
 				return this.finish(node);
 			}
-			if (this.peek(TokenType.AtKeyword) || this.peek(TokenType.AtIncludeShort) || this.peek(TokenType.AtMixinShort)) {
+			if (this.peek(TokenType.AtKeyword) || this.peek(TokenType.AtIncludeShort)) {
 				return this.finish(node);
 			}
 			// nesting

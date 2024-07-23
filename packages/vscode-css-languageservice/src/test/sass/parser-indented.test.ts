@@ -86,6 +86,34 @@ suite("Sass - Parser", () => {
 		);
 	});
 
+	// TODO: you are here
+	test("Comments and nested rulesets", () => {
+		assertNode(
+			`// The Grid
+=grid-core($gridColumnWidth, $gridGutterWidth)
+  .row
+    margin-left: $gridGutterWidth * -1
+    +clearfix
+  [class*="span"]
+    float: left
+    min-height: 1px
+    // prevent collapsing columns
+    margin-left: $gridGutterWidth
+  // Set the container width, and override it for fixed navbars in media queries
+	.container,
+  .navbar-static-top .container,
+  .navbar-fixed-top .container,
+  .navbar-fixed-bottom .container
+    +grid-core-span($gridColumns, $gridColumnWidth, $gridGutterWidth)
+  // generate .spanX and .offsetX
+  +grid-core-span-x($gridColumns, $gridColumnWidth, $gridGutterWidth)
+  +grid-core-offset-x($gridColumns, $gridColumnWidth, $gridGutterWidth)
+`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+	});
+
 	test("Sass multi-line silent comment", () => {
 		assertNode(
 			`a

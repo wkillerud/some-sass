@@ -423,6 +423,9 @@ export class Parser {
 		}
 
 		while (this.accept(TokenType.Comma)) {
+			while (this.accept(TokenType.Newline)) {
+				// accept any newlines after , and the next selector
+			}
 			if (!selectors.addChild(this._parseSelector(isNested))) {
 				return this.finish(node, ParseError.SelectorExpected);
 			}

@@ -264,7 +264,8 @@ $color: #F5F5F5`,
 	test("selectors", () => {
 		assertNode(
 			`
-#boo, far
+#boo,
+far
 	a: b
 
 .far boo

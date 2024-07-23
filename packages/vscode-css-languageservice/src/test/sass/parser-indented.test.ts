@@ -73,6 +73,19 @@ suite("Sass - Parser", () => {
 		);
 	});
 
+	test("Sass single-line silent comments after end of declaration and at root of stylesheet", () => {
+		assertNode(
+			`=input-block-level
+  display: block
+  // Makes inputs behave like true block-level elements
+
+// Mixin for form field states
+`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+	});
+
 	test("Sass multi-line silent comment", () => {
 		assertNode(
 			`a

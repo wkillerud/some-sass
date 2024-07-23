@@ -542,7 +542,10 @@ export class Parser {
 				// dedents as we get indents. If the depth is zero at this point
 				// we should drop out so we don't end up adding a ruleset as a
 				// child of another ruleset when in reality it's a direct child
-				// of Stylesheet.
+				// of Stylesheet
+				while (this.accept(TokenType.Dedent)) {
+					// Accept any dedents there may be
+				}
 				return this.finish(node);
 			}
 

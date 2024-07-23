@@ -215,6 +215,9 @@ export class SassScanner extends Scanner {
 							this.stream.goBackTo(mark, depth);
 							break scan;
 						}
+					} else if (commentDepth === 0) {
+						// This is a "clean dedent", we're back to the root of the stylesheet. Finish the comment.
+						break scan;
 					} else {
 						this.stream.goBackTo(mark, depth);
 						break scan;

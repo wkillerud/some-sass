@@ -62,6 +62,17 @@ suite("Sass - Parser", () => {
 		);
 	});
 
+	test("Sass single-line silent comment at end of declaration", () => {
+		assertNode(
+			`a
+	b: c
+	// single-line silent comment
+`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+		);
+	});
+
 	test("Sass multi-line silent comment", () => {
 		assertNode(
 			`a

@@ -29,3 +29,6 @@ docs/book/
 
 
 .nx/cache
+
+*.cpuprofile
+*.heapprofile

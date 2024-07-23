@@ -307,7 +307,7 @@ export abstract class LanguageFeature {
 	 * Looks at {@link position} for a {@link VariableDeclaration} and returns its value as a string (or null if no value was found).
 	 * If the value is a reference to another variable this method will find that variable's definition and look for the value there instead.
 	 *
-	 * If the value is not found in 20 lookups, assumes a circular reference and returns null.
+	 * If the value is not found in 10 lookups, assumes a circular reference and returns null.
 	 */
 	async findValue(
 		document: TextDocument,
@@ -321,13 +321,13 @@ export abstract class LanguageFeature {
 		position: Position,
 		depth = 0,
 	): Promise<string | null> {
-		const MAX_VARIABLE_REFERENCE_LOOKUPS = 20;
+		const MAX_VARIABLE_REFERENCE_LOOKUPS = 10;
 		if (depth > MAX_VARIABLE_REFERENCE_LOOKUPS) {
 			return null;
 		}
-		const offset = document.offsetAt(position);
 		const stylesheet = this.ls.parseStylesheet(document);
 
+		const offset = document.offsetAt(position);
 		const variable = getNodeAtOffset(stylesheet, offset);
 		if (!(variable instanceof Variable)) {
 			return null;
@@ -339,7 +339,7 @@ export abstract class LanguageFeature {
 		}
 
 		const valueString = variable.getText();
-		const dollarIndex = valueString.indexOf("$");
+		const dollarIndex = valueString.indexOf("$"); // is this always true in indented?
 		if (dollarIndex !== -1) {
 			// If the variable at position references another variable,
 			// find that variable's definition and look for the real value

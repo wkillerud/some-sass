@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { LanguageService as VSCodeLanguageService } from "@somesass/vscode-css-languageservice";
-import { ParseResult, parseSync } from "sassdoc-parser";
+import { ParseResult, Parser as SassdocParser } from "sassdoc-parser";
 import {
 	TextDocument,
 	Stylesheet,
@@ -34,6 +34,7 @@ export class LanguageModelCache {
 	#nModels = 0;
 	#options: LanguageModelCacheOptions & { sassLs: VSCodeLanguageService };
 	#cleanupInterval: NodeJS.Timeout | undefined = undefined;
+	#sassdocParser = new SassdocParser();
 
 	constructor(
 		options: LanguageModelCacheOptions & { sassLs: VSCodeLanguageService },
@@ -81,7 +82,7 @@ export class LanguageModelCache {
 		let sassdoc: ParseResult[] = [];
 		try {
 			const text = document.getText();
-			sassdoc = parseSync(text);
+			sassdoc = this.#sassdocParser.parseStringSync(text);
 		} catch {
 			// do nothing
 		}
@@ -173,7 +174,7 @@ export class LanguageModelCache {
 		let sassdoc: ParseResult[] = [];
 		try {
 			const text = document.getText();
-			sassdoc = parseSync(text);
+			sassdoc = this.#sassdocParser.parseStringSync(text);
 		} catch {
 			// do nothing
 		}

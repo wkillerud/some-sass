@@ -1,3 +1,10 @@
+## 1.0.4 (2024-07-25)
+
+
+### 🩹 Fixes
+
+- update language server for completion regression fixes
+
 ## 1.0.3 (2024-06-16)
 
 

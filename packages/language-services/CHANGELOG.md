@@ -1,3 +1,15 @@
+## 1.0.6 (2024-07-25)
+
+
+### 🩹 Fixes
+
+- update language server for completion regression fixes
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 1.0.4
+
 ## 1.0.5 (2024-06-16)
 
 

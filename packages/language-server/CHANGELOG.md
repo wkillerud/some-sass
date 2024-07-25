@@ -1,3 +1,17 @@
+## 1.2.7 (2024-07-25)
+
+
+### 🩹 Fixes
+
+- update language server for completion regression fixes
+
+- don't crash on ENOENT when looking up realPath
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.0.6
+
 ## 1.2.6 (2024-06-16)
 
 

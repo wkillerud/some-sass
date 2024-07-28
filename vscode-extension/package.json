@@ -2,7 +2,7 @@
 	"name": "some-sass",
 	"displayName": "Some Sass: extended support for Sass and SassDoc",
 	"description": "Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
-	"version": "3.1.4",
+	"version": "3.1.9",
 	"private": true,
 	"publisher": "SomewhatStationery",
 	"license": "MIT",
@@ -10,7 +10,7 @@
 		"vscode": "^1.86.0"
 	},
 	"icon": "icon.png",
-	"homepage": "https://github.com/wkillerud/some-sass/blob/main/vscode-extension/README.md",
+	"homepage": "https://wkillerud.github.io/some-sass/",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/wkillerud/some-sass"
@@ -138,16 +138,16 @@
 	},
 	"dependencies": {
 		"fast-glob": "3.3.2",
-		"some-sass-language-server": "1.2.3",
-		"vscode-css-languageservice": "6.2.14",
+		"some-sass-language-server": "1.2.8",
+		"vscode-css-languageservice": "6.3.0",
 		"vscode-languageclient": "9.0.1",
 		"vscode-uri": "3.0.7"
 	},
 	"devDependencies": {
 		"@types/mocha": "10.0.6",
 		"@types/vscode": "1.86.0",
-		"@vscode/test-electron": "2.3.9",
-		"@vscode/test-web": "0.0.54",
+		"@vscode/test-electron": "2.4.0",
+		"@vscode/test-web": "0.0.56",
 		"assert": "2.1.0",
 		"mocha": "10.4.0",
 		"shx": "0.3.4"

@@ -96,7 +96,12 @@ export class CSSNavigation {
 	): nodes.Node | undefined {
 		const offset = document.offsetAt(position);
 		let node = nodes.getNodeAtOffset(stylesheet, offset);
-		if (!node || node.type === nodes.NodeType.Stylesheet || node.type === nodes.NodeType.Declarations) {
+		if (
+			!node ||
+			node.type === nodes.NodeType.Stylesheet ||
+			node.type === nodes.NodeType.Declarations ||
+			node.type === nodes.NodeType.ModuleConfig
+		) {
 			return;
 		}
 		if (node.type === nodes.NodeType.Identifier && node.parent && node.parent.type === nodes.NodeType.ClassSelector) {
@@ -553,13 +558,6 @@ export class CSSNavigation {
 			return this.mapReference(await this.resolveModuleReference(target, documentUri, documentContext), isRawLink);
 		}
 
-		// Following the [sass package importer](https://github.com/sass/sass/blob/f6832f974c61e35c42ff08b3640ff155071a02dd/js-api-doc/importer.d.ts#L349),
-		// look for the `exports` field of the module and any `sass`, `style` or `default` that matches the import.
-		// If it's only `pkg:module`, also look for `sass` and `style` on the root of package.json.
-		if (target.startsWith("pkg:")) {
-			return this.resolvePkgModulePath(target, documentUri, documentContext);
-		}
-
 		const ref = await this.mapReference(documentContext.resolveReference(target, documentUri), isRawLink);
 
 		// Following [less-loader](https://github.com/webpack-contrib/less-loader#imports)
@@ -603,7 +601,7 @@ export class CSSNavigation {
 		return ref;
 	}
 
-	private async resolvePathToModule(
+	protected async resolvePathToModule(
 		_moduleName: string,
 		documentFolderUri: string,
 		rootFolderUri: string | undefined,
@@ -619,103 +617,6 @@ export class CSSNavigation {
 			documentFolderUri.length !== rootFolderUri.length
 		) {
 			return this.resolvePathToModule(_moduleName, dirname(documentFolderUri), rootFolderUri);
-		}
-		return undefined;
-	}
-
-	private async resolvePkgModulePath(
-		target: string,
-		documentUri: string,
-		documentContext: DocumentContext,
-	): Promise<string | undefined> {
-		const bareTarget = target.replace("pkg:", "");
-		const moduleName = bareTarget.includes("/") ? getModuleNameFromPath(bareTarget) : bareTarget;
-		const rootFolderUri = documentContext.resolveReference("/", documentUri);
-		const documentFolderUri = dirname(documentUri);
-		const modulePath = await this.resolvePathToModule(moduleName, documentFolderUri, rootFolderUri);
-		if (modulePath) {
-			const packageJsonPath = `${modulePath}/package.json`;
-			if (packageJsonPath) {
-				// Since submodule exports import strings don't match the file system,
-				// we need the contents of `package.json` to look up the correct path.
-				let packageJsonContent = await this.getContent(packageJsonPath);
-				if (packageJsonContent) {
-					const packageJson: {
-						style?: string;
-						sass?: string;
-						exports: Record<string, string | Record<string, string>>;
-					} = JSON.parse(packageJsonContent);
-
-					const subpath = bareTarget.substring(moduleName.length + 1);
-					if (packageJson.exports) {
-						if (!subpath) {
-							// look for the default/index export
-							const entry: string =
-								// @ts-expect-error If ['.'] is a string this just produces undefined
-								packageJson.exports["."]["sass"] ||
-								// @ts-expect-error If ['.'] is a string this just produces undefined
-								packageJson.exports["."]["style"] ||
-								// @ts-expect-error If ['.'] is a string this just produces undefined
-								packageJson.exports["."]["default"];
-							// the 'default' entry can be whatever, typically .js – confirm it looks like `scss` or `sass`
-							if (entry && entry.match(sassExt)) {
-								const entryPath = joinPath(modulePath, entry);
-								return entryPath;
-							}
-						} else {
-							// The import string may be with or without a file extension.
-							// Likewise the exports entry. Look up both paths.
-							// However, they need to be relative (start with ./).
-							const lookupSubpath = subpath.match(sassExt) ? `./${subpath.replace(sassExt, "")}` : `./${subpath}`;
-							const lookupSubpathScss = subpath.match(sassExt) ? `./${subpath}` : `./${subpath}.scss`;
-							const lookupSubpathSass = subpath.match(sassExt) ? `./${subpath}` : `./${subpath}.sass`;
-							const subpathObject =
-								packageJson.exports[lookupSubpathScss] ||
-								packageJson.exports[lookupSubpathSass] ||
-								packageJson.exports[lookupSubpath];
-							if (subpathObject) {
-								// @ts-expect-error If subpathObject is a string this just produces undefined
-								const entry = subpathObject["sass"] || subpathObject["styles"] || subpathObject["default"];
-								// the 'default' entry can be whatever, typically .js – confirm it looks like `scss` or `sass`
-								if (entry && entry.match(sassExt)) {
-									const entryPath = joinPath(modulePath, entry);
-									return entryPath;
-								}
-							} else {
-								// We have a subpath, but found no matches on direct lookup.
-								// It may be a [subpath pattern](https://nodejs.org/api/packages.html#subpath-patterns).
-								for (const [maybePattern, subpathObject] of Object.entries(packageJson.exports)) {
-									if (!maybePattern.includes("*")) {
-										continue;
-									}
-									// Patterns may also be without a file extension on the left side, so compare without on both sides
-									const re = new RegExp(maybePattern.replace("./", "\\./").replace(sassExt, "").replace("*", "(.+)"));
-									const match = re.exec(lookupSubpath);
-									if (match) {
-										// @ts-expect-error If subpathObject is a string this just produces undefined
-										const entry: string = subpathObject["sass"] || subpathObject["styles"] || subpathObject["default"];
-										// the 'default' entry can be whatever, typically .js – confirm it looks like `scss` or `sass`
-										if (entry && entry.match(sassExt)) {
-											// The right-hand side of a subpath pattern is also a pattern.
-											// Replace the pattern with the match from our regexp capture group above.
-											const expandedPattern = entry.replace("*", match[1]);
-											const entryPath = joinPath(modulePath, expandedPattern);
-											return entryPath;
-										}
-									}
-								}
-							}
-						}
-					} else if (!subpath && (packageJson.sass || packageJson.style)) {
-						// Fall back to a direct lookup on `sass` and `style` on package root
-						const entry = packageJson.sass || packageJson.style;
-						if (entry) {
-							const entryPath = joinPath(modulePath, entry);
-							return entryPath;
-						}
-					}
-				}
-			}
 		}
 		return undefined;
 	}
@@ -817,7 +718,7 @@ function toTwoDigitHex(n: number): string {
 	return r.length !== 2 ? "0" + r : r;
 }
 
-function getModuleNameFromPath(path: string) {
+export function getModuleNameFromPath(path: string) {
 	const firstSlash = path.indexOf("/");
 	if (firstSlash === -1) {
 		return "";

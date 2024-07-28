@@ -34,6 +34,8 @@ type FindOptions = {
 	 * @default false
 	 */
 	lazy: boolean;
+	/** Set the initial starting depth, in case the caller uses a linked document as the starting point. */
+	depth?: number;
 };
 
 const defaultConfiguration: LanguageServiceConfiguration = {
@@ -140,7 +142,7 @@ export abstract class LanguageFeature {
 			show: string[],
 		) => T | T[] | undefined | Promise<T | T[] | undefined>,
 		initialDocument: TextDocument,
-		options: FindOptions = { lazy: false },
+		options: FindOptions = { lazy: false, depth: 0 },
 	): Promise<T[]> {
 		return this.internalFindInWorkspace(callback, initialDocument, options);
 	}
@@ -159,7 +161,7 @@ export abstract class LanguageFeature {
 		hide: string[] = [],
 		show: string[] = [],
 		visited = new Set<string>(),
-		depth = 0,
+		depth = options.depth || 0,
 	): Promise<T[]> {
 		if (visited.has(currentDocument.uri)) return [];
 
@@ -350,6 +352,15 @@ export abstract class LanguageFeature {
 				if (!newDocument) {
 					return null;
 				}
+
+				if (newDocument.uri === document.uri) {
+					const definitionOffset = document.offsetAt(definition.range.start);
+					if (definitionOffset === variable.offset) {
+						// break early if we're looking up ourselves
+						return null;
+					}
+				}
+
 				return await this.internalFindValue(
 					newDocument,
 					definition.range.start,

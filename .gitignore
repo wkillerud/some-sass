@@ -29,6 +29,7 @@ docs/book/
 
 
 .nx/cache
+.nx/workspace-data
 
 *.cpuprofile
 *.heapprofile

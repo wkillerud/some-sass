@@ -1,6 +1,6 @@
 {
 	"name": "@somesass/vscode-css-languageservice",
-	"version": "1.0.1",
+	"version": "1.0.5",
 	"private": true,
 	"description": "Language service for CSS, LESS and SCSS",
 	"main": "./lib/umd/cssLanguageService.js",
@@ -16,12 +16,9 @@
 		"url": "https://github.com/wkillerud/some-sass"
 	},
 	"devDependencies": {
-		"@types/node": "20.12.8",
-		"@typescript-eslint/eslint-plugin": "7.8.0",
-		"@typescript-eslint/parser": "7.8.0",
-		"@vscode/web-custom-data": "0.4.9",
-		"eslint": "8.57.0",
-		"rimraf": "5.0.5",
+		"@types/mocha": "10.0.6",
+		"@vscode/web-custom-data": "0.4.11",
+		"rimraf": "5.0.7",
 		"source-map-support": "0.5.21",
 		"typescript": "5.4.5",
 		"vitest": "1.6.0"

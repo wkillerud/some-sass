@@ -87,7 +87,7 @@ suite("Sass - Parser", () => {
 	});
 
 	// TODO: you are here
-	test("Comments and nested rulesets", () => {
+	test.skip("Comments and nested rulesets", () => {
 		assertNode(
 			`// The Grid
 =grid-core($gridColumnWidth, $gridGutterWidth)

@@ -40,7 +40,7 @@ import { applySassDoc } from "../utils/sassdoc";
 const reNewSassdocBlock = /\/\/\/\s?$/;
 const reSassdocLine = /\/\/\/\s/;
 const reSassDotExt = /\.s(a|c)ss$/;
-const rePrivate = /^\$?[_].*$/;
+const rePrivate = /^\$?[-_].*$/;
 
 const reReturn = /^.*@return/;
 const reEach = /^.*@each .+ in /;
@@ -715,6 +715,7 @@ export class DoComplete extends LanguageFeature {
 				return items;
 			},
 			start,
+			{ lazy: false, depth: 1 },
 		);
 		return result;
 	}
@@ -940,9 +941,14 @@ export class DoComplete extends LanguageFeature {
 		const items: CompletionItem[] = [];
 
 		const label = `${prefix}${symbol.name}`;
-		const filterText = namespace
-			? `${namespace !== "*" ? namespace : ""}.${prefix}${symbol.name}`
-			: symbol.name;
+		let filterText = symbol.name;
+		if (namespace) {
+			if (namespace === "*") {
+				filterText = `${prefix}${symbol.name}`;
+			} else {
+				filterText = `${namespace}.${prefix}${symbol.name}`;
+			}
+		}
 
 		const isEmbedded = this.isEmbedded(initialDocument);
 		const includeDot =

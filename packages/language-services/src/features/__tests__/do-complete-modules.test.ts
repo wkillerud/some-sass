@@ -134,6 +134,105 @@ test("should suggest symbol from a different document via @use when in @return",
 	assert.ok(items.find((annotation) => annotation.label === "$primary"));
 });
 
+test("should not suggest symbols from a module used by the one we use", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument(
+		['@use "./three";', "$primary: limegreen;"],
+		{
+			uri: "one.scss",
+		},
+	);
+	const two = fileSystemProvider.createDocument(
+		['@use "./one";', "@function test() { @return one."],
+		{
+			uri: "two.scss",
+		},
+	);
+	const three = fileSystemProvider.createDocument(
+		["@function three() { @return 3; }"],
+		{
+			uri: "three.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(three);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 31));
+	assert.notOk(items.find((annotation) => annotation.label === "three"));
+	assert.ok(items.find((annotation) => annotation.label === "$primary"));
+});
+
+test("should only suggest symbols from the current namespace, not others being used", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument(
+		['@use "./two";', '@use "./three";', "@function test() { @return two."],
+		{
+			uri: "one.scss",
+		},
+	);
+	const two = fileSystemProvider.createDocument("$two: 2;", {
+		uri: "two.scss",
+	});
+	const three = fileSystemProvider.createDocument(
+		["@function three() { @return 3; }"],
+		{
+			uri: "three.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(three);
+
+	const { items } = await ls.doComplete(one, Position.create(2, 31));
+	assert.notOk(items.find((annotation) => annotation.label === "three"));
+	assert.ok(items.find((annotation) => annotation.label === "$two"));
+});
+
+test("should not suggest private symbols from the current namespace", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument(
+		['@use "./two";', "@function test() { @return two."],
+		{
+			uri: "one.scss",
+		},
+	);
+	const two = fileSystemProvider.createDocument(
+		["$two: 2;", "$-three: 3;", "$_four: 4;"],
+		{
+			uri: "two.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(one, Position.create(2, 31));
+	assert.notOk(items.find((annotation) => annotation.label === "$_four"));
+	assert.notOk(items.find((annotation) => annotation.label === "$-three"));
+	assert.ok(items.find((annotation) => annotation.label === "$two"));
+});
+
 test("should suggest symbol from a different document via @use when in @if", async () => {
 	ls.configure({
 		completionSettings: {
@@ -902,9 +1001,12 @@ test("should suggest symbol from a different document via @use with wildcard ali
 		},
 	});
 
-	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
-		uri: "one.scss",
-	});
+	const one = fileSystemProvider.createDocument(
+		["$primary: limegreen;", "@function one() { @return 1; }"],
+		{
+			uri: "one.scss",
+		},
+	);
 	const two = fileSystemProvider.createDocument(
 		['@use "./one" as *;', ".a { color: "],
 		{
@@ -917,11 +1019,7 @@ test("should suggest symbol from a different document via @use with wildcard ali
 	ls.parseStylesheet(two);
 
 	const { items } = await ls.doComplete(two, Position.create(1, 12));
-	assert.notEqual(
-		0,
-		items.length,
-		"Expected to find a completion item for $primary",
-	);
+	assert.equal(2, items.length, "Expected to find two completion items");
 	assert.deepStrictEqual(
 		items.find((annotation) => annotation.label === "$primary"),
 		{
@@ -931,6 +1029,26 @@ test("should suggest symbol from a different document via @use with wildcard ali
 			insertText: undefined,
 			kind: CompletionItemKind.Color,
 			label: "$primary",
+			sortText: undefined,
+			tags: [],
+		},
+	);
+	assert.deepStrictEqual(
+		items.find((annotation) => annotation.label === "one"),
+		{
+			documentation: {
+				kind: "markdown",
+				value:
+					"```scss\n@function one()\n```\n____\nFunction declared in one.scss",
+			},
+			filterText: "one",
+			insertText: "one()",
+			insertTextFormat: InsertTextFormat.Snippet,
+			kind: CompletionItemKind.Function,
+			label: "one",
+			labelDetails: {
+				detail: "()",
+			},
 			sortText: undefined,
 			tags: [],
 		},

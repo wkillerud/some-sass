@@ -1483,6 +1483,21 @@ foo
 				testUri,
 				workspaceFolder,
 			);
+			await assertLinks(
+				ls,
+				`@use "pkg:sass-true"`,
+				[
+					{
+						namespace: "sass-true",
+						range: newRange(5, 20),
+						target: getTestResource("node_modules/sass-true/_index.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"scss",
+				testUri,
+				workspaceFolder,
+			);
 		});
 
 		test("Sass node package resolving", async () => {

@@ -222,6 +222,7 @@ export class SassScanner extends Scanner {
 						this.stream.goBackTo(mark, depth);
 						break scan;
 					}
+					// eslint-disable-next-line no-constant-condition
 				} while (true);
 
 				if (success) {

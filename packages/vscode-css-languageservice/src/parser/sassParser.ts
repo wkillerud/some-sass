@@ -915,26 +915,8 @@ export class SassParser extends cssParser.Parser {
 			}
 
 			if (this.acceptIdent("with")) {
-				if (!this.accept(TokenType.ParenthesisL)) {
+				if (!node.setParameters(this._parseModuleConfig())) {
 					return this.finish(node, ParseError.LeftParenthesisExpected, [TokenType.ParenthesisR]);
-				}
-
-				// First variable statement, no comma.
-				if (!node.getParameters().addChild(this._parseModuleConfigDeclaration())) {
-					return this.finish(node, ParseError.VariableNameExpected);
-				}
-
-				while (this.accept(TokenType.Comma)) {
-					if (this.peek(TokenType.ParenthesisR)) {
-						break;
-					}
-					if (!node.getParameters().addChild(this._parseModuleConfigDeclaration())) {
-						return this.finish(node, ParseError.VariableNameExpected);
-					}
-				}
-
-				if (!this.accept(TokenType.ParenthesisR)) {
-					return this.finish(node, ParseError.RightParenthesisExpected);
 				}
 			}
 		}
@@ -947,6 +929,33 @@ export class SassParser extends cssParser.Parser {
 			if (!this.accept(TokenType.SemiColon) && !this.accept(TokenType.EOF)) {
 				return this.finish(node, ParseError.SemiColonExpected);
 			}
+		}
+
+		return this.finish(node);
+	}
+
+	public _parseModuleConfig(): nodes.Node | null {
+		const node = this.createNode(nodes.NodeType.ModuleConfig);
+		if (!this.accept(TokenType.ParenthesisL)) {
+			return null;
+		}
+
+		// First variable statement, no comma.
+		if (!node.addChild(this._parseModuleConfigDeclaration())) {
+			return this.finish(node, ParseError.VariableNameExpected);
+		}
+
+		while (this.accept(TokenType.Comma)) {
+			if (this.peek(TokenType.ParenthesisR)) {
+				break;
+			}
+			if (!node.addChild(this._parseModuleConfigDeclaration())) {
+				return this.finish(node, ParseError.VariableNameExpected);
+			}
+		}
+
+		if (!this.accept(TokenType.ParenthesisR)) {
+			return this.finish(node, ParseError.RightParenthesisExpected);
 		}
 
 		return this.finish(node);
@@ -997,26 +1006,8 @@ export class SassParser extends cssParser.Parser {
 		}
 
 		if (this.acceptIdent("with")) {
-			if (!this.accept(TokenType.ParenthesisL)) {
+			if (!node.setParameters(this._parseModuleConfig())) {
 				return this.finish(node, ParseError.LeftParenthesisExpected, [TokenType.ParenthesisR]);
-			}
-
-			// First variable statement, no comma.
-			if (!node.getParameters().addChild(this._parseModuleConfigDeclaration())) {
-				return this.finish(node, ParseError.VariableNameExpected);
-			}
-
-			while (this.accept(TokenType.Comma)) {
-				if (this.peek(TokenType.ParenthesisR)) {
-					break;
-				}
-				if (!node.getParameters().addChild(this._parseModuleConfigDeclaration())) {
-					return this.finish(node, ParseError.VariableNameExpected);
-				}
-			}
-
-			if (!this.accept(TokenType.ParenthesisR)) {
-				return this.finish(node, ParseError.RightParenthesisExpected);
 			}
 		} else if (this.peekIdent("hide") || this.peekIdent("show")) {
 			if (!node.addChild(this._parseForwardVisibility())) {

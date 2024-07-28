@@ -712,6 +712,7 @@ export class Parser {
 					if (this.syntax === "indented") {
 						break done;
 					}
+					break;
 				}
 				case TokenType.SemiColon:
 					// A semicolon only ends things if we're not inside a delimitor.

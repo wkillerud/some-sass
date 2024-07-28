@@ -25,10 +25,22 @@ nx reads [conventional commits][conventional] to determine what the new versions
 To start a new release:
 
 1. Get the latest `main` branch with `git checkout main && git pull`.
-2. Run `npx nx release --skip-publish`.
-3. Push the changes and tags with `git push && git push --tags`.
+2. Run `npm clean-install`.
+3. Run `npm run release`.
+4. Push the changes and tags with `git push && git push --tags`.
+5. Create a [new GitHub release](https://github.com/wkillerud/some-sass/releases/new?title=some-sass-language-server@x.y.z) for the latest tag.
 
 GitHub Actions is configured to do the actual publishing when there are new tags.
+
+Once the language server has been published to npm:
+
+1. Update the dependency manually in `vscode-extension/package.json`.
+2. Bump the version number of the extension.
+3. Run `npm install` to update the lockfile.
+4. Commit the changes and run `git tag some-sass@<version from package.json>`.
+5. Run `git push && git push --tags`.
+
+For the extension, GitHub Actions is configured to do the actual publishing (including GitHub release) when there are new tags.
 
 ### Manual fallback
 

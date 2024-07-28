@@ -100,6 +100,7 @@ export enum NodeType {
 	LayerName,
 	PropertyAtRule,
 	Container,
+	ModuleConfig,
 }
 
 export enum ReferenceType {
@@ -1018,16 +1019,17 @@ export class Import extends Node {
 
 export class Use extends Node {
 	public identifier?: Identifier;
-	public parameters?: Nodelist;
+	public parameters?: Node;
 
 	public get type(): NodeType {
 		return NodeType.Use;
 	}
 
-	public getParameters(): Nodelist {
-		if (!this.parameters) {
-			this.parameters = new Nodelist(this);
-		}
+	public setParameters(value: Node | null): value is Node {
+		return this.setNode("parameters", value);
+	}
+
+	public getParameters(): Node | undefined {
 		return this.parameters;
 	}
 
@@ -1072,7 +1074,7 @@ export class ModuleConfiguration extends Node {
 export class Forward extends Node {
 	public identifier?: Node;
 	public members?: Nodelist;
-	public parameters?: Nodelist;
+	public parameters?: Node;
 
 	public get type(): NodeType {
 		return NodeType.Forward;
@@ -1093,10 +1095,11 @@ export class Forward extends Node {
 		return this.members;
 	}
 
-	public getParameters(): Nodelist {
-		if (!this.parameters) {
-			this.parameters = new Nodelist(this);
-		}
+	public setParameters(value: Node | null): value is Node {
+		return this.setNode("parameters", value);
+	}
+
+	public getParameters(): Node | undefined {
 		return this.parameters;
 	}
 }

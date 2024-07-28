@@ -33,6 +33,14 @@ export class FindColors extends LanguageFeature {
 			return true;
 		});
 
+		if (
+			variables.length >
+			(this.configuration.editorSettings?.colorDecoratorsLimit || 500)
+		) {
+			// skip color decorators for large documents
+			return [];
+		}
+
 		for (const variable of variables) {
 			const value = await this.findValue(
 				document,

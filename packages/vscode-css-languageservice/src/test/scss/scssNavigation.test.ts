@@ -526,6 +526,21 @@ suite("SCSS - Navigation", () => {
 			let workspaceFolder = getTestResource("");
 			await assertLinks(
 				ls,
+				`@use "pkg:sass-true"`,
+				[
+					{
+						namespace: "sass-true",
+						range: newRange(5, 14),
+						target: getTestResource("node_modules/sass-true/_index.scss"),
+						type: nodes.NodeType.Use,
+					},
+				],
+				"scss",
+				testUri,
+				workspaceFolder,
+			);
+			await assertLinks(
+				ls,
 				`@use "pkg:bar"`,
 				[
 					{

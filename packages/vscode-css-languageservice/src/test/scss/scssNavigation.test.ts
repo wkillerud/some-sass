@@ -530,7 +530,7 @@ suite("SCSS - Navigation", () => {
 				[
 					{
 						namespace: "sass-true",
-						range: newRange(5, 14),
+						range: newRange(5, 20),
 						target: getTestResource("node_modules/sass-true/_index.scss"),
 						type: nodes.NodeType.Use,
 					},

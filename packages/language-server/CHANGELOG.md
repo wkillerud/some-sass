@@ -1,3 +1,17 @@
+## 1.2.8 (2024-07-28)
+
+
+### 🩹 Fixes
+
+- update language server to fix #182
+
+- update vscode-css-languageservice
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.0.7
+
 ## 1.2.7 (2024-07-25)
 
 

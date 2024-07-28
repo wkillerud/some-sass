@@ -1,3 +1,14 @@
+## 1.0.5 (2024-07-28)
+
+
+### 🩹 Fixes
+
+- update language server to fix #182
+
+- update vscode-css-languageservice
+
+- support declaring exports without path
+
 ## 1.0.4 (2024-07-25)
 
 

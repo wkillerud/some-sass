@@ -1,136 +1,136 @@
 {
-	"name": "some-sass",
-	"displayName": "Some Sass: extended support for SCSS and SassDoc",
-	"description": "Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
-	"version": "3.1.10",
-	"private": true,
-	"publisher": "SomewhatStationery",
-	"license": "MIT",
-	"engines": {
-		"vscode": "^1.86.0"
-	},
-	"icon": "icon.png",
-	"homepage": "https://wkillerud.github.io/some-sass/",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/wkillerud/some-sass"
-	},
-	"keywords": [
-		"scss",
-		"sassdoc",
-		"autocompletion",
-		"intellisense",
-		"refactor"
-	],
-	"categories": [
-		"Programming Languages"
-	],
-	"activationEvents": [
-		"onLanguage:scss",
-		"onLanguage:vue",
-		"onLanguage:svelte",
-		"onLanguage:astro",
-		"onCommand:_somesass.applyExtractCodeAction"
-	],
-	"capabilities": {
-		"virtualWorkspaces": true
-	},
-	"browser": "./dist/browser-client.js",
-	"main": "./dist/node-client.js",
-	"contributes": {
-		"configuration": {
-			"properties": {
-				"somesass.scannerDepth": {
-					"type": "number",
-					"default": 30,
-					"description": "The maximum number of nested directories to scan."
-				},
-				"somesass.scannerExclude": {
-					"type": "array",
-					"items": {
-						"type": "string"
-					},
-					"default": [
-						"**/.git/**",
-						"**/node_modules/**",
-						"**/bower_components/**"
-					],
-					"description": "List of glob patterns for directories that are excluded when scanning."
-				},
-				"somesass.scanImportedFiles": {
-					"type": "boolean",
-					"default": true,
-					"deprecationMessage": "Will be removed at some point after `@import` becomes CSS-only.",
-					"description": "Allows scan imported files. Turning this off will severely limit functionality, and is not recommended."
-				},
-				"somesass.suggestionStyle": {
-					"type": "string",
-					"default": "all",
-					"description": "Controls the style of suggestions for mixins and placeholders.",
-					"enum": [
-						"all",
-						"nobracket",
-						"bracket"
-					],
-					"enumItemLabels": [
-						"All",
-						"No brackets",
-						"Only brackets"
-					],
-					"enumDescriptions": [
-						"Show all suggestions",
-						"Only show suggestions without brackets",
-						"Where brackets are suggested, omit duplicates without brackets"
-					]
-				},
-				"somesass.suggestAllFromOpenDocument": {
-					"type": "boolean",
-					"default": false,
-					"description": "VS Code has built-in code suggestions for symbols declared in the open document. If you prefer the suggestions from Some Sass, you can opt in by turning on this setting. There will be duplicates."
-				},
-				"somesass.suggestFromUseOnly": {
-					"type": "boolean",
-					"default": false,
-					"description": "If your project uses the new module system with @use and @forward, you may want to only include suggestions from your used modules."
-				},
-				"somesass.suggestFunctionsInStringContextAfterSymbols": {
-					"type": "string",
-					"default": " (+-*%",
-					"description": "Allows prompt Functions in String context after specified symbols."
-				}
-			}
-		}
-	},
-	"dependencies": {
-		"fast-glob": "3.3.2",
-		"some-sass-language-server": "1.2.8",
-		"vscode-css-languageservice": "6.3.0",
-		"vscode-languageclient": "9.0.1",
-		"vscode-uri": "3.0.7"
-	},
-	"devDependencies": {
-		"@types/mocha": "10.0.7",
-		"@types/vscode": "1.86.0",
-		"@vscode/test-electron": "2.4.1",
-		"@vscode/test-web": "0.0.56",
-		"assert": "2.1.0",
-		"mocha": "10.7.0",
-		"shx": "0.3.4"
-	},
-	"scripts": {
-		"vscode:prepublish": "npm run clean && webpack --mode production",
-		"clean": "shx rm -rf dist",
-		"build": "webpack --mode development",
-		"start:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=.",
-		"lint": "eslint \"**/*.ts\" --cache",
-		"test:e2e": "node ./test/e2e/runTest.js",
-		"pretest:web": "webpack --config ./webpack.test-web.config.js ",
-		"test:web": "node ./test/web/runTest.js"
-	},
-	"__metadata": {
-		"id": "6d35099c-3671-464c-ac0b-34a0c3823927",
-		"publisherDisplayName": "Somewhat Stationery",
-		"publisherId": "02638283-c13a-4acf-9f26-24bdcfdfce24",
-		"isPreReleaseVersion": false
-	}
+  "name": "some-sass",
+  "displayName": "Some Sass: extended support for SCSS and SassDoc",
+  "description": "Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
+  "version": "3.1.11",
+  "private": true,
+  "publisher": "SomewhatStationery",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.86.0"
+  },
+  "icon": "icon.png",
+  "homepage": "https://wkillerud.github.io/some-sass/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wkillerud/some-sass"
+  },
+  "keywords": [
+    "scss",
+    "sassdoc",
+    "autocompletion",
+    "intellisense",
+    "refactor"
+  ],
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:scss",
+    "onLanguage:vue",
+    "onLanguage:svelte",
+    "onLanguage:astro",
+    "onCommand:_somesass.applyExtractCodeAction"
+  ],
+  "capabilities": {
+    "virtualWorkspaces": true
+  },
+  "browser": "./dist/browser-client.js",
+  "main": "./dist/node-client.js",
+  "contributes": {
+    "configuration": {
+      "properties": {
+        "somesass.scannerDepth": {
+          "type": "number",
+          "default": 30,
+          "description": "The maximum number of nested directories to scan."
+        },
+        "somesass.scannerExclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/.git/**",
+            "**/node_modules/**",
+            "**/bower_components/**"
+          ],
+          "description": "List of glob patterns for directories that are excluded when scanning."
+        },
+        "somesass.scanImportedFiles": {
+          "type": "boolean",
+          "default": true,
+          "deprecationMessage": "Will be removed at some point after `@import` becomes CSS-only.",
+          "description": "Allows scan imported files. Turning this off will severely limit functionality, and is not recommended."
+        },
+        "somesass.suggestionStyle": {
+          "type": "string",
+          "default": "all",
+          "description": "Controls the style of suggestions for mixins and placeholders.",
+          "enum": [
+            "all",
+            "nobracket",
+            "bracket"
+          ],
+          "enumItemLabels": [
+            "All",
+            "No brackets",
+            "Only brackets"
+          ],
+          "enumDescriptions": [
+            "Show all suggestions",
+            "Only show suggestions without brackets",
+            "Where brackets are suggested, omit duplicates without brackets"
+          ]
+        },
+        "somesass.suggestAllFromOpenDocument": {
+          "type": "boolean",
+          "default": false,
+          "description": "VS Code has built-in code suggestions for symbols declared in the open document. If you prefer the suggestions from Some Sass, you can opt in by turning on this setting. There will be duplicates."
+        },
+        "somesass.suggestFromUseOnly": {
+          "type": "boolean",
+          "default": false,
+          "description": "If your project uses the new module system with @use and @forward, you may want to only include suggestions from your used modules."
+        },
+        "somesass.suggestFunctionsInStringContextAfterSymbols": {
+          "type": "string",
+          "default": " (+-*%",
+          "description": "Allows prompt Functions in String context after specified symbols."
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "fast-glob": "3.3.2",
+    "some-sass-language-server": "1.2.8",
+    "vscode-css-languageservice": "6.3.0",
+    "vscode-languageclient": "9.0.1",
+    "vscode-uri": "3.0.7"
+  },
+  "devDependencies": {
+    "@types/mocha": "10.0.7",
+    "@types/vscode": "1.86.0",
+    "@vscode/test-electron": "2.4.1",
+    "@vscode/test-web": "0.0.56",
+    "assert": "2.1.0",
+    "mocha": "10.7.0",
+    "shx": "0.3.4"
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run clean && webpack --mode production",
+    "clean": "shx rm -rf dist",
+    "build": "webpack --mode development",
+    "start:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=.",
+    "lint": "eslint \"**/*.ts\" --cache",
+    "test:e2e": "node ./test/e2e/runTest.js",
+    "pretest:web": "webpack --config ./webpack.test-web.config.js ",
+    "test:web": "node ./test/web/runTest.js"
+  },
+  "__metadata": {
+    "id": "6d35099c-3671-464c-ac0b-34a0c3823927",
+    "publisherDisplayName": "Somewhat Stationery",
+    "publisherId": "02638283-c13a-4acf-9f26-24bdcfdfce24",
+    "isPreReleaseVersion": false
+  }
 }

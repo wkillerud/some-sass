@@ -425,7 +425,7 @@ export class DoComplete extends LanguageFeature {
 				: currentWord.substring(
 						// Skip #{ if this is interpolation
 						isInterpolation ? currentWord.indexOf("{") + 1 : 0,
-						currentWord.indexOf("."),
+						currentWord.indexOf(".", currentWord.indexOf("{") + 1),
 					);
 
 		const isPropertyValue = rePropertyValue.test(lineBeforePosition);

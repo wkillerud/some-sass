@@ -35,3 +35,78 @@ test("should suggest symbol from a different document via @use when in @return",
 	const { items } = await ls.doComplete(two, Position.create(1, 31));
 	assert.ok(items.find((annotation) => annotation.label === "$primary"));
 });
+
+test("should suggest symbol from a different document via @use when in @debug", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(
+		['@use "./one";', "@debug one."],
+		{
+			uri: "two.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 11));
+	assert.ok(items.find((annotation) => annotation.label === "$primary"));
+});
+
+test("should suggest symbol from a different document via @use when in @warn", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(
+		['@use "./one";', "@warn one."],
+		{
+			uri: "two.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 11));
+	assert.ok(items.find((annotation) => annotation.label === "$primary"));
+});
+
+test("should suggest symbol from a different document via @use when in @error", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(
+		['@use "./one";', "@error one."],
+		{
+			uri: "two.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 11));
+	assert.ok(items.find((annotation) => annotation.label === "$primary"));
+});

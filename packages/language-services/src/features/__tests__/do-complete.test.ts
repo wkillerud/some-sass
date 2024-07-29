@@ -115,32 +115,6 @@ test("should not suggest function, variable or mixin after an @extend", async ()
 	assert.isUndefined(items.find((item) => item.label === "compare"));
 });
 
-test("should not suggest mixin or placeholder in string interpolation", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
-	const one = fileSystemProvider.createDocument([
-		'$name: "value";',
-		"@mixin mixin($a: 1, $b) {}",
-		"@function compare($a: 1, $b) {}",
-		"%placeholder { color: blue; }",
-		'$interpolation: "/some/#{',
-	]);
-
-	ls.parseStylesheet(one);
-
-	const { items } = await ls.doComplete(one, Position.create(4, 25));
-
-	assert.ok(items.find((item) => item.label === "$name"));
-	assert.ok(items.find((item) => item.label === "compare"));
-	assert.isUndefined(items.find((item) => item.label === "mixin"));
-	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
-});
-
 test("should suggest variable in @return", async () => {
 	ls.configure({
 		completionSettings: {

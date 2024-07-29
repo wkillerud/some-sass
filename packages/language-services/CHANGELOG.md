@@ -1,3 +1,25 @@
+## 1.0.8 (2024-07-29)
+
+
+### 🩹 Fixes
+
+- update language server to fix pkg resolution bug
+
+- completions after warn, error and debug statements
+
+- mark both variable and function contexts in interpolation
+
+- completions bug where symbols in first document weren't included
+
+- support suggestions in interpolation in class selector
+
+- **deps:** update dependency colorjs.io to v0.5.2
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 1.0.6
+
 ## 1.0.7 (2024-07-28)
 
 

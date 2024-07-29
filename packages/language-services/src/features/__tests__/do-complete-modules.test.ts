@@ -12,7 +12,11 @@ const ls = getLanguageService({ fileSystemProvider, ...rest });
 
 beforeEach(() => {
 	ls.clearCache();
-	ls.configure({}); // Reset any configuration to default
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	}); // Reset any configuration to default
 });
 
 test("suggests built-in sass modules", async () => {
@@ -75,6 +79,62 @@ test("should suggest symbol from a different document via @use", async () => {
 			commitCharacters: [";", ","],
 			documentation: "limegreen\n____\nVariable declared in one.scss",
 			filterText: "one.$primary",
+			insertText: ".$primary",
+			kind: CompletionItemKind.Color,
+			label: "$primary",
+			sortText: undefined,
+			tags: [],
+		},
+	);
+});
+
+test("should suggest symbols from the document we use when it also forwards another document with symbols", async () => {
+	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(
+		['@forward "./one";', "$secondary: red;"],
+		{
+			uri: "two.scss",
+		},
+	);
+	const three = fileSystemProvider.createDocument(
+		['@use "./two";', ".a { color: two."],
+		{
+			uri: "three.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(three);
+
+	const { items } = await ls.doComplete(three, Position.create(1, 16));
+	assert.notEqual(
+		0,
+		items.length,
+		"Expected to find a completion item for $primary",
+	);
+	assert.deepStrictEqual(
+		items.find((annotation) => annotation.label === "$secondary"),
+		{
+			commitCharacters: [";", ","],
+			documentation: "red\n____\nVariable declared in two.scss",
+			filterText: "two.$secondary",
+			insertText: ".$secondary",
+			kind: CompletionItemKind.Color,
+			label: "$secondary",
+			sortText: undefined,
+			tags: [],
+		},
+	);
+	assert.deepStrictEqual(
+		items.find((annotation) => annotation.label === "$primary"),
+		{
+			commitCharacters: [";", ","],
+			documentation: "limegreen\n____\nVariable declared in one.scss",
+			filterText: "two.$primary",
 			insertText: ".$primary",
 			kind: CompletionItemKind.Color,
 			label: "$primary",
@@ -887,6 +947,11 @@ test("given both required and optional parameters should suggest two variants of
 });
 
 test("should suggest all symbols as legacy @import may be in use", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: false,
+		},
+	});
 	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
 		uri: "one.scss",
 	});

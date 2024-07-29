@@ -29,7 +29,7 @@ These are the recommended settings:
 ```jsonc
 {
 	// Recommended if you don't rely on @import
-	"somesass.suggestOnlyFromUse": true,
+	"somesass.suggestFromUseOnly": true,
 
 	// Optional, if you get suggestions from the current document after namespace.$ (you don't need the $ for narrowing down suggestions)
 	"editor.wordBasedSuggestions": false,

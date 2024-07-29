@@ -413,6 +413,11 @@ export class DoComplete extends LanguageFeature {
 			currentWord,
 		};
 
+		if (isInterpolation) {
+			context.isFunctionContext = true;
+			context.isVariableContext = true;
+		}
+
 		// Is namespace, e.g. `namespace.$var` or `@include namespace.mixin` or `namespace.func()`
 		context.namespace =
 			currentWord.length === 0 || !currentWord.includes(".")

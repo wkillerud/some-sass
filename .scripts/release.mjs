@@ -15,13 +15,17 @@ async function call(command) {
 	});
 }
 
+/**
+ * Automate the steps in
+ * https://wkillerud.github.io/some-sass/contributing/releases.html#release-process
+ */
 async function run() {
-	// await call(`git checkout main`);
-	// await call(`git pull`);
-	// await call(`npm clean-install`);
-	// await call(`npm run release`);
-	// await call(`git push`);
-	// await call(`git push --tags`);
+	await call(`git checkout main`);
+	await call(`git pull`);
+	await call(`npm clean-install`);
+	await call(`npm run release`);
+	await call(`git push`);
+	await call(`git push --tags`);
 	console.log(`[release-server] pushed server release, updating client`);
 
 	let serverPkgJson = await fs.readFile(
@@ -70,7 +74,7 @@ async function run() {
 
 	console.log(`[release-server] updated client`);
 	console.log(
-		`[release-server] review the last commit and run git push && git push --tags manually`,
+		`[release-server] review the last commit and run git push && git push --tags`,
 	);
 	// TODO: when this works consistently, push automatically.
 	// await call(`git push`);

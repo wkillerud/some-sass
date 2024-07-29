@@ -9,7 +9,7 @@ These are the recommended settings:
 ```jsonc
 {
 	// Recommended if you don't rely on @import
-	"somesass.suggestOnlyFromUse": true,
+	"somesass.suggestFromUseOnly": true,
 
 	// Optional, if you get suggestions from the current document after namespace.$ (you don't need the $ for narrowing down suggestions)
 	"editor.wordBasedSuggestions": false,
@@ -47,7 +47,7 @@ on this setting.
 With this setting turned on, Some Sass will only suggest variables, mixins and functions from the namespaces that are
 in use in the open document. This setting will be turned on by default at some point after `@import` becomes CSS-only.
 
-- JSON key: `somesass.suggestOnlyFromUse`.
+- JSON key: `somesass.suggestFromUseOnly`.
 - Default value: `false`.
 
 #### Suggest variables, mixins, and functions from the open document

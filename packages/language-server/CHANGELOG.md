@@ -1,3 +1,20 @@
+## 1.3.0 (2024-07-30)
+
+
+### 🚀 Features
+
+- add support for loadPaths
+
+
+### 🩹 Fixes
+
+- bugfix update for language server
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.1.0
+
 ## 1.2.9 (2024-07-29)
 
 

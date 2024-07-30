@@ -1,3 +1,15 @@
+## 1.1.0 (2024-07-30)
+
+
+### 🚀 Features
+
+- add support for loadPaths
+
+
+### 🩹 Fixes
+
+- bugfix update for language server
+
 ## 1.0.6 (2024-07-29)
 
 

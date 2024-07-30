@@ -46,7 +46,7 @@
             "type": "string"
           },
           "default": [],
-          "description": "List of paths relative to the workspace root that should be treated as load paths (formerly known as includePaths)"
+          "description": "List of paths relative to the workspace root that should be treated as load paths"
         },
         "somesass.scannerDepth": {
           "type": "number",

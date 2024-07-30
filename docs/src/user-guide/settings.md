@@ -9,7 +9,7 @@ These are the recommended settings:
 ```jsonc
 {
 	// Recommended if you don't rely on @import
-	"somesass.suggestOnlyFromUse": true,
+	"somesass.suggestFromUseOnly": true,
 
 	// Optional, if you get suggestions from the current document after namespace.$ (you don't need the $ for narrowing down suggestions)
 	"editor.wordBasedSuggestions": false,
@@ -47,7 +47,7 @@ on this setting.
 With this setting turned on, Some Sass will only suggest variables, mixins and functions from the namespaces that are
 in use in the open document. This setting will be turned on by default at some point after `@import` becomes CSS-only.
 
-- JSON key: `somesass.suggestOnlyFromUse`.
+- JSON key: `somesass.suggestFromUseOnly`.
 - Default value: `false`.
 
 #### Suggest variables, mixins, and functions from the open document
@@ -83,7 +83,31 @@ could suggest a `hello()` function (`|` in this case indicates cursor position).
 - JSON key: `somesass.suggestFunctionsInStringContextAfterSymbols`.
 - Default value: `" (+-*%"`.
 
-### Workspace scanner
+### Workspace
+
+#### Load paths
+
+A list of paths relative to the workspace root where the language server should look for stylesheets loaded by `@use` and `@import`. `node_modules` is always included.
+
+This feature can also be seen referred to as `includePaths`.
+
+Note that you will have to [configure your Sass compiler separately](https://sass-lang.com/documentation/cli/dart-sass/#load-path).
+
+As an example, say you have a stylesheet `shared/my-lib/variables.scss` and would like to import it as `my-lib/variables` in your other stylesheets.
+
+Add this to your settings and restart Visual Studio Code.
+
+```json
+{
+	"somesass.loadPaths": ["shared/"]
+}
+```
+
+In a different stylesheet you can then get `shared/my-lib/variables.scss` like this:
+
+```scss
+@use "my-lib/variables";
+```
 
 #### Exclude files or folders
 

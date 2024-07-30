@@ -140,7 +140,7 @@ function createFacade(
 			validation.configure(settings);
 			completion.configure(settings?.completion);
 			hover.configure(settings?.hover);
-			navigation.configure(settings?.importAliases);
+			navigation.configure(settings?.importAliases, settings?.loadPaths);
 		},
 		setDataProviders: cssDataManager.setDataProviders.bind(cssDataManager),
 		doValidation: validation.doValidation.bind(validation),

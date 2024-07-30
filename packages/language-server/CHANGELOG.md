@@ -1,3 +1,36 @@
+## 1.3.0 (2024-07-30)
+
+
+### 🚀 Features
+
+- add support for loadPaths
+
+
+### 🩹 Fixes
+
+- bugfix update for language server
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.1.0
+
+## 1.2.9 (2024-07-29)
+
+
+### 🩹 Fixes
+
+- update language server to fix pkg resolution bug
+
+- mark incomplete if empty
+
+- **deps:** update dependency colorjs.io to v0.5.2
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.0.8
+
 ## 1.2.8 (2024-07-28)
 
 

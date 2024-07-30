@@ -92,7 +92,7 @@ describe("SCSS Completion Test", function () {
 		await testCompletion(docUri, position(24, 15), expectedCompletions);
 	});
 
-	// We can't test this until somesass.suggestOnlyFromUse: true becomes the default setting
+	// We can't test this until somesass.suggestFromUseOnly: true becomes the default setting
 	it.skip("Offers no hidden items in namespace completions", async () => {
 		let expectedCompletions = ["$secret"];
 

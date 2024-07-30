@@ -12,7 +12,11 @@ const ls = getLanguageService({ fileSystemProvider, ...rest });
 
 beforeEach(() => {
 	ls.clearCache();
-	ls.configure({}); // Reset any configuration to default
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	}); // Reset any configuration to default
 });
 
 test("suggests built-in sass modules", async () => {
@@ -84,54 +88,60 @@ test("should suggest symbol from a different document via @use", async () => {
 	);
 });
 
-test("should suggest symbol from a different document via @use when in string interpolation", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
+test("should suggest symbols from the document we use when it also forwards another document with symbols", async () => {
 	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
 		uri: "one.scss",
 	});
 	const two = fileSystemProvider.createDocument(
-		['@use "./one";', '.a { background: url("/#{one.'],
+		['@forward "./one";', "$secondary: red;"],
 		{
 			uri: "two.scss",
+		},
+	);
+	const three = fileSystemProvider.createDocument(
+		['@use "./two";', ".a { color: two."],
+		{
+			uri: "three.scss",
 		},
 	);
 
 	// emulate scanner of language service which adds workspace documents to the cache
 	ls.parseStylesheet(one);
 	ls.parseStylesheet(two);
+	ls.parseStylesheet(three);
 
-	const { items } = await ls.doComplete(two, Position.create(1, 29));
-	assert.ok(items.find((annotation) => annotation.label === "$primary"));
-});
-
-test("should suggest symbol from a different document via @use when in @return", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
-	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
-		uri: "one.scss",
-	});
-	const two = fileSystemProvider.createDocument(
-		['@use "./one";', "@function test() { @return one."],
+	const { items } = await ls.doComplete(three, Position.create(1, 16));
+	assert.notEqual(
+		0,
+		items.length,
+		"Expected to find a completion item for $primary",
+	);
+	assert.deepStrictEqual(
+		items.find((annotation) => annotation.label === "$secondary"),
 		{
-			uri: "two.scss",
+			commitCharacters: [";", ","],
+			documentation: "red\n____\nVariable declared in two.scss",
+			filterText: "two.$secondary",
+			insertText: ".$secondary",
+			kind: CompletionItemKind.Color,
+			label: "$secondary",
+			sortText: undefined,
+			tags: [],
 		},
 	);
-
-	// emulate scanner of language service which adds workspace documents to the cache
-	ls.parseStylesheet(one);
-	ls.parseStylesheet(two);
-
-	const { items } = await ls.doComplete(two, Position.create(1, 31));
-	assert.ok(items.find((annotation) => annotation.label === "$primary"));
+	assert.deepStrictEqual(
+		items.find((annotation) => annotation.label === "$primary"),
+		{
+			commitCharacters: [";", ","],
+			documentation: "limegreen\n____\nVariable declared in one.scss",
+			filterText: "two.$primary",
+			insertText: ".$primary",
+			kind: CompletionItemKind.Color,
+			label: "$primary",
+			sortText: undefined,
+			tags: [],
+		},
+	);
 });
 
 test("should not suggest symbols from a module used by the one we use", async () => {
@@ -937,6 +947,11 @@ test("given both required and optional parameters should suggest two variants of
 });
 
 test("should suggest all symbols as legacy @import may be in use", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: false,
+		},
+	});
 	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
 		uri: "one.scss",
 	});

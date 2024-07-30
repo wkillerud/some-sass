@@ -200,6 +200,14 @@ export abstract class LanguageFeature {
 		}
 
 		let result: T[] = [];
+
+		// gather the results from the initial document if any
+		if (Array.isArray(callbackResult)) {
+			result.push(...callbackResult);
+		} else if (callbackResult) {
+			result.push(callbackResult);
+		}
+
 		for (const link of links) {
 			if (!link.target || link.target === currentDocument.uri) {
 				continue;
@@ -246,7 +254,7 @@ export abstract class LanguageFeature {
 				visited,
 				depth + 1,
 			);
-			result = result.concat(linkResult);
+			result.push(...linkResult);
 		}
 
 		return result;

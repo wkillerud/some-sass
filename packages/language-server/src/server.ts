@@ -174,6 +174,7 @@ export class SomeSassServer {
 									suggestFunctionsInStringContextAfterSymbols:
 										settings.suggestFunctionsInStringContextAfterSymbols,
 								},
+								loadPaths: settings.loadPaths,
 							});
 
 							this.connection.console.debug(
@@ -302,6 +303,9 @@ export class SomeSassServer {
 			if (!document) return null;
 
 			const result = await ls.doComplete(document, params.position);
+			if (result.items.length === 0) {
+				result.isIncomplete = true;
+			}
 			return result;
 		});
 

@@ -48,6 +48,9 @@ const reFor = /^.*@for .+ from /;
 const reIf = /^.*@if /;
 const reElseIf = /^.*@else if /;
 const reWhile = /^.*@while /;
+const reDebug = /^.*@debug /;
+const reWarn = /^.*@warn /;
+const reError = /^.*@error /;
 const rePropertyValue = /.*:\s*/;
 const reEmptyPropertyValue = /.*:\s*$/;
 const reQuotedValueInString = /["'](?:[^"'\\]|\\.)*["']/g;
@@ -401,6 +404,11 @@ export class DoComplete extends LanguageFeature {
 			currentWord,
 		};
 
+		if (isInterpolation) {
+			context.isFunctionContext = true;
+			context.isVariableContext = true;
+		}
+
 		// Is namespace, e.g. `namespace.$var` or `@include namespace.mixin` or `namespace.func()`
 		context.namespace =
 			currentWord.length === 0 || !currentWord.includes(".")
@@ -408,15 +416,9 @@ export class DoComplete extends LanguageFeature {
 				: currentWord.substring(
 						// Skip #{ if this is interpolation
 						isInterpolation ? currentWord.indexOf("{") + 1 : 0,
-						currentWord.indexOf("."),
+						currentWord.indexOf(".", currentWord.indexOf("{") + 1),
 					);
 
-		const isReturn = reReturn.test(lineBeforePosition);
-		const isIf = reIf.test(lineBeforePosition);
-		const isElseIf = reElseIf.test(lineBeforePosition);
-		const isEach = reEach.test(lineBeforePosition);
-		const isFor = reFor.test(lineBeforePosition);
-		const isWhile = reWhile.test(lineBeforePosition);
 		const isPropertyValue = rePropertyValue.test(lineBeforePosition);
 		const isEmptyValue = reEmptyPropertyValue.test(lineBeforePosition);
 		const isQuotes = reQuotes.test(
@@ -424,7 +426,15 @@ export class DoComplete extends LanguageFeature {
 		);
 
 		const isControlFlow =
-			isReturn || isIf || isElseIf || isEach || isFor || isWhile;
+			reReturn.test(lineBeforePosition) ||
+			reIf.test(lineBeforePosition) ||
+			reElseIf.test(lineBeforePosition) ||
+			reEach.test(lineBeforePosition) ||
+			reFor.test(lineBeforePosition) ||
+			reWhile.test(lineBeforePosition) ||
+			reDebug.test(lineBeforePosition) ||
+			reError.test(lineBeforePosition) ||
+			reWarn.test(lineBeforePosition);
 
 		if ((isControlFlow || isPropertyValue) && !isEmptyValue && !isQuotes) {
 			if (context.namespace && currentWord.endsWith(".")) {

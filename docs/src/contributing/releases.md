@@ -22,25 +22,24 @@ nx reads [conventional commits][conventional] to determine what the new versions
 
 ### Release process
 
-To start a new release:
+To start a new release, run `node .scripts/release.mjs`. This script:
 
-1. Get the latest `main` branch with `git checkout main && git pull`.
-2. Run `npm clean-install`.
-3. Run `npm run release`.
-4. Push the changes and tags with `git push && git push --tags`.
-5. Create a [new GitHub release](https://github.com/wkillerud/some-sass/releases/new?title=some-sass-language-server@x.y.z) for the latest tag.
+1. Gets the latest `main` branch with `git checkout main && git pull`.
+2. Runs `npm clean-install`.
+3. Runs `npm run release`.
+4. Pushes the changes and tags with `git push && git push --tags`.
 
 GitHub Actions is configured to do the actual publishing when there are new tags.
 
-Once the language server has been published to npm:
+The script continues to:
 
-1. Update the dependency manually in `vscode-extension/package.json`.
+1. Update the dependency on the server in `vscode-extension/package.json`.
 2. Bump the version number of the extension.
 3. Run `npm install` to update the lockfile.
 4. Commit the changes and run `git tag some-sass@<version from package.json>`.
 5. Run `git push && git push --tags`.
 
-For the extension, GitHub Actions is configured to do the actual publishing (including GitHub release) when there are new tags.
+For the extension, GitHub Actions is configured to do the actual publishing (including GitHub release) when there are new tags. For the server, create a [new GitHub release](https://github.com/wkillerud/some-sass/releases/new?title=some-sass-language-server@x.y.z) for the latest tag.
 
 ### Manual fallback
 

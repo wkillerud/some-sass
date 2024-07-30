@@ -1,4 +1,5 @@
 export interface ISettings {
+	readonly loadPaths: string[];
 	readonly scannerDepth: number;
 	readonly scannerExclude: string[];
 	readonly scanImportedFiles: boolean;
@@ -16,6 +17,7 @@ export interface IEditorSettings {
 }
 
 export const defaultSettings: ISettings = Object.freeze({
+	loadPaths: [],
 	scannerDepth: 30,
 	scannerExclude: [
 		"**/.git/**",

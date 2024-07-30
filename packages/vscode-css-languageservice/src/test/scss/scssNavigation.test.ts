@@ -355,6 +355,31 @@ suite("SCSS - Navigation", () => {
 			);
 		});
 
+		// Slightly different from aliases, loadPaths act as additional "roots" for import strings.
+		test("SCSS load paths", async () => {
+			const fixtureRoot = path.resolve(__dirname, "../../../../src/test/scss/linkFixture/loadPaths");
+			const getDocumentUri = (relativePath: string) => {
+				return URI.file(path.resolve(fixtureRoot, relativePath)).toString(true);
+			};
+
+			const settings = {
+				loadPaths: ["shared/"],
+			};
+
+			await assertDynamicLinks(
+				getDocumentUri("./"),
+				`@import 'my-lib/variables'`,
+				[
+					{
+						range: newRange(8, 26),
+						target: getDocumentUri("./shared/my-lib/variables.scss"),
+						type: nodes.NodeType.Import,
+					},
+				],
+				settings,
+			);
+		});
+
 		test("SCSS module file links", async () => {
 			const fixtureRoot = path.resolve(__dirname, "../../../../src/test/scss/linkFixture/module");
 			const getDocumentUri = (relativePath: string) => {

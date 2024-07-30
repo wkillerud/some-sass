@@ -48,14 +48,16 @@ const startsWithSass = /^sass:/;
 
 export class CSSNavigation {
 	protected defaultSettings?: AliasSettings;
+	protected loadPaths?: string[];
 
 	constructor(
 		protected fileSystemProvider: FileSystemProvider | undefined,
 		private readonly resolveModuleReferences: boolean,
 	) {}
 
-	public configure(settings: AliasSettings | undefined) {
+	public configure(settings: AliasSettings | undefined, loadPaths: string[] | undefined) {
 		this.defaultSettings = settings;
+		this.loadPaths = loadPaths;
 	}
 
 	public findDefinition(document: TextDocument, position: Position, stylesheet: nodes.Node): Location | null {
@@ -574,7 +576,7 @@ export class CSSNavigation {
 			}
 		}
 
-		// Try resolving the reference from the language configuration alias settings
+		// Try resolving the reference from the language configuration alias settings or loadPaths
 		if (ref && !(await this.fileExists(ref))) {
 			const rootFolderUri = documentContext.resolveReference("/", documentUri);
 			if (settings && rootFolderUri) {
@@ -589,6 +591,18 @@ export class CSSNavigation {
 					const aliasPath = settings[prefix].slice(0, -1);
 					let newPath = joinPath(rootFolderUri, aliasPath);
 					return this.mapReference((newPath = joinPath(newPath, target.substring(prefix.length - 1))), isRawLink);
+				}
+			}
+			if (this.loadPaths && rootFolderUri) {
+				for (let loadPath of this.loadPaths) {
+					let newPath = joinPath(rootFolderUri, loadPath, target);
+					let ref = await this.mapReference(newPath, isRawLink);
+					if (ref) {
+						let exists = await this.fileExists(ref);
+						if (exists) {
+							return ref;
+						}
+					}
 				}
 			}
 		}

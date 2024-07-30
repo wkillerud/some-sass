@@ -155,6 +155,7 @@ export class SomeSassServer {
 				ls.configure({
 					editorSettings,
 					workspaceRoot,
+					loadPaths: settings.loadPaths,
 				});
 
 				workspaceScanner = new WorkspaceScanner(ls, fileSystemProvider, {

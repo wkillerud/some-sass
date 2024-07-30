@@ -40,6 +40,14 @@
   "contributes": {
     "configuration": {
       "properties": {
+        "somesass.loadPaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "List of paths relative to the workspace root that should be treated as load paths (formerly known as includePaths)"
+        },
         "somesass.scannerDepth": {
           "type": "number",
           "default": 30,

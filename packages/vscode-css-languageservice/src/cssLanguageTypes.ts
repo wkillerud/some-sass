@@ -99,6 +99,7 @@ export interface LanguageSettings {
 	completion?: CompletionSettings;
 	hover?: HoverSettings;
 	importAliases?: AliasSettings;
+	loadPaths?: string[];
 }
 
 export interface AliasSettings {

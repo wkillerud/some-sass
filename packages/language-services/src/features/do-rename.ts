@@ -115,7 +115,6 @@ export class DoRename extends FindReferences {
 				}
 			}
 
-			 
 			edits.changes![location.uri].push(TextEdit.replace(range, newName));
 		}
 

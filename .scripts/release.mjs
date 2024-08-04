@@ -63,13 +63,11 @@ async function run() {
 
 	await call(`npm install`);
 	await call(`git add .`);
-	if (diff === "major") {
-		await call(`git commit -m "feat!: update for language server"`);
-	} else if (diff === "minor") {
-		await call(`git commit -m "feat: feature update for language server"`);
-	} else {
-		await call(`git commit -m "fix: bugfix update for language server"`);
-	}
+
+	// This is always a chore commit so we don't end up
+	// affecting nx's semantic release for the next version
+	// of the language server. We version the extension ourselves.
+	await call(`git commit -m "chore: updated language server"`);
 
 	await call(`git tag some-sass@${clientPkgJson.version}`);
 

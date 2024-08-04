@@ -77,9 +77,8 @@ async function run() {
 	console.log(
 		`[release-server] review the last commit and run git push && git push --tags`,
 	);
-	// TODO: when this works consistently, push automatically.
-	// await call(`git push`);
-	// await call(`git push --tags`);
+	await call(`git push`);
+	await call(`git push --tags`);
 }
 
 run();

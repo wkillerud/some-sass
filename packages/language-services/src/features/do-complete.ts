@@ -408,7 +408,8 @@ export class DoComplete extends LanguageFeature {
 			};
 		}
 
-		const isInterpolation = currentWord.includes("#{");
+		const isInterpolation =
+			currentWord.includes("#{") || lineBeforePosition.includes("#{");
 
 		const context: CompletionContext = {
 			currentWord,

@@ -116,3 +116,32 @@ test("should suggest symbols when interpolation is part of CSS selector", async 
 	const { items } = await ls.doComplete(two, Position.create(1, 7));
 	assert.ok(items.find((annotation) => annotation.label === "$selector"));
 });
+
+test("should suggest variables and functions as function parameters in string interpolation ", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument(
+		["$primary: limegreen;", "@function compare($a: 1, $b) {}"],
+		{
+			uri: "one.scss",
+		},
+	);
+	const two = fileSystemProvider.createDocument(
+		['@use "./one";', '$test: "#{one.compare(one.)}"'],
+		{
+			uri: "two.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 26));
+	assert.ok(items.find((annotation) => annotation.label === "$primary"));
+	assert.ok(items.find((annotation) => annotation.label === "compare"));
+});

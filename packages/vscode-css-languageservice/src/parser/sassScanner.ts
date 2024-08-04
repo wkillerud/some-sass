@@ -178,7 +178,8 @@ export class SassScanner extends Scanner {
 							case _CAR:
 							case _LFD: {
 								// In the case of a newline we need to see if the next line is indented.
-								// If it is, keep advancing the stream.
+								// If it is, keep advancing the stream. If not, consume the whitespace up
+								// to the next non-whitespace character.
 								mark = this.stream.pos();
 								return false;
 							}
@@ -212,7 +213,6 @@ export class SassScanner extends Scanner {
 					} else if (commentDepth === depth) {
 						// If there's no indentation at this point, we require comment syntax
 						if (!this.stream.advanceIfChars([_FSL, _FSL]) && !this.stream.advanceIfChars([_MUL])) {
-							this.stream.goBackTo(mark, depth);
 							break scan;
 						}
 					} else if (commentDepth === 0) {

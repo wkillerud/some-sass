@@ -86,8 +86,7 @@ suite("Sass - Parser", () => {
 		);
 	});
 
-	// TODO: you are here
-	test.skip("Comments and nested rulesets", () => {
+	test("Comments and nested rulesets", () => {
 		assertNode(
 			`// The Grid
 =grid-core($gridColumnWidth, $gridGutterWidth)
@@ -100,7 +99,7 @@ suite("Sass - Parser", () => {
     // prevent collapsing columns
     margin-left: $gridGutterWidth
   // Set the container width, and override it for fixed navbars in media queries
-	.container,
+  .container,
   .navbar-static-top .container,
   .navbar-fixed-top .container,
   .navbar-fixed-bottom .container

@@ -5,7 +5,7 @@ import path from "node:path";
 import semver from "semver";
 
 async function call(command) {
-	console.log(`[release-server] ${command}`);
+	console.log(`[release] ${command}`);
 	return new Promise((resolve, reject) => {
 		exec(command, (e, stdout, stderr) => {
 			if (e) return reject(e);
@@ -27,7 +27,7 @@ async function run() {
 	await call(`npm run release`);
 	await call(`git push`);
 	await call(`git push --tags`);
-	console.log(`[release-server] pushed server release, updating client`);
+	console.log(`[release] pushed server release, updating client`);
 
 	let serverPkgJson = await fs.readFile(
 		path.join(process.cwd(), "packages", "language-server", "package.json"),
@@ -50,7 +50,7 @@ async function run() {
 	let diff = semver.diff(newServerVersion, oldServerVersion);
 	if (!diff) {
 		console.warn(
-			`[release-server] got to the point of updating the client's package.json, but semver found no diff`,
+			`[release] got to the point of updating the client's package.json, but semver found no diff`,
 		);
 		return;
 	}
@@ -73,10 +73,8 @@ async function run() {
 
 	await call(`git tag some-sass@${clientPkgJson.version}`);
 
-	console.log(`[release-server] updated client`);
-	console.log(
-		`[release-server] review the last commit and run git push && git push --tags`,
-	);
+	console.log(`[release] updated client`);
+
 	await call(`git push`);
 	await call(`git push --tags`);
 }

@@ -55,7 +55,10 @@ const rePropertyValue = /.*:\s*/;
 const reEmptyPropertyValue = /.*:\s*$/;
 const reQuotedValueInString = /["'](?:[^"'\\]|\\.)*["']/g;
 const reMixinReference = /.*@include\s+(.*)/;
+const reIndentedMixinReference = /.*(@include\s+|\+)(.*)/;
 const reCompletedMixinWithParametersReference = /.*@include\s+(.*)\(/;
+const reCompletedIndentedMixinWithParametersReference =
+	/.*(@include\s+|\+)(.*)\(/;
 const reComment = /^(.*\/\/|.*\/\*|\s*\*)/;
 const reSassDoc = /^[\\s]*\/{3}.*$/;
 const reQuotes = /["']/;
@@ -174,7 +177,7 @@ export class DoComplete extends LanguageFeature {
 					...this.configuration.completionSettings,
 					triggerPropertyValueCompletion:
 						this.configuration.completionSettings
-							?.triggerPropertyValueCompletion || false,
+							?.triggerPropertyValueCompletion || true,
 				},
 			);
 			if (upstreamResult.items.length > 0) {
@@ -322,11 +325,9 @@ export class DoComplete extends LanguageFeature {
 					}
 				}
 			}
-
-			return result;
 		}
 
-		if (document.languageId === "sass" && result.items.length === 0) {
+		if (document.languageId === "sass") {
 			const upstreamResult = await upstreamLs.doComplete2(
 				document,
 				position,
@@ -343,6 +344,17 @@ export class DoComplete extends LanguageFeature {
 				result.items.push(...upstreamResult.items);
 			}
 		}
+
+		// give suggestions for all @use in case the user is typing one of those
+		for (const link of links) {
+			if (link.namespace) {
+				result.items.push({
+					label: link.namespace,
+					kind: CompletionItemKind.Module,
+				});
+			}
+		}
+
 		return result;
 	}
 
@@ -477,6 +489,23 @@ export class DoComplete extends LanguageFeature {
 				context.isMixinContext = false;
 				context.isVariableContext = true;
 				context.isFunctionContext = true;
+			}
+		} else if (document.languageId === "sass") {
+			// do the same test for the shorthand + to include mixins in this syntax
+			if (
+				!isPropertyValue &&
+				reIndentedMixinReference.test(lineBeforePosition)
+			) {
+				context.isMixinContext = true;
+				if (
+					reCompletedIndentedMixinWithParametersReference.test(
+						lineBeforePosition,
+					)
+				) {
+					context.isMixinContext = false;
+					context.isVariableContext = true;
+					context.isFunctionContext = true;
+				}
 			}
 		}
 

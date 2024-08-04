@@ -99,6 +99,12 @@ export class SomeSassServer {
 
 							// For namespaced completions
 							".",
+
+							// For property values
+							":",
+
+							// For custom properties
+							"-",
 						],
 					},
 					signatureHelpProvider: {
@@ -173,6 +179,8 @@ export class SomeSassServer {
 									suggestionStyle: settings.suggestionStyle,
 									suggestFunctionsInStringContextAfterSymbols:
 										settings.suggestFunctionsInStringContextAfterSymbols,
+									triggerPropertyValueCompletion:
+										settings.triggerPropertyValueCompletion,
 								},
 								loadPaths: settings.loadPaths,
 							});

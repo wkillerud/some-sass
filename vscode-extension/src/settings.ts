@@ -6,6 +6,7 @@ export interface ISettings {
 	readonly suggestionStyle: "all" | "nobracket" | "bracket";
 	readonly suggestAllFromOpenDocument: boolean;
 	readonly suggestFromUseOnly: boolean;
+	readonly triggerPropertyValueCompletion: boolean;
 	readonly suggestFunctionsInStringContextAfterSymbols: string;
 }
 
@@ -29,4 +30,5 @@ export const defaultSettings: ISettings = Object.freeze({
 	suggestAllFromOpenDocument: true,
 	suggestFromUseOnly: true,
 	suggestFunctionsInStringContextAfterSymbols: " (+-*%",
+	triggerPropertyValueCompletion: true,
 });

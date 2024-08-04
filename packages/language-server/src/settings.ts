@@ -7,6 +7,7 @@ export interface ISettings {
 	readonly suggestAllFromOpenDocument: boolean;
 	readonly suggestFromUseOnly: boolean;
 	readonly suggestFunctionsInStringContextAfterSymbols: string;
+	readonly triggerPropertyValueCompletion: boolean;
 }
 
 export interface IEditorSettings {
@@ -29,4 +30,5 @@ export const defaultSettings: ISettings = Object.freeze({
 	suggestAllFromOpenDocument: true,
 	suggestFromUseOnly: true,
 	suggestFunctionsInStringContextAfterSymbols: " (+-*%",
+	triggerPropertyValueCompletion: true,
 });

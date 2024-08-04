@@ -331,6 +331,7 @@ export class Parser {
 				}
 				while (
 					this.accept(TokenType.Newline) ||
+					this.accept(TokenType.Dedent) ||
 					this.accept(TokenType.SemiColon) ||
 					this.accept(TokenType.CDO) ||
 					this.accept(TokenType.CDC)
@@ -556,13 +557,17 @@ export class Parser {
 			if (this.accept(TokenType.EOF)) {
 				return this.finish(node);
 			}
+
 			if (this.peek(TokenType.AtKeyword) || this.peek(TokenType.AtIncludeShort)) {
 				return this.finish(node);
 			}
-			// nesting
-			if (this.peekDelim("&")) {
+
+			let mark = this.mark();
+			if (this._parseSelector(true)) {
+				this.restoreAtMark(mark);
 				return this.finish(node);
 			}
+
 			if (!this.accept(TokenType.Dedent)) {
 				return this.finish(node, ParseError.DedentExpected, [TokenType.Newline, TokenType.Indent, TokenType.EOF]);
 			}

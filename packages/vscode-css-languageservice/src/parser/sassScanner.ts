@@ -213,6 +213,7 @@ export class SassScanner extends Scanner {
 					} else if (commentDepth === depth) {
 						// If there's no indentation at this point, we require comment syntax
 						if (!this.stream.advanceIfChars([_FSL, _FSL]) && !this.stream.advanceIfChars([_MUL])) {
+							this.stream.goBackTo(mark, depth);
 							break scan;
 						}
 					} else if (commentDepth === 0) {

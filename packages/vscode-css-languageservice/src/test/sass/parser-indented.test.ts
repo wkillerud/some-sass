@@ -106,8 +106,7 @@ suite("Sass - Parser", () => {
     +grid-core-span($gridColumns, $gridColumnWidth, $gridGutterWidth)
   // generate .spanX and .offsetX
   +grid-core-span-x($gridColumns, $gridColumnWidth, $gridGutterWidth)
-  +grid-core-offset-x($gridColumns, $gridColumnWidth, $gridGutterWidth)
-`,
+  +grid-core-offset-x($gridColumns, $gridColumnWidth, $gridGutterWidth)`,
 			parser,
 			parser._parseStylesheet.bind(parser),
 		);

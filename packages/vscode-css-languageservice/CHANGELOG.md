@@ -1,3 +1,17 @@
+## 1.2.0 (2024-08-04)
+
+
+### 🚀 Features
+
+- feature update for language server
+
+
+### 🩹 Fixes
+
+- update dependency vscode-languageserver-textdocument to v1.0.12
+
+- **deps:** update dependency scss-sassdoc-parser to v3.2.0
+
 ## 1.1.0 (2024-07-30)
 
 

@@ -1,13 +1,16 @@
 {
-  "somesass.scannerDepth": 30,
   "somesass.scannerExclude": [
     "**/.git/**",
     "**/node_modules/**",
     "**/bower_components/**"
   ],
-  "somesass.scanImportedFiles": true,
-  "somesass.suggestAllFromOpenDocument": false,
-  "somesass.suggestFromUseOnly": false,
-  "somesass.suggestionStyle": "all",
-  "somesass.suggestFunctionsInStringContextAfterSymbols": " (+-*%"
+  "somesass.scss.completion.suggestAllFromOpenDocument": false,
+  "somesass.scss.completion.suggestFromUseOnly": false,
+  "somesass.scss.completion.suggestionStyle": "all",
+  "somesass.scss.completion.suggestFunctionsInStringContextAfterSymbols": " (+-*%",
+
+  "somesass.sass.completion.suggestAllFromOpenDocument": true,
+  "somesass.sass.completion.suggestFromUseOnly": false,
+  "somesass.sass.completion.suggestionStyle": "all",
+  "somesass.sass.completion.suggestFunctionsInStringContextAfterSymbols": " (+-*%"
 }

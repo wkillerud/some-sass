@@ -177,56 +177,88 @@ export type Rename =
 	| { defaultBehavior: boolean };
 
 export interface LanguageServiceConfiguration {
-	completionSettings?: CompletionSettings;
-	editorSettings?: EditorSettings;
-	/**
-	 * Configure custom aliases that the link resolution should resolve.
-	 *
-	 * @example
-	 * ```js
-	 * importAliases: {
-	 *   // \@import "@SassStylesheet" would resolve to /src/assets/style.sass
-	 *   "@SassStylesheet": "/src/assets/styles.sass",
-	 * }
-	 * ```
-	 */
-	importAliases?: AliasSettings;
 	/**
 	 * Pass in [load paths](https://sass-lang.com/documentation/cli/dart-sass/#load-path) that will be used in addition to `node_modules`.
 	 */
 	loadPaths?: string[];
+	scss?: {
+		completion?: {
+			/**
+			 * By default for SCSS in Visual Studio Code, Some Sass will not give code suggestions based on contents
+			 * from the current document. This setting is default off in the language server if used outside VS Code.
+			 * If you use this server as well as vscode-css-languageserver you can set this setting to false to run
+			 * Some Sass in "VS Code Compat Mode".
+			 */
+			suggestAllFromOpenDocument?: boolean;
+			/**
+			 * 	Mixins with `@content` SassDoc annotations and `%placeholders` get two suggestions by default:
+			 *   - One without `{ }`.
+			 *   - One _with_ `{ }`. This one creates a new block, and moves the cursor inside the block.
+			 *
+			 * If you find this noisy, you can control which suggestions you would like to see:
+			 *   - All suggestions (default).
+			 *   - No brackets.
+			 *   - Only brackets. This still includes other suggestions, where there are no brackets to begin with.
+			 *
+			 * @default "all"
+			 */
+			suggestionStyle?: "all" | "nobracket" | "bracket";
+			/**
+			 * Recommended if you don't rely on `@import`. With this setting turned on,
+			 * Some Sass will only suggest variables, mixins and functions from the
+			 * namespaces that are in use in the open document.
+			 */
+			suggestFromUseOnly?: boolean;
+			/**
+			 * Suggest functions after the specified symbols when in a string context.
+			 * For example, if you add the `/` symbol to this setting, then `background: url(images/he|)`
+			 * could suggest a `hello()` function (`|` in this case indicates cursor position).
+			 *
+			 * @default " (+-*%"
+			 */
+			suggestFunctionsInStringContextAfterSymbols?: string;
+		};
+	};
+	sass?: {
+		completion?: {
+			/**
+			 * 	Mixins with `@content` SassDoc annotations and `%placeholders` get two suggestions by default:
+			 *   - One without `{ }`.
+			 *   - One _with_ `{ }`. This one creates a new block, and moves the cursor inside the block.
+			 *
+			 * If you find this noisy, you can control which suggestions you would like to see:
+			 *   - All suggestions (default).
+			 *   - No brackets.
+			 *   - Only brackets. This still includes other suggestions, where there are no brackets to begin with.
+			 *
+			 * @default "all"
+			 */
+			suggestionStyle?: "all" | "nobracket" | "bracket";
+			/**
+			 * Recommended if you don't rely on `@import`. With this setting turned on,
+			 * Some Sass will only suggest variables, mixins and functions from the
+			 * namespaces that are in use in the open document.
+			 */
+			suggestFromUseOnly?: boolean;
+			/**
+			 * Suggest functions after the specified symbols when in a string context.
+			 * For example, if you add the `/` symbol to this setting, then `background: url(images/he|)`
+			 * could suggest a `hello()` function (`|` in this case indicates cursor position).
+			 *
+			 * @default " (+-*%"
+			 */
+			suggestFunctionsInStringContextAfterSymbols?: string;
+			/**
+			 * By default, Some Sass triggers property value completion after selecting a CSS property.
+			 * Use this setting to disable this behavior.
+			 *
+			 * @default true
+			 */
+			triggerPropertyValueCompletion?: boolean;
+		};
+	};
+	editorSettings?: EditorSettings;
 	workspaceRoot?: URI;
-}
-
-export interface CompletionSettings extends Partial<VSCodeCompletionSettings> {
-	suggestAllFromOpenDocument?: boolean;
-	/**
-	 * 	Mixins with `@content` SassDoc annotations and `%placeholders` get two suggestions by default:
-	 *   - One without `{ }`.
-	 *   - One _with_ `{ }`. This one creates a new block, and moves the cursor inside the block.
-	 *
-	 * If you find this noisy, you can control which suggestions you would like to see:
-	 *   - All suggestions (default).
-	 *   - No brackets.
-	 *   - Only brackets. This still includes other suggestions, where there are no brackets to begin with.
-	 *
-	 * @default "all"
-	 */
-	suggestionStyle?: "all" | "nobracket" | "bracket";
-	/**
-	 * Recommended if you don't rely on `@import`. With this setting turned on,
-	 * Some Sass will only suggest variables, mixins and functions from the
-	 * namespaces that are in use in the open document.
-	 */
-	suggestFromUseOnly?: boolean;
-	/**
-	 * Suggest functions after the specified symbols when in a string context.
-	 * For example, if you add the `/` symbol to this setting, then `background: url(images/he|)`
-	 * could suggest a `hello()` function (`|` in this case indicates cursor position).
-	 *
-	 * @default " (+-*%"
-	 */
-	suggestFunctionsInStringContextAfterSymbols?: string;
 }
 
 export interface EditorSettings {

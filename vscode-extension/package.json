@@ -74,6 +74,7 @@
 			}
 		],
 		"configuration": {
+			"title": "Some Sass",
 			"properties": {
 				"somesass.loadPaths": {
 					"type": "array",
@@ -81,12 +82,7 @@
 						"type": "string"
 					},
 					"default": [],
-					"description": "List of paths relative to the workspace root that should be treated as load paths"
-				},
-				"somesass.scannerDepth": {
-					"type": "number",
-					"default": 30,
-					"description": "The maximum number of nested directories to scan."
+					"markdownDescription": "A list of paths relative to the workspace root where the language server should look for stylesheets loaded by `@use` and `@import`. `node_modules` is always included.\n\nNote that you will have to [configure your Sass compiler separately](https://sass-lang.com/documentation/cli/dart-sass/#load-path)."
 				},
 				"somesass.scannerExclude": {
 					"type": "array",
@@ -100,13 +96,7 @@
 					],
 					"description": "List of glob patterns for directories that are excluded when scanning."
 				},
-				"somesass.scanImportedFiles": {
-					"type": "boolean",
-					"default": true,
-					"deprecationMessage": "Will be removed at some point after `@import` becomes CSS-only.",
-					"description": "Allows scan imported files. Turning this off will severely limit functionality, and is not recommended."
-				},
-				"somesass.suggestionStyle": {
+				"somesass.scss.completion.suggestionStyle": {
 					"type": "string",
 					"default": "all",
 					"description": "Controls the style of suggestions for mixins and placeholders.",
@@ -126,25 +116,60 @@
 						"Where brackets are suggested, omit duplicates without brackets"
 					]
 				},
-				"somesass.suggestAllFromOpenDocument": {
+				"somesass.scss.completion.suggestAllFromOpenDocument": {
 					"type": "boolean",
 					"default": false,
 					"description": "VS Code has built-in code suggestions for symbols declared in the open document. If you prefer the suggestions from Some Sass, you can opt in by turning on this setting. There will be duplicates."
 				},
-				"somesass.suggestFromUseOnly": {
+				"somesass.scss.completion.suggestFromUseOnly": {
 					"type": "boolean",
 					"default": false,
 					"description": "If your project uses the new module system with @use and @forward, you may want to only include suggestions from your used modules."
 				},
-				"somesass.suggestFunctionsInStringContextAfterSymbols": {
+				"somesass.scss.completion.suggestFunctionsInStringContextAfterSymbols": {
 					"type": "string",
 					"default": " (+-*%",
 					"description": "Allows prompt Functions in String context after specified symbols."
 				},
-				"somesass.triggerPropertyValueCompletion": {
+				"somesass.sass.completion.suggestionStyle": {
+					"type": "string",
+					"default": "all",
+					"description": "Controls the style of suggestions for mixins and placeholders.",
+					"enum": [
+						"all",
+						"nobracket",
+						"bracket"
+					],
+					"enumItemLabels": [
+						"All",
+						"No brackets",
+						"Only brackets"
+					],
+					"enumDescriptions": [
+						"Show all suggestions",
+						"Only show suggestions without brackets",
+						"Where brackets are suggested, omit duplicates without brackets"
+					]
+				},
+				"somesass.sass.completion.suggestAllFromOpenDocument": {
 					"type": "boolean",
-					"default": true,
-					"description": "By default, Some Sass triggers property value completion after selecting a CSS property in for Sass. Use this setting to disable this behavior."
+					"default": false,
+					"description": "VS Code has built-in code suggestions for symbols declared in the open document. If you prefer the suggestions from Some Sass, you can opt in by turning on this setting. There will be duplicates."
+				},
+				"somesass.sass.completion.suggestFromUseOnly": {
+					"type": "boolean",
+					"default": false,
+					"description": "If your project uses the new module system with @use and @forward, you may want to only include suggestions from your used modules."
+				},
+				"somesass.sass.completion.suggestFunctionsInStringContextAfterSymbols": {
+					"type": "string",
+					"default": " (+-*%",
+					"description": "Allows prompt Functions in String context after specified symbols."
+				},
+				"somesass.sass.completion.triggerPropertyValueCompletion": {
+					"type": "boolean",
+					"default": false,
+					"description": "By default, Some Sass triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."
 				}
 			}
 		}

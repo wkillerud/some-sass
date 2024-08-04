@@ -9,26 +9,17 @@ import { getSassRegionsDocument } from "./utils/embedded";
 export default class WorkspaceScanner {
 	#ls: LanguageService;
 	#fs: FileSystemProvider;
-	#settings: { scannerDepth: number; scanImportedFiles: boolean };
 
-	constructor(
-		ls: LanguageService,
-		fs: FileSystemProvider,
-		settings = { scannerDepth: 30, scanImportedFiles: true },
-	) {
+	constructor(ls: LanguageService, fs: FileSystemProvider) {
 		this.#ls = ls;
 		this.#fs = fs;
-		this.#settings = settings;
 	}
 
 	public async scan(files: URI[]): Promise<void[]> {
 		// Populate the cache for the new language services
 		return Promise.all(
 			files.map((uri) => {
-				if (
-					this.#settings.scanImportedFiles &&
-					(uri.path.includes("/_") || uri.path.includes("\\_"))
-				) {
+				if (uri.path.includes("/_") || uri.path.includes("\\_")) {
 					// If we scan imported files (which we do by default), don't include partials in the initial scan.
 					// This way we can be reasonably sure that we scan whatever index files there are _before_ we scan
 					// partials which may or may not have been forwarded with a prefix.
@@ -40,11 +31,6 @@ export default class WorkspaceScanner {
 	}
 
 	private async parse(file: URI, depth = 0) {
-		const maxDepth = this.#settings.scannerDepth ?? 30;
-		if (depth > maxDepth || !this.#settings.scanImportedFiles) {
-			return;
-		}
-
 		let uri = file;
 		if (file.scheme === "vscode-test-web") {
 			// TODO: test-web paths includes /static/extensions/fs which causes issues.

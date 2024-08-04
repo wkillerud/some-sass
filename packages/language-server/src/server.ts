@@ -170,19 +170,9 @@ export class SomeSassServer {
 							}
 
 							ls.configure({
+								...settings,
 								editorSettings,
 								workspaceRoot,
-								completionSettings: {
-									suggestAllFromOpenDocument:
-										settings.suggestAllFromOpenDocument,
-									suggestFromUseOnly: settings.suggestFromUseOnly,
-									suggestionStyle: settings.suggestionStyle,
-									suggestFunctionsInStringContextAfterSymbols:
-										settings.suggestFunctionsInStringContextAfterSymbols,
-									triggerPropertyValueCompletion:
-										settings.triggerPropertyValueCompletion,
-								},
-								loadPaths: settings.loadPaths,
 							});
 
 							this.connection.console.debug(
@@ -202,10 +192,6 @@ export class SomeSassServer {
 									workspaceScanner = new WorkspaceScanner(
 										ls!,
 										fileSystemProvider!,
-										{
-											scannerDepth: settings.scannerDepth,
-											scanImportedFiles: settings.scanImportedFiles,
-										},
 									);
 
 									return workspaceScanner.scan(files);

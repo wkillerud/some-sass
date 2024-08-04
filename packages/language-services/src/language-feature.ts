@@ -38,14 +38,25 @@ type FindOptions = {
 	depth?: number;
 };
 
-const defaultConfiguration: LanguageServiceConfiguration = {
-	completionSettings: {
-		triggerPropertyValueCompletion: false,
-		completePropertyWithSemicolon: false,
-		suggestAllFromOpenDocument: false,
-		suggestFromUseOnly: false,
-		suggestFunctionsInStringContextAfterSymbols: " (+-*%",
-		suggestionStyle: "all",
+const defaultConfiguration: Pick<
+	LanguageServiceConfiguration,
+	"scss" | "sass"
+> = {
+	scss: {
+		completion: {
+			suggestAllFromOpenDocument: false,
+			suggestFromUseOnly: false,
+			suggestFunctionsInStringContextAfterSymbols: " (+-*%",
+			suggestionStyle: "all",
+		},
+	},
+	sass: {
+		completion: {
+			triggerPropertyValueCompletion: true,
+			suggestFromUseOnly: false,
+			suggestFunctionsInStringContextAfterSymbols: " (+-*%",
+			suggestionStyle: "all",
+		},
 	},
 };
 
@@ -78,13 +89,6 @@ export abstract class LanguageFeature {
 		this.configuration = {
 			...defaultConfiguration,
 			...configuration,
-			completionSettings: {
-				...defaultConfiguration.completionSettings,
-				...configuration.completionSettings,
-				triggerPropertyValueCompletion:
-					configuration.completionSettings?.triggerPropertyValueCompletion ||
-					false,
-			},
 		};
 		this._internal.sassLs.configure(configuration);
 	}

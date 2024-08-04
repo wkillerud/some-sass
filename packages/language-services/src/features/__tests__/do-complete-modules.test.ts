@@ -13,8 +13,15 @@ const ls = getLanguageService({ fileSystemProvider, ...rest });
 beforeEach(() => {
 	ls.clearCache();
 	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
+		scss: {
+			completion: {
+				suggestFromUseOnly: true,
+			},
+		},
+		sass: {
+			completion: {
+				suggestFromUseOnly: true,
+			},
 		},
 	}); // Reset any configuration to default
 });
@@ -986,8 +993,16 @@ test("should suggest all symbols as legacy @import may be in use", async () => {
 
 test("should not suggest legacy @import symbols if configured", async () => {
 	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
+		scss: {
+			completion: {
+				suggestAllFromOpenDocument: true,
+				suggestFromUseOnly: true,
+			},
+		},
+		sass: {
+			completion: {
+				suggestFromUseOnly: true,
+			},
 		},
 	});
 
@@ -1011,8 +1026,15 @@ test("should not suggest legacy @import symbols if configured", async () => {
 
 test("should suggest symbol from a different document via @use with wildcard alias", async () => {
 	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
+		scss: {
+			completion: {
+				suggestFromUseOnly: true,
+			},
+		},
+		sass: {
+			completion: {
+				suggestFromUseOnly: true,
+			},
 		},
 	});
 

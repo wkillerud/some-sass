@@ -31,7 +31,13 @@ import {
 } from "./language-services-types";
 import { mapFsProviders } from "./utils/fs-provider";
 
-export { LanguageService, FileStat, FileSystemProvider, FileType };
+export {
+	LanguageService,
+	LanguageServiceConfiguration,
+	FileStat,
+	FileSystemProvider,
+	FileType,
+};
 
 export function getLanguageService(
 	options: LanguageServiceOptions,

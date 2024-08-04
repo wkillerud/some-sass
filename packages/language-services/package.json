@@ -1,6 +1,6 @@
 {
 	"name": "@somesass/language-services",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"private": true,
 	"description": "The features powering some-sass-language-server",
 	"keywords": [
@@ -48,14 +48,14 @@
 		"coverage": "vitest run --coverage"
 	},
 	"dependencies": {
-		"@somesass/vscode-css-languageservice": "1.1.0",
+		"@somesass/vscode-css-languageservice": "1.2.0",
 		"colorjs.io": "0.5.2",
 		"sassdoc-parser": "3.4.0"
 	},
 	"devDependencies": {
-		"@vitest/coverage-v8": "1.6.0",
+		"@vitest/coverage-v8": "2.0.5",
 		"shx": "0.3.4",
 		"typescript": "5.5.4",
-		"vitest": "1.6.0"
+		"vitest": "2.0.5"
 	}
 }

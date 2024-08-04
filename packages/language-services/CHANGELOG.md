@@ -1,3 +1,26 @@
+## 1.2.0 (2024-08-04)
+
+
+### 🚀 Features
+
+- feature update for language server
+
+
+### 🩹 Fixes
+
+- update dependency vscode-languageserver-textdocument to v1.0.12
+
+- suggest variables and functions as mixin parameters
+
+- functions in string interpolation get suggestions
+
+- **deps:** update dependency scss-sassdoc-parser to v3.2.0
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 1.2.0
+
 ## 1.1.0 (2024-07-30)
 
 

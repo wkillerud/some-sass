@@ -55,6 +55,7 @@ const rePropertyValue = /.*:\s*/;
 const reEmptyPropertyValue = /.*:\s*$/;
 const reQuotedValueInString = /["'](?:[^"'\\]|\\.)*["']/g;
 const reMixinReference = /.*@include\s+(.*)/;
+const reCompletedMixinWithParametersReference = /.*@include\s+(.*)\(/;
 const reComment = /^(.*\/\/|.*\/\*|\s*\*)/;
 const reSassDoc = /^[\\s]*\/{3}.*$/;
 const reQuotes = /["']/;
@@ -398,7 +399,8 @@ export class DoComplete extends LanguageFeature {
 			};
 		}
 
-		const isInterpolation = currentWord.includes("#{");
+		const isInterpolation =
+			currentWord.includes("#{") || lineBeforePosition.includes("#{");
 
 		const context: CompletionContext = {
 			currentWord,
@@ -471,6 +473,11 @@ export class DoComplete extends LanguageFeature {
 
 		if (!isPropertyValue && reMixinReference.test(lineBeforePosition)) {
 			context.isMixinContext = true;
+			if (reCompletedMixinWithParametersReference.test(lineBeforePosition)) {
+				context.isMixinContext = false;
+				context.isVariableContext = true;
+				context.isFunctionContext = true;
+			}
 		}
 
 		return context;

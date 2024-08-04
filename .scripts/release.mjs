@@ -5,7 +5,7 @@ import path from "node:path";
 import semver from "semver";
 
 async function call(command) {
-	console.log(`[release-server] ${command}`);
+	console.log(`[release] ${command}`);
 	return new Promise((resolve, reject) => {
 		exec(command, (e, stdout, stderr) => {
 			if (e) return reject(e);
@@ -23,10 +23,11 @@ async function run() {
 	await call(`git checkout main`);
 	await call(`git pull`);
 	await call(`npm clean-install`);
+	await call(`npm run build`);
 	await call(`npm run release`);
 	await call(`git push`);
 	await call(`git push --tags`);
-	console.log(`[release-server] pushed server release, updating client`);
+	console.log(`[release] pushed server release, updating client`);
 
 	let serverPkgJson = await fs.readFile(
 		path.join(process.cwd(), "packages", "language-server", "package.json"),
@@ -49,7 +50,7 @@ async function run() {
 	let diff = semver.diff(newServerVersion, oldServerVersion);
 	if (!diff) {
 		console.warn(
-			`[release-server] got to the point of updating the client's package.json, but semver found no diff`,
+			`[release] got to the point of updating the client's package.json, but semver found no diff`,
 		);
 		return;
 	}
@@ -62,23 +63,18 @@ async function run() {
 
 	await call(`npm install`);
 	await call(`git add .`);
-	if (diff === "major") {
-		await call(`git commit -m "feat!: update for language server"`);
-	} else if (diff === "minor") {
-		await call(`git commit -m "feat: feature update for language server"`);
-	} else {
-		await call(`git commit -m "fix: bugfix update for language server"`);
-	}
+
+	// This is always a chore commit so we don't end up
+	// affecting nx's semantic release for the next version
+	// of the language server. We version the extension ourselves.
+	await call(`git commit -m "chore: updated language server"`);
 
 	await call(`git tag some-sass@${clientPkgJson.version}`);
 
-	console.log(`[release-server] updated client`);
-	console.log(
-		`[release-server] review the last commit and run git push && git push --tags`,
-	);
-	// TODO: when this works consistently, push automatically.
-	// await call(`git push`);
-	// await call(`git push --tags`);
+	console.log(`[release] updated client`);
+
+	await call(`git push`);
+	await call(`git push --tags`);
 }
 
 run();

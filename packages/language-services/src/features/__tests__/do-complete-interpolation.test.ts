@@ -37,6 +37,36 @@ test("should not suggest mixin or placeholder in string interpolation", async ()
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
 
+test("should not suggest module mixin in string interpolation", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument(
+		["$primary: limegreen;", "@mixin mixin($a: 1, $b) {}"],
+		{
+			uri: "one.scss",
+		},
+	);
+	const two = fileSystemProvider.createDocument(
+		['@use "./one";', '.a { background: url("/#{one.'],
+		{
+			uri: "two.scss",
+		},
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 29));
+	assert.equal(items.length, 1);
+	assert.ok(items.find((annotation) => annotation.label === "$primary"));
+	assert.isUndefined(items.find((item) => item.label === "mixin"));
+});
+
 test("should suggest symbol from a different document via @use when in string interpolation", async () => {
 	ls.configure({
 		completionSettings: {

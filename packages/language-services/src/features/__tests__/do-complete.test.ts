@@ -524,3 +524,29 @@ test("should suggest function in @for $i from 1 through ", async () => {
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
+
+test("should suggest variable and function as parameter to mixin, not mixin or placeholder", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestAllFromOpenDocument: true,
+			suggestFromUseOnly: false,
+		},
+	});
+
+	const one = fileSystemProvider.createDocument([
+		'$name: "value";',
+		"@mixin mixin($a: 1, $b) {}",
+		"@function compare($a: 1, $b) {}",
+		"%placeholder { color: blue; }",
+		".a { @include mixin(",
+	]);
+
+	ls.parseStylesheet(one);
+
+	const { items } = await ls.doComplete(one, Position.create(4, 20));
+
+	assert.ok(items.find((item) => item.label === "$name"));
+	assert.ok(items.find((item) => item.label === "compare"));
+	assert.isUndefined(items.find((item) => item.label === "mixin"));
+	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
+});

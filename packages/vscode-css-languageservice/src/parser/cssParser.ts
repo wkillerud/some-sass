@@ -590,6 +590,9 @@ export class Parser {
 	}
 
 	public _parseSelector(isNested?: boolean): nodes.Selector | null {
+		while (this.accept(TokenType.Newline)) {
+			// loop
+		}
 		const node = this.create(nodes.Selector);
 
 		let hasContent = false;

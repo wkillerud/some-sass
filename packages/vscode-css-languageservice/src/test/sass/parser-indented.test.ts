@@ -2520,6 +2520,15 @@ figure
 
 	test("@mixin", () => {
 		assertNode(
+			`@mixin grid-input($gridColumnWidth, $gridGutterWidth)
+  input,
+  textarea,
+  .uneditable-input
+    margin-left: 0`,
+			parser,
+			parser._parseMixinDeclaration.bind(parser),
+		);
+		assertNode(
 			`@mixin large-text
 	font:
 		family: Arial
@@ -3320,6 +3329,20 @@ body
 	color: red`,
 			parser,
 			parser._parseStylesheet.bind(parser),
+		);
+	});
+
+	test("empty selector should be an error", () => {
+		assertError(
+			`.hidden-phone
+
+.hidden-tablet
+
+.hidden-desktop
+  display: none !important`,
+			parser,
+			parser._parseStylesheet.bind(parser),
+			ParseError.IndentExpected,
 		);
 	});
 });

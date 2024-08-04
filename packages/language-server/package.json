@@ -48,7 +48,7 @@
 	"devDependencies": {
 		"@vitest/coverage-v8": "2.0.5",
 		"@somesass/language-services": "1.2.0",
-		"@types/node": "20.14.13",
+		"@types/node": "20.14.14",
 		"fast-glob": "3.3.2",
 		"merge-options": "3.0.4",
 		"path-browserify": "1.0.1",
@@ -58,7 +58,7 @@
 		"url": "0.11.4",
 		"vitest": "2.0.5",
 		"vscode-languageserver": "9.0.1",
-		"vscode-languageserver-textdocument": "1.0.11",
+		"vscode-languageserver-textdocument": "1.0.12",
 		"vscode-languageserver-types": "3.17.5",
 		"vscode-uri": "3.0.8"
 	}

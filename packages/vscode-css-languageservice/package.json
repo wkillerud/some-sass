@@ -17,7 +17,7 @@
 	},
 	"devDependencies": {
 		"@types/mocha": "10.0.7",
-		"@types/node": "20.14.13",
+		"@types/node": "20.14.14",
 		"@vscode/web-custom-data": "0.4.11",
 		"mocha": "10.7.0",
 		"nyc": "17.0.0",

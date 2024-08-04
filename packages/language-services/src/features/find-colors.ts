@@ -13,8 +13,6 @@ import {
 
 export class FindColors extends LanguageFeature {
 	async findColors(document: TextDocument): Promise<ColorInformation[]> {
-		const result: ColorInformation[] = [];
-
 		const variables: Variable[] = [];
 		const stylesheet = this.ls.parseStylesheet(document);
 		stylesheet.accept((node) => {
@@ -41,36 +39,49 @@ export class FindColors extends LanguageFeature {
 			return [];
 		}
 
-		for (const variable of variables) {
-			const value = await this.findValue(
-				document,
-				document.positionAt(variable.offset),
-			);
-			if (value) {
-				try {
-					const color = ColorDotJS.parse(value);
-					const srgba = ColorDotJS.to(color, "srgb");
-					const colorInformation: ColorInformation = {
-						color: {
-							alpha: srgba.alpha || 1,
-							red: srgba.coords[0],
-							green: srgba.coords[1],
-							blue: srgba.coords[2],
-						},
-						range: {
-							start: document.positionAt(variable.offset),
-							end: document.positionAt(
-								variable.offset + (variable as Variable).getName().length,
-							),
-						},
-					};
-					result.push(colorInformation);
-				} catch (e) {
-					// do nothing
+		const result: (ColorInformation | null)[] = await Promise.all(
+			variables.map(async (variable) => {
+				const value = await this.findValue(
+					document,
+					document.positionAt(variable.offset),
+				);
+				if (value) {
+					try {
+						const color = ColorDotJS.parse(value);
+						const srgba = ColorDotJS.to(color, "srgb");
+						const colorInformation: ColorInformation = {
+							color: {
+								alpha: srgba.alpha || 1,
+								red: srgba.coords[0],
+								green: srgba.coords[1],
+								blue: srgba.coords[2],
+							},
+							range: {
+								start: document.positionAt(variable.offset),
+								end: document.positionAt(
+									variable.offset + (variable as Variable).getName().length,
+								),
+							},
+						};
+
+						return colorInformation;
+					} catch (e) {
+						// do nothing
+					}
 				}
-			}
+				return null;
+			}),
+		);
+
+		if (document.languageId === "sass") {
+			const upstream = this.getUpstreamLanguageServer().findDocumentColors(
+				document,
+				stylesheet,
+			);
+			result.push(...upstream);
 		}
-		return result;
+
+		return result.filter((c) => c !== null);
 	}
 
 	getColorPresentations(
@@ -93,6 +104,13 @@ export class FindColors extends LanguageFeature {
 					range,
 				);
 			}
+		} else if (document.languageId === "sass") {
+			return this.getUpstreamLanguageServer().getColorPresentations(
+				document,
+				stylesheet,
+				color,
+				range,
+			);
 		}
 
 		return [];

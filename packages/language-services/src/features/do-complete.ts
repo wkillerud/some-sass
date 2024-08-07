@@ -738,6 +738,30 @@ export class DoComplete extends LanguageFeature {
 						}
 					}
 				}
+
+				// check if the document @forwards a sass built-in
+				// since they aren't documents that are visited by findInWorkspace
+				const links = await this.ls.findDocumentLinks(currentDocument);
+				for (let link of links) {
+					if (
+						link.type === NodeType.Forward &&
+						link.target &&
+						link.target.includes("sass:")
+					) {
+						// Look for matches in built-in namespaces, which do not appear in storage
+						for (const [builtIn, docs] of Object.entries(sassBuiltInModules)) {
+							if (builtIn === link.target) {
+								const suggestions = this.doSassBuiltInCompletion(
+									document,
+									context,
+									docs,
+								);
+								items.push(...suggestions);
+							}
+						}
+					}
+				}
+
 				return items;
 			},
 			start,

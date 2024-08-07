@@ -52,6 +52,47 @@ test("suggests built-in sass modules", async () => {
 	);
 });
 
+test("suggest sass built-ins that are forwarded by the stylesheet that is @used", async () => {
+	const one = fileSystemProvider.createDocument(['@forward "sass:math";'], {
+		uri: "test.scss",
+	});
+	const two = fileSystemProvider.createDocument([
+		'@use "./test";',
+		"$var: test.",
+	]);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+
+	const { items } = await ls.doComplete(two, Position.create(1, 11));
+	assert.notEqual(
+		items.length,
+		0,
+		"Expected to get completions from the sass:math module",
+	);
+
+	// Quick sampling of the results
+	assert.deepStrictEqual(
+		items.find((annotation) => annotation.label === "$pi"),
+		{
+			documentation: {
+				kind: "markdown",
+				value:
+					"The value of the mathematical constant **π**.\n\n[Sass documentation](https://sass-lang.com/documentation/modules/math#$pi)",
+			},
+			filterText: "test.$pi",
+			insertText: ".$pi",
+			insertTextFormat: InsertTextFormat.PlainText,
+			kind: CompletionItemKind.Variable,
+			label: "$pi",
+			labelDetails: {
+				detail: undefined,
+			},
+		},
+	);
+});
+
 test("should suggest symbol from a different document via @use", async () => {
 	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
 		uri: "one.scss",

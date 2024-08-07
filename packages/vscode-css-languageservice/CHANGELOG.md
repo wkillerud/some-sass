@@ -1,3 +1,10 @@
+## 1.3.0 (2024-08-07)
+
+
+### 🚀 Features
+
+- feature update for language server
+
 ## 1.2.0 (2024-08-04)
 
 

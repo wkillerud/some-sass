@@ -1,3 +1,15 @@
+## 1.5.0 (2024-08-07)
+
+
+### 🚀 Features
+
+- feature update for language server
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.3.0
+
 ## 1.4.0 (2024-08-04)
 
 

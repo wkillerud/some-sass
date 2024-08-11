@@ -1,3 +1,12 @@
+## 1.3.1 (2024-08-11)
+
+
+### 🩹 Fixes
+
+- adjust when suggesting functions, variables in control flow
+
+- add prefix support to forwarded sass built-ins
+
 ## 1.3.0 (2024-08-07)
 
 

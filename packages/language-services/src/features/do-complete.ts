@@ -755,6 +755,7 @@ export class DoComplete extends LanguageFeature {
 									document,
 									context,
 									docs,
+									link.as ? prefix + link.as : "",
 								);
 								items.push(...suggestions);
 							}
@@ -1072,12 +1073,25 @@ export class DoComplete extends LanguageFeature {
 		document: TextDocument,
 		context: CompletionContext,
 		moduleDocs: SassBuiltInModule,
+		prefix: string = "",
 	): CompletionItem[] {
 		const items: CompletionItem[] = [];
 		for (const [name, docs] of Object.entries(moduleDocs.exports)) {
 			const { description, signature, parameterSnippet, returns } = docs;
+			const kind = signature
+				? CompletionItemKind.Function
+				: CompletionItemKind.Variable;
+
+			let label = name;
+			if (kind === CompletionItemKind.Variable) {
+				// Avoid ending up with namespace.prefix-$variable
+				label = `$${prefix}${asDollarlessVariable(name)}`;
+			} else {
+				label = `${prefix}${name}`;
+			}
+
 			// Client needs the namespace as part of the text that is matched,
-			const filterText = `${context.namespace}.${name}`;
+			const filterText = `${context.namespace}.${label}`;
 
 			// Inserted text needs to include the `.` which will otherwise
 			// be replaced (except when we're embedded in Vue, Svelte or Astro).
@@ -1085,10 +1099,10 @@ export class DoComplete extends LanguageFeature {
 			const isEmbedded = this.isEmbedded(document);
 
 			const insertText = context.currentWord.includes(".")
-				? `${isEmbedded ? "" : "."}${name}${
+				? `${isEmbedded ? "" : "."}${label}${
 						signature ? `(${parameterSnippet})` : ""
 					}`
-				: name;
+				: label;
 
 			items.push({
 				documentation: {
@@ -1103,7 +1117,7 @@ export class DoComplete extends LanguageFeature {
 				kind: signature
 					? CompletionItemKind.Function
 					: CompletionItemKind.Variable,
-				label: name,
+				label,
 				labelDetails: {
 					detail:
 						signature && returns ? `${signature} => ${returns}` : signature,

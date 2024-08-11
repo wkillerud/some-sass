@@ -47,7 +47,7 @@ async function run() {
 	newServerVersion = semver.parse(newServerVersion);
 	oldServerVersion = semver.parse(oldServerVersion);
 
-	let diff = semver.diff(newServerVersion, oldServerVersion);
+	let diff = semver.diff(oldServerVersion, newServerVersion);
 	if (!diff) {
 		console.warn(
 			`[release] got to the point of updating the client's package.json, but semver found no diff`,

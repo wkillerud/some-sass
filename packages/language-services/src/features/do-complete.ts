@@ -447,23 +447,29 @@ export class DoComplete extends LanguageFeature {
 			reError.test(lineBeforePosition) ||
 			reWarn.test(lineBeforePosition);
 
-		if ((isControlFlow || isPropertyValue) && !isEmptyValue && !isQuotes) {
-			if (context.namespace && currentWord.endsWith(".")) {
+		if (isControlFlow) {
+			context.isVariableContext = true;
+			context.isFunctionContext = true;
+			return context;
+		}
+
+		if (reMixinReference.test(lineBeforePosition)) {
+			context.isMixinContext = true;
+			if (reCompletedMixinWithParametersReference.test(lineBeforePosition)) {
+				context.isMixinContext = false;
+				context.isVariableContext = true;
+				context.isFunctionContext = true;
+			}
+			return context;
+		}
+
+		if (isPropertyValue && !isEmptyValue && !isQuotes) {
+			if (context.namespace) {
+				context.isFunctionContext = true;
 				context.isVariableContext = true;
 			} else {
 				context.isVariableContext = currentWord.includes("$");
-			}
-		} else if (isQuotes) {
-			context.isVariableContext = isInterpolation;
-		} else {
-			context.isVariableContext =
-				currentWord.startsWith("$") || isInterpolation || isEmptyValue;
-		}
 
-		if ((isControlFlow || isPropertyValue) && !isEmptyValue && !isQuotes) {
-			if (context.namespace) {
-				context.isFunctionContext = true;
-			} else {
 				const lastChar = lineBeforePosition.charAt(
 					lineBeforePosition.length - 1,
 				);
@@ -475,18 +481,12 @@ export class DoComplete extends LanguageFeature {
 				}
 			}
 		} else if (isQuotes) {
+			context.isVariableContext = isInterpolation;
 			context.isFunctionContext = isInterpolation;
-		} else if (isPropertyValue && isEmptyValue) {
-			context.isFunctionContext = true;
-		}
-
-		if (!isPropertyValue && reMixinReference.test(lineBeforePosition)) {
-			context.isMixinContext = true;
-			if (reCompletedMixinWithParametersReference.test(lineBeforePosition)) {
-				context.isMixinContext = false;
-				context.isVariableContext = true;
-				context.isFunctionContext = true;
-			}
+		} else {
+			context.isVariableContext =
+				currentWord.startsWith("$") || isInterpolation || isEmptyValue;
+			context.isFunctionContext = isPropertyValue && isEmptyValue;
 		}
 
 		return context;

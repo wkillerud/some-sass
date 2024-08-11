@@ -135,7 +135,7 @@ test("should suggest variable in @return", async () => {
 	const { items } = await ls.doComplete(one, Position.create(3, 40));
 
 	assert.ok(items.find((item) => item.label === "$name"));
-	assert.isUndefined(items.find((item) => item.label === "compare")); // allow for recursion
+	assert.ok(items.find((item) => item.label === "compare")); // allow for recursion
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
@@ -160,7 +160,7 @@ test("should suggest function in @return", async () => {
 	const { items } = await ls.doComplete(one, Position.create(3, 39));
 
 	assert.ok(items.find((item) => item.label === "compare")); // allow for recursion
-	assert.isUndefined(items.find((item) => item.label === "$name"));
+	assert.ok(items.find((item) => item.label === "$name"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
@@ -186,7 +186,7 @@ test("should suggest variable in @if", async () => {
 	const { items } = await ls.doComplete(one, Position.create(4, 5));
 
 	assert.ok(items.find((item) => item.label === "$name"));
-	assert.isUndefined(items.find((item) => item.label === "compare"));
+	assert.ok(items.find((item) => item.label === "compare"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
@@ -212,7 +212,7 @@ test("should suggest function in @if", async () => {
 	const { items } = await ls.doComplete(one, Position.create(4, 4));
 
 	assert.ok(items.find((item) => item.label === "compare"));
-	assert.isUndefined(items.find((item) => item.label === "$name"));
+	assert.ok(items.find((item) => item.label === "$name"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
@@ -239,7 +239,7 @@ test("should suggest variable in @else if", async () => {
 	const { items } = await ls.doComplete(one, Position.create(5, 12));
 
 	assert.ok(items.find((item) => item.label === "$name"));
-	assert.isUndefined(items.find((item) => item.label === "compare"));
+	assert.ok(items.find((item) => item.label === "compare"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
@@ -266,7 +266,7 @@ test("should suggest function in @else if", async () => {
 	const { items } = await ls.doComplete(one, Position.create(5, 12));
 
 	assert.ok(items.find((item) => item.label === "compare"));
-	assert.isUndefined(items.find((item) => item.label === "$name"));
+	assert.ok(items.find((item) => item.label === "$name"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
@@ -315,7 +315,7 @@ test("should suggest variable in for @each $foo in", async () => {
 	const { items } = await ls.doComplete(one, Position.create(4, 15));
 
 	assert.ok(items.find((item) => item.label === "$name"));
-	assert.isUndefined(items.find((item) => item.label === "compare"));
+	assert.ok(items.find((item) => item.label === "compare"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
@@ -341,7 +341,7 @@ test("should suggest function in for @each $foo in", async () => {
 	const { items } = await ls.doComplete(one, Position.create(4, 15));
 
 	assert.ok(items.find((item) => item.label === "compare"));
-	assert.isUndefined(items.find((item) => item.label === "$name"));
+	assert.ok(items.find((item) => item.label === "$name"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
@@ -390,7 +390,7 @@ test("should suggest variable in @for $i from ", async () => {
 	const { items } = await ls.doComplete(one, Position.create(4, 15));
 
 	assert.ok(items.find((item) => item.label === "$name"));
-	assert.isUndefined(items.find((item) => item.label === "compare"));
+	assert.ok(items.find((item) => item.label === "compare"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
@@ -416,7 +416,7 @@ test("should suggest function in @for $i from ", async () => {
 	const { items } = await ls.doComplete(one, Position.create(4, 15));
 
 	assert.ok(items.find((item) => item.label === "compare"));
-	assert.isUndefined(items.find((item) => item.label === "$name"));
+	assert.ok(items.find((item) => item.label === "$name"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
@@ -442,7 +442,7 @@ test("should suggest variable @for $i from 1 to ", async () => {
 	const { items } = await ls.doComplete(one, Position.create(4, 19));
 
 	assert.ok(items.find((item) => item.label === "$name"));
-	assert.isUndefined(items.find((item) => item.label === "compare"));
+	assert.ok(items.find((item) => item.label === "compare"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
@@ -468,7 +468,7 @@ test("should suggest function @for $i from 1 to ", async () => {
 	const { items } = await ls.doComplete(one, Position.create(4, 23));
 
 	assert.ok(items.find((item) => item.label === "compare"));
-	assert.isUndefined(items.find((item) => item.label === "$name"));
+	assert.ok(items.find((item) => item.label === "$name"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
@@ -494,7 +494,7 @@ test("should suggest variable in @for $i from 1 through ", async () => {
 	const { items } = await ls.doComplete(one, Position.create(4, 24));
 
 	assert.ok(items.find((item) => item.label === "$name"));
-	assert.isUndefined(items.find((item) => item.label === "compare"));
+	assert.ok(items.find((item) => item.label === "compare"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
@@ -520,7 +520,7 @@ test("should suggest function in @for $i from 1 through ", async () => {
 	const { items } = await ls.doComplete(one, Position.create(4, 24));
 
 	assert.ok(items.find((item) => item.label === "compare"));
-	assert.isUndefined(items.find((item) => item.label === "$name"));
+	assert.ok(items.find((item) => item.label === "$name"));
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });

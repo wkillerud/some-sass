@@ -135,6 +135,7 @@ test("suggest sass built-ins that are forwarded with a prefix", async () => {
 			},
 		},
 	);
+	assert.ok(items.find((a) => a.label === "math-clamp"));
 });
 
 test("should suggest symbol from a different document via @use", async () => {

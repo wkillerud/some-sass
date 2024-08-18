@@ -17,6 +17,7 @@
 - [Getting started](language-server/getting-started.md)
 - [Configure a client](language-server/configure-a-client.md)
 - [Existing clients](language-server/existing-clients.md)
+  - [Kate](language-server/kate.md)
   - [Neovim](language-server/neovim.md)
 
 # Contributing to Some Sass

@@ -1,3 +1,20 @@
+## 1.5.3 (2024-08-20)
+
+
+### 🩹 Fixes
+
+- a race condition that caused partials not to be parsed sometimes
+
+
+### 🔥 Performance
+
+- only run parseStylesheet for new documents
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.3.3
+
 ## 1.5.2 (2024-08-20)
 
 

@@ -1,6 +1,6 @@
 {
 	"name": "@somesass/language-services",
-	"version": "1.3.2",
+	"version": "1.3.3",
 	"private": true,
 	"description": "The features powering some-sass-language-server",
 	"keywords": [

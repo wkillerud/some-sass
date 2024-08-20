@@ -1,3 +1,10 @@
+## 1.3.3 (2024-08-20)
+
+
+### 🩹 Fixes
+
+- a race condition that caused partials not to be parsed sometimes
+
 ## 1.3.2 (2024-08-20)
 
 

@@ -11,8 +11,7 @@ export default tseslint.config(
 		ignores: [
 			"vscode-extension/.vscode-test/",
 			"vscode-extension/.vscode-test-web/",
-			"vscode-extension/test/e2e/",
-			"vscode-extension/test/web/",
+			"vscode-extension/test/",
 			"**/dist/**",
 			"**/lib/**",
 		],

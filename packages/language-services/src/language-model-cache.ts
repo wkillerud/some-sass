@@ -128,6 +128,10 @@ export class LanguageModelCache {
 		return Object.values(this.#languageModels).map((cached) => cached.document);
 	}
 
+	getCachedTextDocument(uri: string): TextDocument | undefined {
+		return this.#languageModels[uri]?.document;
+	}
+
 	has(uri: string) {
 		return typeof this.#languageModels[uri] !== "undefined";
 	}

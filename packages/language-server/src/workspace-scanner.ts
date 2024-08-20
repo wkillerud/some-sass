@@ -53,21 +53,17 @@ export default class WorkspaceScanner {
 			uri = URI.parse(file.toString().replace("/static/extensions/fs", ""));
 		}
 
-		const alreadyParsed = this.#ls.hasCached(uri);
-		if (alreadyParsed) {
-			// The same file may be referenced by multiple other files,
-			// so skip doing the parsing work if it's already been done.
-			// Changes to the file are handled by the `update` method.
-			return;
-		}
-
 		try {
-			const content = await this.#fs.readFile(uri);
+			let document: TextDocument | null | undefined =
+				this.#ls.getCachedTextDocument(uri);
+			if (!document) {
+				const content = await this.#fs.readFile(uri);
 
-			const document = getSCSSRegionsDocument(
-				TextDocument.create(uri.toString(), "scss", 1, content),
-			);
-			if (!document) return;
+				document = getSCSSRegionsDocument(
+					TextDocument.create(uri.toString(), "scss", 1, content),
+				);
+				if (!document) return;
+			}
 
 			this.#ls.parseStylesheet(document);
 

@@ -63,9 +63,8 @@ export default class WorkspaceScanner {
 					TextDocument.create(uri.toString(), "scss", 1, content),
 				);
 				if (!document) return;
+				this.#ls.parseStylesheet(document);
 			}
-
-			this.#ls.parseStylesheet(document);
 
 			const links = await this.#ls.findDocumentLinks(document);
 			for (const link of links) {

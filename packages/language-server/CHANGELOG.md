@@ -1,3 +1,15 @@
+## 1.5.2 (2024-08-20)
+
+
+### 🩹 Fixes
+
+- apply completion settings
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.3.2
+
 ## 1.5.1 (2024-08-11)
 
 

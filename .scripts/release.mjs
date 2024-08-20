@@ -40,14 +40,11 @@ async function run() {
 	serverPkgJson = JSON.parse(serverPkgJson);
 	clientPkgJson = JSON.parse(clientPkgJson);
 
-	let oldServerVersion =
+	const oldServerVersion =
 		clientPkgJson.dependencies["some-sass-language-server"];
-	let newServerVersion = serverPkgJson.version;
+	const newServerVersion = serverPkgJson.version;
 
-	newServerVersion = semver.parse(newServerVersion);
-	oldServerVersion = semver.parse(oldServerVersion);
-
-	let diff = semver.diff(
+	const diff = semver.diff(
 		semver.parse(oldServerVersion),
 		semver.parse(newServerVersion),
 	);

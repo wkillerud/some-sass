@@ -62,6 +62,7 @@ export default class WorkspaceScanner {
 		}
 
 		try {
+			// TODO: figure out what caused the loop
 			const content = await this.#fs.readFile(uri);
 
 			const document = getSCSSRegionsDocument(

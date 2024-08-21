@@ -1155,3 +1155,28 @@ test("should suggest symbol from a different document via @use with wildcard ali
 		},
 	);
 });
+
+test("does not suggest sass globals if suggestFromUseOnly is true", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: true,
+		},
+	});
+
+	const document = fileSystemProvider.createDocument("@debug co");
+	const { items } = await ls.doComplete(document, Position.create(0, 9));
+	assert.isUndefined(items.find((item) => item.label === "comparable"));
+});
+
+// We don't call the upstream for suggestions here since we got complaints about duplicates
+test.skip("does suggest sass globals if suggestFromUseOnly is false", async () => {
+	ls.configure({
+		completionSettings: {
+			suggestFromUseOnly: false,
+		},
+	});
+
+	const document = fileSystemProvider.createDocument("@debug co");
+	const { items } = await ls.doComplete(document, Position.create(0, 9));
+	assert.isOk(items.find((item) => item.label === "comparable"));
+});

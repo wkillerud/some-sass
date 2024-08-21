@@ -133,7 +133,7 @@ export interface LanguageService {
 		range: Range,
 		context?: CodeActionContext,
 	): Promise<CodeAction[]>;
-	getCachedTextDocument(uri: URI): TextDocument | undefined;
+	hasCached(uri: URI): boolean;
 	/**
 	 * Utility function to reparse an updated document.
 	 * Like {@link LanguageService.parseStylesheet}, but returns nothing.

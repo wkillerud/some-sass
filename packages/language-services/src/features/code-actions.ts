@@ -17,17 +17,31 @@ export class CodeActions extends LanguageFeature {
 	async getCodeActions(
 		document: TextDocument,
 		range: Range,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		context: CodeActionContext = { diagnostics: [] },
 	): Promise<CodeAction[]> {
 		if (!this.hasSelection(range)) {
 			return [];
 		}
 
+		let upstream: CodeAction[] = [];
+		if (
+			document.languageId === "sass" ||
+			this.configuration.completionSettings?.suggestAllFromOpenDocument
+		) {
+			const stylesheet = this.ls.parseStylesheet(document);
+			upstream = this.getUpstreamLanguageServer().doCodeActions2(
+				document,
+				range,
+				context,
+				stylesheet,
+			);
+		}
+
 		return [
 			this.getExtractVariableAction(document, range),
 			this.getExtractMixinAction(document, range),
 			this.getExtractFunctionAction(document, range),
+			...upstream,
 		];
 	}
 

@@ -73,7 +73,10 @@ export class FindColors extends LanguageFeature {
 			}),
 		);
 
-		if (document.languageId === "sass") {
+		if (
+			document.languageId === "sass" ||
+			this.configuration.completionSettings?.suggestAllFromOpenDocument
+		) {
 			const upstream = this.getUpstreamLanguageServer().findDocumentColors(
 				document,
 				stylesheet,
@@ -104,7 +107,10 @@ export class FindColors extends LanguageFeature {
 					range,
 				);
 			}
-		} else if (document.languageId === "sass") {
+		} else if (
+			document.languageId === "sass" ||
+			this.configuration.completionSettings?.suggestAllFromOpenDocument
+		) {
 			return this.getUpstreamLanguageServer().getColorPresentations(
 				document,
 				stylesheet,

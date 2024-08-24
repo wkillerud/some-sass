@@ -7,7 +7,9 @@ This page assumes you're using Visual Studio Code as the debugger. Go to the [Ru
 
 ## Launch extension
 
-This opens a new window of Visual Studio Code running as a [local extension host][exthost]. Open the Sass project you're using to test in the extension host window.
+This opens a new window of Visual Studio Code running as a [local extension host][exthost].
+
+Open the Sass project you're using to test in the extension host window.
 If you don't have one you can find several `workspace/`
 directories inside `vscode-extension/test/e2e/` in this repository.
 

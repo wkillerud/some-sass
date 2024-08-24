@@ -943,7 +943,9 @@ export class DoComplete extends LanguageFeature {
 			}
 
 			if (
-				this.configuration.completionSettings?.suggestionStyle !== "nobracket"
+				this.configuration.completionSettings?.suggestionStyle !==
+					"nobracket" &&
+				currentDocument.languageId === "scss"
 			) {
 				variants.push({
 					documentation,

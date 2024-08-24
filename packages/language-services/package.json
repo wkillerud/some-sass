@@ -43,7 +43,7 @@
 	"license": "MIT",
 	"scripts": {
 		"build": "tsc",
-		"clean": "shx rm -rf dist",
+		"clean": "shx rm -rf dist node_modules",
 		"test": "vitest",
 		"coverage": "vitest run --coverage"
 	},
@@ -55,7 +55,6 @@
 	"devDependencies": {
 		"@vitest/coverage-v8": "2.0.5",
 		"shx": "0.3.4",
-		"typescript": "5.5.4",
-		"vitest": "2.0.5"
+		"typescript": "5.5.4"
 	}
 }

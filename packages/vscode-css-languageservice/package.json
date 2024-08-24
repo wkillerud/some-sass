@@ -20,8 +20,7 @@
 		"@vscode/web-custom-data": "0.4.11",
 		"rimraf": "6.0.1",
 		"source-map-support": "0.5.21",
-		"typescript": "5.5.4",
-		"vitest": "1.6.0"
+		"typescript": "5.5.4"
 	},
 	"dependencies": {
 		"@vscode/l10n": "0.0.18",
@@ -33,7 +32,7 @@
 		"build": "npm run compile && npm run compile-esm",
 		"compile": "tsc -p ./src/tsconfig.json && npm run lint",
 		"compile-esm": "tsc -p ./src/tsconfig.esm.json",
-		"clean": "rimraf lib",
+		"clean": "rimraf lib node_modules",
 		"watch": "tsc -w -p ./src",
 		"test": "vitest",
 		"coverage": "vitest run --coverage",

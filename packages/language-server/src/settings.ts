@@ -26,6 +26,7 @@ export const defaultSettings: Readonly<Required<ISettings>> = {
 	],
 	scannerDepth: 30,
 	scanImportedFiles: true,
+	// This setting is essentially "VS Code Compat Mode" if set to false.
 	suggestAllFromOpenDocument: true,
 	suggestionStyle: "all",
 	suggestFromUseOnly: false,

@@ -93,8 +93,6 @@ These are more guidelines than actual rules.
 - The first time you reference Visual Studio Code below a heading, write out the full name. After that you can use VS Code.
 - Prefer [Excalidraw][excalidraw] for diagrams, exported as PNG and included in Markdown as [an image][images].
 
-The [Hemingway Editor](https://hemingwayapp.com/) is a free tool to help edit your writing. You can also refer to these [notes from Google Technical Writing One][gtechwriting] if you'd like. That said, don't worry too much about the details.
-
 [brew]: https://brew.sh
 [mdbook]: https://rust-lang.github.io/mdBook/
 [installation]: https://rust-lang.github.io/mdBook/guide/installation.html

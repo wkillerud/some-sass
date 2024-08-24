@@ -1,3 +1,70 @@
+## 1.5.5 (2024-08-24)
+
+
+### 🩹 Fixes
+
+- race condition in workspace scanner
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.3.4
+
+## 1.5.4 (2024-08-21)
+
+
+### 🩹 Fixes
+
+- cut release
+
+## 1.5.3 (2024-08-20)
+
+
+### 🩹 Fixes
+
+- a race condition that caused partials not to be parsed sometimes
+
+
+### 🔥 Performance
+
+- only run parseStylesheet for new documents
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.3.3
+
+## 1.5.2 (2024-08-20)
+
+
+### 🩹 Fixes
+
+- apply completion settings
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.3.2
+
+## 1.5.1 (2024-08-11)
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.3.1
+
+## 1.5.0 (2024-08-07)
+
+
+### 🚀 Features
+
+- feature update for language server
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.3.0
+
 ## 1.4.0 (2024-08-04)
 
 

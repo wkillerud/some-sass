@@ -170,9 +170,17 @@ export class SomeSassServer {
 							}
 
 							ls.configure({
-								...settings,
 								editorSettings,
 								workspaceRoot,
+								loadPaths: settings.loadPaths,
+								completionSettings: {
+									suggestAllFromOpenDocument:
+										settings.suggestAllFromOpenDocument,
+									suggestFromUseOnly: settings.suggestFromUseOnly,
+									suggestionStyle: settings.suggestionStyle,
+									suggestFunctionsInStringContextAfterSymbols:
+										settings.suggestFunctionsInStringContextAfterSymbols,
+								},
 							});
 
 							this.connection.console.debug(
@@ -243,8 +251,16 @@ export class SomeSassServer {
 		this.connection.onDidChangeConfiguration((params) => {
 			if (!ls) return;
 
+			const somesassConfiguration: Partial<ISettings> =
+				params.settings.somesass;
+
 			const editorConfiguration: Partial<IEditorSettings> =
 				params.settings.editor;
+
+			const settings: ISettings = {
+				...defaultSettings,
+				...somesassConfiguration,
+			};
 
 			const editorSettings: IEditorSettings = {
 				insertSpaces: false,
@@ -256,6 +272,13 @@ export class SomeSassServer {
 			ls.configure({
 				editorSettings,
 				workspaceRoot,
+				completionSettings: {
+					suggestAllFromOpenDocument: settings.suggestAllFromOpenDocument,
+					suggestFromUseOnly: settings.suggestFromUseOnly,
+					suggestionStyle: settings.suggestionStyle,
+					suggestFunctionsInStringContextAfterSymbols:
+						settings.suggestFunctionsInStringContextAfterSymbols,
+				},
 			});
 		});
 

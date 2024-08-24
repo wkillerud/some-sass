@@ -40,14 +40,14 @@ async function run() {
 	serverPkgJson = JSON.parse(serverPkgJson);
 	clientPkgJson = JSON.parse(clientPkgJson);
 
-	let oldServerVersion =
+	const oldServerVersion =
 		clientPkgJson.dependencies["some-sass-language-server"];
-	let newServerVersion = serverPkgJson.version;
+	const newServerVersion = serverPkgJson.version;
 
-	newServerVersion = semver.parse(newServerVersion);
-	oldServerVersion = semver.parse(oldServerVersion);
-
-	let diff = semver.diff(newServerVersion, oldServerVersion);
+	const diff = semver.diff(
+		semver.parse(oldServerVersion),
+		semver.parse(newServerVersion),
+	);
 	if (!diff) {
 		console.warn(
 			`[release] got to the point of updating the client's package.json, but semver found no diff`,
@@ -55,6 +55,7 @@ async function run() {
 		return;
 	}
 	clientPkgJson.version = semver.inc(clientPkgJson.version, diff);
+	clientPkgJson.dependencies["some-sass-language-server"] = newServerVersion;
 
 	await fs.writeFile(
 		path.join(process.cwd(), "vscode-extension", "package.json"),

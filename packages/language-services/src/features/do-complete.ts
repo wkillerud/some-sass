@@ -458,23 +458,29 @@ export class DoComplete extends LanguageFeature {
 			reError.test(lineBeforePosition) ||
 			reWarn.test(lineBeforePosition);
 
-		if ((isControlFlow || isPropertyValue) && !isEmptyValue && !isQuotes) {
-			if (context.namespace && currentWord.endsWith(".")) {
+		if (isControlFlow) {
+			context.isVariableContext = true;
+			context.isFunctionContext = true;
+			return context;
+		}
+
+		if (reMixinReference.test(lineBeforePosition)) {
+			context.isMixinContext = true;
+			if (reCompletedMixinWithParametersReference.test(lineBeforePosition)) {
+				context.isMixinContext = false;
+				context.isVariableContext = true;
+				context.isFunctionContext = true;
+			}
+			return context;
+		}
+
+		if (isPropertyValue && !isEmptyValue && !isQuotes) {
+			if (context.namespace) {
+				context.isFunctionContext = true;
 				context.isVariableContext = true;
 			} else {
 				context.isVariableContext = currentWord.includes("$");
-			}
-		} else if (isQuotes) {
-			context.isVariableContext = isInterpolation;
-		} else {
-			context.isVariableContext =
-				currentWord.startsWith("$") || isInterpolation || isEmptyValue;
-		}
 
-		if ((isControlFlow || isPropertyValue) && !isEmptyValue && !isQuotes) {
-			if (context.namespace) {
-				context.isFunctionContext = true;
-			} else {
 				const lastChar = lineBeforePosition.charAt(
 					lineBeforePosition.length - 1,
 				);
@@ -489,9 +495,12 @@ export class DoComplete extends LanguageFeature {
 				}
 			}
 		} else if (isQuotes) {
+			context.isVariableContext = isInterpolation;
 			context.isFunctionContext = isInterpolation;
-		} else if (isPropertyValue && isEmptyValue) {
-			context.isFunctionContext = true;
+		} else {
+			context.isVariableContext =
+				currentWord.startsWith("$") || isInterpolation || isEmptyValue;
+			context.isFunctionContext = isPropertyValue && isEmptyValue;
 		}
 
 		if (!isPropertyValue && reMixinReference.test(lineBeforePosition)) {
@@ -773,6 +782,31 @@ export class DoComplete extends LanguageFeature {
 						}
 					}
 				}
+
+				// check if the document @forwards a sass built-in
+				// since they aren't documents that are visited by findInWorkspace
+				const links = await this.ls.findDocumentLinks(currentDocument);
+				for (let link of links) {
+					if (
+						link.type === NodeType.Forward &&
+						link.target &&
+						link.target.includes("sass:")
+					) {
+						// Look for matches in built-in namespaces, which do not appear in storage
+						for (const [builtIn, docs] of Object.entries(sassBuiltInModules)) {
+							if (builtIn === link.target) {
+								const suggestions = this.doSassBuiltInCompletion(
+									document,
+									context,
+									docs,
+									link.as ? prefix + link.as : "",
+								);
+								items.push(...suggestions);
+							}
+						}
+					}
+				}
+
 				return items;
 			},
 			start,
@@ -1087,12 +1121,25 @@ export class DoComplete extends LanguageFeature {
 		document: TextDocument,
 		context: CompletionContext,
 		moduleDocs: SassBuiltInModule,
+		prefix: string = "",
 	): CompletionItem[] {
 		const items: CompletionItem[] = [];
 		for (const [name, docs] of Object.entries(moduleDocs.exports)) {
 			const { description, signature, parameterSnippet, returns } = docs;
+			const kind = signature
+				? CompletionItemKind.Function
+				: CompletionItemKind.Variable;
+
+			let label = name;
+			if (kind === CompletionItemKind.Variable) {
+				// Avoid ending up with namespace.prefix-$variable
+				label = `$${prefix}${asDollarlessVariable(name)}`;
+			} else {
+				label = `${prefix}${name}`;
+			}
+
 			// Client needs the namespace as part of the text that is matched,
-			const filterText = `${context.namespace}.${name}`;
+			const filterText = `${context.namespace}.${label}`;
 
 			// Inserted text needs to include the `.` which will otherwise
 			// be replaced (except when we're embedded in Vue, Svelte or Astro).
@@ -1100,10 +1147,10 @@ export class DoComplete extends LanguageFeature {
 			const isEmbedded = this.isEmbedded(document);
 			const includeDot = isEmbedded && document.languageId !== "sass";
 			const insertText = context.currentWord.includes(".")
-				? `${includeDot ? "" : "."}${name}${
+				? `${includeDot ? "" : "."}${label}${
 						signature ? `(${parameterSnippet})` : ""
 					}`
-				: name;
+				: label;
 
 			items.push({
 				documentation: {
@@ -1118,7 +1165,7 @@ export class DoComplete extends LanguageFeature {
 				kind: signature
 					? CompletionItemKind.Function
 					: CompletionItemKind.Variable,
-				label: name,
+				label,
 				labelDetails: {
 					detail:
 						signature && returns ? `${signature} => ${returns}` : signature,

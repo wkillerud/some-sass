@@ -1,3 +1,17 @@
+## 1.3.4 (2024-08-24)
+
+
+### 🩹 Fixes
+
+- race condition in workspace scanner
+
+- exclude sass globals if suggestFromUseOnly
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 1.3.1
+
 ## 1.3.3 (2024-08-20)
 
 

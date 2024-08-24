@@ -1,3 +1,15 @@
+## 1.5.5 (2024-08-24)
+
+
+### 🩹 Fixes
+
+- race condition in workspace scanner
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.3.4
+
 ## 1.5.4 (2024-08-21)
 
 

@@ -1,3 +1,10 @@
+## 1.3.1 (2024-08-24)
+
+
+### 🩹 Fixes
+
+- exclude sass globals if suggestFromUseOnly
+
 ## 1.3.0 (2024-08-07)
 
 

@@ -337,7 +337,18 @@ export abstract class LanguageFeature {
 
 		const parent = variable.getParent();
 		if (parent instanceof VariableDeclaration) {
-			return parent.getValue()?.getText() || null;
+			const value = parent.getValue();
+			if (!value) {
+				return null;
+			}
+			if (value.getText().includes("$")) {
+				return await this.internalFindValue(
+					document,
+					document.positionAt(value.offset),
+					depth + 1,
+				);
+			}
+			return value.getText();
 		}
 
 		const valueString = variable.getText();

@@ -53,24 +53,22 @@ export default class WorkspaceScanner {
 			uri = URI.parse(file.toString().replace("/static/extensions/fs", ""));
 		}
 
-		const alreadyParsed = this.#ls.hasCached(uri);
-		if (alreadyParsed) {
-			// The same file may be referenced by multiple other files,
-			// so skip doing the parsing work if it's already been done.
-			// Changes to the file are handled by the `update` method.
-			return;
-		}
-
 		try {
-			// TODO: figure out what caused the loop
-			const content = await this.#fs.readFile(uri);
+			let document: TextDocument | null | undefined =
+				this.#ls.getCachedTextDocument(uri);
 
-			const document = getSCSSRegionsDocument(
-				TextDocument.create(uri.toString(), "scss", 1, content),
-			);
-			if (!document) return;
+			if (!document) {
+				const content = await this.#fs.readFile(uri);
 
+				document = getSCSSRegionsDocument(
+					TextDocument.create(uri.toString(), "scss", 1, content),
+				);
+				if (!document) return;
+			}
+
+			this.#ls.parseStylesheet(document);
 			const links = await this.#ls.findDocumentLinks(document);
+
 			for (const link of links) {
 				if (
 					!link.target ||
@@ -81,8 +79,17 @@ export default class WorkspaceScanner {
 					continue;
 				}
 
+				let uri = URI.parse(link.target);
+				let visited: TextDocument | null | undefined =
+					this.#ls.getCachedTextDocument(uri);
+
+				if (visited) {
+					// avoid infinite loop if circular references
+					continue;
+				}
+
 				try {
-					await this.parse(URI.parse(link.target), depth + 1);
+					await this.parse(uri, depth + 1);
 				} catch {
 					// do nothing
 				}

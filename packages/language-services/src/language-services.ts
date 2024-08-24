@@ -160,8 +160,8 @@ class LanguageServiceImpl implements LanguageService {
 		return this.#findSymbols.findWorkspaceSymbols(query);
 	}
 
-	hasCached(uri: URI): boolean {
-		return this.#cache.has(uri.toString());
+	getCachedTextDocument(uri: URI): TextDocument | undefined {
+		return this.#cache.getDocument(uri.toString());
 	}
 
 	getColorPresentations(document: TextDocument, color: Color, range: Range) {

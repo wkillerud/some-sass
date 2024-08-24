@@ -144,7 +144,7 @@ export class SomeSassServer {
 							Partial<ISettings>,
 							Partial<IEditorSettings>,
 						]) => {
-							const settings: ISettings = {
+							const settings = {
 								...defaultSettings,
 								...somesassConfiguration,
 							};
@@ -200,6 +200,10 @@ export class SomeSassServer {
 									workspaceScanner = new WorkspaceScanner(
 										ls!,
 										fileSystemProvider!,
+										{
+											scanImportedFiles: settings.scanImportedFiles,
+											scannerDepth: settings.scannerDepth,
+										},
 									);
 
 									return workspaceScanner.scan(files);

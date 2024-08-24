@@ -96,7 +96,7 @@
           ],
           "description": "List of glob patterns for directories that are excluded when scanning."
         },
-        "somesass.scss.completion.suggestionStyle": {
+        "somesass.suggestionStyle": {
           "type": "string",
           "default": "all",
           "description": "Controls the style of suggestions for mixins and placeholders.",
@@ -116,57 +116,22 @@
             "Where brackets are suggested, omit duplicates without brackets"
           ]
         },
-        "somesass.scss.completion.suggestAllFromOpenDocument": {
+        "somesass.suggestAllFromOpenDocument": {
           "type": "boolean",
           "default": false,
-          "description": "VS Code has built-in code suggestions for symbols declared in the open document. If you prefer the suggestions from Some Sass, you can opt in by turning on this setting. There will be duplicates."
+          "description": "VS Code has built-in code suggestions for (S)CSS symbols declared in the open document. If you prefer the suggestions from Some Sass, you can opt in by turning on this setting. There will be duplicates. No effect for Sass Indented (always on)."
         },
-        "somesass.scss.completion.suggestFromUseOnly": {
-          "type": "boolean",
-          "default": false,
-          "description": "If your project uses the new module system with @use and @forward, you may want to only include suggestions from your used modules."
-        },
-        "somesass.scss.completion.suggestFunctionsInStringContextAfterSymbols": {
-          "type": "string",
-          "default": " (+-*%",
-          "description": "Allows prompt Functions in String context after specified symbols."
-        },
-        "somesass.sass.completion.suggestionStyle": {
-          "type": "string",
-          "default": "all",
-          "description": "Controls the style of suggestions for mixins and placeholders.",
-          "enum": [
-            "all",
-            "nobracket",
-            "bracket"
-          ],
-          "enumItemLabels": [
-            "All",
-            "No brackets",
-            "Only brackets"
-          ],
-          "enumDescriptions": [
-            "Show all suggestions",
-            "Only show suggestions without brackets",
-            "Where brackets are suggested, omit duplicates without brackets"
-          ]
-        },
-        "somesass.sass.completion.suggestAllFromOpenDocument": {
-          "type": "boolean",
-          "default": false,
-          "description": "VS Code has built-in code suggestions for symbols declared in the open document. If you prefer the suggestions from Some Sass, you can opt in by turning on this setting. There will be duplicates."
-        },
-        "somesass.sass.completion.suggestFromUseOnly": {
+        "somesass.suggestFromUseOnly": {
           "type": "boolean",
           "default": false,
           "description": "If your project uses the new module system with @use and @forward, you may want to only include suggestions from your used modules."
         },
-        "somesass.sass.completion.suggestFunctionsInStringContextAfterSymbols": {
+        "somesass.suggestFunctionsInStringContextAfterSymbols": {
           "type": "string",
           "default": " (+-*%",
           "description": "Allows prompt Functions in String context after specified symbols."
         },
-        "somesass.sass.completion.triggerPropertyValueCompletion": {
+        "somesass.triggerPropertyValueCompletion": {
           "type": "boolean",
           "default": false,
           "description": "By default, Some Sass triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."

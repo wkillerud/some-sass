@@ -1079,16 +1079,9 @@ test("should suggest all symbols as legacy @import may be in use", async () => {
 
 test("should not suggest legacy @import symbols if configured", async () => {
 	ls.configure({
-		scss: {
-			completion: {
-				suggestAllFromOpenDocument: true,
-				suggestFromUseOnly: true,
-			},
-		},
-		sass: {
-			completion: {
-				suggestFromUseOnly: true,
-			},
+		completionSettings: {
+			suggestAllFromOpenDocument: true,
+			suggestFromUseOnly: true,
 		},
 	});
 
@@ -1112,15 +1105,8 @@ test("should not suggest legacy @import symbols if configured", async () => {
 
 test("should suggest symbol from a different document via @use with wildcard alias", async () => {
 	ls.configure({
-		scss: {
-			completion: {
-				suggestFromUseOnly: true,
-			},
-		},
-		sass: {
-			completion: {
-				suggestFromUseOnly: true,
-			},
+		completionSettings: {
+			suggestFromUseOnly: true,
 		},
 	});
 

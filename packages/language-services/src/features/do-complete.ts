@@ -172,16 +172,7 @@ export class DoComplete extends LanguageFeature {
 				position,
 				stylesheet,
 				this.getDocumentContext(),
-				{
-					...(document.languageId === "sass"
-						? this.configuration.sass?.completion
-						: this.configuration.scss?.completion),
-					triggerPropertyValueCompletion:
-						document.languageId === "sass"
-							? this.configuration.sass?.completion
-									?.triggerPropertyValueCompletion || true
-							: false,
-				},
+				this.configuration.completionSettings,
 			);
 			if (upstreamResult.items.length > 0) {
 				result.items.push(...upstreamResult.items);
@@ -261,19 +252,13 @@ export class DoComplete extends LanguageFeature {
 		}
 
 		// Legacy @import style suggestions
-		if (
-			!(
-				document.languageId === "sass"
-					? this.configuration.sass?.completion
-					: this.configuration.scss?.completion
-			)?.suggestFromUseOnly
-		) {
+		if (!this.configuration.completionSettings?.suggestFromUseOnly) {
 			const currentWord = context.currentWord;
 			const documents = this.cache.documents();
 			for (const currentDocument of documents) {
 				if (
 					document.languageId === "scss" &&
-					this.configuration.scss?.completion?.suggestAllFromOpenDocument &&
+					!this.configuration.completionSettings?.suggestAllFromOpenDocument &&
 					currentDocument.uri === document.uri
 				) {
 					continue;
@@ -337,16 +322,13 @@ export class DoComplete extends LanguageFeature {
 			}
 		}
 
-		if (
-			document.languageId === "sass" ||
-			this.configuration.scss?.completion?.suggestAllFromOpenDocument
-		) {
+		if (document.languageId === "sass") {
 			const upstreamResult = await upstreamLs.doComplete2(
 				document,
 				position,
 				stylesheet,
 				this.getDocumentContext(),
-				this.configuration.sass?.completion,
+				this.configuration.completionSettings,
 			);
 			if (upstreamResult.items.length > 0) {
 				result.items.push(...upstreamResult.items);
@@ -485,11 +467,8 @@ export class DoComplete extends LanguageFeature {
 					lineBeforePosition.length - 1,
 				);
 				const triggers =
-					document.languageId === "sass"
-						? this.configuration.sass?.completion
-								?.suggestFunctionsInStringContextAfterSymbols
-						: this.configuration.scss?.completion
-								?.suggestFunctionsInStringContextAfterSymbols;
+					this.configuration.completionSettings
+						?.suggestFunctionsInStringContextAfterSymbols;
 				if (triggers) {
 					context.isFunctionContext = triggers.includes(lastChar);
 				}
@@ -552,11 +531,7 @@ export class DoComplete extends LanguageFeature {
 			items.push(...result);
 		}
 
-		if (
-			initialDocument.languageId === "sass"
-				? this.configuration.sass?.completion?.suggestFromUseOnly
-				: this.configuration.scss?.completion?.suggestFromUseOnly
-		) {
+		if (this.configuration.completionSettings?.suggestFromUseOnly) {
 			const documents = this.cache.documents();
 			for (const current of documents) {
 				const symbols = this.ls.findDocumentSymbols(current);
@@ -950,9 +925,7 @@ export class DoComplete extends LanguageFeature {
 			// Include as separate suggestion since content may not always be needed or wanted.
 
 			if (
-				initialDocument.languageId === "sass"
-					? this.configuration.sass?.completion?.suggestionStyle !== "bracket"
-					: this.configuration.scss?.completion?.suggestionStyle !== "bracket"
+				this.configuration.completionSettings?.suggestionStyle !== "bracket"
 			) {
 				variants.push({
 					documentation,
@@ -970,9 +943,7 @@ export class DoComplete extends LanguageFeature {
 			}
 
 			if (
-				initialDocument.languageId === "sass"
-					? this.configuration.sass?.completion?.suggestionStyle !== "nobracket"
-					: this.configuration.scss?.completion?.suggestionStyle !== "nobracket"
+				this.configuration.completionSettings?.suggestionStyle !== "nobracket"
 			) {
 				variants.push({
 					documentation,

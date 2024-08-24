@@ -38,25 +38,13 @@ type FindOptions = {
 	depth?: number;
 };
 
-const defaultConfiguration: Pick<
-	LanguageServiceConfiguration,
-	"scss" | "sass"
-> = {
-	scss: {
-		completion: {
-			suggestAllFromOpenDocument: false,
-			suggestFromUseOnly: false,
-			suggestFunctionsInStringContextAfterSymbols: " (+-*%",
-			suggestionStyle: "all",
-		},
-	},
-	sass: {
-		completion: {
-			triggerPropertyValueCompletion: true,
-			suggestFromUseOnly: false,
-			suggestFunctionsInStringContextAfterSymbols: " (+-*%",
-			suggestionStyle: "all",
-		},
+const defaultConfiguration: LanguageServiceConfiguration = {
+	completionSettings: {
+		suggestAllFromOpenDocument: false,
+		suggestFromUseOnly: false,
+		suggestFunctionsInStringContextAfterSymbols: " (+-*%",
+		suggestionStyle: "all",
+		triggerPropertyValueCompletion: true,
 	},
 };
 

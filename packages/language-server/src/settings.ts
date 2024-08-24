@@ -1,7 +1,13 @@
-import { LanguageServiceConfiguration } from "@somesass/language-services";
-
-export interface ISettings extends LanguageServiceConfiguration {
+export interface ISettings {
+	loadPaths?: string[];
 	scannerExclude: string[];
+	scannerDepth?: number;
+	scanImportedFiles?: boolean;
+	suggestionStyle?: "all" | "nobracket" | "bracket";
+	suggestAllFromOpenDocument?: boolean;
+	suggestFromUseOnly?: boolean;
+	suggestFunctionsInStringContextAfterSymbols?: " (+-*%";
+	triggerPropertyValueCompletion?: boolean;
 }
 
 export interface IEditorSettings {
@@ -11,27 +17,18 @@ export interface IEditorSettings {
 	tabSize: number;
 }
 
-export const defaultSettings: Readonly<ISettings> = {
+export const defaultSettings: Readonly<Required<ISettings>> = {
+	loadPaths: [],
 	scannerExclude: [
 		"**/.git/**",
 		"**/node_modules/**",
 		"**/bower_components/**",
 	],
-	loadPaths: [],
-	scss: {
-		completion: {
-			suggestAllFromOpenDocument: true,
-			suggestionStyle: "all",
-			suggestFromUseOnly: false,
-			suggestFunctionsInStringContextAfterSymbols: " (+-*%",
-		},
-	},
-	sass: {
-		completion: {
-			suggestionStyle: "all",
-			suggestFromUseOnly: false,
-			suggestFunctionsInStringContextAfterSymbols: " (+-*%",
-			triggerPropertyValueCompletion: true,
-		},
-	},
+	scannerDepth: 30,
+	scanImportedFiles: true,
+	suggestAllFromOpenDocument: true,
+	suggestionStyle: "all",
+	suggestFromUseOnly: false,
+	suggestFunctionsInStringContextAfterSymbols: " (+-*%",
+	triggerPropertyValueCompletion: true,
 };

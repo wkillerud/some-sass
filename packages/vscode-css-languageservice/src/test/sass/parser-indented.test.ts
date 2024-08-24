@@ -3345,4 +3345,8 @@ body
 			ParseError.IndentExpected,
 		);
 	});
+
+	test("flags semicolon as error in variable declaration", async () => {
+		assertError(`$font-size: 20px;`, parser, parser._parseStylesheet.bind(parser), ParseError.UnexpectedSemicolon);
+	});
 });

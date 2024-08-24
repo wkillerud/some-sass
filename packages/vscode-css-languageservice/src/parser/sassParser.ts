@@ -111,6 +111,10 @@ export class SassParser extends cssParser.Parser {
 		}
 
 		if (this.peek(TokenType.SemiColon)) {
+			if (this.syntax === "indented") {
+				return this.finish(node, ParseError.UnexpectedSemicolon);
+			}
+
 			node.semicolonPosition = this.token.offset; // not part of the declaration, but useful information for code assist
 		}
 

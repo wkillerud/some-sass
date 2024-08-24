@@ -24,6 +24,8 @@ interface IFunctionInfo {
 	func: string;
 	desc?: string;
 	type?: string;
+	/** If true, doesn't have an equivalent in the module system and should be suggested regardless of suggestFromUseOnly */
+	noModule?: boolean;
 }
 
 const sassDocumentationName = l10n.t("Sass documentation");
@@ -55,21 +57,21 @@ export class SCSSCompletion extends CSSCompletion {
 		{ func: "hue($color)", desc: l10n.t("Gets the hue component of a color.") },
 		{ func: "saturation($color)", desc: l10n.t("Gets the saturation component of a color.") },
 		{ func: "lightness($color)", desc: l10n.t("Gets the lightness component of a color.") },
-		{ func: "adjust-hue($color, $degrees)", desc: l10n.t("Changes the hue of a color.") },
-		{ func: "lighten($color, $amount)", desc: l10n.t("Makes a color lighter.") },
-		{ func: "darken($color, $amount)", desc: l10n.t("Makes a color darker.") },
+		{ func: "adjust-hue($color, $degrees)", desc: l10n.t("Changes the hue of a color."), noModule: true },
+		{ func: "lighten($color, $amount)", desc: l10n.t("Makes a color lighter."), noModule: true },
+		{ func: "darken($color, $amount)", desc: l10n.t("Makes a color darker."), noModule: true },
 		{ func: "saturate($color, $amount)", desc: l10n.t("Makes a color more saturated.") },
-		{ func: "desaturate($color, $amount)", desc: l10n.t("Makes a color less saturated.") },
+		{ func: "desaturate($color, $amount)", desc: l10n.t("Makes a color less saturated."), noModule: true },
 		{ func: "grayscale($color)", desc: l10n.t("Converts a color to grayscale.") },
 		{ func: "complement($color)", desc: l10n.t("Returns the complement of a color.") },
 		{ func: "invert($color)", desc: l10n.t("Returns the inverse of a color.") },
 		{ func: "alpha($color)", desc: l10n.t("Gets the opacity component of a color.") },
 		{ func: "opacity($color)", desc: "Gets the alpha component (opacity) of a color." },
 		{ func: "rgba($color, $alpha)", desc: l10n.t("Changes the alpha component for a color.") },
-		{ func: "opacify($color, $amount)", desc: l10n.t("Makes a color more opaque.") },
-		{ func: "fade-in($color, $amount)", desc: l10n.t("Makes a color more opaque.") },
-		{ func: "transparentize($color, $amount)", desc: l10n.t("Makes a color more transparent.") },
-		{ func: "fade-out($color, $amount)", desc: l10n.t("Makes a color more transparent.") },
+		{ func: "opacify($color, $amount)", desc: l10n.t("Makes a color more opaque."), noModule: true },
+		{ func: "fade-in($color, $amount)", desc: l10n.t("Makes a color more opaque."), noModule: true },
+		{ func: "transparentize($color, $amount)", desc: l10n.t("Makes a color more transparent."), noModule: true },
+		{ func: "fade-out($color, $amount)", desc: l10n.t("Makes a color more transparent."), noModule: true },
 		{
 			func: "adjust-color($color, [$red], [$green], [$blue], [$hue], [$saturation], [$lightness], [$alpha])",
 			desc: l10n.t("Increases or decreases one or more components of a color."),
@@ -369,6 +371,16 @@ export class SCSSCompletion extends CSSCompletion {
 		result: CompletionList,
 	): CompletionList {
 		for (const p of proposals) {
+			if (this.documentSettings?.suggestFromUseOnly) {
+				// If the user has a preference to avoid globals, exclude
+				// the proposal unless it has no equivalent in the module
+				// system. This affects older color functions like
+				// adjust-hue https://sass-lang.com/documentation/modules/color/#adjust-hue
+				if (!p.noModule) {
+					continue;
+				}
+			}
+
 			const insertText = p.func.replace(/\[?(\$\w+)\]?/g, this.createReplaceFunction());
 			const label = p.func.substr(0, p.func.indexOf("("));
 			const item: CompletionItem = {

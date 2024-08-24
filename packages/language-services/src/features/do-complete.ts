@@ -320,21 +320,6 @@ export class DoComplete extends LanguageFeature {
 			}
 
 			return result;
-
-			// // If we don't have any suggestions, maybe upstream does
-			// const upstreamResult = await upstreamLs.doComplete2(
-			// 	document,
-			// 	position,
-			// 	stylesheet,
-			// 	this.getDocumentContext(),
-			// 	{
-			// 		...this.configuration.completionSettings,
-			// 		triggerPropertyValueCompletion:
-			// 			this.configuration.completionSettings
-			// 				?.triggerPropertyValueCompletion || false,
-			// 	},
-			// );
-			// return upstreamResult;
 		}
 
 		const upstreamResult = await upstreamLs.doComplete2(

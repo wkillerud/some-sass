@@ -92,7 +92,7 @@ function defineConfig(config) {
 				},
 			],
 		},
-		devtool: "hidden-source-map",
+		devtool: false,
 	};
 
 	/** @type WebpackConfig */

@@ -20,7 +20,15 @@ async function main() {
 			"web-tests.js",
 		);
 
-		const folderPath = path.resolve(__dirname, "..", "..", "test", "fixtures");
+		const folderPath = path.resolve(
+			__dirname,
+			"..",
+			"..",
+			"test",
+			"e2e",
+			"defaults-scss",
+			"workspace",
+		);
 
 		const attachArgName = "--waitForDebugger=";
 		const waitForDebugger = process.argv.find((arg) =>

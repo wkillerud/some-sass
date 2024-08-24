@@ -1,243 +1,186 @@
-const assert = require("assert");
-const vscode = require("vscode");
+const { testSignature } = require("./signature-helper");
 const { getDocUri, showFile, position, sleep } = require("./util");
 
-/**
- * @param {import('vscode').Uri} docUri
- * @param {import('vscode').Position} position
- * @param {import('vscode').SignatureHelp} signature
- * @returns {Promise<void>}
- */
-async function testSignature(docUri, position, signature) {
+const docUri = getDocUri("signature/main.scss");
+
+before(async () => {
 	await showFile(docUri);
+	await sleep();
+});
 
-	const result = /** @type {import('vscode').SignatureHelp} */ (
-		await vscode.commands.executeCommand(
-			"vscode.executeSignatureHelpProvider",
-			docUri,
-			position,
-		)
-	);
-	if (result === undefined) {
-		assert.fail("The 'result' is undefined.");
-	}
+test("should suggest all parameters of mixin", async () => {
+	const expected = {
+		activeParameter: 0,
+		activeSignature: 0,
+		signatures: [
+			{
+				label: "square($size, $radius: 0)",
+				parameters: [{ label: "$size" }, { label: "$radius" }],
+			},
+		],
+	};
 
-	assert.strictEqual(
-		result.activeParameter,
-		signature.activeParameter,
-		`activeParameter in ${docUri.fsPath}`,
-	);
-	assert.strictEqual(
-		result.activeSignature,
-		signature.activeSignature,
-		"activeSignature",
-	);
+	await testSignature(docUri, position(5, 19), expected);
+});
 
-	assert.strictEqual(
-		result.signatures.length,
-		signature.signatures.length,
-		`Count of signatures: ${signature.signatures.length} expected; ${result.signatures.length} actual`,
-	);
+test("should suggest all parameters of mixin behind namespace and prefix", async () => {
+	const expected = {
+		activeParameter: 0,
+		activeSignature: 0,
+		signatures: [
+			{
+				label: "mix-mix-square($size, $radius: 0)",
+				parameters: [{ label: "$size" }, { label: "$radius" }],
+			},
+		],
+	};
 
-	signature.signatures.forEach((expectedSignature, i) => {
-		const actualSignature = result.signatures[i];
+	await testSignature(docUri, position(14, 30), expected);
+});
 
-		if (actualSignature === undefined) {
-			assert.fail("The 'actualSignature' is undefined.");
-		}
+test("should suggest the second parameter of mixin", async () => {
+	const expected = {
+		activeParameter: 1,
+		activeSignature: 0,
+		signatures: [
+			{
+				label: "square($size, $radius: 0)",
+				parameters: [{ label: "$size" }, { label: "$radius" }],
+			},
+		],
+	};
 
-		assert.strictEqual(actualSignature.label, expectedSignature.label);
+	await testSignature(docUri, position(6, 21), expected);
+});
 
-		assert.strictEqual(
-			actualSignature.parameters.length,
-			expectedSignature.parameters.length,
-			`Count of parameters for {expectedSignature.label}: ${expectedSignature.parameters.length} expected; ${actualSignature.parameters.length} actual`,
-		);
-	});
-}
+test("should suggest the second parameter of mixin behind namespace and prefix", async () => {
+	const expected = {
+		activeParameter: 1,
+		activeSignature: 0,
+		signatures: [
+			{
+				label: "mix-mix-square($size, $radius: 0)",
+				parameters: [{ label: "$size" }, { label: "$radius" }],
+			},
+		],
+	};
 
-describe("Signature", () => {
-	const docUri = getDocUri("signature/main.scss");
+	await testSignature(docUri, position(15, 32), expected);
+});
 
-	before(async () => {
-		await showFile(docUri);
-		await sleep();
-	});
+test("should suggest all parameters of function", async () => {
+	const expected = {
+		activeParameter: 0,
+		activeSignature: 0,
+		signatures: [
+			{
+				label: "pow($base, $exponent)",
+				parameters: [{ label: "$base" }, { label: "$exponent" }],
+			},
+		],
+	};
 
-	it("should suggest all parameters of mixin", async () => {
-		const expected = {
-			activeParameter: 0,
-			activeSignature: 0,
-			signatures: [
-				{
-					label: "square($size, $radius: 0)",
-					parameters: [{ label: "$size" }, { label: "$radius" }],
-				},
-			],
-		};
+	await testSignature(docUri, position(8, 16), expected);
+});
 
-		await testSignature(docUri, position(5, 19), expected);
-	});
+test("should suggest all parameters of function behind namespace and prefix", async () => {
+	const expected = {
+		activeParameter: 0,
+		activeSignature: 0,
+		signatures: [
+			{
+				label: "fun-fun-pow($base, $exponent)",
+				parameters: [{ label: "$base" }, { label: "$exponent" }],
+			},
+		],
+	};
 
-	it("should suggest all parameters of mixin behind namespace and prefix", async () => {
-		const expected = {
-			activeParameter: 0,
-			activeSignature: 0,
-			signatures: [
-				{
-					label: "mix-mix-square($size, $radius: 0)",
-					parameters: [{ label: "$size" }, { label: "$radius" }],
-				},
-			],
-		};
+	await testSignature(docUri, position(17, 27), expected);
+});
 
-		await testSignature(docUri, position(14, 30), expected);
-	});
+test("should suggest the second parameter of function", async () => {
+	const expected = {
+		activeParameter: 1,
+		activeSignature: 0,
+		signatures: [
+			{
+				label: "pow($base, $exponent)",
+				parameters: [{ label: "$base" }, { label: "$exponent" }],
+			},
+		],
+	};
 
-	it("should suggest the second parameter of mixin", async () => {
-		const expected = {
-			activeParameter: 1,
-			activeSignature: 0,
-			signatures: [
-				{
-					label: "square($size, $radius: 0)",
-					parameters: [{ label: "$size" }, { label: "$radius" }],
-				},
-			],
-		};
+	await testSignature(docUri, position(8, 26), expected);
+});
 
-		await testSignature(docUri, position(6, 21), expected);
-	});
+test("should suggest the second parameter of function behind namespace and prefix", async () => {
+	const expected = {
+		activeParameter: 1,
+		activeSignature: 0,
+		signatures: [
+			{
+				label: "fun-fun-pow($base, $exponent)",
+				parameters: [{ label: "$base" }, { label: "$exponent" }],
+			},
+		],
+	};
 
-	it("should suggest the second parameter of mixin behind namespace and prefix", async () => {
-		const expected = {
-			activeParameter: 1,
-			activeSignature: 0,
-			signatures: [
-				{
-					label: "mix-mix-square($size, $radius: 0)",
-					parameters: [{ label: "$size" }, { label: "$radius" }],
-				},
-			],
-		};
+	await testSignature(docUri, position(17, 48), expected);
+});
 
-		await testSignature(docUri, position(15, 32), expected);
-	});
+test("should suggest all parameters of function from Sass built-in", async () => {
+	const expected = {
+		activeParameter: 0,
+		activeSignature: 0,
+		signatures: [
+			{
+				label: "clamp($min, $number, $max)",
+				parameters: [
+					{ label: "$min" },
+					{ label: "$number" },
+					{ label: "$max" },
+				],
+			},
+		],
+	};
 
-	it("should suggest all parameters of function", async () => {
-		const expected = {
-			activeParameter: 0,
-			activeSignature: 0,
-			signatures: [
-				{
-					label: "pow($base, $exponent)",
-					parameters: [{ label: "$base" }, { label: "$exponent" }],
-				},
-			],
-		};
+	await testSignature(docUri, position(23, 26), expected);
+});
 
-		await testSignature(docUri, position(8, 16), expected);
-	});
+test("should suggest second and third parameters of function from Sass built-in", async () => {
+	const expected = {
+		activeParameter: 1,
+		activeSignature: 0,
+		signatures: [
+			{
+				label: "clamp($min, $number, $max)",
+				parameters: [
+					{ label: "$min" },
+					{ label: "$number" },
+					{ label: "$max" },
+				],
+			},
+		],
+	};
 
-	it("should suggest all parameters of function behind namespace and prefix", async () => {
-		const expected = {
-			activeParameter: 0,
-			activeSignature: 0,
-			signatures: [
-				{
-					label: "fun-fun-pow($base, $exponent)",
-					parameters: [{ label: "$base" }, { label: "$exponent" }],
-				},
-			],
-		};
+	await testSignature(docUri, position(24, 28), expected);
+});
 
-		await testSignature(docUri, position(17, 27), expected);
-	});
+test("should suggest third parameters of function from Sass built-in", async () => {
+	const expected = {
+		activeParameter: 2,
+		activeSignature: 0,
+		signatures: [
+			{
+				label: "clamp($min, $number, $max)",
+				parameters: [
+					{ label: "$min" },
+					{ label: "$number" },
+					{ label: "$max" },
+				],
+			},
+		],
+	};
 
-	it("should suggest the second parameter of function", async () => {
-		const expected = {
-			activeParameter: 1,
-			activeSignature: 0,
-			signatures: [
-				{
-					label: "pow($base, $exponent)",
-					parameters: [{ label: "$base" }, { label: "$exponent" }],
-				},
-			],
-		};
-
-		await testSignature(docUri, position(8, 26), expected);
-	});
-
-	it("should suggest the second parameter of function behind namespace and prefix", async () => {
-		const expected = {
-			activeParameter: 1,
-			activeSignature: 0,
-			signatures: [
-				{
-					label: "fun-fun-pow($base, $exponent)",
-					parameters: [{ label: "$base" }, { label: "$exponent" }],
-				},
-			],
-		};
-
-		await testSignature(docUri, position(17, 48), expected);
-	});
-
-	it("should suggest all parameters of function from Sass built-in", async () => {
-		const expected = {
-			activeParameter: 0,
-			activeSignature: 0,
-			signatures: [
-				{
-					label: "clamp($min, $number, $max)",
-					parameters: [
-						{ label: "$min" },
-						{ label: "$number" },
-						{ label: "$max" },
-					],
-				},
-			],
-		};
-
-		await testSignature(docUri, position(23, 26), expected);
-	});
-
-	it("should suggest second and third parameters of function from Sass built-in", async () => {
-		const expected = {
-			activeParameter: 1,
-			activeSignature: 0,
-			signatures: [
-				{
-					label: "clamp($min, $number, $max)",
-					parameters: [
-						{ label: "$min" },
-						{ label: "$number" },
-						{ label: "$max" },
-					],
-				},
-			],
-		};
-
-		await testSignature(docUri, position(24, 28), expected);
-	});
-
-	it("should suggest third parameters of function from Sass built-in", async () => {
-		const expected = {
-			activeParameter: 2,
-			activeSignature: 0,
-			signatures: [
-				{
-					label: "clamp($min, $number, $max)",
-					parameters: [
-						{ label: "$min" },
-						{ label: "$number" },
-						{ label: "$max" },
-					],
-				},
-			],
-		};
-
-		await testSignature(docUri, position(25, 30), expected);
-	});
+	await testSignature(docUri, position(25, 30), expected);
 });

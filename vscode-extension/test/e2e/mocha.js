@@ -10,7 +10,7 @@ const ONE_SECOND_IN_MS = 1 * 1000;
  */
 async function runMocha(files, openFile) {
 	const mocha = new Mocha({
-		ui: "bdd",
+		ui: "qunit",
 		timeout: ONE_SECOND_IN_MS * 30,
 	});
 

@@ -4,8 +4,8 @@ const {
 	position,
 	sameLineLocation,
 	sleepCI,
-} = require("../util");
-const { testDefinition } = require("./helper");
+} = require("./util");
+const { testDefinition } = require("./definition-helper");
 
 describe("SCSS Definition Test", function () {
 	const docUri = getDocUri("definition/main.scss");

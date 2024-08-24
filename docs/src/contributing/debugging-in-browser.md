@@ -12,7 +12,9 @@ npm run start:web
 
 This opens Visual Studio Code running as a [web extension host][exthost] in Chromium. The language server runs as a [web worker][worker], and is started when you open a Sass file.
 
-Open the Sass project you're using to test in the extension host window. If you don't have one you can open the folder `vscode-extension/test/fixtures/` in this repository.
+Open the Sass project you're using to test in the extension host window.
+If you don't have one you can find several `workspace/`
+directories inside `vscode-extension/test/e2e/` in this repository.
 
 ## Navigating the Chromium developer tools
 

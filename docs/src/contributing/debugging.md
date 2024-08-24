@@ -4,12 +4,12 @@ This page assumes you're using Visual Studio Code as the debugger. Go to the [Ru
 
 - Launch extension
 - Launch web extension
-- Launch integration tests
-- Launch web integration tests
 
 ## Launch extension
 
-This opens a new window of Visual Studio Code running as a [local extension host][exthost]. Open the Sass project you're using to test in the extension host window. If you don't have one you can open the folder `vscode-extension/test/fixtures/` in this repository.
+This opens a new window of Visual Studio Code running as a [local extension host][exthost]. Open the Sass project you're using to test in the extension host window.
+If you don't have one you can find several `workspace/`
+directories inside `vscode-extension/test/e2e/` in this repository.
 
 ### Set breakpoints
 
@@ -30,7 +30,9 @@ You'll find the log output in two places:
 
 ## Launch web extension
 
-This opens a new window of Visual Studio Code running as a [web extension host][exthost]. Open the Sass project you're using to test in the extension host window. If you don't have one you can open the folder `vscode-extension/test/fixtures/` in this repository.
+This opens a new window of Visual Studio Code running as a [web extension host][exthost]. Open the Sass project you're using to test in the extension host window.
+If you don't have one you can find several `workspace/`
+directories inside `vscode-extension/test/e2e/` in this repository.
 
 Find `browser-server.js` in the `vscode-extension/dist/` folder to set breakpoints.
 

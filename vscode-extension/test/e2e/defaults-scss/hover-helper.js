@@ -1,6 +1,6 @@
 const assert = require("assert");
 const vscode = require("vscode");
-const { showFile } = require("../util");
+const { showFile } = require("./util");
 
 /**
  * @param {import('vscode').Uri} docUri

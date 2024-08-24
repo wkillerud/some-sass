@@ -1,5 +1,5 @@
-const { getDocUri, showFile, position, sleepCI } = require("../util");
-const { testHover } = require("./helper");
+const { getDocUri, showFile, position, sleepCI } = require("./util");
+const { testHover } = require("./hover-helper");
 
 describe("SCSS Hover Test", function () {
 	const docUri = getDocUri("hover/main.scss");

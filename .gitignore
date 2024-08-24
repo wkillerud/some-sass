@@ -9,9 +9,7 @@ npm-debug.log*
 
 # Dependency directory
 node_modules/
-!vscode-extension/test/fixtures/node_modules
-!vscode-extension/test/fixtures/completion/node_modules
-!vscode-extension/test/fixtures/pkg-import/node_modules
+!vscode-extension/test/**/node_modules
 
 # Compiled and temporary files
 dist/

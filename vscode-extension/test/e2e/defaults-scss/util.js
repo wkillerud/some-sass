@@ -17,7 +17,7 @@ function position(line, char) {
  * @returns {string}
  */
 function getDocPath(p) {
-	return path.resolve(__dirname, "..", "..", "fixtures", p);
+	return path.resolve(__dirname, "workspace", p);
 }
 
 /**

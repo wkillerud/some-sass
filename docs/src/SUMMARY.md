@@ -33,7 +33,6 @@
 - [Debugging](contributing/debugging.md)
   - [Debugging in the browser](contributing/debugging-in-browser.md)
   - [Debugging unit tests](contributing/debugging-unit-tests.md)
-  - [Debugging end-to-end tests](contributing/debugging-e2e-tests.md)
   - [Debugging performance](contributing/debugging-performance.md)
 - [Releasing new versions](contributing/releases.md)
 - [Writing documentation](contributing/writing-documentation.md)

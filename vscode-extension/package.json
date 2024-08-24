@@ -84,6 +84,11 @@
           "default": [],
           "markdownDescription": "A list of paths relative to the workspace root where the language server should look for stylesheets loaded by `@use` and `@import`. `node_modules` is always included.\n\nNote that you will have to [configure your Sass compiler separately](https://sass-lang.com/documentation/cli/dart-sass/#load-path)."
         },
+				"somesass.scannerDepth": {
+          "type": "number",
+          "default": 30,
+          "description": "The maximum number of nested directories to scan."
+        },
         "somesass.scannerExclude": {
           "type": "array",
           "items": {
@@ -95,6 +100,12 @@
             "**/bower_components/**"
           ],
           "description": "List of glob patterns for directories that are excluded when scanning."
+        },
+				"somesass.scanImportedFiles": {
+          "type": "boolean",
+          "default": true,
+          "deprecationMessage": "Will be removed at some point after `@import` becomes CSS-only.",
+          "description": "Allows scan imported files. Turning this off will severely limit functionality, and is not recommended."
         },
         "somesass.suggestionStyle": {
           "type": "string",

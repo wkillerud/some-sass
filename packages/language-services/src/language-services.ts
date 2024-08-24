@@ -161,7 +161,7 @@ class LanguageServiceImpl implements LanguageService {
 	}
 
 	getCachedTextDocument(uri: URI): TextDocument | undefined {
-		return this.#cache.getCachedTextDocument(uri.toString());
+		return this.#cache.getDocument(uri.toString());
 	}
 
 	getColorPresentations(document: TextDocument, color: Color, range: Range) {

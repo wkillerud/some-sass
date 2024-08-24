@@ -131,7 +131,7 @@
     "build": "webpack --mode development",
     "start:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=.",
     "lint": "eslint \"**/*.ts\" --cache",
-    "test:e2e": "node ./test/e2e/runTest.js",
+    "test:e2e": "node ./test/e2e/runTest.js && node ./test/new-e2e/runTest.js",
     "pretest:web": "webpack --config ./webpack.test-web.config.js ",
     "test:web": "node ./test/web/runTest.js"
   },

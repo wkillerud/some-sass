@@ -56,6 +56,7 @@ export default class WorkspaceScanner {
 		try {
 			let document: TextDocument | null | undefined =
 				this.#ls.getCachedTextDocument(uri);
+
 			if (!document) {
 				const content = await this.#fs.readFile(uri);
 
@@ -63,10 +64,11 @@ export default class WorkspaceScanner {
 					TextDocument.create(uri.toString(), "scss", 1, content),
 				);
 				if (!document) return;
-				this.#ls.parseStylesheet(document);
 			}
 
+			this.#ls.parseStylesheet(document);
 			const links = await this.#ls.findDocumentLinks(document);
+
 			for (const link of links) {
 				if (
 					!link.target ||
@@ -77,8 +79,17 @@ export default class WorkspaceScanner {
 					continue;
 				}
 
+				let uri = URI.parse(link.target);
+				let visited: TextDocument | null | undefined =
+					this.#ls.getCachedTextDocument(uri);
+
+				if (visited) {
+					// avoid infinite loop if circular references
+					continue;
+				}
+
 				try {
-					await this.parse(URI.parse(link.target), depth + 1);
+					await this.parse(uri, depth + 1);
 				} catch {
 					// do nothing
 				}

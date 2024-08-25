@@ -85,6 +85,7 @@ export class DoComplete extends LanguageFeature {
 		position: Position,
 	): Promise<CompletionList> {
 		const result = CompletionList.create([]);
+
 		const upstreamLs = this.getUpstreamLanguageServer();
 		const context = this.createCompletionContext(document, position);
 
@@ -225,6 +226,7 @@ export class DoComplete extends LanguageFeature {
 			return result;
 		}
 
+		const links = await this.ls.findDocumentLinks(document);
 		if (context.namespace) {
 			const items = await this.doNamespaceCompletion(document, context);
 			if (items.length > 0) {
@@ -232,9 +234,30 @@ export class DoComplete extends LanguageFeature {
 				return result;
 			}
 		}
+		// else {
+		// 	// give suggestions for all @use in case the user is typing one of those
+		//  // unfortunately in VS Code at time of writing this breaks suggestions when
+		//  // manually typing out the namespace. Where without this you get suggestions
+		//  // after typing the dot (ex `module.`), this somehow interferes.
+		//  // Adding result.isIncomplete = true has no effect.  While I'd like to include
+		//  // suggestions for available namespaces, the existing behavior has to work.
+		// 	for (const link of links) {
+		// 		if (link.namespace) {
+		// 			let insertText = `${link.namespace}.`;
+		// 			result.items.push({
+		// 				label: link.namespace,
+		// 				kind: CompletionItemKind.Module,
+		// 				insertText,
+		// 				command: {
+		// 					title: "Suggest",
+		// 					command: "editor.action.triggerSuggest",
+		// 				},
+		// 			});
+		// 		}
+		// 	}
+		// }
 
 		// We might be looking at a wildcard alias (@use "./foo" as *), so check the links and see if we need to go looking
-		const links = await this.ls.findDocumentLinks(document);
 		const wildcards: DocumentLink[] = [];
 		for (const link of links) {
 			if (link.as === "*") {
@@ -332,16 +355,6 @@ export class DoComplete extends LanguageFeature {
 			);
 			if (upstreamResult.items.length > 0) {
 				result.items.push(...upstreamResult.items);
-			}
-		}
-
-		// give suggestions for all @use in case the user is typing one of those
-		for (const link of links) {
-			if (link.namespace) {
-				result.items.push({
-					label: link.namespace,
-					kind: CompletionItemKind.Module,
-				});
 			}
 		}
 
@@ -522,7 +535,7 @@ export class DoComplete extends LanguageFeature {
 			items.push(...result);
 		}
 
-		if (this.configuration.completionSettings?.suggestFromUseOnly) {
+		if (!this.configuration.completionSettings?.suggestFromUseOnly) {
 			const documents = this.cache.documents();
 			for (const current of documents) {
 				const symbols = this.ls.findDocumentSymbols(current);
@@ -1109,9 +1122,9 @@ export class DoComplete extends LanguageFeature {
 			// be replaced (except when we're embedded in Vue, Svelte or Astro).
 			// Example result: .floor(${1:number})
 			const isEmbedded = this.isEmbedded(document);
-			const includeDot = isEmbedded && document.languageId !== "sass";
+			const includeDot = !isEmbedded && document.languageId !== "sass";
 			const insertText = context.currentWord.includes(".")
-				? `${includeDot ? "" : "."}${label}${
+				? `${includeDot ? "." : ""}${label}${
 						signature ? `(${parameterSnippet})` : ""
 					}`
 				: label;

@@ -7,6 +7,7 @@ const {
 	showFile,
 	sleep,
 	sleepCI,
+	type,
 } = require("../util");
 
 /**
@@ -34,4 +35,5 @@ module.exports = {
 	position,
 	sameLineLocation,
 	sameLineRange,
+	type,
 };

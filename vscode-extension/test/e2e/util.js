@@ -63,6 +63,41 @@ async function sleepCI(ms = 2000) {
 	await sleep(0);
 }
 
+
+/**
+ * @private
+ * @param {import('vscode').TextDocument} doc
+ * @returns {Promise<import('vscode').TextDocument>}
+ */
+function onDocumentChange(doc) {
+	return new Promise(resolve => {
+		const sub = vscode.workspace.onDidChangeTextDocument(e => {
+			if (e.document !== doc) {
+				return;
+			}
+			sub.dispose();
+			resolve(e.document);
+		});
+	});
+};
+
+/**
+ * Emulate a user typing in one character at a time.
+ *
+ * @param {import('vscode').TextEditor} editor
+ * @param {string} text
+ * @returns {Promise<import('vscode').TextEditor>}
+ */
+async function type(editor, text) {
+	const document = editor.document;
+	const onChange = onDocumentChange(document);
+	for (let char of text) {
+		await vscode.commands.executeCommand('type', { text: char });
+		await onChange;
+	}
+	return editor;
+};
+
 module.exports = {
 	sleep,
 	sleepCI,
@@ -70,4 +105,5 @@ module.exports = {
 	position,
 	sameLineLocation,
 	sameLineRange,
+	type,
 };

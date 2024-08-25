@@ -1,5 +1,7 @@
-const { getDocUri, showFile, position, sleepCI } = require("./util");
+const vscode = require("vscode");
+const { getDocUri, showFile, position, sleepCI, type, sleep } = require("./util");
 const { testCompletion } = require("./completion-helper");
+const assert = require("assert");
 
 const docUri = getDocUri("completion/main.scss");
 const modulesDocUri = getDocUri("completion/modules.scss");
@@ -89,6 +91,25 @@ test("Offers namespaces completions including prefixes", async () => {
 	];
 
 	await testCompletion(docUri, position(24, 15), expectedCompletions);
+});
+
+test("shows completions for a module after typing the module name and .", async () => {
+	const completions = await showFile(docUri);
+
+	const cursor = new vscode.Position(39, 0);
+	completions.selection = new vscode.Selection(cursor, cursor);
+
+	// should show suggestions from sass:math
+	await type(completions, "$e: math.");
+
+	// give suggestions time to appear
+	await sleep(300);
+
+	// accept the first
+	await vscode.commands.executeCommand("acceptSelectedSuggestion");
+
+	// confirm the suggestion was applied
+	assert.match(completions.document.getText(), /\$e: math\.\$e/);
 });
 
 test("Offers namespace completion inside string interpolation", async () => {

@@ -16,7 +16,7 @@ test("shows completions for a module after typing the module name and .", async 
 	completions.selection = new vscode.Selection(cursor, cursor);
 
 	// should show suggestions for dark- and light-mode-variables
-	let document = await type(completions.document, "@include theme.");
+	await type(completions, "@include theme.");
 
 	// give suggestions time to appear
 	await sleep(300);
@@ -25,5 +25,5 @@ test("shows completions for a module after typing the module name and .", async 
 	await vscode.commands.executeCommand("acceptSelectedSuggestion");
 
 	// confirm the suggestion was applied
-	assert.match(document.getText(), /dark-mode-variables/);
+	assert.match(completions.document.getText(), /dark-mode-variables/);
 });

@@ -355,9 +355,7 @@ test("indented: extraction for function", async () => {
 
 	assert.deepStrictEqual(getEdit(result[2]), [
 		{
-			newText: `@function _function()
-  @return black
---var: _function()`,
+			newText: `@function _function()${EOL}  @return black${EOL}--var: _function()`,
 			range: {
 				end: {
 					character: 12,

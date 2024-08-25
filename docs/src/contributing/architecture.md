@@ -1,6 +1,6 @@
 # Architecture
 
-Being a [language server extension](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide), Some Sass consists of a [client](https://github.com/wkillerud/some-sass/blob/main/vscode-extension) and a [server](https://github.com/wkillerud/some-sass/blob/main/packages/language-server). The client starts the server when it opens a file with SCSS. This is called activation.
+Being a [language server extension](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide), Some Sass consists of a [client](https://github.com/wkillerud/some-sass/blob/main/vscode-extension) and a [server](https://github.com/wkillerud/some-sass/blob/main/packages/language-server). The client starts the server when it opens a file with SCSS or Sass code. This is called activation.
 
 From there everything happens via [messages](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/).
 
@@ -18,17 +18,17 @@ The code for the server is divided in three packages:
 
 1. Language server
 2. Language services
-3. VS Code CSS language service – the SCSS parser and language features that are included in VS Code.
+3. VS Code CSS language service
 
 ### Language server
 
-This package handles communication with the language client, and not much else.
+This package handles communication with the language client, scans the workspace for files to parse them, and not much else.
 
 ### Language services
 
 This is where you find the functionality of the language server, organized in classes that inherit from a base `LanguageFeature` class.
 
-All features will parse the given document, but parses are cached for performance reasons. The flow looks something like this:
+All features will parse the given document, but parses are cached for performance. The flow looks something like this:
 
 ![](../images/architecture/parser-cache.png)
 
@@ -44,4 +44,6 @@ In addition to the parsed document, the cache also holds:
 
 ### VS Code CSS language service
 
-The project includes a private fork of the `vscode-css-languageservice` module. The original `vscode-css-languageservice` powers the CSS, SCSS and Less features in Visual Studio Code. Some Sass uses this module's parser and some of its language features. It's kept as a separate package to simplify updates, and to make it easier to send patches upstream.
+The project includes a private fork of the `vscode-css-languageservice` module.
+
+The original `vscode-css-languageservice` powers the CSS, SCSS and Less features in Visual Studio Code. Some Sass extends this module's parser and some of its language features to support both syntaxes. It's kept as a separate package to simplify updates, and to make it easier to send patches upstream.

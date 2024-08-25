@@ -26,6 +26,7 @@ If something unexpected happens with your build you can do a clean build:
 
 ```sh
 npm run clean
+npm run clean-install
 npm run build
 ```
 

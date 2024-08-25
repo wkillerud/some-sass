@@ -13,14 +13,6 @@ These are the recommended settings:
 
 	// Optional, if you get suggestions from the current document after namespace.$ (you don't need the $ for narrowing down suggestions)
 	"editor.wordBasedSuggestions": false,
-
-	// Optional, for Vue, Svelte, Astro: add `scss` to the list of excluded languages for Emmet to avoid suggestions in Vue, Svelte or Astro files.
-	// VS Code understands that <style lang="scss">`blocks are SCSS, and so won't show Emmet suggestions in that block.
-	"emmet.excludeLanguages": [
-		// Markdown is excluded by default in VS Code
-		"markdown",
-		"scss",
-	],
 }
 ```
 

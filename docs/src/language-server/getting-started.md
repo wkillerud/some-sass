@@ -24,7 +24,7 @@ some-sass-language-server --stdio
 
 ### Settings
 
-The language server requests [settings](../user-guide/settings.md) via `workspace/configuration` on the `somesass` key. All fields are optional.
+The language server requests [settings](../user-guide/settings.md) via the [`workspace/configuration` message](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_configuration), on the `somesass` key. All fields are optional.
 
 ## Configure a client
 

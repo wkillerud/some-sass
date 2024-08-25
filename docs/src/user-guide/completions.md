@@ -6,8 +6,8 @@ This page describes what Some Sass adds to [code completions][intellisense], als
 
 With the [recommended settings](./settings.md#recommended-settings), suggestions get limited to only the symbols available in that namespace. Code completions from Some Sass has full support for:
 
-- aliasing (`@use "foo" as f;`)
-- prefixes (`@forward "foo" as bar-*;`)
+- aliasing (`@use "foo" as f`)
+- prefixes (`@forward "foo" as bar-*`)
 - [hide/show][visibility]
 
 Sass [built-in modules][builtin] (such as `"sass:map"`) get the same treatment when imported with `@use`.

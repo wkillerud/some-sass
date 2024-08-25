@@ -4,7 +4,7 @@ The language server is written in TypeScript and runs both in Node and the brows
 
 You need:
 
-- A long-term support version of [Node.js](https://nodejs.org/en)
+- A current long-term support version of [Node.js](https://nodejs.org/en)
 - [Visual Studio Code](https://code.visualstudio.com/)
 
 Recommended extensions:
@@ -20,7 +20,7 @@ Clone the repo and install dependencies:
 ```sh
 git clone git@github.com:wkillerud/some-sass.git
 cd some-sass
-npm install
+npm clean-install
 ```
 
 Run the build and automated tests. Some of the automated tests open a new window and run in Visual Studio Code Insiders.

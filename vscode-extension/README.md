@@ -1,6 +1,7 @@
 # Some Sass for Visual Studio Code
 
-Some Sass is a [language server extension](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide) for Visual Studio Code. It brings improved code suggestions, documentation and code navigation for SCSS.
+Some Sass is a [language server extension](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide) for Visual Studio Code.
+It brings improved code suggestions, documentation and code navigation for both SCSS and indented Sass syntaxes.
 
 Some features include:
 
@@ -8,6 +9,7 @@ Some features include:
 - Workspace-wide code navigation and refactoring, such as Rename Symbol.
 - Rich documentation through [SassDoc](http://sassdoc.com).
 - Language features for [`%placeholders`](https://sass-lang.com/documentation/style-rules/placeholder-selectors/), both when using them and writing them.
+- Support for [both Sass syntaxes](https://sass-lang.com/documentation/syntax/).
 
 ![](/docs/src/images/highlight-reel.gif)
 
@@ -29,8 +31,7 @@ These are the recommended settings:
 ```jsonc
 {
 	// Recommended if you don't rely on @import
-	"somesass.scss.completion.suggestFromUseOnly": true,
-	"somesass.sass.completion.suggestFromUseOnly": true,
+	"somesass.suggestFromUseOnly": true,
 
 	// Optional, if you get suggestions from the current document after namespace.$ (you don't need the $ for narrowing down suggestions)
 	"editor.wordBasedSuggestions": false,
@@ -58,7 +59,7 @@ Visit the [release section on GitHub](https://github.com/wkillerud/some-sass/rel
 
 ## Acknowledgements
 
-Began as SCSS Intellisense by [Denis Malinochkin and contributors](https://github.com/mrmlnc/vscode-scss). Extends the built-in VS Code language server for SCSS.
+Began as SCSS Intellisense by [Denis Malinochkin and contributors](https://github.com/mrmlnc/vscode-scss). Extends the built-in [VS Code language services](https://github.com/microsoft/vscode-css-languageservice) for SCSS.
 
 The logo is [owned by the Sass](https://sass-lang.com/styleguide/brand) project and licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 

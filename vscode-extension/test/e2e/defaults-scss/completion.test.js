@@ -91,26 +91,6 @@ test("Offers namespaces completions including prefixes", async () => {
 	await testCompletion(docUri, position(24, 15), expectedCompletions);
 });
 
-// We can't test this until somesass.suggestFromUseOnly: true becomes the default setting
-test.skip("Offers no hidden items in namespace completions", async () => {
-	let expectedCompletions = ["$secret"];
-
-	await testCompletion(docUri, position(23, 13), expectedCompletions, {
-		expectNoMatch: true,
-	});
-
-	expectedCompletions = [
-		"secret",
-		"other-secret",
-		"mix-secret",
-		"mix-other-secret",
-	];
-
-	await testCompletion(docUri, position(24, 15), expectedCompletions, {
-		expectNoMatch: true,
-	});
-});
-
 test("Offers namespace completion inside string interpolation", async () => {
 	let expectedCompletions = [
 		{

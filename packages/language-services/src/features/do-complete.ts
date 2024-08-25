@@ -454,6 +454,23 @@ export class DoComplete extends LanguageFeature {
 				context.isFunctionContext = true;
 			}
 			return context;
+		} else if (document.languageId === "sass") {
+			// do the same test for the shorthand + to include mixins in this syntax
+			if (
+				!isPropertyValue &&
+				reIndentedMixinReference.test(lineBeforePosition)
+			) {
+				context.isMixinContext = true;
+				if (
+					reCompletedIndentedMixinWithParametersReference.test(
+						lineBeforePosition,
+					)
+				) {
+					context.isMixinContext = false;
+					context.isVariableContext = true;
+					context.isFunctionContext = true;
+				}
+			}
 		}
 
 		if (isPropertyValue && !isEmptyValue && !isQuotes) {
@@ -480,32 +497,6 @@ export class DoComplete extends LanguageFeature {
 			context.isVariableContext =
 				currentWord.startsWith("$") || isInterpolation || isEmptyValue;
 			context.isFunctionContext = isPropertyValue && isEmptyValue;
-		}
-
-		if (!isPropertyValue && reMixinReference.test(lineBeforePosition)) {
-			context.isMixinContext = true;
-			if (reCompletedMixinWithParametersReference.test(lineBeforePosition)) {
-				context.isMixinContext = false;
-				context.isVariableContext = true;
-				context.isFunctionContext = true;
-			}
-		} else if (document.languageId === "sass") {
-			// do the same test for the shorthand + to include mixins in this syntax
-			if (
-				!isPropertyValue &&
-				reIndentedMixinReference.test(lineBeforePosition)
-			) {
-				context.isMixinContext = true;
-				if (
-					reCompletedIndentedMixinWithParametersReference.test(
-						lineBeforePosition,
-					)
-				) {
-					context.isMixinContext = false;
-					context.isVariableContext = true;
-					context.isFunctionContext = true;
-				}
-			}
 		}
 
 		return context;

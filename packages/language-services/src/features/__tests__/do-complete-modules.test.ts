@@ -13,15 +13,8 @@ const ls = getLanguageService({ fileSystemProvider, ...rest });
 beforeEach(() => {
 	ls.clearCache();
 	ls.configure({
-		scss: {
-			completion: {
-				suggestFromUseOnly: true,
-			},
-		},
-		sass: {
-			completion: {
-				suggestFromUseOnly: true,
-			},
+		completionSettings: {
+			suggestFromUseOnly: true,
 		},
 	}); // Reset any configuration to default
 });

@@ -1,6 +1,6 @@
+const assert = require("assert");
 const vscode = require("vscode");
 const { getDocUri, showFile, sleepCI } = require("./util");
-const assert = require("assert");
 
 const mainUri = getDocUri("navigation/main.sass");
 const circularUri = getDocUri("navigation/_circular.sass");

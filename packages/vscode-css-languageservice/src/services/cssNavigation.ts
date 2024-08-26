@@ -539,6 +539,7 @@ export class CSSNavigation {
 		return undefined;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected async mapReference(target: string | undefined, isRawLink: boolean): Promise<string | undefined> {
 		return target;
 	}
@@ -645,7 +646,7 @@ export class CSSNavigation {
 			}
 
 			return true;
-		} catch (err) {
+		} catch {
 			return false;
 		}
 	}
@@ -656,7 +657,7 @@ export class CSSNavigation {
 		}
 		try {
 			return await this.fileSystemProvider.getContent(uri);
-		} catch (err) {
+		} catch {
 			return null;
 		}
 	}

@@ -65,7 +65,7 @@ export class FindColors extends LanguageFeature {
 						};
 
 						return colorInformation;
-					} catch (e) {
+					} catch {
 						// do nothing
 					}
 				}

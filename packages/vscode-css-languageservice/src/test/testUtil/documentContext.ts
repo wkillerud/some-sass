@@ -17,7 +17,7 @@ export function getDocumentContext(workspaceFolder?: string): DocumentContext {
 			}
 			try {
 				return url.resolve(base, ref);
-			} catch (e) {
+			} catch {
 				return undefined;
 			}
 		},

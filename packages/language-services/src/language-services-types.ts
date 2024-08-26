@@ -21,7 +21,6 @@ import {
 	IToken,
 	TokenType,
 	Marker,
-	CompletionSettings as VSCodeCompletionSettings,
 	StylesheetDocumentLink,
 	FoldingRange,
 	FoldingRangeKind,

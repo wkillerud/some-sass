@@ -82,7 +82,7 @@ export class SassNavigation extends CSSNavigation {
 		};
 		try {
 			packageJson = JSON.parse(packageJsonContent);
-		} catch (e) {
+		} catch {
 			// problems parsing package.json
 			return undefined;
 		}

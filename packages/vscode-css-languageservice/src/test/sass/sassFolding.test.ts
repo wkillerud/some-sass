@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { suite, test, assert } from "vitest";
+import { suite, test } from "vitest";
 import { FoldingRange, FoldingRangeKind } from "vscode-languageserver-types";
 import { assertRanges as assertCssRanges } from "../css/folding.test";
 

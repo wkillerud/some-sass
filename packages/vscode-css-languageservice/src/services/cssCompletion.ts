@@ -10,7 +10,6 @@ import * as languageFacts from "../languageFacts/facts";
 import * as strings from "../utils/strings";
 import {
 	ICompletionParticipant,
-	LanguageSettings,
 	TextDocument,
 	Command,
 	Position,
@@ -1079,7 +1078,6 @@ export class CSSCompletion {
 		parameters: nodes.Nodelist,
 		existingNode: nodes.Node | null,
 	): CompletionItem {
-		const decl = <nodes.FunctionDeclaration>symbol.node;
 		const params = parameters.getChildren().map((c) => {
 			return c instanceof nodes.FunctionParameter ? (<nodes.FunctionParameter>c).getName() : c.getText();
 		});

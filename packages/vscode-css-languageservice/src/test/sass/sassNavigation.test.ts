@@ -108,7 +108,6 @@ export function assertSymbolsInScope(
 suite("SCSS - Navigation", () => {
 	suite("Scopes and Symbols", () => {
 		test("symbols in scopes", () => {
-			const ls = getSCSSLS();
 			assertSymbolsInScope("scss", "$var: iable;", 0, { name: "$var", type: nodes.ReferenceType.Variable });
 			assertSymbolsInScope("scss", "$var: iable;", 11, { name: "$var", type: nodes.ReferenceType.Variable });
 			assertSymbolsInScope(

@@ -124,7 +124,7 @@ export class PathCompletionParticipant implements ICompletionParticipant {
 					}
 				}
 				return result;
-			} catch (e) {
+			} catch {
 				// ignore
 			}
 		}

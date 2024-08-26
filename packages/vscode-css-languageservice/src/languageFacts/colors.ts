@@ -380,7 +380,7 @@ export function isColorValue(node: nodes.Node): boolean {
 const Digit0 = 48;
 const Digit9 = 57;
 const A = 65;
-const F = 70;
+// const F = 70;
 const a = 97;
 const f = 102;
 
@@ -612,7 +612,7 @@ export function getColorValue(node: nodes.Node): Color | null {
 				const b = getNumericValue(colorValues[2], 100.0);
 				return colorFromHWB(h, w, b, alpha);
 			}
-		} catch (e) {
+		} catch {
 			// parse error on numeric value
 			return null;
 		}

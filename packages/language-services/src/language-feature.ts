@@ -97,7 +97,7 @@ export abstract class LanguageFeature {
 				}
 				try {
 					return resolve(base, ref);
-				} catch (e) {
+				} catch {
 					return undefined;
 				}
 			},

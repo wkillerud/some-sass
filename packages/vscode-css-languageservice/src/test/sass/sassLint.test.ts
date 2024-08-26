@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { suite, test, assert } from "vitest";
+import { suite, test } from "vitest";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { LintConfigurationSettings, Rule, Rules } from "../../services/lintRules";
 import { SassParser } from "../../parser/sassParser";

@@ -51,7 +51,7 @@ export function getFileSystemProvider(
 				const params = uri.toString();
 				const res = await connection.sendRequest(FsStatRequest.type, params);
 				return res as FileStat;
-			} catch (e) {
+			} catch {
 				return {
 					type: FileType.Unknown,
 					mtime: -1,

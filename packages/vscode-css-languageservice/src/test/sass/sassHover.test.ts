@@ -3,8 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { suite, test, assert } from "vitest";
-import { Hover, TextDocument, getSassLanguageService } from "../../cssLanguageService";
+import { suite, test } from "vitest";
+import { Hover } from "../../cssLanguageService";
 import { HoverSettings } from "../../cssLanguageTypes";
 import { assertHover as assertCssHover } from "../css/hover.test";
 

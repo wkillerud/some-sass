@@ -157,7 +157,7 @@ export class MultiLineStream {
 const _a = "a".charCodeAt(0);
 const _f = "f".charCodeAt(0);
 const _z = "z".charCodeAt(0);
-const _u = "u".charCodeAt(0);
+// const _u = "u".charCodeAt(0);
 const _A = "A".charCodeAt(0);
 const _F = "F".charCodeAt(0);
 const _Z = "Z".charCodeAt(0);
@@ -567,7 +567,7 @@ export class Scanner {
 					if (hexVal) {
 						result.push(String.fromCharCode(hexVal));
 					}
-				} catch (e) {
+				} catch {
 					// ignore
 				}
 

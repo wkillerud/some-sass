@@ -390,7 +390,7 @@ export class Parser {
 	}
 
 	public _tryParseRuleset(isNested: boolean): nodes.RuleSet | null {
-		let mark = this.mark();
+		const mark = this.mark();
 		if (this._parseSelector(isNested)) {
 			while (this.accept(TokenType.Comma) && this._parseSelector(isNested)) {
 				// loop
@@ -527,7 +527,7 @@ export class Parser {
 					break;
 				}
 				if (this._needsSemicolonAfter(decl) && !this.accept(TokenType.SemiColon)) {
-					return this.finish(node, ParseError.SemiColonExpected, [TokenType.SemiColon, TokenType.CurlyR]); // It's this resync! It consumes stuff up until the syncToken. Need something similar for indented.
+					return this.finish(node, ParseError.SemiColonExpected, [TokenType.SemiColon, TokenType.CurlyR]);
 				}
 				// We accepted semicolon token. Link it to declaration.
 				if (decl && this.prevToken && this.prevToken.type === TokenType.SemiColon) {

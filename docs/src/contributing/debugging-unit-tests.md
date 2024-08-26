@@ -8,7 +8,7 @@ You should see an icon in the gutter. To debug the test, right click and select 
 
 ![](../images/debugging/debug-individual-test.gif)
 
-If you don't see any icons in the gutter it may be because the Vitest extension expects a different version of the `vistest` module. Try updating `vitest` in the repo and the Vitest extension, then restart VS Code.
+If you don't see any icons in the gutter it may be because the Vitest extension expects a different version of the `vitest` module. Try updating `vitest` in the repo and the Vitest extension, then restart VS Code.
 
 ## Test-driven development
 

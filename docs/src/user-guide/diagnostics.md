@@ -13,4 +13,4 @@ with a strikethrough.
 
 In Sass indented it's important to not mix tabs and spaces when indenting. Some Sass highlights errors if you start mixing them.
 
-<!-- TODO: screenshot -->
+![](../images/usage/diagnostics-indented.png)

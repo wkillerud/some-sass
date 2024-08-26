@@ -56,7 +56,7 @@ import { cssData } from "./data/webCustomData";
 export type Stylesheet = {};
 
 export { TokenType, IToken, Scanner } from "./parser/cssScanner";
-export { SassScanner as SCSSScanner } from "./parser/sassScanner";
+export { SassScanner } from "./parser/sassScanner";
 export * from "./parser/cssNodes";
 export * from "./cssLanguageTypes";
 

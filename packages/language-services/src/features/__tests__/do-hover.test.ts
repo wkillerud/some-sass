@@ -202,7 +202,7 @@ test("Sass indented should show hover information for Sassdoc annotation", async
 	assert.match(JSON.stringify(result), /@type/);
 });
 
-test.skip("SassDoc hover info works for indented", async () => {
+test("SassDoc hover info works for indented", async () => {
 	const document = fileSystemProvider.createDocument(
 		`/// Foo bar
 /// @type Color

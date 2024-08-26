@@ -280,7 +280,6 @@ export class DoComplete extends LanguageFeature {
 			const documents = this.cache.documents();
 			for (const currentDocument of documents) {
 				if (
-					document.languageId === "scss" &&
 					!this.configuration.completionSettings?.suggestAllFromOpenDocument &&
 					currentDocument.uri === document.uri
 				) {

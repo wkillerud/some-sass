@@ -45,7 +45,6 @@ type DocumentSymbolCollector = (
 const startsWithSchemeRegex = /^\w+:\/\//;
 const startsWithData = /^data:/;
 const startsWithSass = /^sass:/;
-const sassExt = /\.s[ac]ss$/;
 
 export class CSSNavigation {
 	protected defaultSettings?: AliasSettings;

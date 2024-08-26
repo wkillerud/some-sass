@@ -39,7 +39,7 @@ export const Module: TokenType = customTokenValue++;
 export class SassScanner extends Scanner {
 	protected scanNext(offset: number): IToken {
 		const depth = this.stream.depth;
-		// scss variable
+		// ariabl
 		if (this.stream.advanceIfChar(_DLR)) {
 			const content = ["$"];
 			if (this.ident(content)) {
@@ -49,7 +49,7 @@ export class SassScanner extends Scanner {
 			}
 		}
 
-		// scss: interpolation function #{..})
+		// interpolation function #{..}
 		if (this.stream.advanceIfChars([_HSH, _CUL])) {
 			return this.finishToken(offset, InterpolationFunction);
 		}

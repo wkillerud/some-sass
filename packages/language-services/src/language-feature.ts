@@ -3,7 +3,7 @@ import {
 	getNodeAtOffset,
 	LanguageService as VSCodeLanguageService,
 	Scanner,
-	SCSSScanner,
+	SassScanner,
 } from "@somesass/vscode-css-languageservice";
 import { LanguageModelCache } from "./language-model-cache";
 import {
@@ -110,7 +110,7 @@ export abstract class LanguageFeature {
 	 * @param range Optional range passed to {@link TextDocument.getText}
 	 */
 	protected getScanner(document: TextDocument, range?: Range): Scanner {
-		const scanner = new SCSSScanner({
+		const scanner = new SassScanner({
 			syntax: document.languageId === "sass" ? "indented" : "scss",
 		});
 		scanner.ignoreComment = false;

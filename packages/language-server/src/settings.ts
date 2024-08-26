@@ -1,13 +1,13 @@
 export interface ISettings {
-	loadPaths?: string[];
-	scannerExclude: string[];
-	scannerDepth?: number;
-	scanImportedFiles?: boolean;
-	suggestionStyle?: "all" | "nobracket" | "bracket";
-	suggestAllFromOpenDocument?: boolean;
-	suggestFromUseOnly?: boolean;
-	suggestFunctionsInStringContextAfterSymbols?: " (+-*%";
-	triggerPropertyValueCompletion?: boolean;
+	readonly loadPaths: string[];
+	readonly scannerExclude: string[];
+	readonly scannerDepth: number;
+	readonly scanImportedFiles: boolean;
+	readonly suggestionStyle: "all" | "nobracket" | "bracket";
+	readonly suggestAllFromOpenDocument: boolean;
+	readonly suggestFromUseOnly: boolean;
+	readonly suggestFunctionsInStringContextAfterSymbols: " (+-*%";
+	readonly triggerPropertyValueCompletion: boolean;
 }
 
 export interface IEditorSettings {
@@ -17,7 +17,7 @@ export interface IEditorSettings {
 	tabSize: number;
 }
 
-export const defaultSettings: Readonly<Required<ISettings>> = {
+export const defaultSettings: ISettings = Object.freeze({
 	loadPaths: [],
 	scannerExclude: [
 		"**/.git/**",
@@ -32,4 +32,4 @@ export const defaultSettings: Readonly<Required<ISettings>> = {
 	suggestFromUseOnly: false,
 	suggestFunctionsInStringContextAfterSymbols: " (+-*%",
 	triggerPropertyValueCompletion: true,
-};
+});

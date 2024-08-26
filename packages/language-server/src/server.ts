@@ -401,7 +401,7 @@ export class SomeSassServer {
 				if (initialScan) {
 					await initialScan;
 				}
-				const result = ls.findDocumentLinks(document);
+				const result = await ls.findDocumentLinks(document);
 				return result;
 			} catch {
 				// Do nothing

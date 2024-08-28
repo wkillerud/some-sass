@@ -884,7 +884,12 @@ export class Parser {
 			}
 		}
 
-		if (!this.peek(TokenType.SemiColon) && !this.peek(TokenType.EOF) && !this.peek(TokenType.Newline)) {
+		if (
+			!this.peek(TokenType.SemiColon) &&
+			!this.peek(TokenType.EOF) &&
+			!this.peek(TokenType.Newline) &&
+			!this.peek(TokenType.Dedent)
+		) {
 			node.setMedialist(this._parseMediaQueryList());
 		}
 

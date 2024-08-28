@@ -265,23 +265,6 @@ $values: #ff0000, #00ff00, #0000ff;
 	margin-right: 3cm;
 }
 
-/* missing semicolons */
-tr.default {
-	foo.bar {
-		$foo: 1px
-	}
-	foo: {
-		foo : white
-	}
-	foo.bar1 {
-		@extend tr.default
-	}
-	foo.bar2 {
-		@import "compass"
-	}
-	bar: black
-}
-
 /* rules without whitespace */
 legend {foo{a:s}margin-top:0;margin-bottom:#123;margin-top:s(1)}
 

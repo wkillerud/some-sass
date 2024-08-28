@@ -72,9 +72,9 @@ export default class WorkspaceScanner {
 				);
 
 				if (!document) return;
+				this.#ls.parseStylesheet(document);
 			}
 
-			this.#ls.parseStylesheet(document);
 			const links = await this.#ls.findDocumentLinks(document);
 
 			for (const link of links) {

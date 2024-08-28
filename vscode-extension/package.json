@@ -48,15 +48,7 @@
           "sass-indented"
         ],
         "extensions": [
-          ".sass",
-          ".sass.erb"
-        ],
-        "configuration": "./sass.configuration.json"
-      },
-      {
-        "id": "sass.hover",
-        "extensions": [
-          ".sass.hover"
+          ".sass"
         ],
         "configuration": "./sass.configuration.json"
       }
@@ -66,11 +58,6 @@
         "language": "sass",
         "scopeName": "source.sass",
         "path": "./syntaxes/sass.tmLanguage.json"
-      },
-      {
-        "language": "sass.hover",
-        "scopeName": "source.sass.hover",
-        "path": "./syntaxes/sass.hover.highlighting.json"
       }
     ],
     "configuration": {

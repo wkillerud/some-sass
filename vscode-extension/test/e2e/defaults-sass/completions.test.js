@@ -11,6 +11,10 @@ before(async () => {
 
 test("shows completions for a module after typing the module name and .", async () => {
 	const completions = await showFile(completionsUri);
+	await sleepCI();
+
+	// give syntax highlighting time to tell Emmet to GTFO
+	await sleep(300);
 
 	const cursor = new vscode.Position(2, 0);
 	completions.selection = new vscode.Selection(cursor, cursor);

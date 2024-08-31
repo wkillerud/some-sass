@@ -1,0 +1,46 @@
+name: "Bug report"
+description: Report an issue or possible bug
+labels: []
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to file a bug report! Please fill out this form as completely as possible.
+
+        ✅ I am using the latest version of Some Sass.
+        ✅ I am using the latest version of my editor.
+  - type: input
+    id: editor
+    attributes:
+      label: In which editor is this a problem?
+      description: If you use an editor other than VS Code or VSCodium, please try to reproduce the issue in either of those editors and let us know if it works there or not.
+      value: Visual Studio Code
+    validations:
+      required: true
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug
+    validations:
+      required: true
+  - type: textarea
+    id: bug-expectation
+    attributes:
+      label: What's the expected result?
+      description: Describe what you expect to happen.
+    validations:
+      required: true
+  - type: input
+    id: bug-reproduction
+    attributes:
+      label: Link to minimal reproducible example
+      description: 'A minimal reproduction is required. If a report is vague (e.g. just a generic error message) and has no reproduction, it may be closed. Not sure how to create a minimal example? [Read our guide](https://wkillerud.github.io/some-sass/contributing/reporting-bugs.html)'
+      placeholder: 'https://github.com/wkillerud/some-sass-issue-template'
+  - type: checkboxes
+    id: will-pr
+    attributes:
+      label: Participation
+      options:
+        - label:  I am willing to submit a pull request for this issue.
+          required: false

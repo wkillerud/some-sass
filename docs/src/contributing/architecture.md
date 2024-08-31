@@ -44,6 +44,6 @@ In addition to the parsed document, the cache also holds:
 
 ### VS Code CSS language service
 
-The project includes a private fork of the `vscode-css-languageservice` module.
+The project includes a private fork of the `vscode-css-languageservice` module. The original `vscode-css-languageservice` powers the CSS, SCSS and Less features in Visual Studio Code.
 
-The original `vscode-css-languageservice` powers the CSS, SCSS and Less features in Visual Studio Code. Some Sass extends this module's parser and some of its language features to support both syntaxes. It's kept as a separate package to simplify updates, and to make it easier to send patches upstream.
+Some Sass extends this module's parser and some of its language features to support both syntaxes. It's kept as a separate package to simplify updates, and to make it easier to send patches upstream.

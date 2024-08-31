@@ -19,3 +19,14 @@ Remember to remove double slashes. For example:
 
 - This pattern in JSON `(?<=@include)\\s+(?:([\\w-]+)\\s*(\\.))?([\\w-]+)`
 - Should be `(?<=@include)\s+(?:([\w-]+)\s*(\.))?([\w-]+)` on Rubular.
+
+## Word pattern
+
+This is one long regular expression composed of multiple separated by `|`.
+Together they define [what is considered a word](https://code.visualstudio.com/api/language-extensions/language-configuration-guide#word-pattern) in Sass.
+
+The first is `(#?-?\\d*\\.?\\d\\w*%?)`. This matches various different ways of declaring numerical values with or without units.
+
+The second is `(::?[\\w-]*(?=[^,]*[,]))`. This matches various CSS pseudo-selectors.
+
+The third is `(([@$#.!])?[\\w-?]+%?)`. This matches different at-rules, variables, properties and keywords.

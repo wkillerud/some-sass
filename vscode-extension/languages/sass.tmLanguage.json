@@ -12,7 +12,7 @@
 					"name": "punctuation.definition.keyword.sass"
 				}
 			},
-			"end": "\\s*((?=\\n|$))",
+			"end": "\\s*((?=$|$))",
 			"name": "meta.at-rule.charset.sass",
 			"patterns": [
 				{
@@ -33,7 +33,7 @@
 					"name": "keyword.control.content.sass"
 				}
 			},
-			"end": "\\s*(?=\\n)",
+			"end": "\\s*(?=$)",
 			"name": "meta.content.sass",
 			"patterns": [
 				{
@@ -57,7 +57,7 @@
 					"name": "punctuation.definition.keyword.sass"
 				}
 			},
-			"end": "\\s*(?=\\n)",
+			"end": "\\s*(?=$)",
 			"name": "meta.at-rule.each.sass",
 			"patterns": [
 				{
@@ -85,7 +85,7 @@
 					"name": "punctuation.definition.keyword.sass"
 				}
 			},
-			"end": "\\s*(?=\\n)",
+			"end": "\\s*(?=$)",
 			"name": "meta.at-rule.else.sass",
 			"patterns": [
 				{
@@ -109,7 +109,7 @@
 					"name": "punctuation.definition.keyword.sass"
 				}
 			},
-			"end": "\\s*(?=\\n)",
+			"end": "\\s*(?=$)",
 			"name": "meta.at-rule.extend.sass",
 			"patterns": [
 				{
@@ -135,7 +135,7 @@
 							"name": "punctuation.definition.keyword.sass"
 						}
 					},
-					"end": "\\s*(?=\\n)",
+					"end": "\\s*(?=$)",
 					"name": "meta.at-rule.fontface.sass",
 					"patterns": [
 						{
@@ -155,7 +155,7 @@
 					"name": "punctuation.definition.keyword.sass"
 				}
 			},
-			"end": "\\s*(?=\\n)",
+			"end": "\\s*(?=$)",
 			"name": "meta.at-rule.for.sass",
 			"patterns": [
 				{
@@ -183,7 +183,7 @@
 					"name": "punctuation.definition.keyword.sass"
 				}
 			},
-			"end": "\\s*(?=\\n)",
+			"end": "\\s*(?=$)",
 			"name": "meta.at-rule.forward.sass",
 			"patterns": [
 				{
@@ -237,7 +237,7 @@
 							"name": "entity.name.function.sass"
 						}
 					},
-					"end": "\\s*(?=\\n)",
+					"end": "\\s*(?=$)",
 					"name": "meta.at-rule.function.sass",
 					"patterns": [
 						{
@@ -272,7 +272,7 @@
 					"name": "punctuation.definition.keyword.sass"
 				}
 			},
-			"end": "\\s*(?=\\n)",
+			"end": "\\s*(?=$)",
 			"name": "meta.at-rule.if.sass",
 			"patterns": [
 				{
@@ -296,7 +296,7 @@
 					"name": "punctuation.definition.keyword.sass"
 				}
 			},
-			"end": "\\s*(?=\\n)",
+			"end": "\\s*(?=$)",
 			"name": "meta.at-rule.import.sass",
 			"patterns": [
 				{
@@ -409,7 +409,7 @@
 				},
 				{
 					"match": "(?<=\\+)(?:([\\w-]+)\\s*(\\.))?([\\w-]+)",
-					"end": "\\s*(?=\\n)",
+					"end": "\\s*(?=$)",
 					"captures": {
 						"0": {
 							"name": "meta.at-rule.include.sass"
@@ -427,7 +427,7 @@
 				},
 				{
 					"match": "(\\+)\\b",
-					"end": "\\s*(?=\\n)",
+					"end": "\\s*(?=$)",
 					"captures": {
 						"0": {
 							"name": "meta.at-rule.include.sass"
@@ -446,7 +446,7 @@
 					"name": "punctuation.definition.keyword.sass"
 				}
 			},
-			"end": "\\s*(?=\\n)",
+			"end": "\\s*(?=$)",
 			"name": "meta.at-rule.keyframes.sass",
 			"patterns": [
 				{
@@ -506,6 +506,22 @@
 							"include": "#interpolation"
 						}
 					]
+				},
+				{
+					"match": "\\b(?:(?:100|[1-9]\\d|\\d)%|from|to)$",
+					"name": "entity.other.attribute-name.sass"
+				},
+				{
+					"include": "#flow_control"
+				},
+				{
+					"include": "#interpolation"
+				},
+				{
+					"include": "#property_list"
+				},
+				{
+					"include": "#rules"
 				}
 			]
 		},
@@ -521,7 +537,7 @@
 							"name": "punctuation.definition.keyword.sass"
 						}
 					},
-					"end": "\\s*(?=\\n)",
+					"end": "\\s*(?=$)",
 					"name": "meta.at-rule.media.sass",
 					"patterns": [
 						{
@@ -632,7 +648,7 @@
 			"patterns": [
 				{
 					"begin": "(?<=@namespace)\\s+(?=url)",
-					"end": "(?=\\n|$)",
+					"end": "(?=$|$)",
 					"name": "meta.at-rule.namespace.sass",
 					"patterns": [
 						{
@@ -653,7 +669,7 @@
 							"name": "entity.name.namespace-prefix.sass"
 						}
 					},
-					"end": "(?=\\n|$)",
+					"end": "(?=$|$)",
 					"name": "meta.at-rule.namespace.sass",
 					"patterns": [
 						{
@@ -711,7 +727,7 @@
 							"name": "entity.name.function.sass"
 						}
 					},
-					"end": "\\s*(?=\\n)",
+					"end": "\\s*(?=$)",
 					"name": "meta.at-rule.page.sass"
 				}
 			]
@@ -726,7 +742,7 @@
 					"name": "punctuation.definition.keyword.sass"
 				}
 			},
-			"end": "\\s(?=\\n)",
+			"end": "\\s(?=$)",
 			"name": "meta.at-rule.return.sass",
 			"patterns": [
 				{
@@ -739,7 +755,7 @@
 		},
 		"at_rule_at_root": {
 			"begin": "\\s*((@)(at-root))(\\s+|$)",
-			"end": "\\s(?=\\n)",
+			"end": "\\s(?=$)",
 			"beginCaptures": {
 				"1": {
 					"name": "keyword.control.at-rule.at-root.sass"
@@ -858,7 +874,7 @@
 					"name": "punctuation.definition.keyword.sass"
 				}
 			},
-			"end": "\\s*(?=\\n)",
+			"end": "\\s*(?=$)",
 			"name": "meta.at-rule.warn.sass",
 			"patterns": [
 				{
@@ -882,7 +898,7 @@
 					"name": "punctuation.definition.keyword.sass"
 				}
 			},
-			"end": "\\s*(?=\\n)",
+			"end": "\\s*(?=$)",
 			"name": "meta.at-rule.while.sass",
 			"patterns": [
 				{
@@ -1245,13 +1261,13 @@
 					]
 				},
 				{
-					"begin": "(:)\\s*(?!(\\s*))",
+					"begin": "(:)\\s*(?!(\\s*$))",
 					"beginCaptures": {
 						"1": {
 							"name": "punctuation.separator.key-value.sass"
 						}
 					},
-					"end": "\\s*(\\n|(?=$|\\)))",
+					"end": "\\s*(\\n|$|(?=$|\\)))",
 					"endCaptures": {
 						"1": {
 							"name": "punctuation.terminator.rule.sass"
@@ -1720,7 +1736,7 @@
 		},
 		"variable_setting": {
 			"begin": "(?=\\$[\\w-]+\\s*:)",
-			"end": "\\n",
+			"end": "$",
 			"endCaptures": {
 				"0": {
 					"name": "punctuation.terminator.rule.sass"
@@ -1739,7 +1755,7 @@
 							"name": "punctuation.separator.key-value.sass"
 						}
 					},
-					"end": "\\n",
+					"end": "$",
 					"patterns": [
 						{
 							"include": "#comment_docblock"

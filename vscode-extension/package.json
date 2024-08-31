@@ -50,14 +50,14 @@
         "extensions": [
           ".sass"
         ],
-        "configuration": "./sass.configuration.json"
+        "configuration": "./languages/sass.configuration.json"
       }
     ],
     "grammars": [
       {
         "language": "sass",
         "scopeName": "source.sass",
-        "path": "./syntaxes/sass.tmLanguage.json"
+        "path": "./languages/sass.tmLanguage.json"
       }
     ],
     "configuration": {

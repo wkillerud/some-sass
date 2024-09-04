@@ -10,6 +10,17 @@ beforeEach(() => {
 	ls.clearCache();
 });
 
+test("finds variable reference in selector scope", async () => {
+	const document = fileSystemProvider.createDocument(
+		[".a", "  $_variable: 4.2rem", "  font-size: $_variable"],
+		{
+			languageId: "sass",
+		},
+	);
+	const references = await ls.findReferences(document, Position.create(2, 16));
+	assert.equal(references.length, 2);
+});
+
 test("finds variable references", async () => {
 	const one = fileSystemProvider.createDocument('$day: "monday";', {
 		uri: "ki.scss",

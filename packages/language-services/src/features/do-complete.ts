@@ -517,8 +517,13 @@ export class DoComplete extends LanguageFeature {
 	async doPlaceholderUsageCompletion(
 		initialDocument: TextDocument,
 	): Promise<CompletionItem[]> {
+		const visited = new Set<string>();
 		const items: CompletionItem[] = [];
 		const result = await this.findInWorkspace<CompletionItem>((document) => {
+			// keep track of visited to avoid duplicates
+			// if completionSettings?.suggestFromUseOnly is false
+			visited.add(document.uri);
+
 			const symbols = this.ls.findDocumentSymbols(document);
 			const items: CompletionItem[] = [];
 			for (const symbol of symbols) {
@@ -537,6 +542,10 @@ export class DoComplete extends LanguageFeature {
 		if (!this.configuration.completionSettings?.suggestFromUseOnly) {
 			const documents = this.cache.documents();
 			for (const current of documents) {
+				if (visited.has(current.uri)) {
+					continue;
+				}
+
 				const symbols = this.ls.findDocumentSymbols(current);
 				for (const symbol of symbols) {
 					if (symbol.kind === SymbolKind.Class && symbol.name.startsWith("%")) {

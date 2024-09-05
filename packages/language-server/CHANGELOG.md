@@ -1,3 +1,15 @@
+## 1.6.0 (2024-09-05)
+
+
+### 🚀 Features
+
+- support sass indented syntax
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.4.0
+
 ## 1.5.5 (2024-08-24)
 
 

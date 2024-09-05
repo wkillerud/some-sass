@@ -1,6 +1,6 @@
 # Some Sass
 
-Some Sass is a [language server extension][langext] for [Visual Studio Code][vscode]. It brings improved code suggestions, documentation and code navigation for both [SCSS][scss] and [indented] syntaxes.
+Some Sass is a [language server extension][langext] for [Visual Studio Code][vscode]. It brings improved code suggestions, documentation and code navigation for both [SCSS and indented syntaxes][syntax].
 
 Some features include:
 
@@ -37,7 +37,7 @@ The language server has clients for
 
 [lsp]: https://microsoft.github.io/language-server-protocol/
 [npm]: https://www.npmjs.com/package/some-sass-language-server
-[scss]: https://sass-lang.com/documentation/syntax/
+[syntax]: https://sass-lang.com/documentation/syntax/
 [use]: https://sass-lang.com/documentation/at-rules/use/
 [forward]: https://sass-lang.com/documentation/at-rules/forward/
 [langext]: https://code.visualstudio.com/api/language-extensions/language-server-extension-guide

@@ -154,13 +154,17 @@
     "shx": "0.3.4"
   },
   "scripts": {
-    "vscode:prepublish": "npm run clean && webpack --mode production",
+    "vscode:prepublish": "run-s clean build:production:*",
     "clean": "shx rm -rf dist",
-    "build": "webpack --mode development",
+    "build": "run-s build:*",
+		"build:node": "rspack --config ./rspack.node.config.js",
+		"build:browser": "rspack --config ./rspack.browser.config.js",
+		"build:production:node": "npm run build:node -- --mode=production",
+		"build:production:browser": "npm run build:browser -- --mode=production",
     "start:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=.",
     "lint": "eslint \"**/*.ts\" --cache",
     "test:e2e": "node ./test/e2e/runTest.js",
-    "pretest:web": "webpack --config ./webpack.test-web.config.js ",
+    "pretest:web": "rspack --config ./rspack.test-web.config.js ",
     "test:web": "node ./test/web/runTest.js"
   },
   "__metadata": {

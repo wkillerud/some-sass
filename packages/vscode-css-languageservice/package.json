@@ -29,14 +29,15 @@
 		"vscode-uri": "3.0.8"
 	},
 	"scripts": {
-		"build": "npm run compile && npm run compile-esm",
-		"compile": "tsc -p ./src/tsconfig.json && npm run lint",
+		"build": "run-s compile compile-esm",
+		"compile": "tsc -p ./src/tsconfig.json",
 		"compile-esm": "tsc -p ./src/tsconfig.esm.json",
 		"clean": "rimraf lib node_modules",
 		"watch": "tsc -w -p ./src",
 		"test": "vitest",
 		"coverage": "vitest run --coverage",
 		"lint": "eslint src/**/*.ts",
-		"update-data": "npm install @vscode/web-custom-data -D && node ./build/generateData.js"
+		"preupdate-data": "npm install @vscode/web-custom-data -D",
+		"update-data": "node ./build/generateData.js"
 	}
 }

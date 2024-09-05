@@ -3,10 +3,10 @@
 
 const path = require("path");
 const merge = require("merge-options");
-const webpack = require("webpack");
+const rspack = require("@rspack/core");
 
-/** @typedef {import('webpack').Configuration} WebpackConfig **/
-/** @type WebpackConfig */
+/** @typedef {import('@rspack/core').Configuration} RspackConfig **/
+/** @type RspackConfig */
 const nodeConfig = {
 	target: "node",
 	entry: {
@@ -17,7 +17,7 @@ const nodeConfig = {
 	},
 };
 
-/** @type WebpackConfig */
+/** @type RspackConfig */
 const browserConfig = {
 	context: __dirname,
 	target: "webworker",
@@ -48,25 +48,30 @@ const browserConfig = {
 			},
 			{
 				test: /\.ts$/,
-				exclude: /node_modules/,
-				use: [
-					{
-						loader: "ts-loader",
+				exclude: [/[\\/]node_modules[\\/]/],
+				loader: "builtin:swc-loader",
+				options: {
+					jsc: {
+						parser: {
+							syntax: "typescript",
+						},
+						externalHelpers: true,
 					},
-				],
+				},
 			},
 		],
 	},
 	plugins: [
-		new webpack.ProvidePlugin({
+		new rspack.ProvidePlugin({
 			process: "process/browser",
 		}),
 	],
 };
 
-function defineConfig(config) {
-	/** @type WebpackConfig */
+function defineConfig(config, mode) {
+	/** @type RspackConfig */
 	const baseConfig = {
+		mode,
 		output: {
 			filename: "[name].js",
 			path: path.join(__dirname, "dist"),
@@ -78,24 +83,23 @@ function defineConfig(config) {
 			rules: [
 				{
 					test: /\.ts$/,
-					exclude: /node_modules/,
-					use: [
-						{
-							loader: "ts-loader",
-							options: {
-								compilerOptions: {
-									module: "es6",
-								},
+					exclude: [/[\\/]node_modules[\\/]/],
+					loader: "builtin:swc-loader",
+					options: {
+						jsc: {
+							parser: {
+								syntax: "typescript",
 							},
+							externalHelpers: true,
 						},
-					],
+					},
 				},
 			],
 		},
 		devtool: false,
 	};
 
-	/** @type WebpackConfig */
+	/** @type RspackConfig */
 	const developmentConfig = {
 		devtool: "source-map",
 		output: {
@@ -103,13 +107,15 @@ function defineConfig(config) {
 		},
 	};
 
-	// Return a function so we can adjust config by mode: https://webpack.js.org/configuration/mode/#mode-development
-	return (env, argv) => {
-		if (argv.mode === "development") {
-			return merge(baseConfig, config, developmentConfig);
-		}
-		return merge(baseConfig, config);
-	};
+	if (mode === "development") {
+		return merge(baseConfig, config, developmentConfig);
+	}
+	return merge(baseConfig, config);
 }
 
-module.exports = [defineConfig(nodeConfig), defineConfig(browserConfig)];
+module.exports = [
+	defineConfig(nodeConfig, "development"),
+	defineConfig(nodeConfig, "production"),
+	defineConfig(browserConfig, "development"),
+	defineConfig(browserConfig, "production"),
+];

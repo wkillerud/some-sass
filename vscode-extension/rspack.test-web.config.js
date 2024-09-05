@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 const path = require("path");
-const webpack = require("webpack");
+const rspack = require("@rspack/core");
 
-/** @typedef {import('webpack').Configuration} WebpackConfig **/
-/** @type WebpackConfig */
+/** @typedef {import('@rspack/core').Configuration} RspackConfig **/
+/** @type RspackConfig */
 const browserTestsConfig = {
 	context: __dirname,
 	mode: "none",
@@ -41,7 +41,7 @@ const browserTestsConfig = {
 		],
 	},
 	plugins: [
-		new webpack.ProvidePlugin({
+		new rspack.ProvidePlugin({
 			process: "process/browser",
 		}),
 	],

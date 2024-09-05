@@ -42,7 +42,7 @@
 	"author": "William Killerud <william@killerud.com> (https://www.williamkillerud.com/)",
 	"license": "MIT",
 	"scripts": {
-		"build": "webpack --mode production && webpack --mode development",
+		"build": "rspack",
 		"clean": "shx rm -rf dist node_modules",
 		"test": "vitest",
 		"coverage": "vitest run --coverage"

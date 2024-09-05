@@ -21,10 +21,12 @@ import {
 	IToken,
 	TokenType,
 	Marker,
-	CompletionSettings as VSCodeCompletionSettings,
 	StylesheetDocumentLink,
+	FoldingRange,
+	FoldingRangeKind,
+	SelectionRange,
 } from "@somesass/vscode-css-languageservice";
-import type { ParseResult } from "scss-sassdoc-parser";
+import type { ParseResult } from "sassdoc-parser";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
 	Range,
@@ -60,6 +62,7 @@ import {
 	VersionedTextDocumentIdentifier,
 } from "vscode-languageserver-types";
 import { URI, Utils } from "vscode-uri";
+import { FoldingRangeContext } from "./features/folding-ranges";
 
 /**
  * The root of the abstract syntax tree.
@@ -133,6 +136,14 @@ export interface LanguageService {
 		range: Range,
 		context?: CodeActionContext,
 	): Promise<CodeAction[]>;
+	getFoldingRanges(
+		document: TextDocument,
+		context?: FoldingRangeContext,
+	): Promise<FoldingRange[]>;
+	getSelectionRanges(
+		document: TextDocument,
+		positions: Position[],
+	): Promise<SelectionRange[]>;
 	getCachedTextDocument(uri: URI): TextDocument | undefined;
 	/**
 	 * Utility function to reparse an updated document.
@@ -165,56 +176,57 @@ export type Rename =
 	| { defaultBehavior: boolean };
 
 export interface LanguageServiceConfiguration {
-	completionSettings?: CompletionSettings;
-	editorSettings?: EditorSettings;
-	/**
-	 * Configure custom aliases that the link resolution should resolve.
-	 *
-	 * @example
-	 * ```js
-	 * importAliases: {
-	 *   // \@import "@SassStylesheet" would resolve to /src/assets/style.sass
-	 *   "@SassStylesheet": "/src/assets/styles.sass",
-	 * }
-	 * ```
-	 */
-	importAliases?: AliasSettings;
 	/**
 	 * Pass in [load paths](https://sass-lang.com/documentation/cli/dart-sass/#load-path) that will be used in addition to `node_modules`.
 	 */
 	loadPaths?: string[];
+	completionSettings?: {
+		/**
+		 * Essentially "Visual Studio Code compat mode".
+		 *
+		 * If false, Some Sass will not give code suggestions based on contents from the current document.
+		 *
+		 * If you use this server as well as vscode-css-languageserver you can set this setting to avoid duplicates.
+		 * Has no effect for Sass Indented.
+		 */
+		suggestAllFromOpenDocument?: boolean;
+		/**
+		 * 	Mixins with `@content` SassDoc annotations and `%placeholders` get two suggestions by default:
+		 *   - One without `{ }`.
+		 *   - One _with_ `{ }`. This one creates a new block, and moves the cursor inside the block.
+		 *
+		 * If you find this noisy, you can control which suggestions you would like to see:
+		 *   - All suggestions (default).
+		 *   - No brackets.
+		 *   - Only brackets. This still includes other suggestions, where there are no brackets to begin with.
+		 *
+		 * @default "all"
+		 */
+		suggestionStyle?: "all" | "nobracket" | "bracket";
+		/**
+		 * Recommended if you don't rely on `@import`. With this setting turned on,
+		 * Some Sass will only suggest variables, mixins and functions from the
+		 * namespaces that are in use in the open document.
+		 */
+		suggestFromUseOnly?: boolean;
+		/**
+		 * Suggest functions after the specified symbols when in a string context.
+		 * For example, if you add the `/` symbol to this setting, then `background: url(images/he|)`
+		 * could suggest a `hello()` function (`|` in this case indicates cursor position).
+		 *
+		 * @default " (+-*%"
+		 */
+		suggestFunctionsInStringContextAfterSymbols?: string;
+		/**
+		 * By default, Some Sass triggers property value completion after selecting a CSS property.
+		 * Use this setting to disable this behavior.
+		 *
+		 * @default true
+		 */
+		triggerPropertyValueCompletion?: boolean;
+	};
+	editorSettings?: EditorSettings;
 	workspaceRoot?: URI;
-}
-
-export interface CompletionSettings extends Partial<VSCodeCompletionSettings> {
-	suggestAllFromOpenDocument?: boolean;
-	/**
-	 * 	Mixins with `@content` SassDoc annotations and `%placeholders` get two suggestions by default:
-	 *   - One without `{ }`.
-	 *   - One _with_ `{ }`. This one creates a new block, and moves the cursor inside the block.
-	 *
-	 * If you find this noisy, you can control which suggestions you would like to see:
-	 *   - All suggestions (default).
-	 *   - No brackets.
-	 *   - Only brackets. This still includes other suggestions, where there are no brackets to begin with.
-	 *
-	 * @default "all"
-	 */
-	suggestionStyle?: "all" | "nobracket" | "bracket";
-	/**
-	 * Recommended if you don't rely on `@import`. With this setting turned on,
-	 * Some Sass will only suggest variables, mixins and functions from the
-	 * namespaces that are in use in the open document.
-	 */
-	suggestFromUseOnly?: boolean;
-	/**
-	 * Suggest functions after the specified symbols when in a string context.
-	 * For example, if you add the `/` symbol to this setting, then `background: url(images/he|)`
-	 * could suggest a `hello()` function (`|` in this case indicates cursor position).
-	 *
-	 * @default " (+-*%"
-	 */
-	suggestFunctionsInStringContextAfterSymbols?: string;
 }
 
 export interface EditorSettings {
@@ -402,4 +414,7 @@ export {
 	IToken,
 	Module,
 	Marker,
+	FoldingRange,
+	FoldingRangeKind,
+	SelectionRange,
 };

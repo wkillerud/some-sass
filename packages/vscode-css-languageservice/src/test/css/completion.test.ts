@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import * as assert from "assert";
+import { suite, test, assert } from "vitest";
 import * as path from "path";
 import {
 	getCSSLanguageService,
@@ -22,7 +22,7 @@ import {
 	Command,
 	MarkupContent,
 	MixinReferenceCompletionContext,
-	getSCSSLanguageService,
+	getSassLanguageService,
 	ICSSDataProvider,
 	newCSSDataProvider,
 } from "../../cssLanguageService";
@@ -134,8 +134,8 @@ export async function testCompletionFor(
 	const lang = path.extname(testUri).substr(1);
 	const lsOptions = { fileSystemProvider: getFsProvider() };
 	let ls;
-	if (lang === "scss") {
-		ls = getSCSSLanguageService(lsOptions);
+	if (lang === "scss" || lang === "sass") {
+		ls = getSassLanguageService(lsOptions);
 	} else {
 		ls = getCSSLanguageService(lsOptions);
 	}
@@ -155,7 +155,7 @@ export async function testCompletionFor(
 	}
 
 	const document = TextDocument.create(testUri, lang, 0, value);
-	const position = Position.create(0, offset);
+	const position = document.positionAt(offset);
 	const jsonDoc = ls.parseStylesheet(document);
 
 	const context = getDocumentContext(workspaceFolderUri);
@@ -974,7 +974,7 @@ suite("CSS - Completion", () => {
 		assert.ok("d_a2" < "d_fe");
 	});
 
-	const testFixturesPath = path.join(__dirname, "../../../../test");
+	const testFixturesPath = path.join(__dirname, "../../../test");
 
 	test("CSS url() Path completion", async function () {
 		const testUri = URI.file(path.resolve(testFixturesPath, "pathCompletionFixtures/about/about.css")).toString(true);
@@ -1159,7 +1159,7 @@ suite("CSS - Completion", () => {
 		await testCompletionFor(
 			'html { background-image: url("../|")',
 			{
-				count: 4,
+				count: 5,
 			},
 			undefined,
 			testUri,

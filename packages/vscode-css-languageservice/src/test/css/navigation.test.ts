@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import * as assert from "assert";
+import { suite, test, assert } from "vitest";
 import { join } from "path";
 import { Scope, GlobalScope, ScopeBuilder } from "../../parser/cssSymbolScope";
 import * as nodes from "../../parser/cssNodes";
@@ -33,8 +33,13 @@ import { URI } from "vscode-uri";
 import { getFsProvider } from "../testUtil/fsProvider";
 import { getDocumentContext } from "../testUtil/documentContext";
 
-export function assertScopesAndSymbols(ls: LanguageService, input: string, expected: string): void {
-	const global = createScope(ls, input);
+export function assertScopesAndSymbols(
+	ls: LanguageService,
+	input: string,
+	expected: string,
+	lang: "css" | "sass" | "scss" = "css",
+): void {
+	const global = createScope(ls, input, lang);
 	assert.equal(scopeToString(global), expected);
 }
 
@@ -45,8 +50,9 @@ export function assertHighlights(
 	expectedMatches: number,
 	expectedWrites: number,
 	elementName?: string,
+	lang: "css" | "sass" | "scss" = "css",
 ) {
-	const document = TextDocument.create("test://test/test.css", "css", 0, input);
+	const document = TextDocument.create(`test://test/test.${lang}`, lang, 0, input);
 
 	const stylesheet = ls.parseStylesheet(document);
 	assertNoErrors(stylesheet);
@@ -188,7 +194,7 @@ export function assertScopeBuilding(
 }
 
 export function getTestResource(path: string) {
-	return URI.file(join(__dirname, "../../../../test/linksTestFixtures", path)).toString(true);
+	return URI.file(join(__dirname, "../../../test/linksTestFixtures", path)).toString(true);
 }
 
 function scopeToString(scope: Scope): string {
@@ -217,8 +223,8 @@ function assertNoErrors(stylesheet: Stylesheet): void {
 	}
 }
 
-function createScope(ls: LanguageService, input: string): Scope {
-	const document = TextDocument.create("test://test/test.css", "css", 0, input);
+export function createScope(ls: LanguageService, input: string, lang = "css"): Scope {
+	const document = TextDocument.create(`test://test/test.${lang}`, `${lang}`, 0, input);
 
 	const styleSheet = ls.parseStylesheet(document),
 		global = new GlobalScope(),

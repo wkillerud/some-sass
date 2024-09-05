@@ -4,7 +4,7 @@ The language server is written in TypeScript and runs both in Node and the brows
 
 You need:
 
-- A long-term support version of [Node.js](https://nodejs.org/en)
+- A current long-term support version of [Node.js](https://nodejs.org/en)
 - [Visual Studio Code](https://code.visualstudio.com/)
 
 Recommended extensions:
@@ -20,7 +20,7 @@ Clone the repo and install dependencies:
 ```sh
 git clone git@github.com:wkillerud/some-sass.git
 cd some-sass
-npm install
+npm clean-install
 ```
 
 Run the build and automated tests. Some of the automated tests open a new window and run in Visual Studio Code Insiders.
@@ -38,19 +38,30 @@ You can have `nx` watch the workspace for changes and rerun a minimum build:
 npm run dev
 ```
 
-Some packages have watch mode for unit tests using Vitest:
-
-- `packages/language-server/`
-- `packages/language-services/`
-
-In packages with Vitest you start watch mode with the `test` script:
+Packages have watch mode for unit tests using Vitest.
 
 ```sh
 npm test
 ```
+
+## Run the local build
+
+To run the local build of the extension in VS Code, go to the [Run and Debug pane][vsdebug]. There you will find the different launch configurations.
+
+- Launch extension
+- Launch web extension
+
+Running them opens a new window of Visual Studio Code running as a [local extension host][exthost].
+
+Open the Sass project you're using to test in the extension host window.
+If you don't have one you can find several `workspace/`
+directories inside `vscode-extension/test/e2e/` in this repository.
 
 ## Next steps
 
 You may want to have a look at the [architecture](./architecture.md) of the language server. Most of the functionality of the language server is in the `language-services` package in `packages/`.
 
 [Test-driven development](./debugging-unit-tests.md) with Vitest and the VS Code debugger gives the shortest feedback loop.
+
+[vsdebug]: https://code.visualstudio.com/docs/editor/debugging
+[exthost]: https://code.visualstudio.com/api/advanced-topics/extension-host

@@ -16,7 +16,7 @@ beforeEach(() => {
 });
 
 test("symbols forwarded from node_modules don't get suggested unless used", async () => {
-	const pkg = fileSystemProvider.createDocument(['{ "name": "test-module" }'], {
+	fileSystemProvider.createDocument(['{ "name": "test-module" }'], {
 		languageId: "json",
 		uri: "node_modules/sass-true/package.json",
 	});

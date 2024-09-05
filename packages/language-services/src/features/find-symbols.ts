@@ -1,4 +1,4 @@
-import { ParseResult } from "scss-sassdoc-parser";
+import { ParseResult } from "sassdoc-parser";
 import { LanguageFeature } from "../language-feature";
 import {
 	TextDocument,

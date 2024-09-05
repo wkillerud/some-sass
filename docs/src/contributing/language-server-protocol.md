@@ -1,5 +1,7 @@
 # Language Server Protocol
 
+This is not required reading, but read on if you want to learn more about language servers and the language server protocol (LSP).
+
 From [Why Language Server?][why-lsp]:
 
 > [The] Language Server Protocol [...] standardizes the communication between language tooling and code editor. This way [...] any LSP-compliant language toolings can integrate with multiple LSP-compliant code editors, and any LSP-compliant code editors can easily pick up multiple LSP-compliant language toolings. LSP is a win for both language tooling providers and code editor vendors!

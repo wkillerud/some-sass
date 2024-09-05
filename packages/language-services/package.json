@@ -43,19 +43,18 @@
 	"license": "MIT",
 	"scripts": {
 		"build": "tsc",
-		"clean": "shx rm -rf dist",
+		"clean": "shx rm -rf dist node_modules",
 		"test": "vitest",
 		"coverage": "vitest run --coverage"
 	},
 	"dependencies": {
 		"@somesass/vscode-css-languageservice": "1.3.1",
 		"colorjs.io": "0.5.2",
-		"scss-sassdoc-parser": "3.2.0"
+		"sassdoc-parser": "3.4.0"
 	},
 	"devDependencies": {
 		"@vitest/coverage-v8": "2.0.5",
 		"shx": "0.3.4",
-		"typescript": "5.5.4",
-		"vitest": "2.0.5"
+		"typescript": "5.5.4"
 	}
 }

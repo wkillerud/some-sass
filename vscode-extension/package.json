@@ -1,6 +1,6 @@
 {
   "name": "some-sass",
-  "displayName": "Some Sass: extended support for SCSS and SassDoc",
+  "displayName": "Some Sass: extended support for Sass and SassDoc",
   "description": "Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
   "version": "3.6.4",
   "private": true,
@@ -17,6 +17,7 @@
   },
   "keywords": [
     "scss",
+    "sass",
     "sassdoc",
     "autocompletion",
     "intellisense",
@@ -27,6 +28,7 @@
   ],
   "activationEvents": [
     "onLanguage:scss",
+    "onLanguage:sass",
     "onLanguage:vue",
     "onLanguage:svelte",
     "onLanguage:astro",
@@ -38,7 +40,28 @@
   "browser": "./dist/browser-client.js",
   "main": "./dist/node-client.js",
   "contributes": {
+    "languages": [
+      {
+        "id": "sass",
+        "aliases": [
+          "Sass",
+          "sass-indented"
+        ],
+        "extensions": [
+          ".sass"
+        ],
+        "configuration": "./languages/sass.configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "sass",
+        "scopeName": "source.sass",
+        "path": "./languages/sass.tmLanguage.json"
+      }
+    ],
     "configuration": {
+      "title": "Some Sass",
       "properties": {
         "somesass.loadPaths": {
           "type": "array",
@@ -46,9 +69,9 @@
             "type": "string"
           },
           "default": [],
-          "description": "List of paths relative to the workspace root that should be treated as load paths"
+          "markdownDescription": "A list of paths relative to the workspace root where the language server should look for stylesheets loaded by `@use` and `@import`. `node_modules` is always included.\n\nNote that you will have to [configure your Sass compiler separately](https://sass-lang.com/documentation/cli/dart-sass/#load-path)."
         },
-        "somesass.scannerDepth": {
+				"somesass.scannerDepth": {
           "type": "number",
           "default": 30,
           "description": "The maximum number of nested directories to scan."
@@ -65,7 +88,7 @@
           ],
           "description": "List of glob patterns for directories that are excluded when scanning."
         },
-        "somesass.scanImportedFiles": {
+				"somesass.scanImportedFiles": {
           "type": "boolean",
           "default": true,
           "deprecationMessage": "Will be removed at some point after `@import` becomes CSS-only.",
@@ -94,7 +117,7 @@
         "somesass.suggestAllFromOpenDocument": {
           "type": "boolean",
           "default": false,
-          "description": "VS Code has built-in code suggestions for symbols declared in the open document. If you prefer the suggestions from Some Sass, you can opt in by turning on this setting. There will be duplicates."
+          "description": "VS Code has built-in code suggestions for (S)CSS symbols declared in the open document. If you prefer the suggestions from Some Sass, you can opt in by turning on this setting. There will be duplicates. No effect for Sass Indented (always on)."
         },
         "somesass.suggestFromUseOnly": {
           "type": "boolean",
@@ -105,6 +128,11 @@
           "type": "string",
           "default": " (+-*%",
           "description": "Allows prompt Functions in String context after specified symbols."
+        },
+        "somesass.triggerPropertyValueCompletion": {
+          "type": "boolean",
+          "default": false,
+          "description": "By default, Some Sass triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."
         }
       }
     }
@@ -112,7 +140,7 @@
   "dependencies": {
     "fast-glob": "3.3.2",
     "some-sass-language-server": "1.5.5",
-    "vscode-css-languageservice": "6.3.0",
+    "vscode-css-languageservice": "6.3.1",
     "vscode-languageclient": "9.0.1",
     "vscode-uri": "3.0.7"
   },
@@ -120,7 +148,7 @@
     "@types/mocha": "10.0.7",
     "@types/vscode": "1.86.0",
     "@vscode/test-electron": "2.4.1",
-    "@vscode/test-web": "0.0.56",
+    "@vscode/test-web": "0.0.57",
     "assert": "2.1.0",
     "mocha": "10.7.0",
     "shx": "0.3.4"
@@ -131,7 +159,7 @@
     "build": "webpack --mode development",
     "start:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=.",
     "lint": "eslint \"**/*.ts\" --cache",
-    "test:e2e": "node ./test/e2e/runTest.js && node ./test/new-e2e/runTest.js",
+    "test:e2e": "node ./test/e2e/runTest.js",
     "pretest:web": "webpack --config ./webpack.test-web.config.js ",
     "test:web": "node ./test/web/runTest.js"
   },

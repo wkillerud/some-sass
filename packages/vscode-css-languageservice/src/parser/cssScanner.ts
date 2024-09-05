@@ -7,6 +7,8 @@
 export enum TokenType {
 	Ident,
 	AtKeyword,
+	AtIncludeShort,
+	AtMixinShort,
 	String,
 	BadString,
 	UnquotedString,
@@ -21,6 +23,9 @@ export enum TokenType {
 	SemiColon,
 	CurlyL,
 	CurlyR,
+	Indent,
+	Dedent,
+	Newline, // Acts as the end of a statement in the indented syntax
 	ParenthesisL,
 	ParenthesisR,
 	BracketL,
@@ -63,6 +68,18 @@ export class MultiLineStream {
 	private len: number;
 	private position: number;
 
+	// Used by the indented dialect to keep track of indents and dedents
+	private _depth: number = 0;
+	get depth() {
+		return this._depth;
+	}
+
+	set depth(value: number) {
+		this._depth = value;
+	}
+
+	indentation: "tabs" | "spaces" | undefined = undefined;
+
 	constructor(source: string) {
 		this.source = source;
 		this.len = source.length;
@@ -81,8 +98,9 @@ export class MultiLineStream {
 		return this.position;
 	}
 
-	public goBackTo(pos: number): void {
+	public goBackTo(pos: number, depth: number): void {
 		this.position = pos;
+		this.depth = depth;
 	}
 
 	public goBack(n: number): void {
@@ -139,7 +157,7 @@ export class MultiLineStream {
 const _a = "a".charCodeAt(0);
 const _f = "f".charCodeAt(0);
 const _z = "z".charCodeAt(0);
-const _u = "u".charCodeAt(0);
+// const _u = "u".charCodeAt(0);
 const _A = "A".charCodeAt(0);
 const _F = "F".charCodeAt(0);
 const _Z = "Z".charCodeAt(0);
@@ -219,23 +237,38 @@ staticUnitTable["cqb"] = TokenType.ContainerQueryLength;
 staticUnitTable["cqmin"] = TokenType.ContainerQueryLength;
 staticUnitTable["cqmax"] = TokenType.ContainerQueryLength;
 
+export type ScannerOptions = {
+	syntax?: "indented" | "scss";
+};
+
 export class Scanner {
 	public stream: MultiLineStream = new MultiLineStream("");
 	public ignoreComment = true;
 	public ignoreWhitespace = true;
 	public inURL = false;
 
+	syntax;
+
+	constructor({ syntax }: ScannerOptions = {}) {
+		this.syntax = syntax;
+	}
+
+	public configure({ syntax }: ScannerOptions): void {
+		this.syntax = syntax;
+	}
+
 	public setSource(input: string): void {
 		this.stream = new MultiLineStream(input);
 	}
 
 	public finishToken(offset: number, type: TokenType, text?: string): IToken {
-		return {
+		const token = {
 			offset: offset,
 			len: this.stream.pos() - offset,
 			type: type,
 			text: text || this.stream.substring(offset),
 		};
+		return token;
 	}
 
 	public substring(offset: number, len: number): string {
@@ -246,8 +279,8 @@ export class Scanner {
 		return this.stream.pos();
 	}
 
-	public goBackTo(pos: number): void {
-		this.stream.goBackTo(pos);
+	public goBackTo(pos: number, depth: number): void {
+		this.stream.goBackTo(pos, depth);
 	}
 
 	public scanUnquotedString(): IToken | null {
@@ -282,10 +315,11 @@ export class Scanner {
 	 */
 	public tryScanUnicode(): IToken | undefined {
 		const offset = this.stream.pos();
+		const depth = this.stream.depth;
 		if (!this.stream.eos() && this._unicodeRange()) {
 			return this.finishToken(offset, TokenType.UnicodeRange);
 		}
-		this.stream.goBackTo(offset);
+		this.stream.goBackTo(offset, depth);
 		return undefined;
 	}
 
@@ -400,6 +434,44 @@ export class Scanner {
 			return this.finishToken(offset, TokenType.SuffixOperator);
 		}
 
+		// indents and dedents for the indented syntax
+		if (this.syntax === "indented") {
+			let newlines = this.stream.advanceWhileChar((ch) => {
+				return ch === _NWL || ch === _LFD || ch === _CAR;
+			});
+			if (newlines > 0) {
+				let depth = this.stream.advanceWhileChar((ch) => {
+					// Make a note the first time we enchounter either _TAB or _WSP.
+					// Whichever comes first is treated as the correct, expected
+					// kind of indentation. Mixing between the two is not allowed
+					// in the indented syntax.
+					if (!this.stream.indentation && ch === _TAB) {
+						this.stream.indentation = "tabs";
+					}
+					if (!this.stream.indentation && ch === _WSP) {
+						this.stream.indentation = "spaces";
+					}
+					if (this.stream.indentation === "tabs") {
+						return ch === _TAB;
+					}
+					if (this.stream.indentation === "spaces") {
+						return ch === _WSP;
+					}
+					return false;
+				});
+
+				if (depth > this.stream.depth) {
+					this.stream.depth = depth;
+					return this.finishToken(offset, TokenType.Indent);
+				} else if (depth < this.stream.depth) {
+					this.stream.depth = depth;
+					return this.finishToken(offset, TokenType.Dedent);
+				} else {
+					return this.finishToken(offset, TokenType.Newline);
+				}
+			}
+		}
+
 		// Delim
 		this.stream.nextChar();
 		return this.finishToken(offset, TokenType.Delim);
@@ -408,7 +480,7 @@ export class Scanner {
 	protected trivia(): IToken | null {
 		while (true) {
 			const offset = this.stream.pos();
-			if (this._whitespace()) {
+			if (this.whitespace()) {
 				if (!this.ignoreWhitespace) {
 					return this.finishToken(offset, TokenType.Whitespace);
 				}
@@ -431,6 +503,7 @@ export class Scanner {
 					success = true;
 					return false;
 				}
+
 				hot = ch === _MUL;
 				return true;
 			});
@@ -494,7 +567,7 @@ export class Scanner {
 					if (hexVal) {
 						result.push(String.fromCharCode(hexVal));
 					}
-				} catch (e) {
+				} catch {
 					// ignore
 				}
 
@@ -579,7 +652,7 @@ export class Scanner {
 		return hasContent;
 	}
 
-	private _whitespace(): boolean {
+	protected whitespace(): boolean {
 		const n = this.stream.advanceWhileChar((ch) => {
 			return ch === _WSP || ch === _TAB || ch === _NWL || ch === _LFD || ch === _CAR;
 		});
@@ -596,6 +669,7 @@ export class Scanner {
 
 	protected ident(result: string[]): boolean {
 		const pos = this.stream.pos();
+		const depth = this.stream.depth;
 		const hasMinus = this._minus(result);
 		if (hasMinus) {
 			if (this._minus(result) /* -- */ || this._identFirstChar(result) || this._escape(result)) {
@@ -610,7 +684,7 @@ export class Scanner {
 			}
 			return true;
 		}
-		this.stream.goBackTo(pos);
+		this.stream.goBackTo(pos, depth);
 		return false;
 	}
 

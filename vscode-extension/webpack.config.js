@@ -94,6 +94,7 @@ function defineConfig(config) {
 			vscode: "commonjs vscode",
 		},
 		plugins: [],
+		devtool: false,
 	};
 
 	/** @type WebpackConfig */

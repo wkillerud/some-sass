@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 "use strict";
-import { TokenType, Scanner, IToken } from "./cssScanner";
+import { TokenType, Scanner, IToken, ScannerOptions } from "./cssScanner";
 import * as nodes from "./cssNodes";
 import { ParseError, CSSIssueType } from "./cssErrors";
 import * as languageFacts from "../languageFacts/facts";
@@ -12,9 +12,14 @@ import { isDefined } from "../utils/objects";
 
 export interface IMark {
 	prev?: IToken;
+	depth: number;
 	curr: IToken;
 	pos: number;
 }
+
+export type ParserOptions = ScannerOptions & {
+	scanner?: Scanner;
+};
 
 /// <summary>
 /// A parser for the css core specification. See for reference:
@@ -28,10 +33,18 @@ export class Parser {
 
 	private lastErrorToken?: IToken;
 
-	constructor(scnr: Scanner = new Scanner()) {
-		this.scanner = scnr;
+	syntax;
+
+	constructor({ scanner, syntax }: ParserOptions = {}) {
+		this.syntax = syntax;
+		this.scanner = scanner || new Scanner({ syntax });
 		this.token = { type: TokenType.EOF, offset: -1, len: 0, text: "" };
 		this.prevToken = undefined!;
+	}
+
+	public configure({ syntax }: Pick<ParserOptions, "syntax">): void {
+		this.syntax = syntax;
+		this.scanner.configure({ syntax });
 	}
 
 	public peekIdent(text: string): boolean {
@@ -92,6 +105,7 @@ export class Parser {
 		return {
 			prev: this.prevToken,
 			curr: this.token,
+			depth: this.scanner.stream.depth,
 			pos: this.scanner.pos(),
 		};
 	}
@@ -99,7 +113,7 @@ export class Parser {
 	public restoreAtMark(mark: IMark): void {
 		this.prevToken = mark.prev;
 		this.token = mark.curr;
-		this.scanner.goBackTo(mark.pos);
+		this.scanner.goBackTo(mark.pos, mark.depth);
 	}
 
 	public try(func: () => nodes.Node | null): nodes.Node | null {
@@ -170,17 +184,19 @@ export class Parser {
 		return this.finish(node);
 	}
 
-	protected acceptUnquotedString(): boolean {
+	protected acceptUnquotedString(): nodes.Node | null {
 		const pos = this.scanner.pos();
-		this.scanner.goBackTo(this.token.offset);
+		const depth = this.scanner.stream.depth;
+		this.scanner.goBackTo(this.token.offset, depth);
 		const unquoted = this.scanner.scanUnquotedString();
 		if (unquoted) {
+			let node = this.createNode(nodes.NodeType.StringLiteral);
 			this.token = unquoted;
 			this.consumeToken();
-			return true;
+			return this.finish(node);
 		}
-		this.scanner.goBackTo(pos);
-		return false;
+		this.scanner.goBackTo(pos, depth);
+		return null;
 	}
 
 	public resync(resyncTokens: TokenType[] | undefined, resyncStopTokens: TokenType[] | undefined): boolean {
@@ -247,6 +263,9 @@ export class Parser {
 
 	public parseStylesheet(textDocument: TextDocument): nodes.Stylesheet {
 		const versionId = textDocument.version;
+		const syntax = textDocument.languageId === "sass" ? "indented" : "scss";
+		this.configure({ syntax });
+
 		const text = textDocument.getText();
 		const textProvider = (offset: number, length: number) => {
 			if (textDocument.version !== versionId) {
@@ -286,6 +305,12 @@ export class Parser {
 	public _parseStylesheet(): nodes.Stylesheet {
 		const node = this.create(nodes.Stylesheet);
 
+		if (this.syntax === "indented") {
+			while (this.accept(TokenType.Newline)) {
+				// allow empty statements
+			}
+		}
+
 		while (node.addChild(this._parseStylesheetStart())) {
 			// Parse statements only valid at the beginning of stylesheets.
 		}
@@ -304,7 +329,13 @@ export class Parser {
 						this.markError(node, ParseError.SemiColonExpected);
 					}
 				}
-				while (this.accept(TokenType.SemiColon) || this.accept(TokenType.CDO) || this.accept(TokenType.CDC)) {
+				while (
+					this.accept(TokenType.Newline) ||
+					this.accept(TokenType.Dedent) ||
+					this.accept(TokenType.SemiColon) ||
+					this.accept(TokenType.CDO) ||
+					this.accept(TokenType.CDC)
+				) {
 					// accept empty statements
 					hasMatch = true;
 					inRecovery = false;
@@ -364,9 +395,16 @@ export class Parser {
 			while (this.accept(TokenType.Comma) && this._parseSelector(isNested)) {
 				// loop
 			}
-			if (this.accept(TokenType.CurlyL)) {
-				this.restoreAtMark(mark);
-				return this._parseRuleset(isNested);
+			if (this.syntax === "indented") {
+				if (this.accept(TokenType.Indent)) {
+					this.restoreAtMark(mark);
+					return this._parseRuleset(isNested);
+				}
+			} else {
+				if (this.accept(TokenType.CurlyL)) {
+					this.restoreAtMark(mark);
+					return this._parseRuleset(isNested);
+				}
 			}
 		}
 		this.restoreAtMark(mark);
@@ -377,11 +415,18 @@ export class Parser {
 		const node = this.create(nodes.RuleSet);
 		const selectors = node.getSelectors();
 
+		while (this.accept(TokenType.Newline)) {
+			// accept empty statements
+		}
+
 		if (!selectors.addChild(this._parseSelector(isNested))) {
 			return null;
 		}
 
 		while (this.accept(TokenType.Comma)) {
+			while (this.accept(TokenType.Newline)) {
+				// accept any newlines after , and the next selector
+			}
 			if (!selectors.addChild(this._parseSelector(isNested))) {
 				return this.finish(node, ParseError.SelectorExpected);
 			}
@@ -414,6 +459,9 @@ export class Parser {
 	}
 
 	public _needsSemicolonAfter(node: nodes.Node): boolean {
+		if (this.syntax === "indented") {
+			return false;
+		}
 		switch (node.type) {
 			case nodes.NodeType.Keyframe:
 			case nodes.NodeType.ViewPort:
@@ -449,42 +497,102 @@ export class Parser {
 
 	public _parseDeclarations(parseDeclaration: () => nodes.Node | null): nodes.Declarations | null {
 		const node = this.create(nodes.Declarations);
-		if (!this.accept(TokenType.CurlyL)) {
-			return null;
+
+		if (this.syntax === "indented") {
+			if (!this.accept(TokenType.Indent)) {
+				return null;
+			}
+			while (this.accept(TokenType.Newline)) {
+				// accept empty statements
+			}
+		} else {
+			if (!this.accept(TokenType.CurlyL)) {
+				return null;
+			}
 		}
+
+		let initialDepth = this.scanner.stream.depth;
 
 		let decl = parseDeclaration();
 		while (node.addChild(decl)) {
-			if (this.peek(TokenType.CurlyR)) {
-				break;
+			if (this.syntax === "indented") {
+				if (this.peek(TokenType.Dedent)) {
+					break;
+				}
+				while (this.accept(TokenType.Newline)) {
+					// accept empty statements
+				}
+			} else {
+				if (this.peek(TokenType.CurlyR)) {
+					break;
+				}
+				if (this._needsSemicolonAfter(decl) && !this.accept(TokenType.SemiColon)) {
+					return this.finish(node, ParseError.SemiColonExpected, [TokenType.SemiColon, TokenType.CurlyR]);
+				}
+				// We accepted semicolon token. Link it to declaration.
+				if (decl && this.prevToken && this.prevToken.type === TokenType.SemiColon) {
+					(decl as nodes.Declaration).semicolonPosition = this.prevToken.offset;
+				}
+				while (this.accept(TokenType.SemiColon)) {
+					// accept empty statements
+				}
 			}
-			if (this._needsSemicolonAfter(decl) && !this.accept(TokenType.SemiColon)) {
-				return this.finish(node, ParseError.SemiColonExpected, [TokenType.SemiColon, TokenType.CurlyR]);
+
+			if (this.syntax === "indented" && this.scanner.stream.depth < initialDepth) {
+				// For the indented syntax we might not get the same number of
+				// dedents as we get indents. If the depth is zero at this point
+				// we should drop out so we don't end up adding a ruleset as a
+				// child of another ruleset when in reality it's a direct child
+				// of Stylesheet
+				while (this.accept(TokenType.Dedent)) {
+					// Accept any dedents there may be
+				}
+				return this.finish(node);
 			}
-			// We accepted semicolon token. Link it to declaration.
-			if (decl && this.prevToken && this.prevToken.type === TokenType.SemiColon) {
-				(decl as nodes.Declaration).semicolonPosition = this.prevToken.offset;
-			}
-			while (this.accept(TokenType.SemiColon)) {
-				// accept empty statements
-			}
+
 			decl = parseDeclaration();
 		}
 
-		if (!this.accept(TokenType.CurlyR)) {
-			return this.finish(node, ParseError.RightCurlyExpected, [TokenType.CurlyR, TokenType.SemiColon]);
+		if (this.syntax === "indented") {
+			if (this.accept(TokenType.EOF)) {
+				return this.finish(node);
+			}
+
+			if (this.peek(TokenType.AtKeyword) || this.peek(TokenType.AtIncludeShort)) {
+				return this.finish(node);
+			}
+
+			let mark = this.mark();
+			if (this._parseSelector(true)) {
+				this.restoreAtMark(mark);
+				return this.finish(node);
+			}
+
+			if (!this.accept(TokenType.Dedent)) {
+				return this.finish(node, ParseError.DedentExpected, [TokenType.Newline, TokenType.Indent, TokenType.EOF]);
+			}
+		} else {
+			if (!this.accept(TokenType.CurlyR)) {
+				return this.finish(node, ParseError.RightCurlyExpected, [TokenType.CurlyR, TokenType.SemiColon]);
+			}
 		}
 		return this.finish(node);
 	}
 
 	public _parseBody<T extends nodes.BodyDeclaration>(node: T, parseDeclaration: () => nodes.Node | null): T {
 		if (!node.setDeclarations(this._parseDeclarations(parseDeclaration))) {
+			if (this.syntax === "indented") {
+				return this.finish(node, ParseError.IndentExpected, [TokenType.Dedent]);
+			}
 			return this.finish(node, ParseError.LeftCurlyExpected, [TokenType.CurlyR, TokenType.SemiColon]);
 		}
 		return this.finish(node);
 	}
 
 	public _parseSelector(isNested?: boolean): nodes.Selector | null {
+		while (this.accept(TokenType.Newline)) {
+			// loop
+		}
 		const node = this.create(nodes.Selector);
 
 		let hasContent = false;
@@ -547,7 +655,7 @@ export class Parser {
 		}
 
 		const mark = this.mark();
-		if (this.peek(TokenType.CurlyL)) {
+		if (this.peek(TokenType.CurlyL) || this.peek(TokenType.Indent)) {
 			// try to parse it as nested declaration
 			const propertySet = this.create(nodes.CustomPropertySet);
 			const declarations = this._parseDeclarations(this._parseRuleSetDeclaration.bind(this));
@@ -567,7 +675,10 @@ export class Parser {
 		const expression = this._parseExpr();
 		if (expression && !expression.isErroneous(true)) {
 			this._parsePrio();
-			if (this.peekOne(...(stopTokens || []), TokenType.SemiColon, TokenType.EOF)) {
+			if (
+				this.peekOne(...(stopTokens || []), TokenType.SemiColon, TokenType.EOF) ||
+				(this.syntax === "indented" && this.peekOne(...(stopTokens || []), TokenType.Newline, TokenType.Dedent))
+			) {
 				node.setValue(expression);
 				if (this.peek(TokenType.SemiColon)) {
 					node.semicolonPosition = this.token.offset; // not part of the declaration, but useful information for code assist
@@ -604,6 +715,13 @@ export class Parser {
 		let bracketsDepth = 0;
 		done: while (true) {
 			switch (this.token.type) {
+				case TokenType.Dedent:
+				case TokenType.Newline: {
+					if (this.syntax === "indented") {
+						break done;
+					}
+					break;
+				}
 				case TokenType.SemiColon:
 					// A semicolon only ends things if we're not inside a delimitor.
 					if (isTopLevel()) {
@@ -654,6 +772,9 @@ export class Parser {
 				case TokenType.BadString: // fall through
 					break done;
 				case TokenType.EOF:
+					if (this.syntax === "indented") {
+						break done;
+					}
 					// We shouldn't have reached the end of input, something is
 					// unterminated.
 					let error = ParseError.RightCurlyExpected;
@@ -712,9 +833,13 @@ export class Parser {
 		if (!this.accept(TokenType.String)) {
 			return this.finish(node, ParseError.IdentifierExpected);
 		}
-		if (!this.accept(TokenType.SemiColon)) {
+
+		if (this.syntax === "indented" && this.accept(TokenType.SemiColon)) {
+			return this.finish(node, ParseError.UnexpectedSemicolon);
+		} else if (this.syntax !== "indented" && !this.accept(TokenType.SemiColon)) {
 			return this.finish(node, ParseError.SemiColonExpected);
 		}
+
 		return this.finish(node);
 	}
 
@@ -759,7 +884,12 @@ export class Parser {
 			}
 		}
 
-		if (!this.peek(TokenType.SemiColon) && !this.peek(TokenType.EOF)) {
+		if (
+			!this.peek(TokenType.SemiColon) &&
+			!this.peek(TokenType.EOF) &&
+			!this.peek(TokenType.Newline) &&
+			!this.peek(TokenType.Dedent)
+		) {
 			node.setMedialist(this._parseMediaQueryList());
 		}
 
@@ -784,7 +914,9 @@ export class Parser {
 			}
 		}
 
-		if (!this.accept(TokenType.SemiColon)) {
+		if (this.syntax === "indented" && this.accept(TokenType.SemiColon)) {
+			return this.finish(node, ParseError.UnexpectedSemicolon);
+		} else if (this.syntax !== "indented" && !this.accept(TokenType.SemiColon)) {
 			return this.finish(node, ParseError.SemiColonExpected);
 		}
 
@@ -905,7 +1037,7 @@ export class Parser {
 			}
 		}
 
-		if (!this.peek(TokenType.CurlyL)) {
+		if (!this.peek(TokenType.CurlyL) && !this.peek(TokenType.Indent)) {
 			this.restoreAtMark(pos);
 			return null;
 		}
@@ -946,10 +1078,12 @@ export class Parser {
 		if (names) {
 			node.setNames(names);
 		}
-		if ((!names || names.getChildren().length === 1) && this.peek(TokenType.CurlyL)) {
+		if ((!names || names.getChildren().length === 1) && (this.peek(TokenType.CurlyL) || this.peek(TokenType.Indent))) {
 			return this._parseBody(node, this._parseLayerDeclaration.bind(this, isNested));
 		}
-		if (!this.accept(TokenType.SemiColon)) {
+		if (this.syntax === "indented" && this.accept(TokenType.SemiColon)) {
+			return this.finish(node, ParseError.UnexpectedSemicolon);
+		} else if (this.syntax !== "indented" && !this.accept(TokenType.SemiColon)) {
 			return this.finish(node, ParseError.SemiColonExpected);
 		}
 		return this.finish(node);
@@ -1162,7 +1296,7 @@ export class Parser {
 
 		while (parseExpression) {
 			if (!this.accept(TokenType.ParenthesisL)) {
-				return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL]);
+				return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 			}
 			if (this.peek(TokenType.ParenthesisL) || this.peekIdent("not")) {
 				// <media-condition>
@@ -1172,7 +1306,7 @@ export class Parser {
 			}
 			// not yet implemented: general enclosed
 			if (!this.accept(TokenType.ParenthesisR)) {
-				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL]);
+				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 			}
 			parseExpression = this.acceptIdent("and") || this.acceptIdent("or");
 		}
@@ -1285,7 +1419,7 @@ export class Parser {
 		const node = this.create(nodes.PageBoxMarginBox);
 
 		if (!this.acceptOneKeyword(languageFacts.pageBoxDirectives)) {
-			this.markError(node, ParseError.UnknownAtRule, [], [TokenType.CurlyL]);
+			this.markError(node, ParseError.UnknownAtRule, [], [TokenType.CurlyL, TokenType.Indent]);
 		}
 
 		return this._parseBody(node, this._parseRuleSetDeclaration.bind(this));
@@ -1317,7 +1451,25 @@ export class Parser {
 		const node = this.create(nodes.Document);
 		this.consumeToken(); // @-moz-document
 
-		this.resync([], [TokenType.CurlyL]); // ignore all the rules
+		// ignore all the rules, start back up again at first { (SCSS) or new line (indented)
+		const _NWL = "\n".charCodeAt(0);
+		const _CAR = "\r".charCodeAt(0);
+		const _LFD = "\f".charCodeAt(0);
+		const _CUL = "{".charCodeAt(0);
+
+		this.scanner.stream.advanceWhileChar((ch) => {
+			switch (ch) {
+				case _CUL:
+				case _NWL:
+				case _CAR:
+				case _LFD:
+					return false;
+				default:
+					return true;
+			}
+		});
+		this.consumeToken();
+
 		return this._parseBody(node, this._parseStylesheetStatement.bind(this));
 	}
 
@@ -1376,18 +1528,18 @@ export class Parser {
 				node.addChild(this._parseMediaFeature());
 			}
 			if (!this.accept(TokenType.ParenthesisR)) {
-				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL]);
+				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 			}
 		} else if (this.acceptIdent("style")) {
 			if (this.hasWhitespace() || !this.accept(TokenType.ParenthesisL)) {
-				return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL]);
+				return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 			}
 			node.addChild(this._parseStyleQuery());
 			if (!this.accept(TokenType.ParenthesisR)) {
-				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL]);
+				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 			}
 		} else {
-			return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL]);
+			return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 		}
 		return this.finish(node);
 	}
@@ -1425,10 +1577,10 @@ export class Parser {
 		if (this.accept(TokenType.ParenthesisL)) {
 			node.addChild(this._parseStyleQuery());
 			if (!this.accept(TokenType.ParenthesisR)) {
-				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL]);
+				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 			}
 		} else {
-			return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL]);
+			return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 		}
 		return this.finish(node);
 	}
@@ -1450,12 +1602,13 @@ export class Parser {
 		done: while (true) {
 			switch (this.token.type) {
 				case TokenType.SemiColon:
+				case TokenType.Newline:
 					if (isTopLevel()) {
 						break done;
 					}
 					break;
 				case TokenType.EOF:
-					if (curlyDepth > 0) {
+					if (curlyDepth > 0 && this.syntax !== "indented") {
 						return this.finish(node, ParseError.RightCurlyExpected);
 					} else if (bracketsDepth > 0) {
 						return this.finish(node, ParseError.RightSquareBracketExpected);
@@ -1465,11 +1618,18 @@ export class Parser {
 						return this.finish(node);
 					}
 				case TokenType.CurlyL:
+				case TokenType.Indent:
 					curlyLCount++;
 					curlyDepth++;
 					break;
+				case TokenType.Dedent:
 				case TokenType.CurlyR:
-					curlyDepth--;
+					if (this.token.type === TokenType.Dedent) {
+						curlyDepth = this.scanner.stream.depth;
+					} else {
+						curlyDepth--;
+					}
+
 					// End of at-rule, consume CurlyR and return node
 					if (curlyLCount > 0 && curlyDepth === 0) {
 						this.consumeToken();
@@ -1486,6 +1646,9 @@ export class Parser {
 						// this is the last declaration in the ruleset.
 						if (parensDepth === 0 && bracketsDepth === 0) {
 							break done;
+						}
+						if (this.syntax === "indented") {
+							return this.finish(node, ParseError.IndentExpected);
 						}
 						return this.finish(node, ParseError.LeftCurlyExpected);
 					}
@@ -1755,7 +1918,7 @@ export class Parser {
 		const pos = this.mark();
 		const node = this.createNode(nodes.NodeType.PseudoSelector);
 		this.consumeToken(); // Colon
-		if (this.hasWhitespace()) {
+		if (this.hasWhitespace() || this.peek(TokenType.Indent)) {
 			this.restoreAtMark(pos);
 			return null;
 		}
@@ -1928,7 +2091,7 @@ export class Parser {
 	}
 
 	public _parseStringLiteral(): nodes.Node | null {
-		if (!this.peek(TokenType.String) && !this.peek(TokenType.BadString)) {
+		if (!this.peek(TokenType.String) && !this.peek(TokenType.BadString) && !this.peek(TokenType.UnquotedString)) {
 			return null;
 		}
 		const node = this.createNode(nodes.NodeType.StringLiteral);

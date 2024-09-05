@@ -19,7 +19,6 @@ import {
 	TextDocumentEdit,
 	VersionedTextDocumentIdentifier,
 	TextDocument,
-	ICSSDataProvider,
 } from "../cssLanguageTypes";
 import * as l10n from "@vscode/l10n";
 import { CSSDataManager } from "../languageFacts/dataManager";

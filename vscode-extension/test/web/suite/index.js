@@ -7,7 +7,7 @@ require("mocha/mocha");
 function run() {
 	return new Promise((c, e) => {
 		mocha.setup({
-			ui: "bdd",
+			ui: "qunit",
 			reporter: undefined,
 			timeout: 20000,
 		});

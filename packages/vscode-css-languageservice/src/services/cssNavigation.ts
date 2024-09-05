@@ -296,6 +296,9 @@ export class CSSNavigation {
 				const rawText = candidate.getText();
 				if (startsWith(rawText, `'`) || startsWith(rawText, `"`)) {
 					collect(candidate);
+				} else if (document.languageId === "sass" && candidate.type === nodes.NodeType.StringLiteral) {
+					// In the Sass indented syntax the string quotes are optional for @import
+					collect(candidate);
 				}
 				return false;
 			}
@@ -536,6 +539,7 @@ export class CSSNavigation {
 		return undefined;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected async mapReference(target: string | undefined, isRawLink: boolean): Promise<string | undefined> {
 		return target;
 	}
@@ -642,7 +646,7 @@ export class CSSNavigation {
 			}
 
 			return true;
-		} catch (err) {
+		} catch {
 			return false;
 		}
 	}
@@ -653,7 +657,7 @@ export class CSSNavigation {
 		}
 		try {
 			return await this.fileSystemProvider.getContent(uri);
-		} catch (err) {
+		} catch {
 			return null;
 		}
 	}

@@ -23,6 +23,7 @@
 # Contributing to Some Sass
 
 - [New contributors](contributing/new-contributors.md)
+  - [Reporting bugs](contributing/reporting-bugs.md)
   - [Extensions for VS Code](contributing/extensions-for-vs-code.md)
   - [Language Server Protocol](contributing/language-server-protocol.md)
 - [Development environment](contributing/development-environment.md)
@@ -31,8 +32,8 @@
 - [Automated tests](contributing/automated-tests.md)
   - [Test coverage](contributing/test-coverage.md)
 - [Debugging](contributing/debugging.md)
-  - [Debugging in the browser](contributing/debugging-in-browser.md)
   - [Debugging unit tests](contributing/debugging-unit-tests.md)
-  - [Debugging end-to-end tests](contributing/debugging-e2e-tests.md)
+  - [Debugging performance](contributing/debugging-performance.md)
+  - [Debugging in the browser](contributing/debugging-in-browser.md)
 - [Releasing new versions](contributing/releases.md)
 - [Writing documentation](contributing/writing-documentation.md)

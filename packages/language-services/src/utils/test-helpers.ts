@@ -53,7 +53,7 @@ class MemoryFileSystem implements FileSystemProvider {
 				mtime: now.getTime(),
 				size: file?.getText().length || 0,
 			};
-		} catch (e) {
+		} catch {
 			return {
 				type: FileType.Unknown,
 				ctime: -1,

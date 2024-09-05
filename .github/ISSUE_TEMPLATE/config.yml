@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Ideas for new features, improvements
+    url: https://github.com/wkillerud/some-sass/discussions
+    about: Suggest additions or improvements to Some Sass in Discussions
+  - name: Questions when setting up Some Sass in an editor
+    url: https://github.com/wkillerud/some-sass/discussions
+    about: Please use Discussions if you have questions when configuring a language server client in a new editor

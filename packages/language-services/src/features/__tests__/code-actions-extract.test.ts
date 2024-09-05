@@ -59,6 +59,34 @@ test("extraction for variable", async () => {
 	]);
 });
 
+test("indented: extraction for variable", async () => {
+	const document = fileSystemProvider.createDocument(
+		["--var: black", ".a", "  color: var(--var)"],
+		{ languageId: "sass" },
+	);
+
+	const result = await ls.getCodeActions(
+		document,
+		Range.create(Position.create(0, 7), Position.create(0, 12)),
+	);
+
+	assert.deepStrictEqual(getEdit(result[0]), [
+		{
+			newText: `$_variable: black${EOL}--var: $_variable`,
+			range: {
+				end: {
+					character: 12,
+					line: 0,
+				},
+				start: {
+					character: 0,
+					line: 0,
+				},
+			},
+		},
+	]);
+});
+
 test("extraction for multiline variable", async () => {
 	const document = fileSystemProvider.createDocument([
 		`box-shadow: inset 0 0 0 jkl.rem(1px) var(--jkl-calendar-border-color),`,
@@ -182,6 +210,54 @@ a.cta {
 	]);
 });
 
+test("indented: extraction for mixin", async () => {
+	ls.configure({
+		editorSettings: {
+			insertSpaces: true,
+			indentSize: 2,
+		},
+	});
+
+	const document = fileSystemProvider.createDocument(
+		`
+a.cta
+  color: var(--cta-text)
+  text-decoration: none
+
+  &:visited
+    color: var(--cta-text)
+`,
+		{ languageId: "sass" },
+	);
+
+	const result = await ls.getCodeActions(
+		document,
+		Range.create(Position.create(2, 2), Position.create(6, 26)),
+	);
+
+	assert.deepStrictEqual(getEdit(result[1]), [
+		{
+			newText: `@mixin _mixin
+    color: var(--cta-text)
+    text-decoration: none
+
+    &:visited
+      color: var(--cta-text)
+  @include _mixin`,
+			range: {
+				end: {
+					character: 26,
+					line: 6,
+				},
+				start: {
+					character: 2,
+					line: 2,
+				},
+			},
+		},
+	]);
+});
+
 test("extraction for function with tab indents", async () => {
 	ls.configure({
 		editorSettings: {
@@ -253,6 +329,41 @@ box-shadow: _function();`,
 				start: {
 					character: 0,
 					line: 1,
+				},
+			},
+		},
+	]);
+});
+
+test("indented: extraction for function", async () => {
+	ls.configure({
+		editorSettings: {
+			insertSpaces: true,
+			indentSize: 2,
+		},
+	});
+
+	const document = fileSystemProvider.createDocument(
+		["--var: black", ".a", "  color: var(--var)"],
+		{ languageId: "sass" },
+	);
+
+	const result = await ls.getCodeActions(
+		document,
+		Range.create(Position.create(0, 7), Position.create(0, 12)),
+	);
+
+	assert.deepStrictEqual(getEdit(result[2]), [
+		{
+			newText: `@function _function()${EOL}  @return black${EOL}--var: _function()`,
+			range: {
+				end: {
+					character: 12,
+					line: 0,
+				},
+				start: {
+					character: 0,
+					line: 0,
 				},
 			},
 		},

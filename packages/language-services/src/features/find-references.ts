@@ -335,7 +335,7 @@ export class FindReferences extends LanguageFeature {
 		return references;
 	}
 
-	async getDeclaration(
+	private async getDeclaration(
 		document: TextDocument,
 		position: Position,
 		context: ReferenceContext,
@@ -499,6 +499,17 @@ export class FindReferences extends LanguageFeature {
 					if (definitionSymbol) {
 						result.declaration = {
 							symbol: definitionSymbol,
+							document,
+						};
+					} else {
+						// fallback for scoped symbols not included in findDocumentSymbols
+						result.declaration = {
+							symbol: {
+								kind: result.kind,
+								name: result.name,
+								range: definition.range,
+								selectionRange: definition.range,
+							},
 							document,
 						};
 					}

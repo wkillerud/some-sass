@@ -47,7 +47,7 @@ export class NodeFileSystem implements FileSystemProvider {
 			try {
 				const stats = await this.stat(Utils.joinPath(URI.parse(uri), file));
 				result.push([file, stats.type]);
-			} catch (e) {
+			} catch {
 				result.push([file, FileType.Unknown]);
 			}
 		}
@@ -81,7 +81,7 @@ export class NodeFileSystem implements FileSystemProvider {
 				mtime: stats.mtime.getTime(),
 				size: stats.size,
 			};
-		} catch (e) {
+		} catch {
 			return {
 				type: FileType.Unknown,
 				ctime: -1,

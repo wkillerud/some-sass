@@ -1,6 +1,6 @@
 # Some Sass
 
-Some Sass is a [language server extension][langext] for [Visual Studio Code][vscode]. It brings improved code suggestions, documentation and code navigation for [SCSS][scss].
+Some Sass is a [language server extension][langext] for [Visual Studio Code][vscode]. It brings improved code suggestions, documentation and code navigation for both SCSS and indented Sass [syntaxes].
 
 Some features include:
 
@@ -8,6 +8,7 @@ Some features include:
 - Workspace-wide code navigation and refactoring, such as Rename Symbol.
 - Rich documentation through [SassDoc][sassdoc].
 - Language features for [`%placeholders`][placeholder], both when using them and writing them.
+- Support for both SCSS and intended [syntaxes].
 
 ![](./images/highlight-reel.gif)
 
@@ -35,7 +36,7 @@ To search click the magnifying class icon to the top left or press `s` on your k
 
 [lsp]: https://microsoft.github.io/language-server-protocol/
 [npm]: https://www.npmjs.com/package/some-sass-language-server
-[scss]: https://sass-lang.com/documentation/syntax/
+[syntaxes]: https://sass-lang.com/documentation/syntax/
 [use]: https://sass-lang.com/documentation/at-rules/use/
 [forward]: https://sass-lang.com/documentation/at-rules/forward/
 [langext]: https://code.visualstudio.com/api/language-extensions/language-server-extension-guide

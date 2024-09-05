@@ -2,16 +2,18 @@
 
 This document describes how to release a new version of Some Sass.
 
-## Conventional Commits
-
-This repository uses [nx] to manage release
+A new release typically involves two assets:
 
 - The [language service package][lsnpm] is published to `npm`.
 - The Visual Studio Code extension is published to:
   - [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=SomewhatStationery.some-sass)
   - [Open VSX](https://open-vsx.org/extension/SomewhatStationery/some-sass)
 
-nx reads [conventional commits][conventional] to determine what the new versions should be, and to generate changelogs. Which version is released depends on how you write the commit message.
+## Conventional Commits
+
+We use [nx] to version and tag the language service module based on [conventional commits][conventional].
+
+nx reads the commit messages to determine what the new version should be, and to generate changelogs. Which version is released depends on how you write the commit message.
 
 | Commit message                                                                                                                            | Release type                                                                                                                                                         |
 | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -20,16 +22,16 @@ nx reads [conventional commits][conventional] to determine what the new versions
 | `feat: add support for show keyword in forward`                                                                                           | Minor. New feature release.                                                                                                                                          |
 | `refactor: remove reduntant options for latest language version`<br><br>`BREAKING CHANGE: The scanImportedFiles option has been removed.` | Major. Breaking release, like removing an option or changing `engines` version. <br /> (Note that the `BREAKING CHANGE: ` token must be in the footer of the commit) |
 
-### Release process
+## Release process
 
 To start a new release, run `node .scripts/release.mjs`. This script:
 
 1. Gets the latest `main` branch with `git checkout main && git pull`.
 2. Runs `npm clean-install`.
-3. Runs `npm run release`.
+3. Runs `npm run release` which updates versions, generates changelogs and Git tags.
 4. Pushes the changes and tags with `git push && git push --tags`.
 
-GitHub Actions is configured to do the actual publishing when there are new tags.
+GitHub Actions does the actual publishing when there are new tags.  Create a [new GitHub release](https://github.com/wkillerud/some-sass/releases/new?title=some-sass-language-server@x.y.z) for the latest tag.
 
 The script continues to:
 
@@ -39,24 +41,36 @@ The script continues to:
 4. Commit the changes and run `git tag some-sass@<version from package.json>`.
 5. Run `git push && git push --tags`.
 
-For the extension, GitHub Actions is configured to do the actual publishing (including GitHub release) when there are new tags. For the server, create a [new GitHub release](https://github.com/wkillerud/some-sass/releases/new?title=some-sass-language-server@x.y.z) for the latest tag.
+Again, GitHub Actions is does the actual publishing (including GitHub release) when there are new tags.
 
-### Manual fallback
+### Manual release process
 
-For `npm` packages:
+In case `npm run release` fails, or GitHub Actions can't publish, here's how you can release manually (provided you have access).
+
+To prepare the repository:
 
 ```sh
-npm version [major|minor|patch]
+git checkout main
+git pull
+npm clean-install
+npm run build
+npm run test:all
+```
+
+Then, in `packages/language-server`:
+
+```sh
+# run npm version first if nx failed
 npm publish
 ```
 
-For the VS Code extension:
+In `vscode-extension/`:
 
 ```sh
 vsce package
 ```
 
-Then publish manually via Visual Studio [Marketplace], [Open VSX] and GitHub Releases (attach the `.vsix` file to the release).
+Then log in to and publish manually via Visual Studio [Marketplace], [Open VSX] and GitHub Releases (attach the `.vsix` file to the release).
 
 References:
 

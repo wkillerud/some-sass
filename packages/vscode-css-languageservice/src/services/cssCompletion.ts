@@ -10,7 +10,6 @@ import * as languageFacts from "../languageFacts/facts";
 import * as strings from "../utils/strings";
 import {
 	ICompletionParticipant,
-	LanguageSettings,
 	TextDocument,
 	Command,
 	Position,
@@ -275,13 +274,23 @@ export class CSSCompletion {
 			}
 			// Empty .selector { | } case
 			if (!declaration && completePropertyWithSemicolon) {
-				insertText += "$0;";
+				if (this.textDocument.languageId === "sass") {
+					// Semicolons are syntax errors in indented
+					insertText += "$0";
+				} else {
+					insertText += "$0;";
+				}
 			}
 
 			// Cases such as .selector { p; } or .selector { p:; }
 			if (declaration && !declaration.semicolonPosition) {
 				if (completePropertyWithSemicolon && this.offset >= this.textDocument.offsetAt(range.end)) {
-					insertText += "$0;";
+					if (this.textDocument.languageId === "sass") {
+						// Semicolons are syntax errors in indented
+						insertText += "$0";
+					} else {
+						insertText += "$0;";
+					}
 				}
 			}
 
@@ -949,6 +958,13 @@ export class CSSCompletion {
 
 				// complete next property
 				return this.getCompletionsForDeclarationProperty(null, result);
+			} else if (this.textDocument.languageId === "sass") {
+				let declBeforeOffsetHasValue = Boolean(declaration.getChild(1));
+				let isNextDeclaration = this.offset > declaration.offset + declaration.length && declBeforeOffsetHasValue;
+				if (isNextDeclaration) {
+					// complete next property
+					return this.getCompletionsForDeclarationProperty(null, result);
+				}
 			}
 
 			if (declaration instanceof nodes.Declaration) {
@@ -1062,7 +1078,6 @@ export class CSSCompletion {
 		parameters: nodes.Nodelist,
 		existingNode: nodes.Node | null,
 	): CompletionItem {
-		const decl = <nodes.FunctionDeclaration>symbol.node;
 		const params = parameters.getChildren().map((c) => {
 			return c instanceof nodes.FunctionParameter ? (<nodes.FunctionParameter>c).getName() : c.getText();
 		});

@@ -4,13 +4,13 @@
  *--------------------------------------------------------------------------------------------*/
 "use strict";
 
-import * as assert from "assert";
+import { suite, test, assert } from "vitest";
 import { Node, IRule, Level } from "../../parser/cssNodes";
 import { Parser } from "../../parser/cssParser";
 import { LintVisitor } from "../../services/lint";
 import { Rule, Rules, LintConfigurationSettings } from "../../services/lintRules";
 import { TextDocument } from "../../cssLanguageTypes";
-import { SCSSParser } from "../../parser/scssParser";
+import { SassParser } from "../../parser/sassParser";
 import { CSSDataManager } from "../../languageFacts/dataManager";
 
 const cssDataManager = new CSSDataManager({ useDefaultDataProvider: true });
@@ -44,7 +44,7 @@ export function assertEntries(
 		}
 	}
 }
-const parsers = [new Parser(), new SCSSParser()];
+const parsers = [new Parser(), new SassParser()];
 
 function assertStyleSheet(input: string, ...rules: Rule[]): void {
 	for (const p of parsers) {

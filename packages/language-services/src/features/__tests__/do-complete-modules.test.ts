@@ -1073,6 +1073,7 @@ test("should suggest all symbols as legacy @import may be in use", async () => {
 test("should not suggest legacy @import symbols if configured", async () => {
 	ls.configure({
 		completionSettings: {
+			suggestAllFromOpenDocument: true,
 			suggestFromUseOnly: true,
 		},
 	});
@@ -1120,7 +1121,7 @@ test("should suggest symbol from a different document via @use with wildcard ali
 	ls.parseStylesheet(two);
 
 	const { items } = await ls.doComplete(two, Position.create(1, 12));
-	assert.notEqual(2, items.length, "Expected to find two completion items");
+	assert.equal(2, items.length, "Expected to find two completion items");
 	assert.deepStrictEqual(
 		items.find((annotation) => annotation.label === "$primary"),
 		{

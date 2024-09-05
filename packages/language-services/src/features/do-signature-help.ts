@@ -126,7 +126,7 @@ export class DoSignatureHelp extends LanguageFeature {
 
 						if (signature) {
 							const params = signature
-								.replace(/:.+[$)]/g, "") // Remove default values
+								.replace(/:.+?(?=[,)])/g, "") // Remove default values in a non-greedy way
 								.replace(/[().]/g, "") // Remove parentheses and ... list indicator
 								.split(",");
 

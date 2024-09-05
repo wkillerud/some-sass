@@ -3,7 +3,7 @@ import {
 	getNodeAtOffset,
 	LanguageService as VSCodeLanguageService,
 	Scanner,
-	SCSSScanner,
+	SassScanner,
 } from "@somesass/vscode-css-languageservice";
 import { LanguageModelCache } from "./language-model-cache";
 import {
@@ -25,7 +25,7 @@ import { asDollarlessVariable } from "./utils/sass";
 
 export type LanguageFeatureInternal = {
 	cache: LanguageModelCache;
-	scssLs: VSCodeLanguageService;
+	sassLs: VSCodeLanguageService;
 };
 
 type FindOptions = {
@@ -40,12 +40,11 @@ type FindOptions = {
 
 const defaultConfiguration: LanguageServiceConfiguration = {
 	completionSettings: {
-		triggerPropertyValueCompletion: false,
-		completePropertyWithSemicolon: false,
 		suggestAllFromOpenDocument: false,
 		suggestFromUseOnly: false,
 		suggestFunctionsInStringContextAfterSymbols: " (+-*%",
 		suggestionStyle: "all",
+		triggerPropertyValueCompletion: true,
 	},
 };
 
@@ -78,19 +77,12 @@ export abstract class LanguageFeature {
 		this.configuration = {
 			...defaultConfiguration,
 			...configuration,
-			completionSettings: {
-				...defaultConfiguration.completionSettings,
-				...configuration.completionSettings,
-				triggerPropertyValueCompletion:
-					configuration.completionSettings?.triggerPropertyValueCompletion ||
-					false,
-			},
 		};
-		this._internal.scssLs.configure(configuration);
+		this._internal.sassLs.configure(configuration);
 	}
 
 	protected getUpstreamLanguageServer(): VSCodeLanguageService {
-		return this._internal.scssLs;
+		return this._internal.sassLs;
 	}
 
 	protected getDocumentContext() {
@@ -105,7 +97,7 @@ export abstract class LanguageFeature {
 				}
 				try {
 					return resolve(base, ref);
-				} catch (e) {
+				} catch {
 					return undefined;
 				}
 			},
@@ -118,7 +110,9 @@ export abstract class LanguageFeature {
 	 * @param range Optional range passed to {@link TextDocument.getText}
 	 */
 	protected getScanner(document: TextDocument, range?: Range): Scanner {
-		const scanner = new SCSSScanner();
+		const scanner = new SassScanner({
+			syntax: document.languageId === "sass" ? "indented" : "scss",
+		});
 		scanner.ignoreComment = false;
 		scanner.setSource(document.getText(range));
 		return scanner;
@@ -315,7 +309,7 @@ export abstract class LanguageFeature {
 	 * Looks at {@link position} for a {@link VariableDeclaration} and returns its value as a string (or null if no value was found).
 	 * If the value is a reference to another variable this method will find that variable's definition and look for the value there instead.
 	 *
-	 * If the value is not found in 20 lookups, assumes a circular reference and returns null.
+	 * If the value is not found in 10 lookups, assumes a circular reference and returns null.
 	 */
 	async findValue(
 		document: TextDocument,
@@ -329,13 +323,13 @@ export abstract class LanguageFeature {
 		position: Position,
 		depth = 0,
 	): Promise<string | null> {
-		const MAX_VARIABLE_REFERENCE_LOOKUPS = 20;
+		const MAX_VARIABLE_REFERENCE_LOOKUPS = 10;
 		if (depth > MAX_VARIABLE_REFERENCE_LOOKUPS) {
 			return null;
 		}
-		const offset = document.offsetAt(position);
 		const stylesheet = this.ls.parseStylesheet(document);
 
+		const offset = document.offsetAt(position);
 		const variable = getNodeAtOffset(stylesheet, offset);
 		if (!(variable instanceof Variable)) {
 			return null;
@@ -343,11 +337,22 @@ export abstract class LanguageFeature {
 
 		const parent = variable.getParent();
 		if (parent instanceof VariableDeclaration) {
-			return parent.getValue()?.getText() || null;
+			const value = parent.getValue();
+			if (!value) {
+				return null;
+			}
+			if (value.getText().includes("$")) {
+				return await this.internalFindValue(
+					document,
+					document.positionAt(value.offset),
+					depth + 1,
+				);
+			}
+			return value.getText();
 		}
 
 		const valueString = variable.getText();
-		const dollarIndex = valueString.indexOf("$");
+		const dollarIndex = valueString.indexOf("$"); // is this always true in indented?
 		if (dollarIndex !== -1) {
 			// If the variable at position references another variable,
 			// find that variable's definition and look for the real value

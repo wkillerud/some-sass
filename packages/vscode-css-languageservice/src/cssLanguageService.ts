@@ -11,8 +11,8 @@ import { CSSNavigation } from "./services/cssNavigation";
 import { CSSCodeActions } from "./services/cssCodeActions";
 import { CSSValidation } from "./services/cssValidation";
 
-import { SCSSParser } from "./parser/scssParser";
-import { SCSSCompletion } from "./services/scssCompletion";
+import { SassParser } from "./parser/sassParser";
+import { SassCompletion } from "./services/sassCompletion";
 import { getFoldingRanges } from "./services/cssFolding";
 
 import {
@@ -49,14 +49,14 @@ import {
 import { CSSDataManager } from "./languageFacts/dataManager";
 import { CSSDataProvider } from "./languageFacts/dataProvider";
 import { getSelectionRanges } from "./services/cssSelectionRange";
-import { SCSSNavigation } from "./services/scssNavigation";
+import { SassNavigation } from "./services/sassNavigation";
 import { cssData } from "./data/webCustomData";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export type Stylesheet = {};
 
 export { TokenType, IToken, Scanner } from "./parser/cssScanner";
-export { SCSSScanner } from "./parser/scssScanner";
+export { SassScanner } from "./parser/sassScanner";
 export * from "./parser/cssNodes";
 export * from "./cssLanguageTypes";
 
@@ -184,15 +184,15 @@ export function getCSSLanguageService(
 	);
 }
 
-export function getSCSSLanguageService(
+export function getSassLanguageService(
 	options: LanguageServiceOptions = defaultLanguageServiceOptions,
 ): LanguageService {
 	const cssDataManager = new CSSDataManager(options);
 	return createFacade(
-		new SCSSParser(),
-		new SCSSCompletion(options, cssDataManager),
+		new SassParser(),
+		new SassCompletion(options, cssDataManager),
 		new CSSHover(options && options.clientCapabilities, cssDataManager),
-		new SCSSNavigation(options && options.fileSystemProvider),
+		new SassNavigation(options && options.fileSystemProvider),
 		new CSSCodeActions(cssDataManager),
 		new CSSValidation(cssDataManager),
 		cssDataManager,

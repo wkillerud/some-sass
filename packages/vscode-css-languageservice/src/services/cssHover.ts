@@ -61,7 +61,7 @@ export class CSSHover {
 			const node = nodepath[i];
 
 			if (node instanceof nodes.Media) {
-				const regex = /@media[^\{]+/g;
+				const regex = document.languageId === "sass" ? /@media.+/ : /@media[^\{]+/g;
 				const matches = node.getText().match(regex);
 				flagOpts = {
 					isMedia: true,

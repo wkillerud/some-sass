@@ -22,17 +22,6 @@
 			],
 			"outFiles": ["${workspaceFolder}/vscode-extension/dist/browser-*.js"],
 			"autoAttachChildProcesses": true
-		},
-		{
-			"name": "Launch end-to-end tests",
-			"type": "extensionHost",
-			"request": "launch",
-			"runtimeExecutable": "${execPath}",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}/vscode-extension",
-				"--extensionTestsPath=${workspaceFolder}/vscode-extension/test/e2e/suite",
-				"${workspaceFolder}/vscode-extension/test/fixtures/"
-			]
 		}
 	]
 }

@@ -37,6 +37,9 @@ export const ParseError = {
 	PropertyValueExpected: new CSSIssueType("css-propertyvalueexpected", l10n.t("property value expected")),
 	LeftCurlyExpected: new CSSIssueType("css-lcurlyexpected", l10n.t("{ expected")),
 	RightCurlyExpected: new CSSIssueType("css-rcurlyexpected", l10n.t("} expected")),
+	IndentExpected: new CSSIssueType("css-indentexpected", l10n.t("indent expected")),
+	DedentExpected: new CSSIssueType("css-dedentexpected", l10n.t("dedent expected")),
+	NewlineExpected: new CSSIssueType("css-dedentexpected", l10n.t("new line expected")),
 	LeftSquareBracketExpected: new CSSIssueType("css-rbracketexpected", l10n.t("[ expected")),
 	RightSquareBracketExpected: new CSSIssueType("css-lbracketexpected", l10n.t("] expected")),
 	LeftParenthesisExpected: new CSSIssueType("css-lparentexpected", l10n.t("( expected")),
@@ -55,4 +58,5 @@ export const ParseError = {
 	IdentifierOrWildcardExpected: new CSSIssueType("css-idorwildcardexpected", l10n.t("identifier or wildcard expected")),
 	WildcardExpected: new CSSIssueType("css-wildcardexpected", l10n.t("wildcard expected")),
 	IdentifierOrVariableExpected: new CSSIssueType("css-idorvarexpected", l10n.t("identifier or variable expected")),
+	UnexpectedSemicolon: new CSSIssueType("css-nosemi", l10n.t("';' is not allowed in indented syntax")),
 };

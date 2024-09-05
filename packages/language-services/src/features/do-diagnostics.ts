@@ -10,11 +10,68 @@ import {
 	Range,
 	DiagnosticTag,
 	DiagnosticSeverity,
+	Position,
 } from "../language-services-types";
+
+const TAB = "	";
+const SPACE = " ";
 
 export class DoDiagnostics extends LanguageFeature {
 	async doDiagnostics(document: TextDocument): Promise<Diagnostic[]> {
-		return this.doDeprecationDiagnostics(document);
+		return Promise.all([
+			this.doDeprecationDiagnostics(document),
+			this.doUpstreamDiagnostics(document),
+			this.doConsistentIndentationDiagnostics(document),
+		]).then((diagnostics) => diagnostics.flatMap((diagnostic) => diagnostic));
+	}
+
+	private async doConsistentIndentationDiagnostics(
+		document: TextDocument,
+	): Promise<Diagnostic[]> {
+		if (document.languageId !== "sass") {
+			return [];
+		}
+
+		const lines = document.getText().split("\n");
+		let firstIndentation;
+
+		const diagnostics: Diagnostic[] = [];
+		for (let i = 0; i < lines.length; i++) {
+			const line = lines[i];
+			if (!firstIndentation) {
+				if (line.startsWith(TAB)) {
+					firstIndentation = TAB;
+				} else if (line.startsWith(SPACE)) {
+					firstIndentation = SPACE;
+				}
+			}
+			if (firstIndentation === TAB && line.startsWith(SPACE)) {
+				diagnostics.push({
+					message: "Got space for indentation when tab was expected",
+					range: Range.create(Position.create(i, 0), Position.create(i, 1)),
+					source: "Some Sass",
+					severity: DiagnosticSeverity.Error,
+				});
+			} else if (firstIndentation === SPACE && line.startsWith(TAB)) {
+				diagnostics.push({
+					message: "Got tab for indentation when space was expected",
+					range: Range.create(Position.create(i, 0), Position.create(i, 1)),
+					source: "Some Sass",
+					severity: DiagnosticSeverity.Error,
+				});
+			}
+		}
+		return diagnostics;
+	}
+
+	private async doUpstreamDiagnostics(document: TextDocument) {
+		const stylesheet = this.ls.parseStylesheet(document);
+		const diagnostics = this.getUpstreamLanguageServer().doValidation(
+			document,
+			stylesheet,
+			{ validate: true },
+		);
+		return diagnostics;
 	}
 
 	private async doDeprecationDiagnostics(

@@ -11,7 +11,9 @@
 		"prepare": "husky",
 		"postinstall": "patch-package",
 		"build": "nx run-many -t build",
-		"clean": "nx run-many -t clean && nx reset",
+		"preclean": "nx reset",
+		"clean": "nx run-many -t clean",
+		"postclean": "shx rm -rf node_modules",
 		"coverage": "nx run-many -t coverage",
 		"dev": "echo Watching workspace for changes... && nx watch --all -- nx run \\$NX_PROJECT_NAME:build",
 		"lint": "eslint \"**/*.ts\" --cache",
@@ -61,6 +63,7 @@
 		"ts-loader": "9.5.1",
 		"typescript": "5.5.4",
 		"typescript-eslint": "8.0.0",
+		"vitest": "2.0.5",
 		"webpack": "5.94.0",
 		"webpack-cli": "5.1.4"
 	}

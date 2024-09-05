@@ -4,7 +4,7 @@ import {
 } from "@somesass/language-services";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
-import { getSCSSRegionsDocument } from "./utils/embedded";
+import { getSassRegionsDocument } from "./utils/embedded";
 
 export default class WorkspaceScanner {
 	#ls: LanguageService;
@@ -18,12 +18,13 @@ export default class WorkspaceScanner {
 	) {
 		this.#ls = ls;
 		this.#fs = fs;
+
 		this.#settings = settings;
 	}
 
-	public async scan(files: URI[]): Promise<void> {
+	public async scan(files: URI[]): Promise<void[]> {
 		// Populate the cache for the new language services
-		await Promise.all(
+		return Promise.all(
 			files.map((uri) => {
 				if (
 					this.#settings.scanImportedFiles &&
@@ -32,7 +33,7 @@ export default class WorkspaceScanner {
 					// If we scan imported files (which we do by default), don't include partials in the initial scan.
 					// This way we can be reasonably sure that we scan whatever index files there are _before_ we scan
 					// partials which may or may not have been forwarded with a prefix.
-					return;
+					return Promise.resolve();
 				}
 				return this.parse(uri);
 			}),
@@ -59,14 +60,21 @@ export default class WorkspaceScanner {
 
 			if (!document) {
 				const content = await this.#fs.readFile(uri);
+				const uriString = uri.toString();
 
-				document = getSCSSRegionsDocument(
-					TextDocument.create(uri.toString(), "scss", 1, content),
+				document = getSassRegionsDocument(
+					TextDocument.create(
+						uriString,
+						uriString.endsWith(".sass") ? "sass" : "scss",
+						1,
+						content,
+					),
 				);
+
 				if (!document) return;
+				this.#ls.parseStylesheet(document);
 			}
 
-			this.#ls.parseStylesheet(document);
 			const links = await this.#ls.findDocumentLinks(document);
 
 			for (const link of links) {

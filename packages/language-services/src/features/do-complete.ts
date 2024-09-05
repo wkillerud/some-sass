@@ -1,6 +1,6 @@
 import { getNodeAtOffset } from "@somesass/vscode-css-languageservice";
 import ColorDotJS from "colorjs.io";
-import { ParseResult } from "scss-sassdoc-parser";
+import { ParseResult } from "sassdoc-parser";
 import { SassBuiltInModule, sassBuiltInModules } from "../facts/sass";
 import { sassDocAnnotations } from "../facts/sassdoc";
 import { LanguageFeature } from "../language-feature";
@@ -55,7 +55,10 @@ const rePropertyValue = /.*:\s*/;
 const reEmptyPropertyValue = /.*:\s*$/;
 const reQuotedValueInString = /["'](?:[^"'\\]|\\.)*["']/g;
 const reMixinReference = /.*@include\s+(.*)/;
+const reIndentedMixinReference = /.*(@include\s+|\+)(.*)/;
 const reCompletedMixinWithParametersReference = /.*@include\s+(.*)\(/;
+const reCompletedIndentedMixinWithParametersReference =
+	/.*(@include\s+|\+)(.*)\(/;
 const reComment = /^(.*\/\/|.*\/\*|\s*\*)/;
 const reSassDoc = /^[\\s]*\/{3}.*$/;
 const reQuotes = /["']/;
@@ -82,8 +85,8 @@ export class DoComplete extends LanguageFeature {
 		position: Position,
 	): Promise<CompletionList> {
 		const result = CompletionList.create([]);
-		const upstreamLs = this.getUpstreamLanguageServer();
 
+		const upstreamLs = this.getUpstreamLanguageServer();
 		const context = this.createCompletionContext(document, position);
 
 		const stylesheet = this.ls.parseStylesheet(document);
@@ -146,7 +149,10 @@ export class DoComplete extends LanguageFeature {
 					result.items.push(...items);
 				}
 
-				prevToken = token;
+				if (token.type !== TokenType.Newline) {
+					// ignore newlines in the logic
+					prevToken = token;
+				}
 				token = scanner.scan();
 			}
 
@@ -167,12 +173,7 @@ export class DoComplete extends LanguageFeature {
 				position,
 				stylesheet,
 				this.getDocumentContext(),
-				{
-					...this.configuration.completionSettings,
-					triggerPropertyValueCompletion:
-						this.configuration.completionSettings
-							?.triggerPropertyValueCompletion || false,
-				},
+				this.configuration.completionSettings,
 			);
 			if (upstreamResult.items.length > 0) {
 				result.items.push(...upstreamResult.items);
@@ -225,15 +226,38 @@ export class DoComplete extends LanguageFeature {
 			return result;
 		}
 
+		const links = await this.ls.findDocumentLinks(document);
 		if (context.namespace) {
 			const items = await this.doNamespaceCompletion(document, context);
 			if (items.length > 0) {
 				result.items.push(...items);
+				return result;
 			}
 		}
+		// else {
+		// 	// give suggestions for all @use in case the user is typing one of those
+		//  // unfortunately in VS Code at time of writing this breaks suggestions when
+		//  // manually typing out the namespace. Where without this you get suggestions
+		//  // after typing the dot (ex `module.`), this somehow interferes.
+		//  // Adding result.isIncomplete = true has no effect.  While I'd like to include
+		//  // suggestions for available namespaces, the existing behavior has to work.
+		// 	for (const link of links) {
+		// 		if (link.namespace) {
+		// 			let insertText = `${link.namespace}.`;
+		// 			result.items.push({
+		// 				label: link.namespace,
+		// 				kind: CompletionItemKind.Module,
+		// 				insertText,
+		// 				command: {
+		// 					title: "Suggest",
+		// 					command: "editor.action.triggerSuggest",
+		// 				},
+		// 			});
+		// 		}
+		// 	}
+		// }
 
 		// We might be looking at a wildcard alias (@use "./foo" as *), so check the links and see if we need to go looking
-		const links = await this.ls.findDocumentLinks(document);
 		const wildcards: DocumentLink[] = [];
 		for (const link of links) {
 			if (link.as === "*") {
@@ -318,25 +342,21 @@ export class DoComplete extends LanguageFeature {
 					}
 				}
 			}
-
-			return result;
 		}
 
-		const upstreamResult = await upstreamLs.doComplete2(
-			document,
-			position,
-			stylesheet,
-			this.getDocumentContext(),
-			{
-				...this.configuration.completionSettings,
-				triggerPropertyValueCompletion:
-					this.configuration.completionSettings
-						?.triggerPropertyValueCompletion || false,
-			},
-		);
-		if (upstreamResult.items.length > 0) {
-			result.items.push(...upstreamResult.items);
+		if (document.languageId === "sass") {
+			const upstreamResult = await upstreamLs.doComplete2(
+				document,
+				position,
+				stylesheet,
+				this.getDocumentContext(),
+				this.configuration.completionSettings,
+			);
+			if (upstreamResult.items.length > 0) {
+				result.items.push(...upstreamResult.items);
+			}
 		}
+
 		return result;
 	}
 
@@ -446,6 +466,23 @@ export class DoComplete extends LanguageFeature {
 				context.isFunctionContext = true;
 			}
 			return context;
+		} else if (document.languageId === "sass") {
+			// do the same test for the shorthand + to include mixins in this syntax
+			if (
+				!isPropertyValue &&
+				reIndentedMixinReference.test(lineBeforePosition)
+			) {
+				context.isMixinContext = true;
+				if (
+					reCompletedIndentedMixinWithParametersReference.test(
+						lineBeforePosition,
+					)
+				) {
+					context.isMixinContext = false;
+					context.isVariableContext = true;
+					context.isFunctionContext = true;
+				}
+			}
 		}
 
 		if (isPropertyValue && !isEmptyValue && !isQuotes) {
@@ -480,8 +517,13 @@ export class DoComplete extends LanguageFeature {
 	async doPlaceholderUsageCompletion(
 		initialDocument: TextDocument,
 	): Promise<CompletionItem[]> {
+		const visited = new Set<string>();
 		const items: CompletionItem[] = [];
 		const result = await this.findInWorkspace<CompletionItem>((document) => {
+			// keep track of visited to avoid duplicates
+			// if completionSettings?.suggestFromUseOnly is false
+			visited.add(document.uri);
+
 			const symbols = this.ls.findDocumentSymbols(document);
 			const items: CompletionItem[] = [];
 			for (const symbol of symbols) {
@@ -500,6 +542,10 @@ export class DoComplete extends LanguageFeature {
 		if (!this.configuration.completionSettings?.suggestFromUseOnly) {
 			const documents = this.cache.documents();
 			for (const current of documents) {
+				if (visited.has(current.uri)) {
+					continue;
+				}
+
 				const symbols = this.ls.findDocumentSymbols(current);
 				for (const symbol of symbols) {
 					if (symbol.kind === SymbolKind.Class && symbol.name.startsWith("%")) {
@@ -803,14 +849,14 @@ export class DoComplete extends LanguageFeature {
 
 		if (namespace && namespace !== "*") {
 			insertText = currentWord.endsWith(".")
-				? `${isEmbedded ? "" : "."}${label}`
+				? `${isEmbedded || dotExt === ".sass" ? "" : "."}${label}`
 				: isEmbedded
 					? asDollarlessVariable(label)
 					: label;
 
 			filterText = currentWord.endsWith(".") ? `${namespace}.${label}` : label;
-		} else if (dotExt === ".vue" || dotExt === ".astro") {
-			// In Vue and Astro files, the $ does not get replaced by the suggestion,
+		} else if (dotExt === ".vue" || dotExt === ".astro" || dotExt === ".sass") {
+			// In these languages the $ does not get replaced by the suggestion,
 			// so exclude it from the insertText.
 			insertText = asDollarlessVariable(label);
 		}
@@ -861,9 +907,10 @@ export class DoComplete extends LanguageFeature {
 			: symbol.name;
 
 		const isEmbedded = this.isEmbedded(initialDocument);
-
+		const includeDot =
+			namespace !== "*" && !isEmbedded && initialDocument.languageId !== "sass";
 		const insertText = namespace
-			? namespace !== "*" && !isEmbedded
+			? includeDot
 				? `.${prefix}${symbol.name}`
 				: `${prefix}${symbol.name}`
 			: symbol.name;
@@ -908,7 +955,9 @@ export class DoComplete extends LanguageFeature {
 			}
 
 			if (
-				this.configuration.completionSettings?.suggestionStyle !== "nobracket"
+				this.configuration.completionSettings?.suggestionStyle !==
+					"nobracket" &&
+				currentDocument.languageId === "scss"
 			) {
 				variants.push({
 					documentation,
@@ -986,14 +1035,13 @@ export class DoComplete extends LanguageFeature {
 		}
 
 		const isEmbedded = this.isEmbedded(initialDocument);
-		let insertText = symbol.name;
-		if (namespace) {
-			if (namespace === "*" || isEmbedded) {
-				insertText = `${prefix}${symbol.name}`;
-			} else {
-				insertText = `.${prefix}${symbol.name}`;
-			}
-		}
+		const includeDot =
+			namespace !== "*" && !isEmbedded && initialDocument.languageId !== "sass";
+		const insertText = namespace
+			? includeDot
+				? `.${prefix}${symbol.name}`
+				: `${prefix}${symbol.name}`
+			: symbol.name;
 
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
 
@@ -1082,9 +1130,9 @@ export class DoComplete extends LanguageFeature {
 			// be replaced (except when we're embedded in Vue, Svelte or Astro).
 			// Example result: .floor(${1:number})
 			const isEmbedded = this.isEmbedded(document);
-
+			const includeDot = !isEmbedded && document.languageId !== "sass";
 			const insertText = context.currentWord.includes(".")
-				? `${isEmbedded ? "" : "."}${label}${
+				? `${includeDot ? "." : ""}${label}${
 						signature ? `(${parameterSnippet})` : ""
 					}`
 				: label;

@@ -10,7 +10,7 @@ All packages in `packages/` have unit tests. To run them:
 npm run test
 ```
 
-The main test runner is [Vitest]. `vscode-css-languageservice` uses [Mocha].
+The test runner is [Vitest].
 
 Unit tests typically cover either a utility function or a language feature such as `doHover`. For language features the tests are typically split in several files, each focusing on part of the functionality of the language feature.
 
@@ -28,7 +28,7 @@ It also includes end-to-end tests for the web extension. To run them:
 npm run test:web
 ```
 
-The end-to-end tests have some overlap with the unit tests for language features, but are useful to confirm the communication between client and server works as expected.
+The end-to-end tests have some overlap with the unit tests for language features, but are useful to confirm the communication between client and server works as expected. It's also the most practical way to test the `language-server` module.
 
 ## Run all tests
 
@@ -39,4 +39,3 @@ npm run test:all
 ```
 
 [Vitest]: https://vitest.dev/
-[Mocha]: https://mochajs.org/

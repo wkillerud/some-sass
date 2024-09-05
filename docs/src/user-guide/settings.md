@@ -13,14 +13,6 @@ These are the recommended settings:
 
 	// Optional, if you get suggestions from the current document after namespace.$ (you don't need the $ for narrowing down suggestions)
 	"editor.wordBasedSuggestions": false,
-
-	// Optional, for Vue, Svelte, Astro: add `scss` to the list of excluded languages for Emmet to avoid suggestions in Vue, Svelte or Astro files.
-	// VS Code understands that <style lang="scss">`blocks are SCSS, and so won't show Emmet suggestions in that block.
-	"emmet.excludeLanguages": [
-		// Markdown is excluded by default in VS Code
-		"markdown",
-		"scss",
-	],
 }
 ```
 
@@ -82,6 +74,22 @@ could suggest a `hello()` function (`|` in this case indicates cursor position).
 
 - JSON key: `somesass.suggestFunctionsInStringContextAfterSymbols`.
 - Default value: `" (+-*%"`.
+
+#### Suggest values for CSS properties
+
+By default, Some Sass triggers property value completion after selecting a CSS property.
+Use this setting to disable this behavior.
+
+An example would be accepting a suggestion for `display:` and immediately see suggestions like
+`inline-block` for the value.
+
+Note that for SCSS this only applies if `somesass.suggestAllFromOpenDocument` is true,
+which is not the case by default in VS Code.
+Use `scss.completion.triggerPropertyValueCompletion` to configure the feature built in
+to VS Code.
+
+- JSON key: `somesass.triggerPropertyValueCompletion`.
+- Default value: `true`.
 
 ### Workspace
 

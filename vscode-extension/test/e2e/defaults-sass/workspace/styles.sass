@@ -1,0 +1,15 @@
+@use "core/tokens"
+@use "core/theme"
+
++theme.light-mode-variables
+  --color-body-background: #{tokens.$color-background-light}
+  --color-body-text: #{tokens.$color-text-on-light}
+
+@include theme.dark-mode-variables
+  --color-body-background: #{tokens.$color-background-dark}
+  --color-body-text: #{tokens.$color-text-on-dark}
+
+body
+  background-color: var(--color-body-background)
+  color: var(--color-body-text)
+  font-size: tokens.$font-size-body

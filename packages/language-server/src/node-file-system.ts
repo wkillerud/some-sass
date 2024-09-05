@@ -47,7 +47,7 @@ export class NodeFileSystem implements FileSystemProvider {
 			try {
 				const stats = await this.stat(Utils.joinPath(uri, name));
 				result.push([name, stats.type]);
-			} catch (e) {
+			} catch {
 				result.push([name, FileType.Unknown]);
 			}
 		}
@@ -58,7 +58,7 @@ export class NodeFileSystem implements FileSystemProvider {
 		try {
 			const fsPath = await promises.realpath(uri.fsPath);
 			return URI.file(fsPath);
-		} catch (e) {
+		} catch {
 			// Not all links we get here point to real files or symlinks on disk.
 			// Fall back to returning the same URI (#184).
 			return uri;
@@ -83,7 +83,7 @@ export class NodeFileSystem implements FileSystemProvider {
 				mtime: stats.mtime.getTime(),
 				size: stats.size,
 			};
-		} catch (e) {
+		} catch {
 			return {
 				type: FileType.Unknown,
 				ctime: -1,

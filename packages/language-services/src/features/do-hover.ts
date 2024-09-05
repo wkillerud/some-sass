@@ -67,6 +67,15 @@ export class DoHover extends LanguageFeature {
 					type = SymbolKind.Method;
 				}
 				if (type === null) {
+					if (document.languageId === "sass") {
+						// We are probably hovering over a CSS identifier
+						// and want to defer this to vscode-css-languageservice's hover handler
+						return this.getUpstreamLanguageServer().doHover(
+							document,
+							position,
+							stylesheet,
+						);
+					}
 					return null;
 				}
 				if (node) {
@@ -277,7 +286,7 @@ export class DoHover extends LanguageFeature {
 		const result = {
 			kind: MarkupKind.Markdown,
 			value: [
-				"```scss",
+				document.languageId === "sass" ? "```sass" : "```scss",
 				`@function ${maybePrefixedName}${symbol.detail || "()"}`,
 				"```",
 			].join("\n"),
@@ -305,7 +314,7 @@ export class DoHover extends LanguageFeature {
 		const result = {
 			kind: MarkupKind.Markdown,
 			value: [
-				"```scss",
+				document.languageId === "sass" ? "```sass" : "```scss",
 				`@mixin ${maybePrefixedName}${symbol.detail || "()"}`,
 				"```",
 			].join("\n"),
@@ -331,7 +340,11 @@ export class DoHover extends LanguageFeature {
 	): Hover {
 		const result = {
 			kind: MarkupKind.Markdown,
-			value: ["```scss", symbol.name, "```"].join("\n"),
+			value: [
+				document.languageId === "sass" ? "```sass" : "```scss",
+				symbol.name,
+				"```",
+			].join("\n"),
 		};
 
 		const sassdoc = applySassDoc(symbol);
@@ -358,8 +371,8 @@ export class DoHover extends LanguageFeature {
 		const result = {
 			kind: MarkupKind.Markdown,
 			value: [
-				"```scss",
-				`${maybePrefixedName}: ${value};${
+				document.languageId === "sass" ? "```sass" : "```scss",
+				`${maybePrefixedName}: ${value}${document.languageId === "sass" ? "" : ";"}${
 					value !== rawValue ? ` // via ${rawValue}` : ""
 				}`,
 				"```",

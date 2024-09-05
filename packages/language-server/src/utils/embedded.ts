@@ -1,19 +1,22 @@
 import { TextDocument } from "vscode-languageserver-textdocument";
 import type { Position } from "vscode-languageserver-textdocument";
 
-type Region = [number, number];
+type Region = {
+	type: "scss" | "sass";
+	range: [number, number];
+};
 
 export function isFileWhereScssCanBeEmbedded(path: string) {
-	if (path.endsWith(".scss")) {
+	if (path.endsWith(".scss") || path.endsWith(".sass")) {
 		return false;
 	}
 	return true;
 }
 
-export function getSCSSRegions(content: string) {
+export function getSassRegions(content: string) {
 	const regions: Region[] = [];
 	const startRe =
-		/<style[\w\t\n "'=]+(lang|type)=["'](text\/)?scss["'][\w\t\n "'=]*>/g;
+		/<style[\w\t\n "'=]+(lang|type)=["'](text\/)?(?<type>s(a|c)ss)["'][\w\t\n "'=]*>/g;
 	const endRe = /<\/style>/g;
 	let start: RegExpExecArray | null;
 	let end: RegExpExecArray | null;
@@ -22,16 +25,19 @@ export function getSCSSRegions(content: string) {
 		(end = endRe.exec(content)) !== null
 	) {
 		if (start[0] !== undefined) {
-			regions.push([start.index + start[0].length, end.index]);
+			regions.push({
+				type: (start.groups?.type || "scss") as "sass" | "scss",
+				range: [start.index + start[0].length, end.index],
+			});
 		}
 	}
 
 	return regions;
 }
 
-export function getSCSSContent(
+export function getSassContent(
 	content: string,
-	regions = getSCSSRegions(content),
+	regions = getSassRegions(content),
 ) {
 	const oldContent = content;
 
@@ -40,25 +46,25 @@ export function getSCSSContent(
 		.map((line) => " ".repeat(line.length))
 		.join("\n");
 
-	for (const r of regions) {
+	for (const { range } of regions) {
 		newContent =
-			newContent.slice(0, r[0]) +
-			oldContent.slice(r[0], r[1]) +
-			newContent.slice(r[1]);
+			newContent.slice(0, range[0]) +
+			oldContent.slice(range[0], range[1]) +
+			newContent.slice(range[1]);
 	}
 
 	return newContent;
 }
 
 /**
- * Function that extracts only the SCSS region of a template
+ * Function that extracts only the Sass region of a template
  * language such as Vue, Svelte or Astro. This is not the correct
  * approach for embedded languages, compared to say the HTML language
  * server.
  *
  * @todo Look into how to do this properly with a goal to unship this custom handling.
  */
-export function getSCSSRegionsDocument(
+export function getSassRegionsDocument(
 	document: TextDocument | null | undefined = null,
 	position?: Position,
 ): TextDocument | null {
@@ -71,20 +77,21 @@ export function getSCSSRegionsDocument(
 	}
 
 	const text = document.getText();
-	const scssRegions = getSCSSRegions(text);
+	const regions = getSassRegions(text);
 
 	if (
 		typeof position === "undefined" ||
-		scssRegions.some((region) => region[0] <= offset && region[1] >= offset)
+		(regions.some(({ range }) => range[0] <= offset && range[1] >= offset) &&
+			regions.every(({ type }) => type === regions[0].type))
 	) {
 		const uri = document.uri;
 		const version = document.version;
 
 		return TextDocument.create(
 			uri,
-			"scss",
+			regions[0].type,
 			version,
-			getSCSSContent(text, scssRegions),
+			getSassContent(text, regions),
 		);
 	}
 

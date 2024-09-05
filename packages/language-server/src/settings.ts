@@ -1,12 +1,13 @@
 export interface ISettings {
 	readonly loadPaths: string[];
-	readonly scannerDepth: number;
 	readonly scannerExclude: string[];
+	readonly scannerDepth: number;
 	readonly scanImportedFiles: boolean;
 	readonly suggestionStyle: "all" | "nobracket" | "bracket";
 	readonly suggestAllFromOpenDocument: boolean;
 	readonly suggestFromUseOnly: boolean;
-	readonly suggestFunctionsInStringContextAfterSymbols: string;
+	readonly suggestFunctionsInStringContextAfterSymbols: " (+-*%";
+	readonly triggerPropertyValueCompletion: boolean;
 }
 
 export interface IEditorSettings {
@@ -18,15 +19,17 @@ export interface IEditorSettings {
 
 export const defaultSettings: ISettings = Object.freeze({
 	loadPaths: [],
-	scannerDepth: 30,
 	scannerExclude: [
 		"**/.git/**",
 		"**/node_modules/**",
 		"**/bower_components/**",
 	],
+	scannerDepth: 30,
 	scanImportedFiles: true,
-	suggestionStyle: "all",
+	// This setting is essentially "VS Code Compat Mode" if set to false.
 	suggestAllFromOpenDocument: true,
-	suggestFromUseOnly: true,
+	suggestionStyle: "all",
+	suggestFromUseOnly: false,
 	suggestFunctionsInStringContextAfterSymbols: " (+-*%",
+	triggerPropertyValueCompletion: true,
 });

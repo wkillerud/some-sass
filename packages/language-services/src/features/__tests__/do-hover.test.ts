@@ -21,6 +21,23 @@ test("should show hover information for symbol in the same document", async () =
 	assert.match(JSON.stringify(result), /\$primary/);
 });
 
+test("symbol declared with indented syntax is not previewed as SCSS", async () => {
+	const document = fileSystemProvider.createDocument(
+		`$primary: limegreen
+.a
+	color: $primary
+`,
+		{ languageId: "sass" },
+	);
+
+	const result = await ls.doHover(document, Position.create(2, 10));
+	assert.isNotNull(result, "Expected to find a hover result for $primary");
+	const json = JSON.stringify(result);
+	assert.match(json, /\$primary/);
+	assert.match(json, /```sass/);
+	assert.notInclude(json, ";");
+});
+
 test("should show hover information for symbol in a different document via @import", async () => {
 	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
 		uri: "one.scss",
@@ -167,6 +184,38 @@ test("should show hover information for Sassdoc annotation", async () => {
 	const result = await ls.doHover(document, Position.create(2, 8));
 	assert.isNotNull(result, "Expected to find a hover result for @type");
 	assert.match(JSON.stringify(result), /@type/);
+});
+
+test("Sass indented should show hover information for Sassdoc annotation", async () => {
+	const document = fileSystemProvider.createDocument(
+		[
+			"$a: 1",
+			"/// Some wise words",
+			"/// @type String",
+			'$documented-variable: "value"',
+		],
+		{ languageId: "sass" },
+	);
+
+	const result = await ls.doHover(document, Position.create(2, 8));
+	assert.isNotNull(result, "Expected to find a hover result for @type");
+	assert.match(JSON.stringify(result), /@type/);
+});
+
+test("SassDoc hover info works for indented", async () => {
+	const document = fileSystemProvider.createDocument(
+		`/// Foo bar
+/// @type Color
+$_decoration: underline dotted red
+a
+	text-decoration: $_decoration
+	`,
+		{ languageId: "sass" },
+	);
+
+	const result = await ls.doHover(document, Position.create(4, 24));
+	assert.isNotNull(result, "Expected to find a hover result for $_decoration");
+	assert.match(JSON.stringify(result), /Foo bar/);
 });
 
 test("should show hover information for Sassdoc annotation at the start of the document", async () => {

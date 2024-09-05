@@ -1,4 +1,4 @@
-import { getSCSSLanguageService } from "@somesass/vscode-css-languageservice";
+import { getSassLanguageService } from "@somesass/vscode-css-languageservice";
 import { CodeActions } from "./features/code-actions";
 import { DoComplete } from "./features/do-complete";
 import { DoDiagnostics } from "./features/do-diagnostics";
@@ -11,6 +11,8 @@ import { FindDocumentHighlights } from "./features/find-document-highlights";
 import { FindDocumentLinks } from "./features/find-document-links";
 import { FindReferences } from "./features/find-references";
 import { FindSymbols } from "./features/find-symbols";
+import { FoldingRangeContext, FoldingRanges } from "./features/folding-ranges";
+import { SelectionRanges } from "./features/selection-ranges";
 import { LanguageModelCache as LanguageServerCache } from "./language-model-cache";
 import {
 	CodeActionContext,
@@ -29,7 +31,13 @@ import {
 } from "./language-services-types";
 import { mapFsProviders } from "./utils/fs-provider";
 
-export { LanguageService, FileStat, FileSystemProvider, FileType };
+export {
+	LanguageService,
+	LanguageServiceConfiguration,
+	FileStat,
+	FileSystemProvider,
+	FileType,
+};
 
 export function getLanguageService(
 	options: LanguageServiceOptions,
@@ -51,39 +59,41 @@ class LanguageServiceImpl implements LanguageService {
 	#findDocumentLinks: FindDocumentLinks;
 	#findReferences: FindReferences;
 	#findSymbols: FindSymbols;
+	#foldingRanges: FoldingRanges;
+	#selectionRanges: SelectionRanges;
 
 	constructor(options: LanguageServiceOptions) {
-		const scssLs = getSCSSLanguageService({
+		const sassLs = getSassLanguageService({
 			clientCapabilities: options.clientCapabilities,
 			fileSystemProvider: mapFsProviders(options.fileSystemProvider),
 		});
-
 		const cache = new LanguageServerCache({
-			scssLs,
+			sassLs,
 			...options.languageModelCache,
 		});
+		const internal = {
+			sassLs,
+			cache,
+		};
 		this.#cache = cache;
-		this.#codeActions = new CodeActions(this, options, { scssLs, cache });
-		this.#doComplete = new DoComplete(this, options, { scssLs, cache });
-		this.#doDiagnostics = new DoDiagnostics(this, options, { scssLs, cache });
-		this.#doHover = new DoHover(this, options, { scssLs, cache });
-		this.#doRename = new DoRename(this, options, { scssLs, cache });
-		this.#doSignatureHelp = new DoSignatureHelp(this, options, {
-			scssLs,
-			cache,
-		});
-		this.#findColors = new FindColors(this, options, { scssLs, cache });
-		this.#findDefinition = new FindDefinition(this, options, { scssLs, cache });
-		this.#findDocumentHighlights = new FindDocumentHighlights(this, options, {
-			scssLs,
-			cache,
-		});
-		this.#findDocumentLinks = new FindDocumentLinks(this, options, {
-			scssLs,
-			cache,
-		});
-		this.#findReferences = new FindReferences(this, options, { scssLs, cache });
-		this.#findSymbols = new FindSymbols(this, options, { scssLs, cache });
+		this.#codeActions = new CodeActions(this, options, internal);
+		this.#doComplete = new DoComplete(this, options, internal);
+		this.#doDiagnostics = new DoDiagnostics(this, options, internal);
+		this.#doHover = new DoHover(this, options, internal);
+		this.#doRename = new DoRename(this, options, internal);
+		this.#doSignatureHelp = new DoSignatureHelp(this, options, internal);
+		this.#findColors = new FindColors(this, options, internal);
+		this.#findDefinition = new FindDefinition(this, options, internal);
+		this.#findDocumentHighlights = new FindDocumentHighlights(
+			this,
+			options,
+			internal,
+		);
+		this.#findDocumentLinks = new FindDocumentLinks(this, options, internal);
+		this.#findReferences = new FindReferences(this, options, internal);
+		this.#findSymbols = new FindSymbols(this, options, internal);
+		this.#foldingRanges = new FoldingRanges(this, options, internal);
+		this.#selectionRanges = new SelectionRanges(this, options, internal);
 	}
 
 	configure(configuration: LanguageServiceConfiguration): void {
@@ -99,6 +109,8 @@ class LanguageServiceImpl implements LanguageService {
 		this.#findDocumentLinks.configure(configuration);
 		this.#findReferences.configure(configuration);
 		this.#findSymbols.configure(configuration);
+		this.#foldingRanges.configure(configuration);
+		this.#selectionRanges.configure(configuration);
 	}
 
 	parseStylesheet(document: TextDocument) {
@@ -174,6 +186,14 @@ class LanguageServiceImpl implements LanguageService {
 		context?: CodeActionContext,
 	) {
 		return this.#codeActions.getCodeActions(document, range, context);
+	}
+
+	getFoldingRanges(document: TextDocument, context?: FoldingRangeContext) {
+		return this.#foldingRanges.getFoldingRanges(document, context);
+	}
+
+	getSelectionRanges(document: TextDocument, positions: Position[]) {
+		return this.#selectionRanges.getSelectionRanges(document, positions);
 	}
 
 	onDocumentChanged(document: TextDocument) {

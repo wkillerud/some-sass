@@ -1,0 +1,9 @@
+@mixin light-mode-variables
+  @media screen and (prefers-color-scheme: light)
+    :root
+      @content
+
+@mixin dark-mode-variables
+  @media screen and (prefers-color-scheme: dark)
+    :root
+      @content

@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { LanguageService as VSCodeLanguageService } from "@somesass/vscode-css-languageservice";
-import { ParseResult, parseSync } from "scss-sassdoc-parser";
+import { ParseResult, Parser as SassdocParser } from "sassdoc-parser";
 import {
 	TextDocument,
 	Stylesheet,
@@ -32,11 +32,12 @@ const defaultCacheEvictInterval = 0; // default off to not leave an interval run
 export class LanguageModelCache {
 	#languageModels: LanguageModels = {};
 	#nModels = 0;
-	#options: LanguageModelCacheOptions & { scssLs: VSCodeLanguageService };
+	#options: LanguageModelCacheOptions & { sassLs: VSCodeLanguageService };
 	#cleanupInterval: NodeJS.Timeout | undefined = undefined;
+	#sassdocParser = new SassdocParser();
 
 	constructor(
-		options: LanguageModelCacheOptions & { scssLs: VSCodeLanguageService },
+		options: LanguageModelCacheOptions & { sassLs: VSCodeLanguageService },
 	) {
 		this.#options = {
 			maxEntries: 10_000,
@@ -75,13 +76,13 @@ export class LanguageModelCache {
 			languageModelInfo.cTime = Date.now();
 			return languageModelInfo.languageModel;
 		}
-		const languageModel = this.#options.scssLs.parseStylesheet(
+		const languageModel = this.#options.sassLs.parseStylesheet(
 			document,
 		) as Node;
 		let sassdoc: ParseResult[] = [];
 		try {
 			const text = document.getText();
-			sassdoc = parseSync(text);
+			sassdoc = this.#sassdocParser.parseStringSync(text);
 		} catch {
 			// do nothing
 		}
@@ -167,13 +168,13 @@ export class LanguageModelCache {
 	onDocumentChanged(document: TextDocument) {
 		const version = document.version;
 		const languageId = document.languageId;
-		const languageModel = this.#options.scssLs.parseStylesheet(
+		const languageModel = this.#options.sassLs.parseStylesheet(
 			document,
 		) as Node;
 		let sassdoc: ParseResult[] = [];
 		try {
 			const text = document.getText();
-			sassdoc = parseSync(text);
+			sassdoc = this.#sassdocParser.parseStringSync(text);
 		} catch {
 			// do nothing
 		}

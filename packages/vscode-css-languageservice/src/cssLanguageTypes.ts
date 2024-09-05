@@ -89,7 +89,7 @@ export {
 export type LintSettings = { [key: string]: any };
 
 export interface CompletionSettings {
-	triggerPropertyValueCompletion: boolean;
+	triggerPropertyValueCompletion?: boolean;
 	completePropertyWithSemicolon?: boolean;
 	suggestFromUseOnly?: boolean;
 }

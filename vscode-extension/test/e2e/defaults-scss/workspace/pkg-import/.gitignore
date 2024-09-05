@@ -1,4 +1,0 @@
-dist/
-node_modules/*
-!node_modules/my-components
-!node_modules/@my-scope

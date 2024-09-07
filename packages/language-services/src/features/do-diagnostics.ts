@@ -65,6 +65,14 @@ export class DoDiagnostics extends LanguageFeature {
 	}
 
 	private async doUpstreamDiagnostics(document: TextDocument) {
+		if (
+			document.languageId === "vue" ||
+			document.languageId === "astro" ||
+			document.languageId === "svelte"
+		) {
+			return [];
+		}
+
 		const stylesheet = this.ls.parseStylesheet(document);
 		const diagnostics = this.getUpstreamLanguageServer().doValidation(
 			document,

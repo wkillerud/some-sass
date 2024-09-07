@@ -13,7 +13,6 @@ const config = {
 	output: {
 		libraryTarget: "commonjs2",
 		devtoolModuleFilenameTemplate: "../[resource-path]",
-
 		path: path.join(__dirname, "./dist"),
 		filename: "[name].js",
 	},

@@ -156,9 +156,11 @@
   "scripts": {
     "vscode:prepublish": "run-s clean build:production:*",
     "clean": "shx rm -rf dist",
-    "build": "run-s build:*",
+    "build": "run-s build:development:*",
     "build:node": "rspack --config ./rspack.node.config.js",
     "build:browser": "rspack --config ./rspack.browser.config.js",
+    "build:development:node": "npm run build:node -- --mode=development",
+    "build:development:browser": "npm run build:browser -- --mode=development",
     "build:production:node": "npm run build:node -- --mode=production",
     "build:production:browser": "npm run build:browser -- --mode=production",
     "start:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=.",

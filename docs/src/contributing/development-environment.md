@@ -1,11 +1,11 @@
 # Development environment
 
-The language server is written in TypeScript and runs both in Node and the browser. While the server can be used outside of Visual Studio Code, it's recommended to use VS Code for development.
+The language server is written in TypeScript and runs both in Node and the browser. While the server can be used outside of Visual Studio Code, it's recommended to use VS Code or VSCodium for development.
 
 You need:
 
 - A current long-term support version of [Node.js](https://nodejs.org/en)
-- [Visual Studio Code](https://code.visualstudio.com/)
+- [Visual Studio Code](https://code.visualstudio.com/) or [VSCodium](https://vscodium.com)
 
 Recommended extensions:
 

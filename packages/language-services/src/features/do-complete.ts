@@ -848,14 +848,26 @@ export class DoComplete extends LanguageFeature {
 		let filterText: string | undefined;
 
 		if (namespace && namespace !== "*") {
+			const noDot =
+				isEmbedded ||
+				dotExt === ".sass" ||
+				this.configuration.completionSettings?.afterModule === "";
+
+			const noDollar = isEmbedded;
+
 			insertText = currentWord.endsWith(".")
-				? `${isEmbedded || dotExt === ".sass" ? "" : "."}${label}`
-				: isEmbedded
+				? `${noDot ? "" : "."}${label}`
+				: noDollar
 					? asDollarlessVariable(label)
 					: label;
 
 			filterText = currentWord.endsWith(".") ? `${namespace}.${label}` : label;
-		} else if (dotExt === ".vue" || dotExt === ".astro" || dotExt === ".sass") {
+		} else if (
+			dotExt === ".vue" ||
+			dotExt === ".astro" ||
+			dotExt === ".sass" ||
+			this.configuration.completionSettings?.beforeVariable === ""
+		) {
 			// In these languages the $ does not get replaced by the suggestion,
 			// so exclude it from the insertText.
 			insertText = asDollarlessVariable(label);
@@ -907,12 +919,17 @@ export class DoComplete extends LanguageFeature {
 			: symbol.name;
 
 		const isEmbedded = this.isEmbedded(initialDocument);
-		const includeDot =
-			namespace !== "*" && !isEmbedded && initialDocument.languageId !== "sass";
+
+		const noDot =
+			namespace === "*" ||
+			isEmbedded ||
+			initialDocument.languageId === ".sass" ||
+			this.configuration.completionSettings?.afterModule === "";
+
 		const insertText = namespace
-			? includeDot
-				? `.${prefix}${symbol.name}`
-				: `${prefix}${symbol.name}`
+			? noDot
+				? `${prefix}${symbol.name}`
+				: `.${prefix}${symbol.name}`
 			: symbol.name;
 
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
@@ -1035,12 +1052,17 @@ export class DoComplete extends LanguageFeature {
 		}
 
 		const isEmbedded = this.isEmbedded(initialDocument);
-		const includeDot =
-			namespace !== "*" && !isEmbedded && initialDocument.languageId !== "sass";
+
+		const noDot =
+			namespace === "*" ||
+			isEmbedded ||
+			initialDocument.languageId === ".sass" ||
+			this.configuration.completionSettings?.afterModule === "";
+
 		const insertText = namespace
-			? includeDot
-				? `.${prefix}${symbol.name}`
-				: `${prefix}${symbol.name}`
+			? noDot
+				? `${prefix}${symbol.name}`
+				: `.${prefix}${symbol.name}`
 			: symbol.name;
 
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
@@ -1130,9 +1152,14 @@ export class DoComplete extends LanguageFeature {
 			// be replaced (except when we're embedded in Vue, Svelte or Astro).
 			// Example result: .floor(${1:number})
 			const isEmbedded = this.isEmbedded(document);
-			const includeDot = !isEmbedded && document.languageId !== "sass";
+
+			const noDot =
+				isEmbedded ||
+				document.languageId === ".sass" ||
+				this.configuration.completionSettings?.afterModule === "";
+
 			const insertText = context.currentWord.includes(".")
-				? `${includeDot ? "." : ""}${label}${
+				? `${noDot ? "" : "."}${label}${
 						signature ? `(${parameterSnippet})` : ""
 					}`
 				: label;

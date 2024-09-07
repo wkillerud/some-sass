@@ -180,6 +180,8 @@ export class SomeSassServer {
 									suggestionStyle: settings.suggestionStyle,
 									suggestFunctionsInStringContextAfterSymbols:
 										settings.suggestFunctionsInStringContextAfterSymbols,
+									afterModule: settings.completion?.afterModule,
+									beforeVariable: settings.completion?.beforeVariable,
 								},
 							});
 
@@ -282,6 +284,8 @@ export class SomeSassServer {
 					suggestionStyle: settings.suggestionStyle,
 					suggestFunctionsInStringContextAfterSymbols:
 						settings.suggestFunctionsInStringContextAfterSymbols,
+					afterModule: settings.completion?.afterModule,
+					beforeVariable: settings.completion?.beforeVariable,
 				},
 			});
 		});

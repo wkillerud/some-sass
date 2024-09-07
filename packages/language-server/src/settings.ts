@@ -8,6 +8,10 @@ export interface ISettings {
 	readonly suggestFromUseOnly: boolean;
 	readonly suggestFunctionsInStringContextAfterSymbols: " (+-*%";
 	readonly triggerPropertyValueCompletion: boolean;
+	readonly completion?: {
+		afterModule?: string;
+		beforeVariable?: string;
+	};
 }
 
 export interface IEditorSettings {

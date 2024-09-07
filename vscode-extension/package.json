@@ -165,6 +165,7 @@
     "build:production:browser": "npm run build:browser -- --mode=production",
     "start:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=.",
     "lint": "eslint \"**/*.ts\" --cache",
+    "pretest:e2e": "run-s clean build:production:*",
     "test:e2e": "node ./test/e2e/runTest.js",
     "pretest:web": "rspack --config ./rspack.test-web.config.js ",
     "test:web": "node ./test/web/runTest.js"

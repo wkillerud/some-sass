@@ -19,8 +19,8 @@ import {
 	Variable,
 	VariableDeclaration,
 	URI,
+	Utils,
 } from "./language-services-types";
-import { joinPath } from "./utils/resources";
 import { asDollarlessVariable } from "./utils/sass";
 
 export type LanguageFeatureInternal = {
@@ -93,7 +93,9 @@ export abstract class LanguageFeature {
 			 */
 			resolveReference: (ref: string, base: string) => {
 				if (ref.startsWith("/") && this.configuration.workspaceRoot) {
-					return joinPath(this.configuration.workspaceRoot.toString(), ref);
+					return Utils.joinPath(this.configuration.workspaceRoot, ref).toString(
+						true,
+					);
 				}
 				try {
 					return resolve(base, ref);

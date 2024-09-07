@@ -1,5 +1,5 @@
 import { getNodeAtOffset } from "@somesass/vscode-css-languageservice";
-import { sassBuiltInModules } from "../facts/sass";
+import { SassAtRule, sassAtRules, sassBuiltInModules } from "../facts/sass";
 import { sassDocAnnotations } from "../facts/sassdoc";
 import { LanguageFeature } from "../language-feature";
 import {
@@ -85,11 +85,10 @@ export class DoHover extends LanguageFeature {
 				break;
 			}
 
-			case NodeType.MixinReference: {
-				name = (hoverNode as MixinReference)?.getName();
-				kind = SymbolKind.Method;
-				break;
-			}
+			case NodeType.MixinReference:
+				return this.sassAtRule(sassAtRules["@include"]);
+			case NodeType.MixinDeclaration:
+				return this.sassAtRule(sassAtRules["@mixin"]);
 
 			case NodeType.Stylesheet: {
 				// Hover information for SassDoc.
@@ -153,6 +152,28 @@ export class DoHover extends LanguageFeature {
 				name = hoverNode?.getText();
 				kind = SymbolKind.Class;
 				break;
+			}
+
+			case NodeType.ExtendsReference:
+				return this.sassAtRule(sassAtRules["@extend"]);
+
+			case NodeType.Use:
+				return this.sassAtRule(sassAtRules["@use"]);
+			case NodeType.Forward:
+				return this.sassAtRule(sassAtRules["@forward"]);
+
+			case NodeType.Debug:
+				return this.sassAtRule(sassAtRules["@debug"]);
+
+			case NodeType.UnknownAtRule: {
+				const name = hoverNode?.getText();
+				if (name) {
+					// @ts-expect-error Defensive use
+					const rule = sassAtRules[name];
+					if (rule) {
+						return this.sassAtRule(rule);
+					}
+				}
 			}
 		}
 
@@ -390,6 +411,19 @@ export class DoHover extends LanguageFeature {
 
 		return {
 			contents: result,
+		};
+	}
+
+	private sassAtRule(atRule: SassAtRule): Hover {
+		return {
+			contents: {
+				kind: MarkupKind.Markdown,
+				value: [
+					atRule.description,
+					"",
+					`[Sass reference](${atRule.reference})`,
+				].join("\n"),
+			},
 		};
 	}
 }

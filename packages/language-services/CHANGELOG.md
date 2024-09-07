@@ -1,3 +1,15 @@
+## 1.5.0 (2024-09-07)
+
+
+### 🚀 Features
+
+- add two settings to tweak completions in other editors
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 1.5.0
+
 ## 1.4.1 (2024-09-07)
 
 

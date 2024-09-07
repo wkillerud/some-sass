@@ -1,3 +1,15 @@
+## 1.7.0 (2024-09-07)
+
+
+### 🚀 Features
+
+- add two settings to tweak completions in other editors
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.5.0
+
 ## 1.6.1 (2024-09-07)
 
 

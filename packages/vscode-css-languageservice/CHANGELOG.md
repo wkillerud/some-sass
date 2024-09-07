@@ -1,3 +1,10 @@
+## 1.5.0 (2024-09-07)
+
+
+### 🚀 Features
+
+- add two settings to tweak completions in other editors
+
 ## 1.4.0 (2024-09-05)
 
 

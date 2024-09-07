@@ -6,7 +6,32 @@ To configure a client for an editor that doesn't have one yet, check the documen
 
 ## Settings
 
-The language server requests [settings](../user-guide/settings.md) via the [`workspace/configuration` message](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_configuration), on the `somesass` key. All fields are optional.
+The language server requests settings via the [`workspace/configuration` message](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_configuration), on the `somesass` key. All fields are optional.
+
+You can also configure the language server by sending the [`workspace/didChangeConfiguration` message](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_didChangeConfiguration).
+
+While settings keys are documented with dot-notation, the shape of the settings is a nested object.
+
+For example, while we may document `"somesass.loadPaths": []` (and write it this way in `settings.json` in Code), the actual shape of the settings object sent to the server looks like this.
+
+```json
+{
+	"settings": {
+		"somesass": {
+			"loadPaths": []
+		}
+	}
+}
+```
+
+### Server-only settings
+
+In addition to [the user settings](../user-guide/settings.md), language clients may want to configure these server-only settings to tweak how certain features interact with your specific editor and its grammar for Sass.
+
+| Key                                  | Description                                                                                                 |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `somesass.completion.afterModule`    | Set this to the empty string if you end up with `module..$variable` after accepting a code suggestion item. |
+| `somesass.completion.beforeVariable` | Set this to the empty string if you end up with `$$variable` after accepting a code suggestion item.        |
 
 ## Existing clients
 

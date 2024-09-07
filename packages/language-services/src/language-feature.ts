@@ -45,6 +45,8 @@ const defaultConfiguration: LanguageServiceConfiguration = {
 		suggestFunctionsInStringContextAfterSymbols: " (+-*%",
 		suggestionStyle: "all",
 		triggerPropertyValueCompletion: true,
+		afterModule: ".",
+		beforeVariable: "$",
 	},
 };
 

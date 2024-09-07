@@ -22,13 +22,9 @@ some-sass-language-server --stdio
 
 `--debug` – runs the development build of the language server, helpful to get more context if the server crashes
 
-### Settings
+## Configure your editor's client
 
-The language server requests [settings](../user-guide/settings.md) via the [`workspace/configuration` message](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_configuration), on the `somesass` key. All fields are optional.
-
-## Configure a client
-
-The next step is to [configure a language client](./configure-a-client.md).
+The next step is to [configure your editor's language client](./configure-a-client.md).
 
 [lsp]: https://microsoft.github.io/language-server-protocol/
 [npm]: https://www.npmjs.com/package/some-sass-language-server

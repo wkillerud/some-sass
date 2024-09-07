@@ -1,3 +1,10 @@
+## 1.4.1 (2024-09-07)
+
+
+### 🩹 Fixes
+
+- don't do CSS diagnostics on Vue etc code
+
 ## 1.4.0 (2024-09-05)
 
 

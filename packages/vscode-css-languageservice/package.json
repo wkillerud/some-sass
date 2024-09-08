@@ -16,7 +16,7 @@
 		"url": "https://github.com/wkillerud/some-sass"
 	},
 	"devDependencies": {
-		"@types/node": "20.14.14",
+		"@types/node": "20.16.5",
 		"@vscode/web-custom-data": "0.4.12",
 		"rimraf": "6.0.1",
 		"source-map-support": "0.5.21",

@@ -30,10 +30,7 @@ The language server is [published on npm][npm], and can be used with any editor 
 
 ### Editors with clients
 
-The language server has clients for
-
-- [Visual Studio Code](./vscode-extension#readme)
-- [Neovim](https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#somesass_ls)
+See the [documentation for an updated list](https://wkillerud.github.io/some-sass/language-server/existing-clients.html).
 
 [lsp]: https://microsoft.github.io/language-server-protocol/
 [npm]: https://www.npmjs.com/package/some-sass-language-server

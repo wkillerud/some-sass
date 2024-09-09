@@ -277,7 +277,7 @@ See the [documentation for the available settings](https://wkillerud.github.io/s
 
 ## Editors with clients
 
-See [this list](https://github.com/wkillerud/some-sass/blob/main/README.md#editors-with-clients).
+See the [documentation for an updated list](https://wkillerud.github.io/some-sass/language-server/existing-clients.html).
 
 ## Contributing
 

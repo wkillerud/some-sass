@@ -26,7 +26,7 @@ For example, while we may document `"somesass.loadPaths": []` (and write it this
 
 ### Server-only settings
 
-In addition to [the user settings](../user-guide/settings.md), language clients may want to configure these server-only settings to tweak how certain features interact with your specific editor and its grammar for Sass.
+In addition to [the user settings](../user-guide/settings.md), language clients may want to configure these server-only settings to tweak how certain features interact with your specific editor.
 
 | Key                                  | Description                                                                                                 |
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------- |

@@ -50,7 +50,7 @@
 	"devDependencies": {
 		"@vitest/coverage-v8": "2.0.5",
 		"@somesass/language-services": "1.5.0",
-		"@types/node": "20.14.14",
+		"@types/node": "20.16.5",
 		"fast-glob": "3.3.2",
 		"merge-options": "3.0.4",
 		"path-browserify": "1.0.1",

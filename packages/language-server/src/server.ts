@@ -130,6 +130,28 @@ export class SomeSassServer {
 			};
 		});
 
+		function applySettings(
+			editorSettings: IEditorSettings,
+			settings: ISettings,
+		) {
+			if (!ls) return;
+
+			ls.configure({
+				editorSettings,
+				workspaceRoot,
+				loadPaths: settings.loadPaths,
+				completionSettings: {
+					suggestAllFromOpenDocument: settings.suggestAllFromOpenDocument,
+					suggestFromUseOnly: settings.suggestFromUseOnly,
+					suggestionStyle: settings.suggestionStyle,
+					suggestFunctionsInStringContextAfterSymbols:
+						settings.suggestFunctionsInStringContextAfterSymbols,
+					afterModule: settings.completion?.afterModule,
+					beforeVariable: settings.completion?.beforeVariable,
+				},
+			});
+		}
+
 		this.connection.onInitialized(async () => {
 			this.connection.console.debug(
 				`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> received`,
@@ -169,21 +191,7 @@ export class SomeSassServer {
 								);
 							}
 
-							ls.configure({
-								editorSettings,
-								workspaceRoot,
-								loadPaths: settings.loadPaths,
-								completionSettings: {
-									suggestAllFromOpenDocument:
-										settings.suggestAllFromOpenDocument,
-									suggestFromUseOnly: settings.suggestFromUseOnly,
-									suggestionStyle: settings.suggestionStyle,
-									suggestFunctionsInStringContextAfterSymbols:
-										settings.suggestFunctionsInStringContextAfterSymbols,
-									afterModule: settings.completion?.afterModule,
-									beforeVariable: settings.completion?.beforeVariable,
-								},
-							});
+							applySettings(editorSettings, settings);
 
 							this.connection.console.debug(
 								`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> scanning workspace for files`,
@@ -275,20 +283,7 @@ export class SomeSassServer {
 				...editorConfiguration,
 			};
 
-			ls.configure({
-				editorSettings,
-				workspaceRoot,
-				loadPaths: settings.loadPaths,
-				completionSettings: {
-					suggestAllFromOpenDocument: settings.suggestAllFromOpenDocument,
-					suggestFromUseOnly: settings.suggestFromUseOnly,
-					suggestionStyle: settings.suggestionStyle,
-					suggestFunctionsInStringContextAfterSymbols:
-						settings.suggestFunctionsInStringContextAfterSymbols,
-					afterModule: settings.completion?.afterModule,
-					beforeVariable: settings.completion?.beforeVariable,
-				},
-			});
+			applySettings(editorSettings, settings);
 		});
 
 		this.connection.onDidChangeWatchedFiles(async (event) => {

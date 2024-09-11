@@ -923,7 +923,7 @@ export class DoComplete extends LanguageFeature {
 		const noDot =
 			namespace === "*" ||
 			isEmbedded ||
-			initialDocument.languageId === ".sass" ||
+			initialDocument.languageId === "sass" ||
 			this.configuration.completionSettings?.afterModule === "";
 
 		const insertText = namespace
@@ -1056,7 +1056,7 @@ export class DoComplete extends LanguageFeature {
 		const noDot =
 			namespace === "*" ||
 			isEmbedded ||
-			initialDocument.languageId === ".sass" ||
+			initialDocument.languageId === "sass" ||
 			this.configuration.completionSettings?.afterModule === "";
 
 		const insertText = namespace
@@ -1155,7 +1155,7 @@ export class DoComplete extends LanguageFeature {
 
 			const noDot =
 				isEmbedded ||
-				document.languageId === ".sass" ||
+				document.languageId === "sass" ||
 				this.configuration.completionSettings?.afterModule === "";
 
 			const insertText = context.currentWord.includes(".")

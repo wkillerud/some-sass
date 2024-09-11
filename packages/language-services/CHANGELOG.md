@@ -1,3 +1,17 @@
+## 1.5.1 (2024-09-11)
+
+
+### 🩹 Fixes
+
+- apply loadPaths in onDidChangeConfiguration
+
+- remove extra dot for mixins and methods after modules in indented
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 1.5.1
+
 ## 1.5.0 (2024-09-07)
 
 

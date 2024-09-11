@@ -1,3 +1,15 @@
+## 1.7.1 (2024-09-11)
+
+
+### 🩹 Fixes
+
+- apply loadPaths in onDidChangeConfiguration
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.5.1
+
 ## 1.7.0 (2024-09-07)
 
 

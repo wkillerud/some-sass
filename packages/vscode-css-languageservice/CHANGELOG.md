@@ -1,3 +1,10 @@
+## 1.5.1 (2024-09-11)
+
+
+### 🩹 Fixes
+
+- apply loadPaths in onDidChangeConfiguration
+
 ## 1.5.0 (2024-09-07)
 
 

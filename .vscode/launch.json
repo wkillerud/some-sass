@@ -3,6 +3,15 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"name": "Attach to language server running with --inspect",
+			"port": 9229,
+			"request": "attach",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"type": "node"
+		},
+		{
 			"type": "extensionHost",
 			"request": "launch",
 			"name": "Launch extension",

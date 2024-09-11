@@ -227,6 +227,7 @@ export interface LanguageServiceConfiguration {
 		includePrefixDot?: boolean;
 		/**
 		 * If you end up with an extra `.` after accepting a suggestion, set this to the empty string.
+		 * If your module disappears, set it to "{module}" or "{module}." depending on your situation.
 		 *
 		 * @example
 		 * ```scss

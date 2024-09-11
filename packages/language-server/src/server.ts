@@ -278,6 +278,7 @@ export class SomeSassServer {
 			ls.configure({
 				editorSettings,
 				workspaceRoot,
+				loadPaths: settings.loadPaths,
 				completionSettings: {
 					suggestAllFromOpenDocument: settings.suggestAllFromOpenDocument,
 					suggestFromUseOnly: settings.suggestFromUseOnly,

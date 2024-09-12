@@ -1,3 +1,15 @@
+## 1.8.0 (2024-09-12)
+
+
+### 🚀 Features
+
+- add {module} as a magic string for the afterModule setting
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 1.6.0
+
 ## 1.7.1 (2024-09-11)
 
 

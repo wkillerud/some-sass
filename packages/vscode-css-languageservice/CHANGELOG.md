@@ -1,3 +1,10 @@
+## 1.6.0 (2024-09-12)
+
+
+### 🚀 Features
+
+- add {module} as a magic string for the afterModule setting
+
 ## 1.5.1 (2024-09-11)
 
 

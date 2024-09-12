@@ -33,6 +33,20 @@ In addition to [the user settings](../user-guide/settings.md), language clients 
 | `somesass.completion.afterModule`    | Set this to the empty string if you end up with `module..$variable` after accepting a code suggestion item. If `module.` or `module` disappears, you can set it to `"{module}."` or `"{module}"` respectively. That is a "magic string" that will be replaced with the actual module name. |
 | `somesass.completion.beforeVariable` | Set this to the empty string if you end up with `$$variable` after accepting a code suggestion item.                                                                                                                                                                                       |
 
+For example:
+
+```json
+{
+	"settings": {
+		"somesass": {
+			"completion": {
+				"afterModule": "{module}"
+			}
+		}
+	}
+}
+```
+
 ## Existing clients
 
 This list of [language client implementations][languageclients] may be a helpful starting point. You may also want to look at [existing clients](./existing-clients.md).

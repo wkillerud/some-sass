@@ -79,6 +79,10 @@ export abstract class LanguageFeature {
 		this.configuration = {
 			...defaultConfiguration,
 			...configuration,
+			completionSettings: {
+				...defaultConfiguration.completionSettings,
+				...(configuration.completionSettings || {}),
+			},
 		};
 		this._internal.sassLs.configure(configuration);
 	}

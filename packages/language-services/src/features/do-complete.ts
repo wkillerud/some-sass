@@ -861,6 +861,13 @@ export class DoComplete extends LanguageFeature {
 					? asDollarlessVariable(label)
 					: label;
 
+			if (
+				this.configuration.completionSettings?.afterModule &&
+				this.configuration.completionSettings.afterModule.startsWith("{module}")
+			) {
+				insertText = `${namespace}${insertText}`;
+			}
+
 			filterText = currentWord.endsWith(".") ? `${namespace}.${label}` : label;
 		} else if (
 			dotExt === ".vue" ||
@@ -926,11 +933,20 @@ export class DoComplete extends LanguageFeature {
 			initialDocument.languageId === "sass" ||
 			this.configuration.completionSettings?.afterModule === "";
 
-		const insertText = namespace
+		let insertText = namespace
 			? noDot
 				? `${prefix}${symbol.name}`
 				: `.${prefix}${symbol.name}`
 			: symbol.name;
+
+		if (
+			namespace &&
+			namespace !== "*" &&
+			this.configuration.completionSettings?.afterModule &&
+			this.configuration.completionSettings.afterModule.startsWith("{module}")
+		) {
+			insertText = `${namespace}${insertText}`;
+		}
 
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
 
@@ -1059,11 +1075,20 @@ export class DoComplete extends LanguageFeature {
 			initialDocument.languageId === "sass" ||
 			this.configuration.completionSettings?.afterModule === "";
 
-		const insertText = namespace
+		let insertText = namespace
 			? noDot
 				? `${prefix}${symbol.name}`
 				: `.${prefix}${symbol.name}`
 			: symbol.name;
+
+		if (
+			namespace &&
+			namespace !== "*" &&
+			this.configuration.completionSettings?.afterModule &&
+			this.configuration.completionSettings.afterModule.startsWith("{module}")
+		) {
+			insertText = `${namespace}${insertText}`;
+		}
 
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
 
@@ -1158,11 +1183,18 @@ export class DoComplete extends LanguageFeature {
 				document.languageId === "sass" ||
 				this.configuration.completionSettings?.afterModule === "";
 
-			const insertText = context.currentWord.includes(".")
+			let insertText = context.currentWord.includes(".")
 				? `${noDot ? "" : "."}${label}${
 						signature ? `(${parameterSnippet})` : ""
 					}`
 				: label;
+
+			if (
+				this.configuration.completionSettings?.afterModule &&
+				this.configuration.completionSettings.afterModule.startsWith("{module}")
+			) {
+				insertText = `${context.namespace}${insertText}`;
+			}
 
 			items.push({
 				documentation: {

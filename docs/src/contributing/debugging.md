@@ -42,5 +42,27 @@ Find `browser-server.js` in the `vscode-extension/dist/` folder to set breakpoin
 
 Restart the debugger after building to see any changes you make in the code.
 
+## Attach to a running language server
+
+If you need to debug an interaction in an editor other than Visual Studio Code,
+you can run the language server using Node [with the `--inspect` flag](https://nodejs.org/en/learn/getting-started/debugging).
+
+For example, in Sublime Text, this should be the command:
+
+```json
+{
+	"command": ["${node_bin}", "--inspect", "${server_path}", "--stdio", "--debug"]
+}
+```
+
+Note that we also use the `--debug` flag in order to run the language server's non-minified bundle.
+
+You can then [attach an inspector client](https://nodejs.org/en/learn/getting-started/debugging#inspector-clients).
+
+In VS Code, once the debugger is attached, you should be able to find the language server's script in the Loaded scripts section.
+There you can place breakpoints to step through the code you want to inspect.
+
+![](../images/debugging/attach-to-server.png)
+
 [exthost]: https://code.visualstudio.com/api/advanced-topics/extension-host
 [vsdebug]: https://code.visualstudio.com/docs/editor/debugging

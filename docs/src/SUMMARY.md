@@ -18,7 +18,6 @@
 - [Configure a client](language-server/configure-a-client.md)
 - [Existing clients](language-server/existing-clients.md)
   - [Helix](language-server/helix.md)
-  - [Kate](language-server/kate.md)
   - [Neovim](language-server/neovim.md)
 <!-- Sort alphabetically. Add new pages to existing-clients.md as well. -->
 

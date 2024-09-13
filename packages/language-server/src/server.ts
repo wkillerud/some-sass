@@ -148,43 +148,53 @@ export class SomeSassServer {
 						settings.suggestFunctionsInStringContextAfterSymbols,
 					scss: {
 						afterModule:
-							settings.scss?.completion?.afterModule ||
-							settings.completion?.afterModule,
+							typeof settings.scss?.completion?.afterModule === "undefined"
+								? settings.completion?.afterModule
+								: settings.scss?.completion?.afterModule,
 						beforeVariable:
-							settings.scss?.completion?.beforeVariable ||
-							settings.completion?.beforeVariable,
+							typeof settings.scss?.completion?.beforeVariable === "undefined"
+								? settings.completion?.beforeVariable
+								: settings.scss?.completion?.beforeVariable,
 					},
 					sass: {
 						afterModule:
-							settings.sass?.completion?.afterModule ||
-							settings.completion?.afterModule,
+							typeof settings.sass?.completion?.afterModule === "undefined"
+								? settings.completion?.afterModule
+								: settings.sass?.completion?.afterModule,
 						beforeVariable:
-							settings.sass?.completion?.beforeVariable ||
-							settings.completion?.afterModule,
+							typeof settings.sass?.completion?.beforeVariable === "undefined"
+								? settings.completion?.beforeVariable
+								: settings.sass?.completion?.beforeVariable,
 					},
 					astro: {
 						afterModule:
-							settings.astro?.completion?.afterModule ||
-							settings.completion?.afterModule,
+							typeof settings.astro?.completion?.afterModule === "undefined"
+								? settings.completion?.afterModule
+								: settings.astro?.completion?.afterModule,
 						beforeVariable:
-							settings.astro?.completion?.beforeVariable ||
-							settings.completion?.afterModule,
+							typeof settings.astro?.completion?.beforeVariable === "undefined"
+								? settings.completion?.beforeVariable
+								: settings.astro?.completion?.beforeVariable,
 					},
 					vue: {
 						afterModule:
-							settings.vue?.completion?.afterModule ||
-							settings.completion?.afterModule,
+							typeof settings.vue?.completion?.afterModule === "undefined"
+								? settings.completion?.afterModule
+								: settings.vue?.completion?.afterModule,
 						beforeVariable:
-							settings.vue?.completion?.beforeVariable ||
-							settings.completion?.afterModule,
+							typeof settings.vue?.completion?.beforeVariable === "undefined"
+								? settings.completion?.beforeVariable
+								: settings.vue?.completion?.beforeVariable,
 					},
 					svelte: {
 						afterModule:
-							settings.svelte?.completion?.afterModule ||
-							settings.completion?.afterModule,
+							typeof settings.svelte?.completion?.afterModule === "undefined"
+								? settings.completion?.afterModule
+								: settings.svelte?.completion?.afterModule,
 						beforeVariable:
-							settings.svelte?.completion?.beforeVariable ||
-							settings.completion?.afterModule,
+							typeof settings.svelte?.completion?.beforeVariable === "undefined"
+								? settings.completion?.beforeVariable
+								: settings.svelte?.completion?.beforeVariable,
 					},
 				},
 			});

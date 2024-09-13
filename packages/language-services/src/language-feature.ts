@@ -5,6 +5,7 @@ import {
 	Scanner,
 	SassScanner,
 } from "@somesass/vscode-css-languageservice";
+import merge from "lodash.merge";
 import { LanguageModelCache } from "./language-model-cache";
 import {
 	LanguageServiceOptions,
@@ -94,34 +95,7 @@ export abstract class LanguageFeature {
 	}
 
 	configure(configuration: LanguageServiceConfiguration): void {
-		this.configuration = {
-			...defaultConfiguration,
-			...configuration,
-			completionSettings: {
-				...defaultConfiguration.completionSettings,
-				...configuration.completionSettings,
-				scss: {
-					...defaultConfiguration.completionSettings?.scss,
-					...configuration.completionSettings?.scss,
-				},
-				sass: {
-					...defaultConfiguration.completionSettings?.sass,
-					...configuration.completionSettings?.sass,
-				},
-				astro: {
-					...defaultConfiguration.completionSettings?.astro,
-					...configuration.completionSettings?.astro,
-				},
-				vue: {
-					...defaultConfiguration.completionSettings?.vue,
-					...configuration.completionSettings?.vue,
-				},
-				svelte: {
-					...defaultConfiguration.completionSettings?.svelte,
-					...configuration.completionSettings?.svelte,
-				},
-			},
-		};
+		this.configuration = merge(defaultConfiguration, configuration);
 		this._internal.sassLs.configure(this.configuration);
 	}
 

@@ -148,10 +148,10 @@ export class SomeSassServer {
 						settings.suggestFunctionsInStringContextAfterSymbols,
 					scss: {
 						afterModule:
-							settings?.scss?.completion?.afterModule ||
+							settings.scss?.completion?.afterModule ||
 							settings.completion?.afterModule,
 						beforeVariable:
-							settings?.scss?.completion?.beforeVariable ||
+							settings.scss?.completion?.beforeVariable ||
 							settings.completion?.beforeVariable,
 					},
 					sass: {

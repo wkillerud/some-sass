@@ -50,9 +50,11 @@
 	"dependencies": {
 		"@somesass/vscode-css-languageservice": "1.6.0",
 		"colorjs.io": "0.5.2",
+		"lodash.merge": "4.6.2",
 		"sassdoc-parser": "3.4.0"
 	},
 	"devDependencies": {
+		"@types/lodash.merge": "4.6.9",
 		"@vitest/coverage-v8": "2.0.5",
 		"shx": "0.3.4",
 		"typescript": "5.5.4"

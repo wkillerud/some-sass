@@ -1060,8 +1060,8 @@ test("should suggest all symbols as legacy @import may be in use", async () => {
 		{
 			commitCharacters: [";", ","],
 			documentation: "limegreen\n____\nVariable declared in one.scss",
-			filterText: undefined,
-			insertText: undefined,
+			filterText: "$primary",
+			insertText: "$primary",
 			kind: CompletionItemKind.Color,
 			label: "$primary",
 			sortText: undefined,
@@ -1127,8 +1127,8 @@ test("should suggest symbol from a different document via @use with wildcard ali
 		{
 			commitCharacters: [";", ","],
 			documentation: "limegreen\n____\nVariable declared in one.scss",
-			filterText: undefined,
-			insertText: undefined,
+			filterText: "$primary",
+			insertText: "$primary",
 			kind: CompletionItemKind.Color,
 			label: "$primary",
 			sortText: undefined,

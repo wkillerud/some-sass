@@ -89,7 +89,7 @@ export function getSassRegionsDocument(
 
 		return TextDocument.create(
 			uri,
-			regions[0].type,
+			document.languageId,
 			version,
 			getSassContent(text, regions),
 		);

@@ -142,7 +142,7 @@
     "some-sass-language-server": "1.8.0",
     "vscode-css-languageservice": "6.3.1",
     "vscode-languageclient": "9.0.1",
-    "vscode-uri": "3.0.7"
+    "vscode-uri": "3.0.8"
   },
   "devDependencies": {
     "@types/mocha": "10.0.7",
@@ -161,6 +161,7 @@
     "build:browser": "rspack --config ./rspack.browser.config.js",
     "build:development:node": "npm run build:node -- --mode=development",
     "build:development:browser": "npm run build:browser -- --mode=development",
+    "build:production": "run-s build:production:*",
     "build:production:node": "npm run build:node -- --mode=production",
     "build:production:browser": "npm run build:browser -- --mode=production",
     "start:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=.",

@@ -45,8 +45,26 @@ const defaultConfiguration: LanguageServiceConfiguration = {
 		suggestFunctionsInStringContextAfterSymbols: " (+-*%",
 		suggestionStyle: "all",
 		triggerPropertyValueCompletion: true,
-		afterModule: ".",
-		beforeVariable: "$",
+		scss: {
+			afterModule: ".$",
+			beforeVariable: "$",
+		},
+		sass: {
+			afterModule: ".$",
+			beforeVariable: "",
+		},
+		vue: {
+			afterModule: "",
+			beforeVariable: "",
+		},
+		astro: {
+			afterModule: "",
+			beforeVariable: "",
+		},
+		svelte: {
+			afterModule: "",
+			beforeVariable: "$",
+		},
 	},
 };
 
@@ -57,7 +75,7 @@ const defaultConfiguration: LanguageServiceConfiguration = {
 export abstract class LanguageFeature {
 	protected ls;
 	protected options;
-	protected configuration: LanguageServiceConfiguration = {};
+	protected configuration: LanguageServiceConfiguration = defaultConfiguration;
 
 	private _internal: LanguageFeatureInternal;
 
@@ -81,10 +99,30 @@ export abstract class LanguageFeature {
 			...configuration,
 			completionSettings: {
 				...defaultConfiguration.completionSettings,
-				...(configuration.completionSettings || {}),
+				...configuration.completionSettings,
+				scss: {
+					...defaultConfiguration.completionSettings?.scss,
+					...configuration.completionSettings?.scss,
+				},
+				sass: {
+					...defaultConfiguration.completionSettings?.sass,
+					...configuration.completionSettings?.sass,
+				},
+				astro: {
+					...defaultConfiguration.completionSettings?.astro,
+					...configuration.completionSettings?.astro,
+				},
+				vue: {
+					...defaultConfiguration.completionSettings?.vue,
+					...configuration.completionSettings?.vue,
+				},
+				svelte: {
+					...defaultConfiguration.completionSettings?.svelte,
+					...configuration.completionSettings?.svelte,
+				},
 			},
 		};
-		this._internal.sassLs.configure(configuration);
+		this._internal.sassLs.configure(this.configuration);
 	}
 
 	protected getUpstreamLanguageServer(): VSCodeLanguageService {

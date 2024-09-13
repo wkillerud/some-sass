@@ -47,6 +47,34 @@ For example:
 }
 ```
 
+### Language-specific configuration
+
+For the completion settings above you can tweak them per supported language.
+
+The setting without a specified syntax applies to all of them.
+If both are specified, the one for the individual syntax takes precedence.
+
+```json
+{
+	"settings": {
+		"somesass": {
+			"completion": {
+				"afterModule": "{module}",
+			},
+			"vue": {
+				"completion": {
+					"afterModule": "{module}."
+				}
+			}
+		}
+	}
+}
+```
+
+In the example above, `somesass.completion.afterModule` with the value `{module}` applies to all languages except Vue, which uses `{module}.`.
+
+
+
 ## Existing clients
 
 This list of [language client implementations][languageclients] may be a helpful starting point. You may also want to look at [existing clients](./existing-clients.md).

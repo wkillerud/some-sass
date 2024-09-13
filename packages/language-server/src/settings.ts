@@ -12,6 +12,36 @@ export interface ISettings {
 		afterModule?: string;
 		beforeVariable?: string;
 	};
+	readonly scss?: {
+		completion?: {
+			afterModule?: string;
+			beforeVariable?: string;
+		};
+	};
+	readonly sass?: {
+		completion?: {
+			afterModule?: string;
+			beforeVariable?: string;
+		};
+	};
+	readonly astro?: {
+		completion?: {
+			afterModule?: string;
+			beforeVariable?: string;
+		};
+	};
+	readonly vue?: {
+		completion?: {
+			afterModule?: string;
+			beforeVariable?: string;
+		};
+	};
+	readonly svelte?: {
+		completion?: {
+			afterModule?: string;
+			beforeVariable?: string;
+		};
+	};
 }
 
 export interface IEditorSettings {

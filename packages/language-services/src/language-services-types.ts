@@ -175,6 +175,36 @@ export type Rename =
 	| { range: Range; placeholder: string }
 	| { defaultBehavior: boolean };
 
+export type LanguageSpecificCompletionSettings = {
+	/**
+	 * If you end up with an extra `.` after accepting a suggestion, set this to the empty string.
+	 * If your module disappears, set it to "{module}" or "{module}." depending on your situation.
+	 *
+	 * @example
+	 * ```scss
+	 *  .foo {
+	 *    // set this setting to the empty string "" to fix this bug,
+	 *    // which varies depending on your editor's grammar for Sass.
+	 *    color: module..$variable;
+	 *  }
+	 * ```
+	 */
+	afterModule?: string;
+	/**
+	 * If you end up with an extra `&` after accepting a suggestion, set this to the empty string.
+	 *
+	 * @example
+	 * ```scss
+	 *  .foo {
+	 *    // set this setting to the empty string "" to fix this bug,
+	 *    // which varies depending on your editor's grammar for Sass.
+	 *    color: $$variable;
+	 *  }
+	 * ```
+	 */
+	beforeVariable?: string;
+};
+
 export interface LanguageServiceConfiguration {
 	/**
 	 * Pass in [load paths](https://sass-lang.com/documentation/cli/dart-sass/#load-path) that will be used in addition to `node_modules`.
@@ -224,34 +254,11 @@ export interface LanguageServiceConfiguration {
 		 * @default true
 		 */
 		triggerPropertyValueCompletion?: boolean;
-		includePrefixDot?: boolean;
-		/**
-		 * If you end up with an extra `.` after accepting a suggestion, set this to the empty string.
-		 * If your module disappears, set it to "{module}" or "{module}." depending on your situation.
-		 *
-		 * @example
-		 * ```scss
-		 *  .foo {
-		 *    // set this setting to the empty string "" to fix this bug,
-		 *    // which varies depending on your editor's grammar for Sass.
-		 *    color: module..$variable;
-		 *  }
-		 * ```
-		 */
-		afterModule?: string;
-		/**
-		 * If you end up with an extra `&` after accepting a suggestion, set this to the empty string.
-		 *
-		 * @example
-		 * ```scss
-		 *  .foo {
-		 *    // set this setting to the empty string "" to fix this bug,
-		 *    // which varies depending on your editor's grammar for Sass.
-		 *    color: $$variable;
-		 *  }
-		 * ```
-		 */
-		beforeVariable?: string;
+		scss?: LanguageSpecificCompletionSettings;
+		sass?: LanguageSpecificCompletionSettings;
+		vue?: LanguageSpecificCompletionSettings;
+		svelte?: LanguageSpecificCompletionSettings;
+		astro?: LanguageSpecificCompletionSettings;
 	};
 	editorSettings?: EditorSettings;
 	workspaceRoot?: URI;

@@ -146,8 +146,46 @@ export class SomeSassServer {
 					suggestionStyle: settings.suggestionStyle,
 					suggestFunctionsInStringContextAfterSymbols:
 						settings.suggestFunctionsInStringContextAfterSymbols,
-					afterModule: settings.completion?.afterModule,
-					beforeVariable: settings.completion?.beforeVariable,
+					scss: {
+						afterModule:
+							settings?.scss?.completion?.afterModule ||
+							settings.completion?.afterModule,
+						beforeVariable:
+							settings?.scss?.completion?.beforeVariable ||
+							settings.completion?.beforeVariable,
+					},
+					sass: {
+						afterModule:
+							settings.sass?.completion?.afterModule ||
+							settings.completion?.afterModule,
+						beforeVariable:
+							settings.sass?.completion?.beforeVariable ||
+							settings.completion?.afterModule,
+					},
+					astro: {
+						afterModule:
+							settings.astro?.completion?.afterModule ||
+							settings.completion?.afterModule,
+						beforeVariable:
+							settings.astro?.completion?.beforeVariable ||
+							settings.completion?.afterModule,
+					},
+					vue: {
+						afterModule:
+							settings.vue?.completion?.afterModule ||
+							settings.completion?.afterModule,
+						beforeVariable:
+							settings.vue?.completion?.beforeVariable ||
+							settings.completion?.afterModule,
+					},
+					svelte: {
+						afterModule:
+							settings.svelte?.completion?.afterModule ||
+							settings.completion?.afterModule,
+						beforeVariable:
+							settings.svelte?.completion?.beforeVariable ||
+							settings.completion?.afterModule,
+					},
 				},
 			});
 		}

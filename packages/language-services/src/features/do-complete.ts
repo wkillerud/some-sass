@@ -33,6 +33,7 @@ import {
 	TextDocument,
 	URI,
 	Utils,
+	LanguageSpecificCompletionSettings,
 } from "../language-services-types";
 import { asDollarlessVariable } from "../utils/sass";
 import { applySassDoc } from "../utils/sassdoc";
@@ -276,7 +277,6 @@ export class DoComplete extends LanguageFeature {
 
 		// Legacy @import style suggestions
 		if (!this.configuration.completionSettings?.suggestFromUseOnly) {
-			const currentWord = context.currentWord;
 			const documents = this.cache.documents();
 			for (const currentDocument of documents) {
 				if (
@@ -300,7 +300,7 @@ export class DoComplete extends LanguageFeature {
 							const items = await this.doVariableCompletion(
 								document,
 								currentDocument,
-								currentWord,
+								context,
 								symbol,
 								isPrivate,
 							);
@@ -315,7 +315,7 @@ export class DoComplete extends LanguageFeature {
 							const items = await this.doMixinCompletion(
 								document,
 								currentDocument,
-								currentWord,
+								context,
 								symbol,
 								isPrivate,
 							);
@@ -330,7 +330,7 @@ export class DoComplete extends LanguageFeature {
 							const items = await this.doFunctionCompletion(
 								document,
 								currentDocument,
-								currentWord,
+								context,
 								symbol,
 								isPrivate,
 							);
@@ -722,10 +722,9 @@ export class DoComplete extends LanguageFeature {
 							const vars = await this.doVariableCompletion(
 								document,
 								currentDocument,
-								context.currentWord,
+								context,
 								symbol,
 								isPrivate,
-								context.namespace,
 								prefix,
 							);
 							if (vars.length > 0) {
@@ -739,10 +738,9 @@ export class DoComplete extends LanguageFeature {
 							const mixs = await this.doMixinCompletion(
 								document,
 								currentDocument,
-								context.currentWord,
+								context,
 								symbol,
 								isPrivate,
-								context.namespace,
 								prefix,
 							);
 							if (mixs.length > 0) {
@@ -756,10 +754,9 @@ export class DoComplete extends LanguageFeature {
 							const funcs = await this.doFunctionCompletion(
 								document,
 								currentDocument,
-								context.currentWord,
+								context,
 								symbol,
 								isPrivate,
-								context.namespace,
 								prefix,
 							);
 							if (funcs.length > 0) {
@@ -802,13 +799,79 @@ export class DoComplete extends LanguageFeature {
 		return result;
 	}
 
+	getInsertText(
+		document: TextDocument,
+		context: CompletionContext,
+		label: string,
+		symbolKind: SymbolKind,
+	): string {
+		let settings: Required<LanguageSpecificCompletionSettings>;
+
+		// We don't use languageId here since it gets set to scss or sass in vue, svelte and astro files
+		// when we extract only the Sass syntax parts of the document.
+		const dotExt = document.uri.slice(
+			Math.max(0, document.uri.lastIndexOf(".")),
+		);
+
+		switch (dotExt) {
+			case ".vue":
+				settings = this.configuration.completionSettings
+					?.vue as Required<LanguageSpecificCompletionSettings>;
+				break;
+			case ".svelte":
+				settings = this.configuration.completionSettings
+					?.svelte as Required<LanguageSpecificCompletionSettings>;
+				break;
+			case ".astro":
+				settings = this.configuration.completionSettings
+					?.astro as Required<LanguageSpecificCompletionSettings>;
+				break;
+			case ".sass":
+				settings = this.configuration.completionSettings
+					?.sass as Required<LanguageSpecificCompletionSettings>;
+				break;
+			case ".scss":
+			default:
+				settings = this.configuration.completionSettings
+					?.scss as Required<LanguageSpecificCompletionSettings>;
+				break;
+		}
+
+		const namespace = context.namespace;
+		if (!namespace || namespace === "*") {
+			if (settings.beforeVariable === "") {
+				return asDollarlessVariable(label);
+			}
+			return label;
+		}
+
+		let insertText = label;
+		const noDot = !settings.afterModule.includes(".");
+
+		if (symbolKind === SymbolKind.Variable) {
+			const noDollar = !settings.afterModule.includes("$");
+			if (context.currentWord.endsWith(".")) {
+				insertText = `${noDot ? "" : "."}${label}`;
+			} else if (noDollar) {
+				insertText = asDollarlessVariable(label);
+			}
+		} else {
+			insertText = `${noDot ? "" : "."}${label}`;
+		}
+
+		if (settings.afterModule.startsWith("{module}")) {
+			insertText = `${namespace}${insertText}`;
+		}
+
+		return insertText;
+	}
+
 	private async doVariableCompletion(
 		initialDocument: TextDocument,
 		currentDocument: TextDocument,
-		currentWord: string,
+		context: CompletionContext,
 		symbol: SassDocumentSymbol,
 		isPrivate: boolean,
-		namespace = "",
 		prefix = "",
 	): Promise<CompletionItem[]> {
 		// Avoid ending up with namespace.prefix-$variable
@@ -839,46 +902,15 @@ export class DoComplete extends LanguageFeature {
 		documentation += `\n____\nVariable declared in ${this.getFileName(currentDocument.uri)}`;
 
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
-
-		const dotExt = initialDocument.uri.slice(
-			Math.max(0, initialDocument.uri.lastIndexOf(".")),
+		const insertText = this.getInsertText(
+			initialDocument,
+			context,
+			label,
+			SymbolKind.Variable,
 		);
-		const isEmbedded = !dotExt.match(reSassDotExt);
-		let insertText: string | undefined;
-		let filterText: string | undefined;
-
-		if (namespace && namespace !== "*") {
-			const noDot =
-				isEmbedded ||
-				dotExt === ".sass" ||
-				this.configuration.completionSettings?.afterModule === "";
-
-			const noDollar = isEmbedded;
-
-			insertText = currentWord.endsWith(".")
-				? `${noDot ? "" : "."}${label}`
-				: noDollar
-					? asDollarlessVariable(label)
-					: label;
-
-			if (
-				this.configuration.completionSettings?.afterModule &&
-				this.configuration.completionSettings.afterModule.startsWith("{module}")
-			) {
-				insertText = `${namespace}${insertText}`;
-			}
-
-			filterText = currentWord.endsWith(".") ? `${namespace}.${label}` : label;
-		} else if (
-			dotExt === ".vue" ||
-			dotExt === ".astro" ||
-			dotExt === ".sass" ||
-			this.configuration.completionSettings?.beforeVariable === ""
-		) {
-			// In these languages the $ does not get replaced by the suggestion,
-			// so exclude it from the insertText.
-			insertText = asDollarlessVariable(label);
-		}
+		const filterText = context.currentWord.endsWith(".")
+			? `${context.namespace}.${label}`
+			: label;
 
 		const item: CompletionItem = {
 			commitCharacters: [";", ","],
@@ -910,14 +942,14 @@ export class DoComplete extends LanguageFeature {
 	private async doMixinCompletion(
 		initialDocument: TextDocument,
 		currentDocument: TextDocument,
-		currentWord: string,
+		context: CompletionContext,
 		symbol: SassDocumentSymbol,
 		isPrivate: boolean,
-		namespace = "",
 		prefix = "",
 	): Promise<CompletionItem[]> {
 		const items: CompletionItem[] = [];
 
+		const namespace = context.namespace;
 		const label = `${prefix}${symbol.name}`;
 		const filterText = namespace
 			? namespace !== "*"
@@ -925,29 +957,12 @@ export class DoComplete extends LanguageFeature {
 				: `${prefix}${symbol.name}`
 			: symbol.name;
 
-		const isEmbedded = this.isEmbedded(initialDocument);
-
-		const noDot =
-			namespace === "*" ||
-			isEmbedded ||
-			initialDocument.languageId === "sass" ||
-			this.configuration.completionSettings?.afterModule === "";
-
-		let insertText = namespace
-			? noDot
-				? `${prefix}${symbol.name}`
-				: `.${prefix}${symbol.name}`
-			: symbol.name;
-
-		if (
-			namespace &&
-			namespace !== "*" &&
-			this.configuration.completionSettings?.afterModule &&
-			this.configuration.completionSettings.afterModule.startsWith("{module}")
-		) {
-			insertText = `${namespace}${insertText}`;
-		}
-
+		const insertText = this.getInsertText(
+			initialDocument,
+			context,
+			label,
+			SymbolKind.Method,
+		);
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
 
 		const documentation = {
@@ -1049,14 +1064,14 @@ export class DoComplete extends LanguageFeature {
 	private async doFunctionCompletion(
 		initialDocument: TextDocument,
 		currentDocument: TextDocument,
-		currentWord: string,
+		context: CompletionContext,
 		symbol: SassDocumentSymbol,
 		isPrivate: boolean,
-		namespace = "",
 		prefix = "",
 	): Promise<CompletionItem[]> {
 		const items: CompletionItem[] = [];
 
+		const namespace = context.namespace;
 		const label = `${prefix}${symbol.name}`;
 		let filterText = symbol.name;
 		if (namespace) {
@@ -1067,29 +1082,12 @@ export class DoComplete extends LanguageFeature {
 			}
 		}
 
-		const isEmbedded = this.isEmbedded(initialDocument);
-
-		const noDot =
-			namespace === "*" ||
-			isEmbedded ||
-			initialDocument.languageId === "sass" ||
-			this.configuration.completionSettings?.afterModule === "";
-
-		let insertText = namespace
-			? noDot
-				? `${prefix}${symbol.name}`
-				: `.${prefix}${symbol.name}`
-			: symbol.name;
-
-		if (
-			namespace &&
-			namespace !== "*" &&
-			this.configuration.completionSettings?.afterModule &&
-			this.configuration.completionSettings.afterModule.startsWith("{module}")
-		) {
-			insertText = `${namespace}${insertText}`;
-		}
-
+		const insertText = this.getInsertText(
+			initialDocument,
+			context,
+			label,
+			SymbolKind.Function,
+		);
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
 
 		const documentation = {
@@ -1172,29 +1170,12 @@ export class DoComplete extends LanguageFeature {
 
 			// Client needs the namespace as part of the text that is matched,
 			const filterText = `${context.namespace}.${label}`;
-
-			// Inserted text needs to include the `.` which will otherwise
-			// be replaced (except when we're embedded in Vue, Svelte or Astro).
-			// Example result: .floor(${1:number})
-			const isEmbedded = this.isEmbedded(document);
-
-			const noDot =
-				isEmbedded ||
-				document.languageId === "sass" ||
-				this.configuration.completionSettings?.afterModule === "";
-
-			let insertText = context.currentWord.includes(".")
-				? `${noDot ? "" : "."}${label}${
-						signature ? `(${parameterSnippet})` : ""
-					}`
-				: label;
-
-			if (
-				this.configuration.completionSettings?.afterModule &&
-				this.configuration.completionSettings.afterModule.startsWith("{module}")
-			) {
-				insertText = `${context.namespace}${insertText}`;
-			}
+			const insertText = this.getInsertText(
+				document,
+				context,
+				label,
+				signature ? SymbolKind.Function : SymbolKind.Variable,
+			);
 
 			items.push({
 				documentation: {
@@ -1202,7 +1183,7 @@ export class DoComplete extends LanguageFeature {
 					value: `${description}\n\n[Sass documentation](${moduleDocs.reference}#${name})`,
 				},
 				filterText,
-				insertText,
+				insertText: `${insertText}${signature ? `(${parameterSnippet})` : ""}`,
 				insertTextFormat: parameterSnippet
 					? InsertTextFormat.Snippet
 					: InsertTextFormat.PlainText,

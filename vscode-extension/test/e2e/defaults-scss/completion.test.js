@@ -72,12 +72,11 @@ test("Offers namespaces completions including prefixes", async () => {
 	let expectedCompletions = [
 		{
 			label: "$var-var-variable",
-			insertText: '".$var-var-variable"',
-			filterText: '"ns.$var-var-variable"',
+			insertText: '"ns.$var-var-variable"',
 		},
 		{
 			label: "fun-fun-function",
-			insertText: '".fun-fun-function()"',
+			insertText: '"ns.fun-fun-function()"',
 		},
 	];
 
@@ -86,7 +85,7 @@ test("Offers namespaces completions including prefixes", async () => {
 	expectedCompletions = [
 		{
 			label: "mix-mix-mixin",
-			insertText: '".mix-mix-mixin"',
+			insertText: '"ns.mix-mix-mixin"',
 		},
 	];
 
@@ -116,12 +115,11 @@ test("Offers namespace completion inside string interpolation", async () => {
 	let expectedCompletions = [
 		{
 			label: "$var-var-variable",
-			insertText: '".$var-var-variable"',
-			filterText: '"ns.$var-var-variable"',
+			insertText: '"ns.$var-var-variable"',
 		},
 		{
 			label: "fun-fun-function",
-			insertText: '".fun-fun-function()"',
+			insertText: '"ns.fun-fun-function()"',
 		},
 	];
 
@@ -132,7 +130,7 @@ test("Offers completions for Sass built-ins", async () => {
 	let expectedCompletions = [
 		{
 			label: "floor",
-			insertText: '".floor(${1:number})"',
+			insertText: '"math.floor(${1:number})"',
 			filterText: '"math.floor"',
 		},
 	];
@@ -144,12 +142,12 @@ test("Offers namespace completion inside string interpolation with preceeding no
 	const expectedCompletions = [
 		{
 			label: "$var-var-variable",
-			insertText: '".$var-var-variable"',
+			insertText: '"ns.$var-var-variable"',
 			filterText: '"ns.$var-var-variable"',
 		},
 		{
 			label: "fun-fun-function",
-			insertText: '".fun-fun-function()"',
+			insertText: '"ns.fun-fun-function()"',
 		},
 	];
 
@@ -160,12 +158,11 @@ test("Offers namespace completion as part of return statement", async () => {
 	const expectedCompletions = [
 		{
 			label: "$var-var-variable",
-			insertText: '".$var-var-variable"',
-			filterText: '"ns.$var-var-variable"',
+			insertText: '"ns.$var-var-variable"',
 		},
 		{
 			label: "fun-fun-function",
-			insertText: '".fun-fun-function()"',
+			insertText: '"ns.fun-fun-function()"',
 		},
 	];
 

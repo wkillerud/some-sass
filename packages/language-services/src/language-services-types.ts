@@ -286,26 +286,13 @@ export interface ClientCapabilities {
 		completion?: {
 			completionItem?: {
 				documentationFormat?: MarkupKind[];
+				insertReplaceSupport?: boolean;
+				snippetSupport?: boolean;
 			};
 		};
 		hover?: {
 			contentFormat?: MarkupKind[];
 		};
-	};
-}
-
-export namespace ClientCapabilities {
-	export const LATEST: ClientCapabilities = {
-		textDocument: {
-			completion: {
-				completionItem: {
-					documentationFormat: [MarkupKind.Markdown, MarkupKind.PlainText],
-				},
-			},
-			hover: {
-				contentFormat: [MarkupKind.Markdown, MarkupKind.PlainText],
-			},
-		},
 	};
 }
 

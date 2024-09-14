@@ -126,7 +126,10 @@ export function getOptions(): LanguageServiceOptions & {
 		clientCapabilities: {
 			textDocument: {
 				completion: {
-					completionItem: { documentationFormat: ["markdown", "plaintext"] },
+					completionItem: {
+						snippetSupport: true,
+						documentationFormat: ["markdown", "plaintext"],
+					},
 				},
 				hover: {
 					contentFormat: ["markdown", "plaintext"],

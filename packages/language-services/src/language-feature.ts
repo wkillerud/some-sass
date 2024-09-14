@@ -20,6 +20,7 @@ import {
 	VariableDeclaration,
 	URI,
 	Utils,
+	ClientCapabilities,
 } from "./language-services-types";
 import { asDollarlessVariable } from "./utils/sass";
 
@@ -57,6 +58,7 @@ const defaultConfiguration: LanguageServiceConfiguration = {
 export abstract class LanguageFeature {
 	protected ls;
 	protected options;
+	protected clientCapabilities: ClientCapabilities;
 	protected configuration: LanguageServiceConfiguration = {};
 
 	private _internal: LanguageFeatureInternal;
@@ -72,6 +74,7 @@ export abstract class LanguageFeature {
 	) {
 		this.ls = ls;
 		this.options = options;
+		this.clientCapabilities = options.clientCapabilities;
 		this._internal = _internal;
 	}
 

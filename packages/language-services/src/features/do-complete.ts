@@ -1,4 +1,8 @@
-import { getNodeAtOffset } from "@somesass/vscode-css-languageservice";
+import {
+	getNodeAtOffset,
+	Range,
+	TextEdit,
+} from "@somesass/vscode-css-languageservice";
 import ColorDotJS from "colorjs.io";
 import { ParseResult } from "sassdoc-parser";
 import { SassBuiltInModule, sassBuiltInModules } from "../facts/sass";
@@ -67,7 +71,9 @@ const rePlaceholderDeclaration = /^\s*%/;
 const rePartialModuleAtRule = /@(?:use|forward|import) ["']/;
 
 type CompletionContext = {
+	position: Position;
 	currentWord: string;
+	lineBeforePosition: string;
 	namespace?: string;
 	isMixinContext?: boolean;
 	isFunctionContext?: boolean;
@@ -127,14 +133,20 @@ export class DoComplete extends LanguageFeature {
 					const isMixin = keyword === "@mixin";
 					if (isFunction || isMixin) {
 						if (prevToken && prevToken.text.match(reNewSassdocBlock)) {
-							const node = getNodeAtOffset(stylesheet, token.offset);
+							// This makes heavy use of the snippet syntax
 							if (
-								node &&
-								(node instanceof MixinDeclaration ||
-									node instanceof FunctionDeclaration)
+								this.clientCapabilities.textDocument?.completion?.completionItem
+									?.snippetSupport
 							) {
-								const item = this.doSassdocBlockCompletion(document, node);
-								result.items.push(item);
+								const node = getNodeAtOffset(stylesheet, token.offset);
+								if (
+									node &&
+									(node instanceof MixinDeclaration ||
+										node instanceof FunctionDeclaration)
+								) {
+									const item = this.doSassdocBlockCompletion(document, node);
+									result.items.push(item);
+								}
 							}
 						}
 					}
@@ -194,7 +206,7 @@ export class DoComplete extends LanguageFeature {
 		}
 
 		if (context.isPlaceholderDeclarationContext) {
-			const items = await this.doPlaceholderDeclarationCompletion();
+			const items = await this.doPlaceholderDeclarationCompletion(context);
 			if (items.length > 0) {
 				result.items.push(...items);
 			}
@@ -202,7 +214,7 @@ export class DoComplete extends LanguageFeature {
 		}
 
 		if (context.isPlaceholderContext) {
-			const items = await this.doPlaceholderUsageCompletion(document);
+			const items = await this.doPlaceholderUsageCompletion(document, context);
 			if (items.length > 0) {
 				result.items.push(...items);
 			}
@@ -276,7 +288,6 @@ export class DoComplete extends LanguageFeature {
 
 		// Legacy @import style suggestions
 		if (!this.configuration.completionSettings?.suggestFromUseOnly) {
-			const currentWord = context.currentWord;
 			const documents = this.cache.documents();
 			for (const currentDocument of documents) {
 				if (
@@ -298,9 +309,8 @@ export class DoComplete extends LanguageFeature {
 							if (!context.isVariableContext) break;
 
 							const items = await this.doVariableCompletion(
-								document,
 								currentDocument,
-								currentWord,
+								context,
 								symbol,
 								isPrivate,
 							);
@@ -313,9 +323,8 @@ export class DoComplete extends LanguageFeature {
 							if (!context.isMixinContext) break;
 
 							const items = await this.doMixinCompletion(
-								document,
 								currentDocument,
-								currentWord,
+								context,
 								symbol,
 								isPrivate,
 							);
@@ -328,9 +337,8 @@ export class DoComplete extends LanguageFeature {
 							if (!context.isFunctionContext) break;
 
 							const items = await this.doFunctionCompletion(
-								document,
 								currentDocument,
-								currentWord,
+								context,
 								symbol,
 								isPrivate,
 							);
@@ -378,47 +386,39 @@ export class DoComplete extends LanguageFeature {
 		}
 		const currentWord = text.substring(i + 1, offset);
 
+		const context: CompletionContext = {
+			position,
+			currentWord,
+			lineBeforePosition,
+		};
+
 		if (rePartialModuleAtRule.test(lineBeforePosition)) {
-			return {
-				currentWord,
-				isImportContext: true,
-			};
+			context.isImportContext = true;
+			return context;
 		}
 
 		if (reSassDoc.test(lineBeforePosition)) {
-			return {
-				currentWord,
-				isSassdocContext: true,
-			};
+			context.isSassdocContext = true;
+			return context;
 		}
 
 		if (reComment.test(lineBeforePosition)) {
-			return {
-				currentWord,
-				isCommentContext: true,
-			};
+			context.isCommentContext = true;
+			return context;
 		}
 
 		if (rePlaceholder.test(lineBeforePosition)) {
-			return {
-				currentWord,
-				isPlaceholderContext: true,
-			};
+			context.isPlaceholderContext = true;
+			return context;
 		}
 
 		if (rePlaceholderDeclaration.test(lineBeforePosition)) {
-			return {
-				currentWord,
-				isPlaceholderDeclarationContext: true,
-			};
+			context.isPlaceholderDeclarationContext = true;
+			return context;
 		}
 
 		const isInterpolation =
 			currentWord.includes("#{") || lineBeforePosition.includes("#{");
-
-		const context: CompletionContext = {
-			currentWord,
-		};
 
 		if (isInterpolation) {
 			context.isFunctionContext = true;
@@ -516,6 +516,7 @@ export class DoComplete extends LanguageFeature {
 
 	async doPlaceholderUsageCompletion(
 		initialDocument: TextDocument,
+		context: CompletionContext,
 	): Promise<CompletionItem[]> {
 		const visited = new Set<string>();
 		const items: CompletionItem[] = [];
@@ -528,7 +529,11 @@ export class DoComplete extends LanguageFeature {
 			const items: CompletionItem[] = [];
 			for (const symbol of symbols) {
 				if (symbol.kind === SymbolKind.Class && symbol.name.startsWith("%")) {
-					const item: CompletionItem = this.toCompletionItem(document, symbol);
+					const item: CompletionItem = this.toPlaceholderCompletionItem(
+						document,
+						context,
+						symbol,
+					);
 					items.push(item);
 				}
 			}
@@ -549,7 +554,11 @@ export class DoComplete extends LanguageFeature {
 				const symbols = this.ls.findDocumentSymbols(current);
 				for (const symbol of symbols) {
 					if (symbol.kind === SymbolKind.Class && symbol.name.startsWith("%")) {
-						const item: CompletionItem = this.toCompletionItem(current, symbol);
+						const item: CompletionItem = this.toPlaceholderCompletionItem(
+							current,
+							context,
+							symbol,
+						);
 						items.push(item);
 					}
 				}
@@ -559,24 +568,26 @@ export class DoComplete extends LanguageFeature {
 		return items;
 	}
 
-	private toCompletionItem(document: TextDocument, symbol: SassDocumentSymbol) {
-		const filterText = symbol.name.substring(1);
-
+	private toPlaceholderCompletionItem(
+		document: TextDocument,
+		context: CompletionContext,
+		symbol: SassDocumentSymbol,
+	) {
 		let documentation = symbol.name;
 		const sassdoc = applySassDoc(symbol);
 		if (sassdoc) {
 			documentation += `\n____\n${sassdoc}`;
 		}
-
 		const detail = `Placeholder declared in ${this.getFileName(document.uri)}`;
 
+		const filterText = symbol.name.substring(1);
 		const item: CompletionItem = {
 			detail,
 			documentation,
 			filterText,
-			insertText: filterText,
-			insertTextFormat: InsertTextFormat.PlainText,
+			textEdit: TextEdit.replace(this.getReplaceRange(context), symbol.name),
 			kind: CompletionItemKind.Class,
+			insertTextFormat: InsertTextFormat.PlainText,
 			label: symbol.name,
 			tags: symbol.sassdoc?.deprecated
 				? [CompletionItemTag.Deprecated]
@@ -592,7 +603,9 @@ export class DoComplete extends LanguageFeature {
 	 *
 	 * @see https://github.com/wkillerud/some-sass/issues/49
 	 */
-	async doPlaceholderDeclarationCompletion(): Promise<CompletionItem[]> {
+	async doPlaceholderDeclarationCompletion(
+		context: CompletionContext,
+	): Promise<CompletionItem[]> {
 		const items: CompletionItem[] = [];
 		const documents = this.cache.documents();
 		for (const currentDocument of documents) {
@@ -606,13 +619,19 @@ export class DoComplete extends LanguageFeature {
 					for (const child of symbol.children) {
 						if (child.kind === SymbolKind.Class && child.name.startsWith("%")) {
 							const filterText = child.name.substring(1);
-							items.push({
+
+							const item: CompletionItem = {
+								textEdit: TextEdit.replace(
+									this.getReplaceRange(context),
+									child.name,
+								),
 								filterText,
-								insertText: filterText,
 								insertTextFormat: InsertTextFormat.PlainText,
 								kind: CompletionItemKind.Class,
 								label: child.name,
-							});
+							};
+
+							items.push(item);
 						}
 					}
 				}
@@ -720,12 +739,10 @@ export class DoComplete extends LanguageFeature {
 							if (!context.isVariableContext) break;
 
 							const vars = await this.doVariableCompletion(
-								document,
 								currentDocument,
-								context.currentWord,
+								context,
 								symbol,
 								isPrivate,
-								context.namespace,
 								prefix,
 							);
 							if (vars.length > 0) {
@@ -737,12 +754,10 @@ export class DoComplete extends LanguageFeature {
 							if (!context.isMixinContext) break;
 
 							const mixs = await this.doMixinCompletion(
-								document,
 								currentDocument,
-								context.currentWord,
+								context,
 								symbol,
 								isPrivate,
-								context.namespace,
 								prefix,
 							);
 							if (mixs.length > 0) {
@@ -754,12 +769,10 @@ export class DoComplete extends LanguageFeature {
 							if (!context.isFunctionContext) break;
 
 							const funcs = await this.doFunctionCompletion(
-								document,
 								currentDocument,
-								context.currentWord,
+								context,
 								symbol,
 								isPrivate,
-								context.namespace,
 								prefix,
 							);
 							if (funcs.length > 0) {
@@ -803,27 +816,23 @@ export class DoComplete extends LanguageFeature {
 	}
 
 	private async doVariableCompletion(
-		initialDocument: TextDocument,
-		currentDocument: TextDocument,
-		currentWord: string,
+		document: TextDocument,
+		context: CompletionContext,
 		symbol: SassDocumentSymbol,
 		isPrivate: boolean,
-		namespace = "",
 		prefix = "",
 	): Promise<CompletionItem[]> {
-		// Avoid ending up with namespace.prefix-$variable
-		const label = `$${prefix}${asDollarlessVariable(symbol.name)}`;
-		const rawValue = this.getVariableValue(currentDocument, symbol);
-		let value = await this.findValue(
-			currentDocument,
-			symbol.selectionRange.start,
-		);
+		const rawValue = this.getVariableValue(document, symbol);
+		let value = await this.findValue(document, symbol.selectionRange.start);
 		value = value || rawValue;
+
 		const color = value ? getColorValue(value) : null;
 		const completionKind = color
 			? CompletionItemKind.Color
 			: CompletionItemKind.Variable;
 
+		// Avoid ending up with namespace.prefix-$variable
+		const label = `$${prefix}${asDollarlessVariable(symbol.name)}`;
 		let documentation =
 			color ||
 			[
@@ -836,49 +845,9 @@ export class DoComplete extends LanguageFeature {
 		if (sassdoc) {
 			documentation += `\n____\n${sassdoc}`;
 		}
-		documentation += `\n____\nVariable declared in ${this.getFileName(currentDocument.uri)}`;
+		documentation += `\n____\nVariable declared in ${this.getFileName(document.uri)}`;
 
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
-
-		const dotExt = initialDocument.uri.slice(
-			Math.max(0, initialDocument.uri.lastIndexOf(".")),
-		);
-		const isEmbedded = !dotExt.match(reSassDotExt);
-		let insertText: string | undefined;
-		let filterText: string | undefined;
-
-		if (namespace && namespace !== "*") {
-			const noDot =
-				isEmbedded ||
-				dotExt === ".sass" ||
-				this.configuration.completionSettings?.afterModule === "";
-
-			const noDollar = isEmbedded;
-
-			insertText = currentWord.endsWith(".")
-				? `${noDot ? "" : "."}${label}`
-				: noDollar
-					? asDollarlessVariable(label)
-					: label;
-
-			if (
-				this.configuration.completionSettings?.afterModule &&
-				this.configuration.completionSettings.afterModule.startsWith("{module}")
-			) {
-				insertText = `${namespace}${insertText}`;
-			}
-
-			filterText = currentWord.endsWith(".") ? `${namespace}.${label}` : label;
-		} else if (
-			dotExt === ".vue" ||
-			dotExt === ".astro" ||
-			dotExt === ".sass" ||
-			this.configuration.completionSettings?.beforeVariable === ""
-		) {
-			// In these languages the $ does not get replaced by the suggestion,
-			// so exclude it from the insertText.
-			insertText = asDollarlessVariable(label);
-		}
 
 		const item: CompletionItem = {
 			commitCharacters: [";", ","],
@@ -889,14 +858,43 @@ export class DoComplete extends LanguageFeature {
 							kind: MarkupKind.Markdown,
 							value: documentation,
 						},
-			filterText,
 			kind: completionKind,
 			label,
-			insertText,
 			sortText,
 			tags: symbol.sassdoc?.deprecated ? [CompletionItemTag.Deprecated] : [],
 		};
+
+		let insertText: string = label;
+		if (context.namespace && context.namespace !== "*") {
+			insertText = `${context.namespace}.${label}`;
+			item.filterText = `${context.namespace}.${label}`;
+		}
+
+		const range = this.getReplaceRange(context);
+		item.textEdit = TextEdit.replace(range, insertText);
+
 		return [item];
+	}
+
+	getReplaceRange(context: CompletionContext): Range {
+		const { position, currentWord } = context;
+		const start = Position.create(
+			position.line,
+			position.character - currentWord.length,
+		);
+
+		const end = Position.create(
+			position.line,
+			start.character + currentWord.length,
+		);
+
+		const interpolation = currentWord.indexOf("#{");
+		if (interpolation !== -1) {
+			// don't replace the interpolation syntax (or what may be before it)
+			start.character = start.character + interpolation + 2;
+		}
+
+		return Range.create(start, end);
 	}
 
 	private isEmbedded(initialDocument: TextDocument) {
@@ -908,45 +906,25 @@ export class DoComplete extends LanguageFeature {
 	}
 
 	private async doMixinCompletion(
-		initialDocument: TextDocument,
-		currentDocument: TextDocument,
-		currentWord: string,
+		document: TextDocument,
+		context: CompletionContext,
 		symbol: SassDocumentSymbol,
 		isPrivate: boolean,
-		namespace = "",
 		prefix = "",
 	): Promise<CompletionItem[]> {
 		const items: CompletionItem[] = [];
+		const snippetSupport =
+			this.clientCapabilities.textDocument?.completion?.completionItem
+				?.snippetSupport;
 
-		const label = `${prefix}${symbol.name}`;
+		let label = `${prefix}${symbol.name}`;
+
+		const { namespace } = context;
 		const filterText = namespace
 			? namespace !== "*"
 				? `${namespace}.${prefix}${symbol.name}`
 				: `${prefix}${symbol.name}`
 			: symbol.name;
-
-		const isEmbedded = this.isEmbedded(initialDocument);
-
-		const noDot =
-			namespace === "*" ||
-			isEmbedded ||
-			initialDocument.languageId === "sass" ||
-			this.configuration.completionSettings?.afterModule === "";
-
-		let insertText = namespace
-			? noDot
-				? `${prefix}${symbol.name}`
-				: `.${prefix}${symbol.name}`
-			: symbol.name;
-
-		if (
-			namespace &&
-			namespace !== "*" &&
-			this.configuration.completionSettings?.afterModule &&
-			this.configuration.completionSettings.afterModule.startsWith("{module}")
-		) {
-			insertText = `${namespace}${insertText}`;
-		}
 
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
 
@@ -958,106 +936,110 @@ export class DoComplete extends LanguageFeature {
 		if (sassdoc) {
 			documentation.value += `\n____\n${sassdoc}`;
 		}
-		documentation.value += `\n____\nMixin declared in ${this.getFileName(currentDocument.uri)}`;
+		documentation.value += `\n____\nMixin declared in ${this.getFileName(document.uri)}`;
 
-		const getCompletionVariants = (
-			insertText: string,
-			detail?: string,
-		): CompletionItem[] => {
-			const variants: CompletionItem[] = [];
+		const base: CompletionItem = {
+			label,
+			documentation,
+			filterText,
+			sortText,
+			kind: CompletionItemKind.Method,
+			insertTextFormat: snippetSupport
+				? InsertTextFormat.Snippet
+				: InsertTextFormat.PlainText,
+			tags: symbol.sassdoc?.deprecated ? [CompletionItemTag.Deprecated] : [],
+		};
+
+		let insert = label;
+		if (context.namespace && context.namespace !== "*") {
+			insert = `${context.namespace}.${label}`;
+			base.filterText = `${context.namespace}.${label}`;
+		}
+
+		const makeCompletionVariants = (insert: string, detail?: string) => {
 			// Not all mixins have @content, but when they do, be smart about adding brackets
 			// and move the cursor to be ready to add said contents.
 			// Include as separate suggestion since content may not always be needed or wanted.
-
 			if (
 				this.configuration.completionSettings?.suggestionStyle !== "bracket"
 			) {
-				variants.push({
-					documentation,
-					filterText,
-					kind: CompletionItemKind.Method,
-					label,
+				items.push({
+					...base,
 					labelDetails: detail ? { detail: `(${detail})` } : undefined,
-					insertText,
-					insertTextFormat: InsertTextFormat.Snippet,
-					sortText,
-					tags: symbol.sassdoc?.deprecated
-						? [CompletionItemTag.Deprecated]
-						: [],
+					textEdit: TextEdit.replace(this.getReplaceRange(context), insert),
 				});
 			}
 
 			if (
+				snippetSupport &&
 				this.configuration.completionSettings?.suggestionStyle !==
 					"nobracket" &&
-				currentDocument.languageId === "scss"
+				document.languageId === "scss"
 			) {
-				variants.push({
-					documentation,
-					filterText,
-					kind: CompletionItemKind.Method,
-					label,
+				// TODO: test if this works correctly with multiline, I think so from the spec text
+				const insertSnippet = `${insert} {\n\t$0\n}`;
+				items.push({
+					...base,
 					labelDetails: { detail: detail ? `(${detail}) { }` : " { }" },
-					insertText: (insertText += " {\n\t$0\n}"),
-					insertTextFormat: InsertTextFormat.Snippet,
-					sortText,
-					tags: symbol.sassdoc?.deprecated
-						? [CompletionItemTag.Deprecated]
-						: [],
+					textEdit: TextEdit.replace(
+						this.getReplaceRange(context),
+						insertSnippet,
+					),
 				});
 			}
-
-			return variants;
 		};
 
 		// In the case of no required parameters, skip details.
-		// If there are required parameters, add a suggestion with only them.
-		// If there are optional parameters, add a suggestion with all parameters.
-		if (symbol.detail) {
+		if (symbol.detail && snippetSupport) {
 			const parameters = getParametersFromDetail(symbol.detail);
 			const requiredParameters = parameters.filter((p) => !p.defaultValue);
+
+			// If there are required parameters, add a suggestion with only them.
 			if (requiredParameters.length > 0) {
 				const parametersSnippet = requiredParameters
 					.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
 					.join(", ");
-				const insert = insertText + `(${parametersSnippet})`;
-
 				const detail = requiredParameters
 					.map((p) => mapParameterSignature(p))
 					.join(", ");
 
-				items.push(...getCompletionVariants(insert, detail));
+				makeCompletionVariants(`${insert}(${parametersSnippet})`, detail);
 			}
+
+			// If there are optional parameters, add a suggestion with all parameters.
 			if (requiredParameters.length !== parameters.length) {
 				const parametersSnippet = parameters
 					.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
 					.join(", ");
-				const insert = insertText + `(${parametersSnippet})`;
 
 				const detail = parameters
 					.map((p) => mapParameterSignature(p))
 					.join(", ");
 
-				items.push(...getCompletionVariants(insert, detail));
+				makeCompletionVariants(`${insert}(${parametersSnippet})`, detail);
 			}
 		} else {
-			items.push(...getCompletionVariants(insertText));
+			makeCompletionVariants(insert);
 		}
+
 		return items;
 	}
 
 	private async doFunctionCompletion(
-		initialDocument: TextDocument,
-		currentDocument: TextDocument,
-		currentWord: string,
+		document: TextDocument,
+		context: CompletionContext,
 		symbol: SassDocumentSymbol,
 		isPrivate: boolean,
-		namespace = "",
 		prefix = "",
 	): Promise<CompletionItem[]> {
 		const items: CompletionItem[] = [];
+		const snippetSupport =
+			this.clientCapabilities.textDocument?.completion?.completionItem
+				?.snippetSupport;
 
 		const label = `${prefix}${symbol.name}`;
+
+		const { namespace } = context;
 		let filterText = symbol.name;
 		if (namespace) {
 			if (namespace === "*") {
@@ -1065,29 +1047,6 @@ export class DoComplete extends LanguageFeature {
 			} else {
 				filterText = `${namespace}.${prefix}${symbol.name}`;
 			}
-		}
-
-		const isEmbedded = this.isEmbedded(initialDocument);
-
-		const noDot =
-			namespace === "*" ||
-			isEmbedded ||
-			initialDocument.languageId === "sass" ||
-			this.configuration.completionSettings?.afterModule === "";
-
-		let insertText = namespace
-			? noDot
-				? `${prefix}${symbol.name}`
-				: `.${prefix}${symbol.name}`
-			: symbol.name;
-
-		if (
-			namespace &&
-			namespace !== "*" &&
-			this.configuration.completionSettings?.afterModule &&
-			this.configuration.completionSettings.afterModule.startsWith("{module}")
-		) {
-			insertText = `${namespace}${insertText}`;
 		}
 
 		const sortText = isPrivate ? label.replace(/^$[_]/, "") : undefined;
@@ -1100,7 +1059,7 @@ export class DoComplete extends LanguageFeature {
 		if (sassdoc) {
 			documentation.value += `\n____\n${sassdoc}`;
 		}
-		documentation.value += `\n____\nFunction declared in ${this.getFileName(currentDocument.uri)}`;
+		documentation.value += `\n____\nFunction declared in ${this.getFileName(document.uri)}`;
 
 		// If there are required parameters, add a suggestion with only them.
 		// If there are optional parameters, add a suggestion with all parameters.
@@ -1113,37 +1072,55 @@ export class DoComplete extends LanguageFeature {
 			.map((p) => mapParameterSignature(p))
 			.join(", ");
 
-		const item: CompletionItem = {
+		const base: CompletionItem = {
 			documentation,
 			filterText,
-			kind: CompletionItemKind.Function,
 			label,
 			labelDetails: { detail: `(${detail})` },
-			insertText: `${insertText}(${parametersSnippet})`,
-			insertTextFormat: InsertTextFormat.Snippet,
 			sortText,
+			insertTextFormat: InsertTextFormat.Snippet,
+			kind: CompletionItemKind.Function,
 			tags: symbol.sassdoc?.deprecated ? [CompletionItemTag.Deprecated] : [],
 		};
-		items.push(item);
 
-		if (requiredParameters.length !== parameters.length) {
-			const parametersSnippet = parameters
-				.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
-				.join(", ");
-			const detail = parameters.map((p) => mapParameterSignature(p)).join(", ");
+		let insert = label;
+		if (context.namespace && context.namespace !== "*") {
+			insert = `${context.namespace}.${label}`;
+			base.filterText = `${context.namespace}.${label}`;
+		}
 
+		if (!snippetSupport) {
+			const insertText = `${insert}()`;
 			const item: CompletionItem = {
-				documentation,
-				filterText,
-				kind: CompletionItemKind.Function,
-				label,
-				labelDetails: { detail: `(${detail})` },
-				insertText: `${insertText}(${parametersSnippet})`,
-				insertTextFormat: InsertTextFormat.Snippet,
-				sortText,
-				tags: symbol.sassdoc?.deprecated ? [CompletionItemTag.Deprecated] : [],
+				...base,
+				textEdit: TextEdit.replace(this.getReplaceRange(context), insertText),
+				insertTextFormat: InsertTextFormat.PlainText,
 			};
 			items.push(item);
+		} else {
+			const insertText = `${insert}(${parametersSnippet})`;
+			const item: CompletionItem = {
+				...base,
+				textEdit: TextEdit.replace(this.getReplaceRange(context), insertText),
+			};
+			items.push(item);
+
+			if (requiredParameters.length !== parameters.length) {
+				const parametersSnippet = parameters
+					.map((p, i) => mapParameterSnippet(p, i, symbol.sassdoc))
+					.join(", ");
+				const detail = parameters
+					.map((p) => mapParameterSignature(p))
+					.join(", ");
+
+				const insertText = `${insert}(${parametersSnippet})`;
+				const item: CompletionItem = {
+					...base,
+					labelDetails: { detail: `(${detail})` },
+					textEdit: TextEdit.replace(this.getReplaceRange(context), insertText),
+				};
+				items.push(item);
+			}
 		}
 
 		return items;
@@ -1156,6 +1133,10 @@ export class DoComplete extends LanguageFeature {
 		prefix: string = "",
 	): CompletionItem[] {
 		const items: CompletionItem[] = [];
+		const snippetSupport =
+			this.clientCapabilities.textDocument?.completion?.completionItem
+				?.snippetSupport;
+
 		for (const [name, docs] of Object.entries(moduleDocs.exports)) {
 			const { description, signature, parameterSnippet, returns } = docs;
 			const kind = signature
@@ -1173,39 +1154,16 @@ export class DoComplete extends LanguageFeature {
 			// Client needs the namespace as part of the text that is matched,
 			const filterText = `${context.namespace}.${label}`;
 
-			// Inserted text needs to include the `.` which will otherwise
-			// be replaced (except when we're embedded in Vue, Svelte or Astro).
-			// Example result: .floor(${1:number})
-			const isEmbedded = this.isEmbedded(document);
-
-			const noDot =
-				isEmbedded ||
-				document.languageId === "sass" ||
-				this.configuration.completionSettings?.afterModule === "";
-
-			let insertText = context.currentWord.includes(".")
-				? `${noDot ? "" : "."}${label}${
-						signature ? `(${parameterSnippet})` : ""
-					}`
-				: label;
-
-			if (
-				this.configuration.completionSettings?.afterModule &&
-				this.configuration.completionSettings.afterModule.startsWith("{module}")
-			) {
-				insertText = `${context.namespace}${insertText}`;
-			}
-
-			items.push({
+			const base: CompletionItem = {
 				documentation: {
 					kind: MarkupKind.Markdown,
 					value: `${description}\n\n[Sass documentation](${moduleDocs.reference}#${name})`,
 				},
 				filterText,
-				insertText,
-				insertTextFormat: parameterSnippet
-					? InsertTextFormat.Snippet
-					: InsertTextFormat.PlainText,
+				insertTextFormat:
+					parameterSnippet && snippetSupport
+						? InsertTextFormat.Snippet
+						: InsertTextFormat.PlainText,
 				kind: signature
 					? CompletionItemKind.Function
 					: CompletionItemKind.Variable,
@@ -1214,6 +1172,14 @@ export class DoComplete extends LanguageFeature {
 					detail:
 						signature && returns ? `${signature} => ${returns}` : signature,
 				},
+			};
+
+			const insert = `${context.namespace}.${label}${
+				signature ? `(${snippetSupport ? parameterSnippet : ""})` : ""
+			}`;
+			items.push({
+				...base,
+				textEdit: TextEdit.replace(this.getReplaceRange(context), insert),
 			});
 		}
 

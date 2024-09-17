@@ -66,9 +66,9 @@ export class DoDiagnostics extends LanguageFeature {
 
 	private async doUpstreamDiagnostics(document: TextDocument) {
 		if (
-			document.languageId === "vue" ||
-			document.languageId === "astro" ||
-			document.languageId === "svelte"
+			document.uri.endsWith(".vue") ||
+			document.uri.endsWith(".astro") ||
+			document.uri.endsWith(".svelte")
 		) {
 			return [];
 		}

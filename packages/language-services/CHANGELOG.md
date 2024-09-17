@@ -1,3 +1,12 @@
+## 1.6.1 (2024-09-17)
+
+
+### 🩹 Fixes
+
+- use textEdit for completion items
+
+- skip upstream diagnostics for svelte
+
 ## 1.6.0 (2024-09-12)
 
 

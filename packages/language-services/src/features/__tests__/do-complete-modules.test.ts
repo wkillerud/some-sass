@@ -41,12 +41,24 @@ test("suggests built-in sass modules", async () => {
 					"The value of the mathematical constant **π**.\n\n[Sass documentation](https://sass-lang.com/documentation/modules/math#$pi)",
 			},
 			filterText: "math.$pi",
-			insertText: ".$pi",
 			insertTextFormat: InsertTextFormat.PlainText,
 			kind: CompletionItemKind.Variable,
 			label: "$pi",
 			labelDetails: {
 				detail: undefined,
+			},
+			textEdit: {
+				newText: "math.$pi",
+				range: {
+					end: {
+						character: 11,
+						line: 1,
+					},
+					start: {
+						character: 6,
+						line: 1,
+					},
+				},
 			},
 		},
 	);
@@ -82,12 +94,24 @@ test("suggest sass built-ins that are forwarded by the stylesheet that is @used"
 					"The value of the mathematical constant **π**.\n\n[Sass documentation](https://sass-lang.com/documentation/modules/math#$pi)",
 			},
 			filterText: "test.$pi",
-			insertText: ".$pi",
 			insertTextFormat: InsertTextFormat.PlainText,
 			kind: CompletionItemKind.Variable,
 			label: "$pi",
 			labelDetails: {
 				detail: undefined,
+			},
+			textEdit: {
+				newText: "test.$pi",
+				range: {
+					end: {
+						character: 11,
+						line: 1,
+					},
+					start: {
+						character: 6,
+						line: 1,
+					},
+				},
 			},
 		},
 	);
@@ -102,7 +126,7 @@ test("suggest sass built-ins that are forwarded with a prefix", async () => {
 	);
 	const two = fileSystemProvider.createDocument([
 		'@use "./test";',
-		"$var: test.",
+		"$var: test.;",
 	]);
 
 	// emulate scanner of language service which adds workspace documents to the cache
@@ -126,12 +150,24 @@ test("suggest sass built-ins that are forwarded with a prefix", async () => {
 					"The value of the mathematical constant **π**.\n\n[Sass documentation](https://sass-lang.com/documentation/modules/math#$pi)",
 			},
 			filterText: "test.$math-pi",
-			insertText: ".$math-pi",
 			insertTextFormat: InsertTextFormat.PlainText,
 			kind: CompletionItemKind.Variable,
 			label: "$math-pi",
 			labelDetails: {
 				detail: undefined,
+			},
+			textEdit: {
+				newText: "test.$math-pi",
+				range: {
+					end: {
+						character: 11,
+						line: 1,
+					},
+					start: {
+						character: 6,
+						line: 1,
+					},
+				},
 			},
 		},
 	);
@@ -165,11 +201,23 @@ test("should suggest symbol from a different document via @use", async () => {
 			commitCharacters: [";", ","],
 			documentation: "limegreen\n____\nVariable declared in one.scss",
 			filterText: "one.$primary",
-			insertText: ".$primary",
 			kind: CompletionItemKind.Color,
 			label: "$primary",
 			sortText: undefined,
 			tags: [],
+			textEdit: {
+				newText: "one.$primary",
+				range: {
+					end: {
+						character: 16,
+						line: 1,
+					},
+					start: {
+						character: 12,
+						line: 1,
+					},
+				},
+			},
 		},
 	);
 });
@@ -208,11 +256,23 @@ test("should suggest symbols from the document we use when it also forwards anot
 			commitCharacters: [";", ","],
 			documentation: "red\n____\nVariable declared in two.scss",
 			filterText: "two.$secondary",
-			insertText: ".$secondary",
 			kind: CompletionItemKind.Color,
 			label: "$secondary",
 			sortText: undefined,
 			tags: [],
+			textEdit: {
+				newText: "two.$secondary",
+				range: {
+					end: {
+						character: 16,
+						line: 1,
+					},
+					start: {
+						character: 12,
+						line: 1,
+					},
+				},
+			},
 		},
 	);
 	assert.deepStrictEqual(
@@ -221,11 +281,23 @@ test("should suggest symbols from the document we use when it also forwards anot
 			commitCharacters: [";", ","],
 			documentation: "limegreen\n____\nVariable declared in one.scss",
 			filterText: "two.$primary",
-			insertText: ".$primary",
 			kind: CompletionItemKind.Color,
 			label: "$primary",
 			sortText: undefined,
 			tags: [],
+			textEdit: {
+				newText: "two.$primary",
+				range: {
+					end: {
+						character: 16,
+						line: 1,
+					},
+					start: {
+						character: 12,
+						line: 1,
+					},
+				},
+			},
 		},
 	);
 });
@@ -459,7 +531,7 @@ test("should suggest prefixed symbol from a different document via @use and @for
 		uri: "two.scss",
 	});
 	const three = fileSystemProvider.createDocument(
-		['@use "./two";', ".a { color: two."],
+		['@use "./two";', ".a { color: two.; }"],
 		{
 			uri: "three.scss",
 		},
@@ -482,11 +554,23 @@ test("should suggest prefixed symbol from a different document via @use and @for
 			commitCharacters: [";", ","],
 			documentation: "limegreen\n____\nVariable declared in one.scss",
 			filterText: "two.$foo-primary",
-			insertText: ".$foo-primary",
 			kind: CompletionItemKind.Color,
 			label: "$foo-primary",
 			sortText: undefined,
 			tags: [],
+			textEdit: {
+				newText: "two.$foo-primary",
+				range: {
+					end: {
+						character: 16,
+						line: 1,
+					},
+					start: {
+						character: 12,
+						line: 1,
+					},
+				},
+			},
 		},
 	);
 });
@@ -634,13 +718,25 @@ test("should suggest mixin with no parameter", async () => {
 					"```scss\n@mixin primary()\n```\n____\nMixin declared in one.scss",
 			},
 			filterText: "one.primary",
-			insertText: ".primary",
 			insertTextFormat: InsertTextFormat.Snippet,
 			kind: CompletionItemKind.Method,
 			label: "primary",
 			labelDetails: undefined,
 			sortText: undefined,
 			tags: [],
+			textEdit: {
+				newText: "one.primary",
+				range: {
+					end: {
+						character: 18,
+						line: 1,
+					},
+					start: {
+						character: 14,
+						line: 1,
+					},
+				},
+			},
 		},
 	);
 });
@@ -649,6 +745,7 @@ test("should suggest mixin with optional parameter", async () => {
 	ls.configure({
 		completionSettings: {
 			suggestFromUseOnly: true,
+			suggestionStyle: "nobracket",
 		},
 	});
 
@@ -676,28 +773,25 @@ test("should suggest mixin with optional parameter", async () => {
 						"```scss\n@mixin primary($color: red)\n```\n____\nMixin declared in one.scss",
 				},
 				filterText: "one.primary",
-				insertText: ".primary(${1:color})",
 				insertTextFormat: InsertTextFormat.Snippet,
 				kind: CompletionItemKind.Method,
 				label: "primary",
 				labelDetails: { detail: "($color: red)" },
 				sortText: undefined,
 				tags: [],
-			},
-			{
-				documentation: {
-					kind: "markdown",
-					value:
-						"```scss\n@mixin primary($color: red)\n```\n____\nMixin declared in one.scss",
+				textEdit: {
+					newText: "one.primary(${1:color})",
+					range: {
+						end: {
+							character: 18,
+							line: 1,
+						},
+						start: {
+							character: 14,
+							line: 1,
+						},
+					},
 				},
-				filterText: "one.primary",
-				insertText: ".primary(${1:color}) {\n\t$0\n}",
-				insertTextFormat: InsertTextFormat.Snippet,
-				kind: CompletionItemKind.Method,
-				label: "primary",
-				labelDetails: { detail: "($color: red) { }" },
-				sortText: undefined,
-				tags: [],
 			},
 		],
 	);
@@ -707,6 +801,7 @@ test("should suggest mixin with required parameter", async () => {
 	ls.configure({
 		completionSettings: {
 			suggestFromUseOnly: true,
+			suggestionStyle: "bracket",
 		},
 	});
 
@@ -734,28 +829,25 @@ test("should suggest mixin with required parameter", async () => {
 						"```scss\n@mixin primary($color)\n```\n____\nMixin declared in one.scss",
 				},
 				filterText: "one.primary",
-				insertText: ".primary(${1:color})",
-				insertTextFormat: InsertTextFormat.Snippet,
-				kind: CompletionItemKind.Method,
-				label: "primary",
-				labelDetails: { detail: "($color)" },
-				sortText: undefined,
-				tags: [],
-			},
-			{
-				documentation: {
-					kind: "markdown",
-					value:
-						"```scss\n@mixin primary($color)\n```\n____\nMixin declared in one.scss",
-				},
-				filterText: "one.primary",
-				insertText: ".primary(${1:color}) {\n\t$0\n}",
 				insertTextFormat: InsertTextFormat.Snippet,
 				kind: CompletionItemKind.Method,
 				label: "primary",
 				labelDetails: { detail: "($color) { }" },
 				sortText: undefined,
 				tags: [],
+				textEdit: {
+					newText: "one.primary(${1:color}) {\n\t$0\n}",
+					range: {
+						end: {
+							character: 18,
+							line: 1,
+						},
+						start: {
+							character: 14,
+							line: 1,
+						},
+					},
+				},
 			},
 		],
 	);
@@ -765,6 +857,7 @@ test("given both required and optional parameters should suggest two variants of
 	ls.configure({
 		completionSettings: {
 			suggestFromUseOnly: true,
+			suggestionStyle: "nobracket",
 		},
 	});
 
@@ -776,7 +869,7 @@ test("given both required and optional parameters should suggest two variants of
 	);
 	const two = fileSystemProvider.createDocument([
 		'@use "./one";',
-		".a { @include one.",
+		".a { @include one.; }",
 	]);
 
 	// emulate scanner of language service which adds workspace documents to the cache
@@ -794,13 +887,25 @@ test("given both required and optional parameters should suggest two variants of
 						"```scss\n@mixin primary($background, $color: red)\n```\n____\nMixin declared in one.scss",
 				},
 				filterText: "one.primary",
-				insertText: ".primary(${1:background})",
 				insertTextFormat: InsertTextFormat.Snippet,
 				kind: CompletionItemKind.Method,
 				label: "primary",
 				labelDetails: { detail: "($background)" },
 				sortText: undefined,
 				tags: [],
+				textEdit: {
+					newText: "one.primary(${1:background})",
+					range: {
+						end: {
+							character: 18,
+							line: 1,
+						},
+						start: {
+							character: 14,
+							line: 1,
+						},
+					},
+				},
 			},
 			{
 				documentation: {
@@ -809,43 +914,25 @@ test("given both required and optional parameters should suggest two variants of
 						"```scss\n@mixin primary($background, $color: red)\n```\n____\nMixin declared in one.scss",
 				},
 				filterText: "one.primary",
-				insertText: ".primary(${1:background}) {\n\t$0\n}",
-				insertTextFormat: InsertTextFormat.Snippet,
-				kind: CompletionItemKind.Method,
-				label: "primary",
-				labelDetails: { detail: "($background) { }" },
-				sortText: undefined,
-				tags: [],
-			},
-			{
-				documentation: {
-					kind: "markdown",
-					value:
-						"```scss\n@mixin primary($background, $color: red)\n```\n____\nMixin declared in one.scss",
-				},
-				filterText: "one.primary",
-				insertText: ".primary(${1:background}, ${2:color})",
 				insertTextFormat: InsertTextFormat.Snippet,
 				kind: CompletionItemKind.Method,
 				label: "primary",
 				labelDetails: { detail: "($background, $color: red)" },
 				sortText: undefined,
 				tags: [],
-			},
-			{
-				documentation: {
-					kind: "markdown",
-					value:
-						"```scss\n@mixin primary($background, $color: red)\n```\n____\nMixin declared in one.scss",
+				textEdit: {
+					newText: "one.primary(${1:background}, ${2:color})",
+					range: {
+						end: {
+							character: 18,
+							line: 1,
+						},
+						start: {
+							character: 14,
+							line: 1,
+						},
+					},
 				},
-				filterText: "one.primary",
-				insertText: ".primary(${1:background}, ${2:color}) {\n\t$0\n}",
-				insertTextFormat: InsertTextFormat.Snippet,
-				kind: CompletionItemKind.Method,
-				label: "primary",
-				labelDetails: { detail: "($background, $color: red) { }" },
-				sortText: undefined,
-				tags: [],
 			},
 		],
 	);
@@ -881,13 +968,25 @@ test("should suggest function with no parameter", async () => {
 					"```scss\n@function primary()\n```\n____\nFunction declared in one.scss",
 			},
 			filterText: "one.primary",
-			insertText: ".primary()",
 			insertTextFormat: InsertTextFormat.Snippet,
 			kind: CompletionItemKind.Function,
 			label: "primary",
 			labelDetails: { detail: "()" },
 			sortText: undefined,
 			tags: [],
+			textEdit: {
+				newText: "one.primary()",
+				range: {
+					end: {
+						character: 18,
+						line: 1,
+					},
+					start: {
+						character: 14,
+						line: 1,
+					},
+				},
+			},
 		},
 	);
 });
@@ -922,13 +1021,25 @@ test("should suggest function with optional parameter", async () => {
 					"```scss\n@function primary($color: red)\n```\n____\nFunction declared in one.scss",
 			},
 			filterText: "one.primary",
-			insertText: ".primary()",
 			insertTextFormat: InsertTextFormat.Snippet,
 			kind: CompletionItemKind.Function,
 			label: "primary",
 			labelDetails: { detail: "()" },
 			sortText: undefined,
 			tags: [],
+			textEdit: {
+				newText: "one.primary()",
+				range: {
+					end: {
+						character: 18,
+						line: 1,
+					},
+					start: {
+						character: 14,
+						line: 1,
+					},
+				},
+			},
 		},
 	);
 });
@@ -963,13 +1074,25 @@ test("should suggest function with required parameter", async () => {
 					"```scss\n@function primary($color)\n```\n____\nFunction declared in one.scss",
 			},
 			filterText: "one.primary",
-			insertText: ".primary(${1:color})",
 			insertTextFormat: InsertTextFormat.Snippet,
 			kind: CompletionItemKind.Function,
 			label: "primary",
 			labelDetails: { detail: "($color)" },
 			sortText: undefined,
 			tags: [],
+			textEdit: {
+				newText: "one.primary(${1:color})",
+				range: {
+					end: {
+						character: 18,
+						line: 1,
+					},
+					start: {
+						character: 14,
+						line: 1,
+					},
+				},
+			},
 		},
 	);
 });
@@ -1005,13 +1128,25 @@ test("given both required and optional parameters should suggest two variants of
 						"```scss\n@function primary($a, $b: 1)\n```\n____\nFunction declared in one.scss",
 				},
 				filterText: "one.primary",
-				insertText: ".primary(${1:a})",
 				insertTextFormat: InsertTextFormat.Snippet,
 				kind: CompletionItemKind.Function,
 				label: "primary",
 				labelDetails: { detail: "($a)" },
 				sortText: undefined,
 				tags: [],
+				textEdit: {
+					newText: "one.primary(${1:a})",
+					range: {
+						end: {
+							character: 18,
+							line: 1,
+						},
+						start: {
+							character: 14,
+							line: 1,
+						},
+					},
+				},
 			},
 			{
 				documentation: {
@@ -1020,13 +1155,25 @@ test("given both required and optional parameters should suggest two variants of
 						"```scss\n@function primary($a, $b: 1)\n```\n____\nFunction declared in one.scss",
 				},
 				filterText: "one.primary",
-				insertText: ".primary(${1:a}, ${2:b})",
 				insertTextFormat: InsertTextFormat.Snippet,
 				kind: CompletionItemKind.Function,
 				label: "primary",
 				labelDetails: { detail: "($a, $b: 1)" },
 				sortText: undefined,
 				tags: [],
+				textEdit: {
+					newText: "one.primary(${1:a}, ${2:b})",
+					range: {
+						end: {
+							character: 18,
+							line: 1,
+						},
+						start: {
+							character: 14,
+							line: 1,
+						},
+					},
+				},
 			},
 		],
 	);
@@ -1064,6 +1211,19 @@ test("should suggest all symbols as legacy @import may be in use", async () => {
 			label: "$primary",
 			sortText: undefined,
 			tags: [],
+			textEdit: {
+				newText: "$primary",
+				range: {
+					end: {
+						character: 12,
+						line: 0,
+					},
+					start: {
+						character: 12,
+						line: 0,
+					},
+				},
+			},
 		},
 	);
 });
@@ -1108,7 +1268,7 @@ test("should suggest symbol from a different document via @use with wildcard ali
 		},
 	);
 	const two = fileSystemProvider.createDocument(
-		['@use "./one" as *;', ".a { color: "],
+		['@use "./one" as *;', ".a { color: }"],
 		{
 			uri: "two.scss",
 		},
@@ -1129,6 +1289,19 @@ test("should suggest symbol from a different document via @use with wildcard ali
 			label: "$primary",
 			sortText: undefined,
 			tags: [],
+			textEdit: {
+				newText: "$primary",
+				range: {
+					end: {
+						character: 12,
+						line: 1,
+					},
+					start: {
+						character: 12,
+						line: 1,
+					},
+				},
+			},
 		},
 	);
 	assert.deepStrictEqual(
@@ -1140,7 +1313,6 @@ test("should suggest symbol from a different document via @use with wildcard ali
 					"```scss\n@function one()\n```\n____\nFunction declared in one.scss",
 			},
 			filterText: "one",
-			insertText: "one()",
 			insertTextFormat: InsertTextFormat.Snippet,
 			kind: CompletionItemKind.Function,
 			label: "one",
@@ -1149,6 +1321,19 @@ test("should suggest symbol from a different document via @use with wildcard ali
 			},
 			sortText: undefined,
 			tags: [],
+			textEdit: {
+				newText: "one()",
+				range: {
+					end: {
+						character: 12,
+						line: 1,
+					},
+					start: {
+						character: 12,
+						line: 1,
+					},
+				},
+			},
 		},
 	);
 });

@@ -96,7 +96,7 @@ test("should suggest symbol from a different document via @use", async () => {
 			'<style lang="scss">',
 			'@use "./one" as ns;',
 			".foo {",
-			"	color: ns.",
+			"	color: ns.;",
 			"}",
 			"</style>",
 		],
@@ -124,11 +124,23 @@ test("should suggest symbol from a different document via @use", async () => {
 			commitCharacters: [";", ","],
 			documentation: "limegreen\n____\nVariable declared in one.scss",
 			filterText: "ns.$primary",
-			insertText: "$primary",
 			kind: CompletionItemKind.Color,
 			label: "$primary",
 			sortText: undefined,
 			tags: [],
+			textEdit: {
+				newText: "ns.$primary",
+				range: {
+					end: {
+						character: 11,
+						line: 9,
+					},
+					start: {
+						character: 8,
+						line: 9,
+					},
+				},
+			},
 		},
 	);
 });

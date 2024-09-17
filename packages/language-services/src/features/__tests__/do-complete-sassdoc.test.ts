@@ -285,7 +285,7 @@ ____
 Function declared in timing.scss`,
 				},
 				filterText: "t.timing",
-				insertText: '.timing(${1|"sonic","link","homer","snorlax"|})',
+
 				insertTextFormat: 2,
 				kind: 3,
 				label: "timing",
@@ -294,6 +294,19 @@ Function declared in timing.scss`,
 				},
 				sortText: undefined,
 				tags: [],
+				textEdit: {
+					newText: 't.timing(${1|"sonic","link","homer","snorlax"|})',
+					range: {
+						end: {
+							character: 28,
+							line: 2,
+						},
+						start: {
+							character: 22,
+							line: 2,
+						},
+					},
+				},
 			},
 		],
 	});

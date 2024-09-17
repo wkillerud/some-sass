@@ -19,12 +19,12 @@ test("for namespaces including prefixes", async () => {
 	let expectedCompletions = [
 		{
 			label: "$var-var-variable",
-			insertText: '".$var-var-variable"',
+			insertText: '"ns.$var-var-variable"',
 			filterText: '"ns.$var-var-variable"',
 		},
 		{
 			label: "fun-fun-function",
-			insertText: '".fun-fun-function()"',
+			insertText: '"ns.fun-fun-function()"',
 		},
 	];
 
@@ -33,7 +33,7 @@ test("for namespaces including prefixes", async () => {
 	expectedCompletions = [
 		{
 			label: "mix-mix-mixin",
-			insertText: '".mix-mix-mixin"',
+			insertText: '"ns.mix-mix-mixin"',
 		},
 	];
 
@@ -44,12 +44,12 @@ test("inside string interpolation", async () => {
 	const expectedCompletions = [
 		{
 			label: "$var-var-variable",
-			insertText: '".$var-var-variable"',
+			insertText: '"ns.$var-var-variable"',
 			filterText: '"ns.$var-var-variable"',
 		},
 		{
 			label: "fun-fun-function",
-			insertText: '".fun-fun-function()"',
+			insertText: '"ns.fun-fun-function()"',
 		},
 	];
 
@@ -60,7 +60,7 @@ test("for Sass built-ins", async () => {
 	const expectedCompletions = [
 		{
 			label: "floor",
-			insertText: '".floor(${1:number})"',
+			insertText: '"math.floor(${1:number})"',
 			filterText: '"math.floor"',
 		},
 	];
@@ -72,12 +72,12 @@ test("inside string interpolation with preceeding non-space character", async ()
 	const expectedCompletions = [
 		{
 			label: "$var-var-variable",
-			insertText: '".$var-var-variable"',
+			insertText: '"ns.$var-var-variable"',
 			filterText: '"ns.$var-var-variable"',
 		},
 		{
 			label: "fun-fun-function",
-			insertText: '".fun-fun-function()"',
+			insertText: '"ns.fun-fun-function()"',
 		},
 	];
 
@@ -88,12 +88,12 @@ test("as part of return statement", async () => {
 	const expectedCompletions = [
 		{
 			label: "$var-var-variable",
-			insertText: '".$var-var-variable"',
+			insertText: '"ns.$var-var-variable"',
 			filterText: '"ns.$var-var-variable"',
 		},
 		{
 			label: "fun-fun-function",
-			insertText: '".fun-fun-function()"',
+			insertText: '"ns.fun-fun-function()"',
 		},
 	];
 

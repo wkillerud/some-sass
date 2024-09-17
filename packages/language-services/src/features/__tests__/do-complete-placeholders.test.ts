@@ -29,9 +29,21 @@ test("when declaring a placeholder selector, suggest placeholders that have an @
 	const { items } = await ls.doComplete(two, Position.create(0, 1));
 	assert.deepStrictEqual(items[0], {
 		filterText: "main",
-		insertText: "main",
 		insertTextFormat: InsertTextFormat.PlainText,
 		kind: CompletionItemKind.Class,
 		label: "%main",
+		textEdit: {
+			newText: "%main",
+			range: {
+				end: {
+					character: 1,
+					line: 0,
+				},
+				start: {
+					character: 0,
+					line: 0,
+				},
+			},
+		},
 	});
 });

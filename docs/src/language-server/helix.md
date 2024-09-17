@@ -8,7 +8,7 @@ You can configure new language servers in [`.config/helix/languages.toml`](https
 [language-server.some-sass-language-server]
 command = "some-sass-language-server"
 args = ["--stdio"]
-config = { somesass = { completion = { afterModule = "", beforeVariable = "" } } }
+config = { somesass = { loadPaths = [] } }
 
 [[language]]
 name = "scss"

@@ -35,9 +35,7 @@ some-sass-language-server --stdio
 
 ### Workspace configuration
 
-The language server requests [settings](../user-guide/settings.md) via the [`workspace/configuration` message](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_configuration), on the `somesass` key. All fields are optional.
-
-See the [documentation for the available settings](https://wkillerud.github.io/some-sass/user-guide/settings.html).
+See [how to configure a client](https://wkillerud.github.io/some-sass/language-server/configure-a-client.html) and the [documentation for the available settings](https://wkillerud.github.io/some-sass/user-guide/settings.html).
 
 ## Capabilities
 

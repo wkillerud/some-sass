@@ -225,33 +225,6 @@ export interface LanguageServiceConfiguration {
 		 */
 		triggerPropertyValueCompletion?: boolean;
 		includePrefixDot?: boolean;
-		/**
-		 * If you end up with an extra `.` after accepting a suggestion, set this to the empty string.
-		 * If your module disappears, set it to "{module}" or "{module}." depending on your situation.
-		 *
-		 * @example
-		 * ```scss
-		 *  .foo {
-		 *    // set this setting to the empty string "" to fix this bug,
-		 *    // which varies depending on your editor's grammar for Sass.
-		 *    color: module..$variable;
-		 *  }
-		 * ```
-		 */
-		afterModule?: string;
-		/**
-		 * If you end up with an extra `&` after accepting a suggestion, set this to the empty string.
-		 *
-		 * @example
-		 * ```scss
-		 *  .foo {
-		 *    // set this setting to the empty string "" to fix this bug,
-		 *    // which varies depending on your editor's grammar for Sass.
-		 *    color: $$variable;
-		 *  }
-		 * ```
-		 */
-		beforeVariable?: string;
 	};
 	editorSettings?: EditorSettings;
 	workspaceRoot?: URI;

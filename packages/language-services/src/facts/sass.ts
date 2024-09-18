@@ -235,7 +235,7 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 					description:
 						"Returns a visually similar color to `$color` in the gamut of `$space`, which defaults to `$color`'s space. The `$space` must be an unquoted string. `$method` is mandatory until a default browser behavior is established.",
 					signature: "($color, $space: null, $method: local-minde | clip)",
-					parameterSnippet: "${1:color}, $method: ${2:method}",
+					parameterSnippet: "${1:color}, \\$method: ${2|local-minde,clip|}",
 					returns: "color",
 				},
 				"to-space": {

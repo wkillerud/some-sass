@@ -65,19 +65,21 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 				},
 				blackness: {
 					description:
-						"Returns the HWB blackness of `$color` as a number between **0%** and **100%**.",
+						"Returns the HWB blackness of `$color` as a number between **0%** and **100%**.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#blackness) for how to migrate.",
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "number",
-					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#blackness).`,
+					deprecated:
+						"This function is deprecated in favor of color-space-friendly functions.",
 				},
 				blue: {
 					description:
-						"Returns the blue channel of `$color` as a number between **0** and **255**.",
+						"Returns the blue channel of `$color` as a number between **0** and **255**.\n\nSee [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#blue) for how to migrate.",
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "number",
-					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#blue).`,
+					deprecated:
+						"This function is deprecated in favor of color-space-friendly functions.",
 				},
 				change: {
 					description:
@@ -89,13 +91,13 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 				},
 				channel: {
 					description:
-						"Returns the value of $channel in $space, which defaults to $color’s space. The $channel must be a quoted string, and the $space must be an unquoted string.",
+						"Returns the value of `$channel` in `$space`, which defaults to `$color`'s space. The `$channel` must be a quoted string, and the `$space` must be an unquoted string.",
 					signature: "($color, $channel, $space: null)",
 					parameterSnippet: "${1:color}, ${2:channel}",
 					returns: "color",
 				},
 				complement: {
-					description: "Returns the RGB complement of $color",
+					description: "Returns the RGB complement of `$color`",
 					signature: "($color, $space: null)",
 					parameterSnippet: "${1:color}",
 					returns: "color",
@@ -109,30 +111,33 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 				},
 				green: {
 					description:
-						"Returns the green channel of `$color` as a number between **0** and **255**.",
+						"Returns the green channel of `$color` as a number between **0** and **255**.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#green) for how to migrate.",
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "number",
-					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#green).`,
+					deprecated:
+						"This function is deprecated in favor of color-space-friendly functions.",
 				},
 				hue: {
 					description:
-						"Returns the hue of `$color` as a number between **0deg** and **360deg**.",
+						"Returns the hue of `$color` as a number between **0deg** and **360deg**.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#hue) for how to migrate.",
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					return: "number",
-					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#hue).`,
+					deprecated:
+						"This function is deprecated in favor of color-space-friendly functions.",
 				},
 				hwb: {
 					description:
-						"Returns a color with the given hue, whiteness, and blackness and the given alpha channel.",
+						"Returns a color with the given hue, whiteness, and blackness and the given alpha channel.\n\nThis function is [deprecated](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#css-color-functions-in-sass) in favor of the CSS [hwb function](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hwb).",
 					signature: "($hue, $whiteness, $blackness, $alpha: 1)",
 					returns: "color",
-					deprecated: `This function is [deprecated](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#css-color-functions-in-sass) in favor of the CSS [hwb function](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hwb).`,
+					deprecated:
+						"This function is deprecated in favor of the CSS hwb function.",
 				},
 				"ie-hex-str": {
 					description:
-						"Returns a string that represents `$color` in the #AARRGGBB format expected by -ms-filter.",
+						"Returns a string that represents `$color` in the #AARRGGBB format expected by `-ms-filter`.",
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "string",
@@ -144,36 +149,41 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 					returns: "color",
 				},
 				"is-in-gamut": {
-					description: `Returns whether $color is [in a given gamut](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#working-with-gamut-boundaries). Defaults to the space the color is defined in. $space must be an unquoted string.`,
+					description:
+						"Returns whether `$color` is [in a given gamut](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#working-with-gamut-boundaries). Defaults to the space the color is defined in. The `$space` must be an unquoted string.",
 					signature: "($color, $space: null)",
 					parameterSnippet: "${1:color}",
 					returns: "boolean",
 				},
 				"is-legacy": {
-					description: `Returns whether $color is in a [legacy color space](https://sass-lang.com/documentation/values/colors#legacy-color-spaces).`,
+					description:
+						"Returns whether `$color` is in a [legacy color space](https://sass-lang.com/documentation/values/colors#legacy-color-spaces).",
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "boolean",
 				},
 				"is-missing": {
-					description: `Returns whether $channel is [missing](https://sass-lang.com/documentation/values/colors/#missing-channels) in $color. The channel must be a quoted string.`,
+					description:
+						"Returns whether `$channel` is [missing](https://sass-lang.com/documentation/values/colors/#missing-channels) in `$color`. The `$channel` must be a quoted string.",
 					signature: "($color, $channel)",
 					parameterSnippet: "${1:color}, ${2:channel}",
 					returns: "boolean",
 				},
 				"is-powerless": {
-					description: `Returns whether $color's $channel is [powerless](https://sass-lang.com/documentation/values/colors/#powerless-channels) in $space. The channel must be a quoted string and the space must be an unquoted string.`,
+					description:
+						"Returns whether `$color`'s $channel is [powerless](https://sass-lang.com/documentation/values/colors/#powerless-channels) in the `$space`. The `$channel` must be a quoted string and the `$space` must be an unquoted string.",
 					signature: "($color, $channel, $space: null)",
 					parameterSnippet: "${1:color}, ${2:channel}",
 					returns: "boolean",
 				},
 				lightness: {
 					description:
-						"Returns the HSL lightness of `$color` as a number between **0%** and **100%**.",
+						"Returns the HSL lightness of `$color` as a number between **0%** and **100%**.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#lightness) for how to migrate.",
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "number",
-					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#lightness).`,
+					deprecated:
+						"This function is deprecated in favor of color-space-friendly functions.",
 				},
 				mix: {
 					description:
@@ -184,25 +194,28 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 				},
 				red: {
 					description:
-						"Returns the red channel of `$color` as a number between **0** and **255**.",
+						"Returns the red channel of `$color` as a number between **0** and **255**.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#red) for how to migrate.",
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "number",
-					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#red).`,
+					deprecated:
+						"This function is deprecated in favor of color-space-friendly functions.",
 				},
 				same: {
-					description: `Returns whether $color1 and $color2 visually render as the same color.`,
+					description:
+						"Returns whether `$color1` and `$color2` visually render as the same color.",
 					signature: "($color1, $color2)",
 					parameterSnippet: "${1:color1}, ${2:color2}",
 					returns: "boolean",
 				},
 				saturation: {
 					description:
-						"Returns the HSL saturation of `$color` as a number between **0%** and **100%**.",
+						"Returns the HSL saturation of `$color` as a number between **0%** and **100%**.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#saturation) for how to migrate.",
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "number",
-					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#saturation).`,
+					deprecated:
+						"This function is deprecated in favor of color-space-friendly functions.",
 				},
 				scale: {
 					description:
@@ -220,25 +233,26 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 				},
 				"to-gamut": {
 					description:
-						"Returns a visually similar color to $color in the gamut of $space, which defaults to $color's space. The $space must be an unquoted string. $method is mandatory until a default browser behavior is established.",
+						"Returns a visually similar color to `$color` in the gamut of `$space`, which defaults to `$color`'s space. The `$space` must be an unquoted string. `$method` is mandatory until a default browser behavior is established.",
 					signature: "($color, $space: null, $method: local-minde | clip)",
 					parameterSnippet: "${1:color}, $method: ${2:method}",
 					returns: "color",
 				},
 				"to-space": {
 					description:
-						"Converts $color into the given $space, which must be an unquoted string.",
+						"Converts `$color` into the given `$space`, which must be an unquoted string.",
 					signature: "($color, $space: null)",
 					parameterSnippet: "${1:color}",
 					returns: "color",
 				},
 				whiteness: {
 					description:
-						"Returns the HWB whiteness of `$color` as a number between **0%** and **100%**.",
+						"Returns the HWB whiteness of `$color` as a number between **0%** and **100%**.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#whiteness) for how to migrate.",
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "number",
-					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#whiteness).`,
+					deprecated:
+						"This function is deprecated in favor of color-space-friendly functions.",
 				},
 			},
 		},

@@ -33,6 +33,7 @@ export interface SassBuiltInExport {
 		| "number"
 		| "selector"
 		| "string";
+	deprecated?: string;
 }
 
 export interface SassBuiltInModule {
@@ -51,7 +52,7 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 					description:
 						"Increases or decreases one or more properties of `$color` by fixed amounts. All optional arguments must be numbers.\n\nIt's an error to specify an RGB property at the same time as an HSL property, or either of those at the same time as an HWB property.",
 					signature:
-						"($color, $red: null, $green: null, $blue: null, $hue: null, $saturation: null, $lightness: null, $whiteness: null, $blackness: null, $alpha: null)",
+						"($color, $red: null, $green: null, $blue: null, $hue: null, $saturation: null, $lightness: null, $whiteness: null, $blackness: null, $alpha: null, $space: null)",
 					parameterSnippet: "${1:color}",
 					returns: "color",
 				},
@@ -68,6 +69,7 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "number",
+					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#blackness).`,
 				},
 				blue: {
 					description:
@@ -75,17 +77,28 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "number",
+					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#blue).`,
 				},
 				change: {
 					description:
 						"Sets one or more properties of `$color` to new values.\n\nIt's an error to specify an RGB property at the same time as an HSL property, or either of those at the same time as an HWB property.",
 					signature:
-						"($color, $red: null, $green: null, $blue: null, $hue: null, $saturation: null, $lightness: null, $whiteness: null, $blackness: null, $alpha: null)",
+						"($color, $red: null, $green: null, $blue: null, $hue: null, $saturation: null, $lightness: null, $whiteness: null, $blackness: null, $alpha: null, $space: null)",
 					parameterSnippet: "${1:color}",
+					returns: "color",
+				},
+				channel: {
+					description:
+						"Returns the value of $channel in $space, which defaults to $color’s space. The $channel must be a quoted string, and the $space must be an unquoted string.",
+					signature: "($color, $channel, $space: null)",
+					parameterSnippet: "${1:color}, ${2:channel}",
 					returns: "color",
 				},
 				complement: {
 					description: "Returns the RGB complement of $color",
+					signature: "($color, $space: null)",
+					parameterSnippet: "${1:color}",
+					returns: "color",
 				},
 				grayscale: {
 					description:
@@ -100,6 +113,7 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "number",
+					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#green).`,
 				},
 				hue: {
 					description:
@@ -107,12 +121,14 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					return: "number",
+					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#hue).`,
 				},
 				hwb: {
 					description:
 						"Returns a color with the given hue, whiteness, and blackness and the given alpha channel.",
 					signature: "($hue, $whiteness, $blackness, $alpha: 1)",
 					returns: "color",
+					deprecated: `This function is [deprecated](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#css-color-functions-in-sass) in favor of the CSS [hwb function](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hwb).`,
 				},
 				"ie-hex-str": {
 					description:
@@ -123,9 +139,33 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 				},
 				invert: {
 					description: "Returns the inverse of `$color`.",
-					signature: "($color, $weight: 100)",
+					signature: "($color, $weight: 100, $space: null)",
 					parameterSnippet: "${1:color}",
 					returns: "color",
+				},
+				"is-in-gamut": {
+					description: `Returns whether $color is [in a given gamut](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#working-with-gamut-boundaries). Defaults to the space the color is defined in. $space must be an unquoted string.`,
+					signature: "($color, $space: null)",
+					parameterSnippet: "${1:color}",
+					returns: "boolean",
+				},
+				"is-legacy": {
+					description: `Returns whether $color is in a [legacy color space](https://sass-lang.com/documentation/values/colors#legacy-color-spaces).`,
+					signature: "($color)",
+					parameterSnippet: "${1:color}",
+					returns: "boolean",
+				},
+				"is-missing": {
+					description: `Returns whether $channel is [missing](https://sass-lang.com/documentation/values/colors/#missing-channels) in $color. The channel must be a quoted string.`,
+					signature: "($color, $channel)",
+					parameterSnippet: "${1:color}, ${2:channel}",
+					returns: "boolean",
+				},
+				"is-powerless": {
+					description: `Returns whether $color's $channel is [powerless](https://sass-lang.com/documentation/values/colors/#powerless-channels) in $space. The channel must be a quoted string and the space must be an unquoted string.`,
+					signature: "($color, $channel, $space: null)",
+					parameterSnippet: "${1:color}, ${2:channel}",
+					returns: "boolean",
 				},
 				lightness: {
 					description:
@@ -133,6 +173,7 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "number",
+					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#lightness).`,
 				},
 				mix: {
 					description:
@@ -147,6 +188,13 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "number",
+					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#red).`,
+				},
+				same: {
+					description: `Returns whether $color1 and $color2 visually render as the same color.`,
+					signature: "($color1, $color2)",
+					parameterSnippet: "${1:color1}, ${2:color2}",
+					returns: "boolean",
 				},
 				saturation: {
 					description:
@@ -154,12 +202,33 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "number",
+					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#saturation).`,
 				},
 				scale: {
 					description:
 						"Fluidly scales one or more properties of `$color`. Each keyword argument must be a number between **-100%** and **100%**.\n\nIt's an error to specify an RGB property at the same time as an HSL property, or either of those at the same time as an HWB property.",
 					signature:
-						"($color, $red: null, $green: null, $blue: null, $saturation: null, $lightness: null, $whiteness: null, $blackness: null, $alpha: null)",
+						"($color, $red: null, $green: null, $blue: null, $saturation: null, $lightness: null, $whiteness: null, $blackness: null, $alpha: null, $space: null)",
+					parameterSnippet: "${1:color}",
+					returns: "color",
+				},
+				space: {
+					description: `Returns the name of $color's space as an unquoted string.`,
+					signature: "($color)",
+					parameterSnippet: "${1:color}",
+					returns: "string",
+				},
+				"to-gamut": {
+					description:
+						"Returns a visually similar color to $color in the gamut of $space, which defaults to $color's space. The $space must be an unquoted string. $method is mandatory until a default browser behavior is established.",
+					signature: "($color, $space: null, $method: local-minde | clip)",
+					parameterSnippet: "${1:color}, $method: ${2:method}",
+					returns: "color",
+				},
+				"to-space": {
+					description:
+						"Converts $color into the given $space, which must be an unquoted string.",
+					signature: "($color, $space: null)",
 					parameterSnippet: "${1:color}",
 					returns: "color",
 				},
@@ -169,6 +238,7 @@ export const sassBuiltInModules: Record<string, SassBuiltInModule> =
 					signature: "($color)",
 					parameterSnippet: "${1:color}",
 					returns: "number",
+					deprecated: `This function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions), and [documentation for possible migration](https://sass-lang.com/documentation/modules/color/#whiteness).`,
 				},
 			},
 		},

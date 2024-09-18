@@ -47,6 +47,7 @@ test("suggests built-in sass modules", async () => {
 			labelDetails: {
 				detail: undefined,
 			},
+			tags: undefined,
 			textEdit: {
 				newText: "math.$pi",
 				range: {
@@ -100,6 +101,7 @@ test("suggest sass built-ins that are forwarded by the stylesheet that is @used"
 			labelDetails: {
 				detail: undefined,
 			},
+			tags: undefined,
 			textEdit: {
 				newText: "test.$pi",
 				range: {
@@ -156,6 +158,7 @@ test("suggest sass built-ins that are forwarded with a prefix", async () => {
 			labelDetails: {
 				detail: undefined,
 			},
+			tags: undefined,
 			textEdit: {
 				newText: "test.$math-pi",
 				range: {

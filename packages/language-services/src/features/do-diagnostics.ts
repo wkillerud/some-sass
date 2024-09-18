@@ -1,3 +1,4 @@
+import { sassBuiltInModules } from "../facts/sass";
 import { LanguageFeature } from "../language-feature";
 import {
 	TextDocument,
@@ -93,7 +94,67 @@ export class DoDiagnostics extends LanguageFeature {
 				document,
 				document.positionAt(node.offset),
 			);
-			if (!definition) continue;
+
+			// TODO: maybe look for deprecation notice in sass built-in
+
+			if (!definition) {
+				let name: string | undefined;
+				switch (node.type) {
+					case NodeType.VariableName: {
+						const parent = node?.getParent();
+						if (
+							parent &&
+							parent.type !== NodeType.VariableDeclaration &&
+							parent.type !== NodeType.FunctionParameter
+						) {
+							name = (node as Variable).getName();
+						}
+						break;
+					}
+					case NodeType.Function: {
+						name = (node as Function).getName();
+						break;
+					}
+				}
+
+				if (name) {
+					// Look to see if this is a built-in with a deprecation notice
+
+					for (const { exports } of Object.values(sassBuiltInModules)) {
+						for (const [builtinName, { deprecated }] of Object.entries(
+							exports,
+						)) {
+							if (deprecated && builtinName === name) {
+								let range: Range | null = null;
+								if (node.type === NodeType.Function) {
+									const ident = (node as Function).getIdentifier();
+									if (ident) {
+										range = Range.create(
+											document.positionAt(ident.offset),
+											document.positionAt(ident.end),
+										);
+									}
+								}
+
+								diagnostics.push({
+									message: deprecated,
+									range:
+										range ||
+										Range.create(
+											document.positionAt(node.offset),
+											document.positionAt(node.end),
+										),
+									source: "Some Sass",
+									tags: [DiagnosticTag.Deprecated],
+									severity: DiagnosticSeverity.Hint,
+								});
+							}
+						}
+					}
+				}
+
+				continue;
+			}
 
 			const name =
 				node.type === NodeType.SelectorPlaceholder

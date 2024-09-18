@@ -1138,7 +1138,8 @@ export class DoComplete extends LanguageFeature {
 				?.snippetSupport;
 
 		for (const [name, docs] of Object.entries(moduleDocs.exports)) {
-			const { description, signature, parameterSnippet, returns } = docs;
+			const { description, signature, parameterSnippet, returns, deprecated } =
+				docs;
 			const kind = signature
 				? CompletionItemKind.Function
 				: CompletionItemKind.Variable;
@@ -1172,6 +1173,7 @@ export class DoComplete extends LanguageFeature {
 					detail:
 						signature && returns ? `${signature} => ${returns}` : signature,
 				},
+				tags: deprecated ? [CompletionItemTag.Deprecated] : undefined,
 			};
 
 			const insert = `${context.namespace}.${label}${

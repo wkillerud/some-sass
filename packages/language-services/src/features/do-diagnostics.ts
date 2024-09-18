@@ -95,8 +95,6 @@ export class DoDiagnostics extends LanguageFeature {
 				document.positionAt(node.offset),
 			);
 
-			// TODO: maybe look for deprecation notice in sass built-in
-
 			if (!definition) {
 				let name: string | undefined;
 				switch (node.type) {

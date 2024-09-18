@@ -12,13 +12,10 @@ config = { somesass = { loadPaths = [] } }
 
 [[language]]
 name = "scss"
-scope = "source.scss"
-injection-regex = "scss"
-file-types = ["scss"]
-block-comment-tokens = { start = "/*", end = "*/" }
-language-servers = [ "some-sass-language-server" ]
-auto-format = true
-indent = { tab-width = 2, unit = "  " }
+language-servers = [
+	{ name = "some-sass-language-server" },
+	{ name = "vscode-css-language-server" },
+]
 ```
 
 The language server will start once you open an SCSS file.

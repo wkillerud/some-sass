@@ -1,3 +1,15 @@
+## 1.7.0 (2024-09-18)
+
+
+### 🚀 Features
+
+- add completions and documentation for color changes in Sass 1.79.0
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 1.7.0
+
 ## 1.6.1 (2024-09-17)
 
 

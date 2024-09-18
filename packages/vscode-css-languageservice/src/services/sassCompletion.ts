@@ -26,6 +26,7 @@ interface IFunctionInfo {
 	type?: string;
 	/** If true, doesn't have an equivalent in the module system and should be suggested regardless of suggestFromUseOnly */
 	noModule?: boolean;
+	deprecated?: string;
 }
 
 const sassDocumentationName = l10n.t("Sass documentation");
@@ -50,28 +51,95 @@ export class SassCompletion extends CSSCompletion {
 	};
 
 	private static colorProposals: IFunctionInfo[] = [
-		{ func: "red($color)", desc: l10n.t("Gets the red component of a color.") },
-		{ func: "green($color)", desc: l10n.t("Gets the green component of a color.") },
-		{ func: "blue($color)", desc: l10n.t("Gets the blue component of a color.") },
+		{
+			func: "red($color)",
+			desc: "Gets the red component of a color.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#red) for how to migrate.",
+			deprecated: "This function is deprecated in favor of color-space-friendly functions.",
+		},
+		{
+			func: "green($color)",
+			desc: "Gets the green component of a color.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#green) for how to migrate.",
+			deprecated: "This function is deprecated in favor of color-space-friendly functions.",
+		},
+		{
+			func: "blue($color)",
+			desc: "Gets the blue component of a color.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#blue) for how to migrate.",
+			deprecated: "This function is deprecated in favor of color-space-friendly functions.",
+		},
 		{ func: "mix($color, $color, [$weight])", desc: l10n.t("Mixes two colors together.") },
-		{ func: "hue($color)", desc: l10n.t("Gets the hue component of a color.") },
-		{ func: "saturation($color)", desc: l10n.t("Gets the saturation component of a color.") },
-		{ func: "lightness($color)", desc: l10n.t("Gets the lightness component of a color.") },
-		{ func: "adjust-hue($color, $degrees)", desc: l10n.t("Changes the hue of a color."), noModule: true },
-		{ func: "lighten($color, $amount)", desc: l10n.t("Makes a color lighter."), noModule: true },
-		{ func: "darken($color, $amount)", desc: l10n.t("Makes a color darker."), noModule: true },
-		{ func: "saturate($color, $amount)", desc: l10n.t("Makes a color more saturated.") },
-		{ func: "desaturate($color, $amount)", desc: l10n.t("Makes a color less saturated."), noModule: true },
+		{
+			func: "hue($color)",
+			desc: "Gets the hue component of a color.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#hue) for how to migrate.",
+			deprecated: "This function is deprecated in favor of color-space-friendly functions.",
+		},
+		{
+			func: "saturation($color)",
+			desc: "Gets the saturation component of a color.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#saturation) for how to migrate.",
+			deprecated: "This function is deprecated in favor of color-space-friendly functions.",
+		},
+		{
+			func: "lightness($color)",
+			desc: "Gets the lightness component of a color.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#lightness) for how to migrate.",
+			deprecated: "This function is deprecated in favor of color-space-friendly functions.",
+		},
+		{
+			func: "adjust-hue($color, $degrees)",
+			desc: "Changes the hue of a color.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#adjust-hue) for how to migrate.",
+			noModule: true,
+			deprecated: "This function is deprecated in favor of color-space-friendly functions.",
+		},
+		{
+			func: "lighten($color, $amount)",
+			desc: "Makes a color lighter.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#lighten) for how to migrate.",
+			noModule: true,
+			deprecated: "This function is deprecated in favor of color-space-friendly functions.",
+		},
+		{
+			func: "darken($color, $amount)",
+			desc: "Makes a color darker.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#darken) for how to migrate.",
+			noModule: true,
+			deprecated: "This function is deprecated in favor of color-space-friendly functions.",
+		},
+		{
+			func: "saturate($color, $amount)",
+			desc: "Makes a color more saturated.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#saturate) for how to migrate.",
+			deprecated: "This function is deprecated in favor of color-space-friendly functions.",
+		},
+		{
+			func: "desaturate($color, $amount)",
+			desc: "Makes a color less saturated.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#desaturate) for how to migrate.",
+			noModule: true,
+			deprecated: "This function is deprecated in favor of color-space-friendly functions.",
+		},
 		{ func: "grayscale($color)", desc: l10n.t("Converts a color to grayscale.") },
 		{ func: "complement($color)", desc: l10n.t("Returns the complement of a color.") },
 		{ func: "invert($color)", desc: l10n.t("Returns the inverse of a color.") },
 		{ func: "alpha($color)", desc: l10n.t("Gets the opacity component of a color.") },
 		{ func: "opacity($color)", desc: "Gets the alpha component (opacity) of a color." },
-		{ func: "rgba($color, $alpha)", desc: l10n.t("Changes the alpha component for a color.") },
-		{ func: "opacify($color, $amount)", desc: l10n.t("Makes a color more opaque."), noModule: true },
-		{ func: "fade-in($color, $amount)", desc: l10n.t("Makes a color more opaque."), noModule: true },
-		{ func: "transparentize($color, $amount)", desc: l10n.t("Makes a color more transparent."), noModule: true },
-		{ func: "fade-out($color, $amount)", desc: l10n.t("Makes a color more transparent."), noModule: true },
+		{
+			func: "opacify($color, $amount)",
+			desc: "Makes a color more opaque.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#opacity) for how to migrate.",
+			noModule: true,
+			deprecated: "This function is deprecated in favor of color-space-friendly functions.",
+		},
+		{
+			func: "fade-in($color, $amount)",
+			desc: "Makes a color more opaque.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#opacity) for how to migrate.",
+			noModule: true,
+			deprecated: "This function is deprecated in favor of color-space-friendly functions.",
+		},
+		{
+			func: "transparentize($color, $amount)",
+			desc: "Makes a color more transparent.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#transparentize) for how to migrate.",
+			noModule: true,
+			deprecated: "This function is deprecated in favor of color-space-friendly functions.",
+		},
+		{
+			func: "fade-out($color, $amount)",
+			desc: "Makes a color more transparent.\n\nThis function is deprecated in favor of color-space-friendly functions. See [the announcement post](https://sass-lang.com/blog/wide-gamut-colors-in-sass/#deprecated-functions) and [documentation](https://sass-lang.com/documentation/modules/color/#transparentize) for how to migrate.",
+			noModule: true,
+			deprecated: "This function is deprecated in favor of color-space-friendly functions.",
+		},
 		{
 			func: "adjust-color($color, [$red], [$green], [$blue], [$hue], [$saturation], [$lightness], [$alpha])",
 			desc: l10n.t("Increases or decreases one or more components of a color."),

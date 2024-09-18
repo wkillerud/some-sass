@@ -519,7 +519,7 @@ test("provides signature help for sass built-ins with named parameters in signat
 						"Increases or decreases one or more properties of `$color` by fixed amounts. All optional arguments must be numbers.\n\nIt's an error to specify an RGB property at the same time as an HSL property, or either of those at the same time as an HWB property.\n\n[Sass reference](https://sass-lang.com/documentation/modules/color#adjust)",
 				},
 				label:
-					"adjust($color, $red: null, $green: null, $blue: null, $hue: null, $saturation: null, $lightness: null, $whiteness: null, $blackness: null, $alpha: null)",
+					"adjust($color, $red: null, $green: null, $blue: null, $hue: null, $saturation: null, $lightness: null, $whiteness: null, $blackness: null, $alpha: null, $space: null)",
 				parameters: [
 					{
 						label: "$color",
@@ -550,6 +550,9 @@ test("provides signature help for sass built-ins with named parameters in signat
 					},
 					{
 						label: "$alpha",
+					},
+					{
+						label: "$space",
 					},
 				],
 			},

@@ -27,6 +27,7 @@
     "Programming Languages"
   ],
   "activationEvents": [
+    "onLanguage:css",
     "onLanguage:scss",
     "onLanguage:sass",
     "onLanguage:vue",

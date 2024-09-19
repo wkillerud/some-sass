@@ -36,6 +36,8 @@ export function log(message: string): void {
 export function createLanguageClientOptions(
 	currentWorkspace?: WorkspaceFolder,
 ): LanguageClientOptions {
+	// TODO: also include CSS if opted in
+
 	let documentSelector: DocumentSelector = [
 		{ scheme: "untitled", language: "scss" },
 		{ scheme: "untitled", language: "sass" },

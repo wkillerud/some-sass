@@ -24,14 +24,17 @@ import { RuntimeEnvironment } from "./runtime";
 import { defaultSettings, IEditorSettings, ISettings } from "./settings";
 import { getSassRegionsDocument } from "./utils/embedded";
 import WorkspaceScanner from "./workspace-scanner";
+import { createLogger, type Logger } from "./logger";
 
 export class SomeSassServer {
 	private readonly connection: Connection;
 	private readonly runtime: RuntimeEnvironment;
+	private readonly logger: Logger;
 
 	constructor(connection: Connection, runtime: RuntimeEnvironment) {
 		this.connection = connection;
 		this.runtime = runtime;
+		this.logger = createLogger(connection);
 	}
 
 	public listen(): void {
@@ -49,13 +52,13 @@ export class SomeSassServer {
 		// Make the text document manager listen on the connection
 		// _for open, change and close text document events
 		documents.listen(this.connection);
-		this.connection.console.log(`[Server(${process.pid})] Listening`);
+		this.logger.info(`[Server(${process.pid})] Listening`);
 
 		// After the server has started the client sends an initilize request. The server receives
 		// _in the passed params the rootPath of the workspace plus the client capabilites
 		this.connection.onInitialize((params) => {
-			this.connection.console.debug(
-				`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialize> received`,
+			this.logger.trace(
+				`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] got initialize request`,
 			);
 
 			clientCapabilities = params.capabilities;
@@ -65,15 +68,12 @@ export class SomeSassServer {
 			ls = getLanguageService({
 				clientCapabilities,
 				fileSystemProvider,
+				logger: this.logger,
 			});
 
 			// TODO: migrate to workspace folders. Workspace was an unnecessary older workaround of mine.
 			workspaceRoot = URI.parse(
 				params.initializationOptions?.workspace || params.rootUri!,
-			);
-
-			this.connection.console.debug(
-				`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialize> returning server capabilities`,
 			);
 
 			return {
@@ -130,11 +130,15 @@ export class SomeSassServer {
 			};
 		});
 
-		function applySettings(
+		const applySettings = (
 			editorSettings: IEditorSettings,
 			settings: ISettings,
-		) {
+		) => {
 			if (!ls) return;
+
+			if (settings.logLevel) {
+				this.logger.setLogLevel(settings.logLevel);
+			}
 
 			ls.configure({
 				editorSettings,
@@ -148,11 +152,11 @@ export class SomeSassServer {
 						settings.suggestFunctionsInStringContextAfterSymbols,
 				},
 			});
-		}
+		};
 
 		this.connection.onInitialized(async () => {
-			this.connection.console.debug(
-				`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> received`,
+			this.logger.debug(
+				`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] got initialized notification`,
 			);
 			try {
 				initialScan = new Promise<void>((resolve, reject) => {
@@ -191,8 +195,8 @@ export class SomeSassServer {
 
 							applySettings(editorSettings, settings);
 
-							this.connection.console.debug(
-								`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> scanning workspace for files`,
+							this.logger.debug(
+								`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] scanning workspace for files`,
 							);
 
 							return fileSystemProvider
@@ -201,8 +205,8 @@ export class SomeSassServer {
 									settings.scannerExclude,
 								)
 								.then((files) => {
-									this.connection.console.debug(
-										`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> found ${files.length} files, starting parse`,
+									this.logger.debug(
+										`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] found ${files.length} files, starting parse`,
 									);
 
 									workspaceScanner = new WorkspaceScanner(
@@ -217,8 +221,8 @@ export class SomeSassServer {
 									return workspaceScanner.scan(files);
 								})
 								.then((promises) => {
-									this.connection.console.debug(
-										`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] <initialized> parsed ${promises.length} files`,
+									this.logger.debug(
+										`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] parsed ${promises.length} files`,
 									);
 									resolve();
 								});
@@ -227,7 +231,7 @@ export class SomeSassServer {
 				});
 				await initialScan;
 			} catch (error) {
-				this.connection.console.log(String(error));
+				this.logger.fatal(String(error));
 			}
 		});
 
@@ -238,6 +242,9 @@ export class SomeSassServer {
 
 			try {
 				ls.onDocumentChanged(params.document);
+
+				// TODO: look into this so we can get diagnostics on first open, not working properly
+
 				// Check that no new version has been made while we waited,
 				// in which case the diagnostics may no longer be valid.
 				let latest = documents.get(params.document.uri);
@@ -448,6 +455,8 @@ export class SomeSassServer {
 
 			for (const action of actions) {
 				if (action.kind?.startsWith("refactor.extract")) {
+					// TODO: can we detect support for the custom command here before we do this?
+
 					// Replace with a custom command that immediately starts a rename after applying the edit.
 					// If this causes problems for other clients, look into passing some kind of client identifier (optional)
 					// with initOptions that indicate this command exists in the client.

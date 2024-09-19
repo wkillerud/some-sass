@@ -8,6 +8,7 @@ export interface ISettings {
 	readonly suggestFromUseOnly: boolean;
 	readonly suggestFunctionsInStringContextAfterSymbols: " (+-*%";
 	readonly triggerPropertyValueCompletion: boolean;
+	readonly logLevel: string;
 }
 
 export interface IEditorSettings {
@@ -19,11 +20,7 @@ export interface IEditorSettings {
 
 export const defaultSettings: ISettings = Object.freeze({
 	loadPaths: [],
-	scannerExclude: [
-		"**/.git/**",
-		"**/node_modules/**",
-		"**/bower_components/**",
-	],
+	scannerExclude: ["**/.git/**", "**/node_modules/**"],
 	scannerDepth: 30,
 	scanImportedFiles: true,
 	// This setting is essentially "VS Code Compat Mode" if set to false.

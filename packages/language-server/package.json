@@ -48,16 +48,16 @@
 		"coverage": "vitest run --coverage"
 	},
 	"devDependencies": {
-		"@vitest/coverage-v8": "2.0.5",
 		"@somesass/language-services": "1.7.1",
 		"@types/node": "20.16.5",
+		"@vitest/coverage-v8": "2.0.5",
 		"fast-glob": "3.3.2",
 		"merge-options": "3.0.4",
 		"path-browserify": "1.0.1",
 		"process": "0.11.10",
 		"shx": "0.3.4",
-		"util": "0.12.5",
 		"url": "0.11.4",
+		"util": "0.12.5",
 		"vscode-languageserver": "9.0.1",
 		"vscode-languageserver-textdocument": "1.0.12",
 		"vscode-languageserver-types": "3.17.5",

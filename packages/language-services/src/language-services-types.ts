@@ -269,6 +269,15 @@ export interface ClientCapabilities {
 	};
 }
 
+export type Logger = {
+	fatal(message: string): void;
+	error(message: string): void;
+	warn(message: string): void;
+	info(message: string): void;
+	debug(message: string): void;
+	trace(message: string): void;
+};
+
 export interface LanguageServiceOptions {
 	clientCapabilities: ClientCapabilities;
 	/**
@@ -280,6 +289,7 @@ export interface LanguageServiceOptions {
 	 */
 	fileSystemProvider: FileSystemProvider;
 	languageModelCache?: LanguageModelCacheOptions;
+	logger?: Logger;
 }
 
 export type LanguageModelCacheOptions = {

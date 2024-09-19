@@ -1,3 +1,10 @@
+## 1.7.1 (2024-09-19)
+
+
+### 🩹 Fixes
+
+- no duplicate decorators if suggestAllFromOpenDocument is true
+
 ## 1.7.0 (2024-09-18)
 
 

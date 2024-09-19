@@ -73,10 +73,7 @@ export class FindColors extends LanguageFeature {
 			}),
 		);
 
-		if (
-			document.languageId === "sass" ||
-			this.configuration.completionSettings?.suggestAllFromOpenDocument
-		) {
+		if (document.languageId === "sass") {
 			const upstream = this.getUpstreamLanguageServer().findDocumentColors(
 				document,
 				stylesheet,

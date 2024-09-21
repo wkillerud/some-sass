@@ -25,6 +25,7 @@ export class DoHover extends LanguageFeature {
 		document: TextDocument,
 		position: Position,
 	): Promise<Hover | null> {
+		const config = this.languageConfiguration(document);
 		const stylesheet = this.ls.parseStylesheet(document);
 		const offset = document.offsetAt(position);
 
@@ -70,7 +71,7 @@ export class DoHover extends LanguageFeature {
 					if (document.languageId === "sass") {
 						// We are probably hovering over a CSS identifier
 						// and want to defer this to vscode-css-languageservice's hover handler
-						return this.getUpstreamLanguageServer().doHover(
+						return this.getUpstreamLanguageServer(document).doHover(
 							document,
 							position,
 							stylesheet,
@@ -136,11 +137,14 @@ export class DoHover extends LanguageFeature {
 								kind: MarkupKind.Markdown,
 								value: [
 									candidate.annotation,
-									"____",
-									`[SassDoc reference](http://sassdoc.com/annotations/#${candidate.annotation.slice(
-										1,
-									)})`,
-								].join("\n"),
+									config.hover.references
+										? `\n\n[SassDoc reference](http://sassdoc.com/annotations/#${candidate.annotation.slice(
+												1,
+											)})`
+										: "",
+								]
+									.join("\n")
+									.trim(),
 							},
 						};
 					}
@@ -259,9 +263,12 @@ export class DoHover extends LanguageFeature {
 									kind: MarkupKind.Markdown,
 									value: [
 										description,
-										"",
-										`[Sass reference](${reference}#${builtinName})`,
-									].join("\n"),
+										config.hover.references
+											? `\n\n[Sass reference](${reference}#${builtinName})`
+											: "",
+									]
+										.join("\n")
+										.trim(),
 								},
 							};
 						}
@@ -271,7 +278,7 @@ export class DoHover extends LanguageFeature {
 		}
 
 		// Lastly, fall back to CSS hover information
-		return this.getUpstreamLanguageServer().doHover(
+		return this.getUpstreamLanguageServer(document).doHover(
 			document,
 			position,
 			stylesheet,

@@ -1,4 +1,7 @@
-import { getSassLanguageService } from "@somesass/vscode-css-languageservice";
+import {
+	getCSSLanguageService,
+	getSassLanguageService,
+} from "@somesass/vscode-css-languageservice";
 import { defaultConfiguration } from "./configuration";
 import { CodeActions } from "./features/code-actions";
 import { DoComplete } from "./features/do-complete";
@@ -65,18 +68,25 @@ class LanguageServiceImpl implements LanguageService {
 	#selectionRanges: SelectionRanges;
 
 	constructor(options: LanguageServiceOptions) {
-		const sassLs = getSassLanguageService({
+		const vscodeLsOptions = {
 			clientCapabilities: options.clientCapabilities,
 			fileSystemProvider: mapFsProviders(options.fileSystemProvider),
-		});
+		};
+		const sassLs = getSassLanguageService(vscodeLsOptions);
+
 		const cache = new LanguageServerCache({
 			sassLs,
 			...options.languageModelCache,
 		});
+
 		const internal = {
-			sassLs,
 			cache,
+			sassLs,
+			cssLs: getCSSLanguageService(vscodeLsOptions),
+			// The server code is the same as sassLs, but separate on syntax in case the user has different settings
+			scssLs: getSassLanguageService(vscodeLsOptions),
 		};
+
 		this.#cache = cache;
 		this.#codeActions = new CodeActions(this, options, internal);
 		this.#doComplete = new DoComplete(this, options, internal);

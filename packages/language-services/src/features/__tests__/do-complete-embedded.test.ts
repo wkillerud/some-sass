@@ -1,4 +1,4 @@
-import { test, assert, beforeEach } from "vitest";
+import { test, assert } from "vitest";
 import { getLanguageService } from "../../language-services";
 import {
 	CompletionItemKind,
@@ -75,11 +75,6 @@ function getSCSSRegionsDocument(document: TextDocument, position?: Position) {
 
 	return document;
 }
-
-beforeEach(() => {
-	ls.clearCache();
-	ls.configure({}); // Reset any configuration to default
-});
 
 test("should suggest symbol from a different document via @use", async () => {
 	const one = fileSystemProvider.createDocument("$primary: limegreen;", {

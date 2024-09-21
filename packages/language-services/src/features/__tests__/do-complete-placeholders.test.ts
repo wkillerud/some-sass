@@ -1,4 +1,4 @@
-import { test, assert, beforeEach } from "vitest";
+import { test, assert } from "vitest";
 import { getLanguageService } from "../../language-services";
 import {
 	CompletionItemKind,
@@ -9,10 +9,6 @@ import { getOptions } from "../../utils/test-helpers";
 
 const { fileSystemProvider, ...rest } = getOptions();
 const ls = getLanguageService({ fileSystemProvider, ...rest });
-
-beforeEach(() => {
-	ls.clearCache();
-});
 
 test("when declaring a placeholder selector, suggest placeholders that have an @extend usage", async () => {
 	// https://github.com/wkillerud/some-sass/issues/49

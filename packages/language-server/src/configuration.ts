@@ -1,57 +1,57 @@
 import {
 	defaultConfiguration,
-	type LanguageServerConfiguration,
+	type LanguageServiceConfiguration,
 } from "@somesass/language-services";
 
 export function toNewConfiguration(
 	v1: Partial<ConfigurationV1>,
-): LanguageServerConfiguration {
+): LanguageServiceConfiguration {
 	const newSettings = Object.assign({}, defaultConfiguration);
 	if (v1.loadPaths) newSettings.workspace.loadPaths = v1.loadPaths;
 	if (v1.scannerExclude) newSettings.workspace.exclude = v1.scannerExclude;
 
 	if (typeof v1.suggestAllFromOpenDocument !== "undefined") {
-		newSettings.css.completions.includeFromCurrentDocument =
+		newSettings.css.completion.includeFromCurrentDocument =
 			v1.suggestAllFromOpenDocument;
 	}
 	if (typeof v1.suggestionStyle !== "undefined") {
-		newSettings.css.completions.mixinStyle = v1.suggestionStyle;
+		newSettings.css.completion.mixinStyle = v1.suggestionStyle;
 	}
 	if (typeof v1.suggestFromUseOnly !== "undefined") {
-		newSettings.css.completions.suggestFromUseOnly = v1.suggestFromUseOnly;
+		newSettings.css.completion.suggestFromUseOnly = v1.suggestFromUseOnly;
 	}
 	if (typeof v1.triggerPropertyValueCompletion !== "undefined") {
-		newSettings.css.completions.triggerPropertyValueCompletion =
+		newSettings.css.completion.triggerPropertyValueCompletion =
 			v1.triggerPropertyValueCompletion;
 	}
 
 	if (typeof v1.suggestAllFromOpenDocument !== "undefined") {
-		newSettings.sass.completions.includeFromCurrentDocument =
+		newSettings.sass.completion.includeFromCurrentDocument =
 			v1.suggestAllFromOpenDocument;
 	}
 	if (typeof v1.suggestionStyle !== "undefined") {
-		newSettings.sass.completions.mixinStyle = v1.suggestionStyle;
+		newSettings.sass.completion.mixinStyle = v1.suggestionStyle;
 	}
 	if (typeof v1.suggestFromUseOnly !== "undefined") {
-		newSettings.sass.completions.suggestFromUseOnly = v1.suggestFromUseOnly;
+		newSettings.sass.completion.suggestFromUseOnly = v1.suggestFromUseOnly;
 	}
 	if (typeof v1.triggerPropertyValueCompletion !== "undefined") {
-		newSettings.sass.completions.triggerPropertyValueCompletion =
+		newSettings.sass.completion.triggerPropertyValueCompletion =
 			v1.triggerPropertyValueCompletion;
 	}
 
 	if (typeof v1.suggestAllFromOpenDocument !== "undefined") {
-		newSettings.scss.completions.includeFromCurrentDocument =
+		newSettings.scss.completion.includeFromCurrentDocument =
 			v1.suggestAllFromOpenDocument;
 	}
 	if (typeof v1.suggestionStyle !== "undefined") {
-		newSettings.scss.completions.mixinStyle = v1.suggestionStyle;
+		newSettings.scss.completion.mixinStyle = v1.suggestionStyle;
 	}
 	if (typeof v1.suggestFromUseOnly !== "undefined") {
-		newSettings.scss.completions.suggestFromUseOnly = v1.suggestFromUseOnly;
+		newSettings.scss.completion.suggestFromUseOnly = v1.suggestFromUseOnly;
 	}
 	if (typeof v1.triggerPropertyValueCompletion !== "undefined") {
-		newSettings.scss.completions.triggerPropertyValueCompletion =
+		newSettings.scss.completion.triggerPropertyValueCompletion =
 			v1.triggerPropertyValueCompletion;
 	}
 
@@ -59,7 +59,7 @@ export function toNewConfiguration(
 }
 
 export function isOldConfiguration(
-	maybeV1: Partial<LanguageServerConfiguration | ConfigurationV1>,
+	maybeV1: Partial<LanguageServiceConfiguration | ConfigurationV1>,
 ) {
 	const asV1 = maybeV1 as Partial<ConfigurationV1>;
 	if (typeof asV1.loadPaths !== "undefined") return true;

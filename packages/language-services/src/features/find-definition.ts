@@ -24,7 +24,11 @@ export class FindDefinition extends LanguageFeature {
 		const offset = document.offsetAt(position);
 		const node = getNodeAtOffset(stylesheet, offset);
 		if (!node) {
-			return this.goUpstream(document, position, stylesheet);
+			return this.getUpstreamLanguageServer(document).findDefinition(
+				document,
+				position,
+				stylesheet,
+			);
 		}
 
 		// Sometimes we can't tell at position whether an identifier is a Method or a Function
@@ -99,7 +103,11 @@ export class FindDefinition extends LanguageFeature {
 		}
 
 		if (!name || !kinds) {
-			return this.goUpstream(document, position, stylesheet);
+			return this.getUpstreamLanguageServer(document).findDefinition(
+				document,
+				position,
+				stylesheet,
+			);
 		}
 
 		// Traverse the workspace looking for a symbol of kinds.includes(symbol.kind) && name === symbol.name
@@ -137,15 +145,7 @@ export class FindDefinition extends LanguageFeature {
 			}
 		}
 
-		return this.goUpstream(document, position, stylesheet);
-	}
-
-	private goUpstream(
-		document: TextDocument,
-		position: Position,
-		stylesheet: Node,
-	): Location | null {
-		return this.getUpstreamLanguageServer().findDefinition(
+		return this.getUpstreamLanguageServer(document).findDefinition(
 			document,
 			position,
 			stylesheet,

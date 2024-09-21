@@ -11,7 +11,7 @@ export class FindDocumentHighlights extends LanguageFeature {
 		position: Position,
 	): DocumentHighlight[] {
 		const stylesheet = this.ls.parseStylesheet(document);
-		return this.getUpstreamLanguageServer().findDocumentHighlights(
+		return this.getUpstreamLanguageServer(document).findDocumentHighlights(
 			document,
 			position,
 			stylesheet,

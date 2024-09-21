@@ -13,6 +13,7 @@ import {
 
 export class FindColors extends LanguageFeature {
 	async findColors(document: TextDocument): Promise<ColorInformation[]> {
+		const config = this.languageConfiguration(document);
 		const variables: Variable[] = [];
 		const stylesheet = this.ls.parseStylesheet(document);
 		stylesheet.accept((node) => {
@@ -31,11 +32,8 @@ export class FindColors extends LanguageFeature {
 			return true;
 		});
 
-		if (
-			variables.length >
-			(this.configuration.editor?.colorDecoratorsLimit || 500)
-		) {
-			// skip color decorators for large documents
+		if (variables.length > this.configuration.editor.colorDecoratorsLimit) {
+			// skip color decorators for large documents, it freezes up other features
 			return [];
 		}
 
@@ -73,14 +71,14 @@ export class FindColors extends LanguageFeature {
 			}),
 		);
 
-		if (document.languageId === "sass") {
-			const upstream = this.getUpstreamLanguageServer().findDocumentColors(
-				document,
-				stylesheet,
-			);
-			result.push(...upstream);
+		if (config.colors.includeFromCurrentDocument === false) {
+			return result.filter((c) => c !== null);
 		}
 
+		const upstream = this.getUpstreamLanguageServer(
+			document,
+		).findDocumentColors(document, stylesheet);
+		result.push(...upstream);
 		return result.filter((c) => c !== null);
 	}
 
@@ -97,25 +95,22 @@ export class FindColors extends LanguageFeature {
 		if (node && node.type === NodeType.VariableName) {
 			const parent = node.getParent();
 			if (parent && parent.type === NodeType.VariableDeclaration) {
-				return this.getUpstreamLanguageServer().getColorPresentations(
+				return this.getUpstreamLanguageServer(document).getColorPresentations(
 					document,
 					stylesheet,
 					color,
 					range,
 				);
+			} else {
+				return [];
 			}
-		} else if (
-			document.languageId === "sass" ||
-			this.configuration.completionSettings?.suggestAllFromOpenDocument
-		) {
-			return this.getUpstreamLanguageServer().getColorPresentations(
-				document,
-				stylesheet,
-				color,
-				range,
-			);
 		}
 
-		return [];
+		return this.getUpstreamLanguageServer(document).getColorPresentations(
+			document,
+			stylesheet,
+			color,
+			range,
+		);
 	}
 }

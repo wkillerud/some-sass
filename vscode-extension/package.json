@@ -669,7 +669,7 @@
 							"type": "boolean",
 							"scope": "resource",
 							"default": true,
-							"description": "Show references to MDN in CSS hovers."
+							"description": "Show references to MDN in CSS hovers, Sass documentation for Sass built-in modules and SassDoc for annotations."
 						},
 						"somesass.scss.links.enabled": {
 							"type": "boolean",
@@ -957,7 +957,7 @@
 							"type": "boolean",
 							"scope": "resource",
 							"default": true,
-							"description": "Show references to MDN in CSS hovers."
+							"description": "Show references to MDN in CSS hovers, Sass documentation for Sass built-in modules and SassDoc for annotations."
 						},
 						"somesass.sass.links.enabled": {
 							"type": "boolean",

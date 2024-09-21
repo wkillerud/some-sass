@@ -74,11 +74,12 @@ export class DoDiagnostics extends LanguageFeature {
 			return [];
 		}
 
+		// TODO: move cssValidation in here so we can apply settings more easliy (turn off linting globally)
+
 		const stylesheet = this.ls.parseStylesheet(document);
-		const diagnostics = this.getUpstreamLanguageServer().doValidation(
+		const diagnostics = this.getUpstreamLanguageServer(document).doValidation(
 			document,
 			stylesheet,
-			{ validate: true },
 		);
 		return diagnostics;
 	}
@@ -86,6 +87,11 @@ export class DoDiagnostics extends LanguageFeature {
 	private async doDeprecationDiagnostics(
 		document: TextDocument,
 	): Promise<Diagnostic[]> {
+		const config = this.languageConfiguration(document);
+		if (config.diagnostics.deprecation.enabled === false) {
+			return [];
+		}
+
 		const references = this.getReferences(document);
 
 		const diagnostics: Diagnostic[] = [];

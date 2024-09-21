@@ -520,7 +520,7 @@ export class FindReferences extends LanguageFeature {
 		return result;
 	}
 
-	async isSameRealPath(
+	private async isSameRealPath(
 		candidate: string,
 		definition: string,
 	): Promise<boolean> {

@@ -13,10 +13,17 @@ const ls = getLanguageService({ fileSystemProvider, ...rest });
 beforeEach(() => {
 	ls.clearCache();
 	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
+		scss: {
+			completion: {
+				suggestFromUseOnly: true,
+			},
 		},
-	}); // Reset any configuration to default
+		sass: {
+			completion: {
+				suggestFromUseOnly: true,
+			},
+		},
+	});
 });
 
 test("suggests built-in sass modules", async () => {
@@ -306,12 +313,6 @@ test("should suggest symbols from the document we use when it also forwards anot
 });
 
 test("should not suggest symbols from a module used by the one we use", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument(
 		['@use "./three";', "$primary: limegreen;"],
 		{
@@ -342,12 +343,6 @@ test("should not suggest symbols from a module used by the one we use", async ()
 });
 
 test("should only suggest symbols from the current namespace, not others being used", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument(
 		['@use "./two";', '@use "./three";', "@function test() { @return two."],
 		{
@@ -375,12 +370,6 @@ test("should only suggest symbols from the current namespace, not others being u
 });
 
 test("should not suggest private symbols from the current namespace", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument(
 		['@use "./two";', "@function test() { @return two."],
 		{
@@ -405,12 +394,6 @@ test("should not suggest private symbols from the current namespace", async () =
 });
 
 test("should suggest symbol from a different document via @use when in @if", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
 		uri: "one.scss",
 	});
@@ -427,12 +410,6 @@ test("should suggest symbol from a different document via @use when in @if", asy
 });
 
 test("should suggest symbol from a different document via @use when in @else if", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
 		uri: "one.scss",
 	});
@@ -452,12 +429,6 @@ test("should suggest symbol from a different document via @use when in @else if"
 });
 
 test("should suggest symbol from a different document via @use when in @each", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
 		uri: "one.scss",
 	});
@@ -477,12 +448,6 @@ test("should suggest symbol from a different document via @use when in @each", a
 });
 
 test("should suggest symbol from a different document via @use when in @for", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
 		uri: "one.scss",
 	});
@@ -502,12 +467,6 @@ test("should suggest symbol from a different document via @use when in @for", as
 });
 
 test("should suggest symbol from a different document via @use when in @wile", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
 		uri: "one.scss",
 	});
@@ -579,12 +538,6 @@ test("should suggest prefixed symbol from a different document via @use and @for
 });
 
 test("should not include hidden symbol if configured", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument(
 		["$primary: limegreen;", "$secret: red;"],
 		{
@@ -646,12 +599,6 @@ test("should not include private symbol", async () => {
 });
 
 test("should only include shown symbol if configured", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument(
 		["$primary: limegreen;", "$secondary: yellow;", "$public: red;"],
 		{
@@ -692,12 +639,6 @@ test("should only include shown symbol if configured", async () => {
 });
 
 test("should suggest mixin with no parameter", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument(
 		["@mixin primary() { color: $primary; }"],
 		{ uri: "one.scss" },
@@ -746,9 +687,11 @@ test("should suggest mixin with no parameter", async () => {
 
 test("should suggest mixin with optional parameter", async () => {
 	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-			suggestionStyle: "nobracket",
+		scss: {
+			completion: {
+				mixinStyle: "nobracket",
+				suggestFromUseOnly: true,
+			},
 		},
 	});
 
@@ -802,9 +745,11 @@ test("should suggest mixin with optional parameter", async () => {
 
 test("should suggest mixin with required parameter", async () => {
 	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-			suggestionStyle: "bracket",
+		scss: {
+			completion: {
+				mixinStyle: "bracket",
+				suggestFromUseOnly: true,
+			},
 		},
 	});
 
@@ -858,9 +803,11 @@ test("should suggest mixin with required parameter", async () => {
 
 test("given both required and optional parameters should suggest two variants of mixin - one with all parameters and one with only required", async () => {
 	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-			suggestionStyle: "nobracket",
+		scss: {
+			completion: {
+				mixinStyle: "nobracket",
+				suggestFromUseOnly: true,
+			},
 		},
 	});
 
@@ -942,12 +889,6 @@ test("given both required and optional parameters should suggest two variants of
 });
 
 test("should suggest function with no parameter", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument(
 		["@function primary() { @return $primary; }"],
 		{ uri: "one.scss" },
@@ -995,12 +936,6 @@ test("should suggest function with no parameter", async () => {
 });
 
 test("should suggest function with optional parameter", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument(
 		["@function primary($color: red) { @return $color; }"],
 		{ uri: "one.scss" },
@@ -1048,12 +983,6 @@ test("should suggest function with optional parameter", async () => {
 });
 
 test("should suggest function with required parameter", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument(
 		["@function primary($color) { @return $color; }"],
 		{ uri: "one.scss" },
@@ -1101,12 +1030,6 @@ test("should suggest function with required parameter", async () => {
 });
 
 test("given both required and optional parameters should suggest two variants of function - one with all parameters and one with only required", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument(
 		["@function primary($a, $b: 1) { @return $a * $b; }"],
 		{ uri: "one.scss" },
@@ -1184,8 +1107,10 @@ test("given both required and optional parameters should suggest two variants of
 
 test("should suggest all symbols as legacy @import may be in use", async () => {
 	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: false,
+		scss: {
+			completion: {
+				suggestFromUseOnly: false,
+			},
 		},
 	});
 	const one = fileSystemProvider.createDocument("$primary: limegreen;", {
@@ -1233,9 +1158,10 @@ test("should suggest all symbols as legacy @import may be in use", async () => {
 
 test("should not suggest legacy @import symbols if configured", async () => {
 	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: true,
+		scss: {
+			completion: {
+				suggestFromUseOnly: true,
+			},
 		},
 	});
 
@@ -1258,12 +1184,6 @@ test("should not suggest legacy @import symbols if configured", async () => {
 });
 
 test("should suggest symbol from a different document via @use with wildcard alias", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument(
 		["$primary: limegreen;", "@function one() { @return 1; }"],
 		{
@@ -1342,26 +1262,7 @@ test("should suggest symbol from a different document via @use with wildcard ali
 });
 
 test("does not suggest sass globals if suggestFromUseOnly is true", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
-		},
-	});
-
 	const document = fileSystemProvider.createDocument("@debug co");
 	const { items } = await ls.doComplete(document, Position.create(0, 9));
 	assert.isUndefined(items.find((item) => item.label === "comparable"));
-});
-
-// We don't call the upstream for suggestions here since we got complaints about duplicates
-test.skip("does suggest sass globals if suggestFromUseOnly is false", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: false,
-		},
-	});
-
-	const document = fileSystemProvider.createDocument("@debug co");
-	const { items } = await ls.doComplete(document, Position.create(0, 9));
-	assert.isOk(items.find((item) => item.label === "comparable"));
 });

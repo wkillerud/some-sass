@@ -1,6 +1,8 @@
 import {
+	defaultConfiguration,
 	getLanguageService,
 	LanguageService,
+	LanguageServiceConfiguration,
 } from "@somesass/language-services";
 import {
 	ClientCapabilities,
@@ -22,16 +24,15 @@ import type { FileSystemProvider } from "./file-system";
 import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";
 import {
-	defaultSettings,
-	EditorSettings as EditorConfiguration,
+	ConfigurationV1,
 	isOldConfiguration,
-	LanguageServerConfiguration as Configuration,
-	ConfigurationV1 as ConfigurationV1,
 	toNewConfiguration,
 } from "./configuration";
 import { getSassRegionsDocument } from "./utils/embedded";
 import WorkspaceScanner from "./workspace-scanner";
 import { createLogger, type Logger } from "./logger";
+import { EditorConfiguration } from "@somesass/language-services/dist/language-services-types";
+import merge from "lodash.merge";
 
 export class SomeSassServer {
 	private readonly connection: Connection;
@@ -136,9 +137,9 @@ export class SomeSassServer {
 		});
 
 		const applyConfiguration = (
-			somesass: Partial<ConfigurationV1 | Configuration>,
+			somesass: Partial<ConfigurationV1 | LanguageServiceConfiguration>,
 			editor: Partial<EditorConfiguration>,
-		): Configuration => {
+		): LanguageServiceConfiguration => {
 			if (isOldConfiguration(somesass)) {
 				this.log.warn(
 					`Your somesass configuration uses old setting names. They will continue to work for some time, but it's recommended you change your settings to the new names. See https://wkillerud.github.io/some-sass/user-guide/settings.html`,
@@ -146,35 +147,23 @@ export class SomeSassServer {
 				somesass = toNewConfiguration(somesass as Partial<ConfigurationV1>);
 			}
 
-			const settings: Configuration = {
-				...defaultSettings,
-				...somesass,
-			};
-
-			const editorSettings: EditorConfiguration = {
-				insertSpaces: false,
-				indentSize: undefined,
-				tabSize: 2,
-				...editor,
-			};
+			const settings: LanguageServiceConfiguration = merge(
+				defaultConfiguration,
+				somesass,
+				{
+					editor: {
+						...editor,
+					},
+				},
+			);
+			settings.workspace.workspaceRoot = workspaceRoot;
 
 			if (settings.logLevel) {
 				this.log.setLogLevel(settings.logLevel);
 			}
 
 			if (ls) {
-				ls.configure({
-					editorSettings,
-					workspaceRoot,
-					loadPaths: settings.workspace.loadPaths,
-					completionSettings: {
-						suggestAllFromOpenDocument: settings.suggestAllFromOpenDocument,
-						suggestFromUseOnly: settings.suggestFromUseOnly,
-						suggestionStyle: settings.suggestionStyle,
-						suggestFunctionsInStringContextAfterSymbols:
-							settings.suggestFunctionsInStringContextAfterSymbols,
-					},
-				});
+				ls.configure(settings);
 			}
 
 			return settings;
@@ -204,14 +193,11 @@ export class SomeSassServer {
 						}
 
 						let [somesass, editor] = configs as [
-							Partial<Configuration | ConfigurationV1>,
+							Partial<LanguageServiceConfiguration | ConfigurationV1>,
 							Partial<EditorConfiguration>,
 						];
 
-						const configuration: Configuration = applyConfiguration(
-							somesass,
-							editor,
-						);
+						const configuration = applyConfiguration(somesass, editor);
 
 						this.log.debug(
 							`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] scanning workspace for files`,
@@ -281,15 +267,7 @@ export class SomeSassServer {
 		documents.onDidChangeContent(onDocumentChanged);
 
 		this.connection.onDidChangeConfiguration((params) => {
-			if (!ls) return;
-
-			const somesassConfiguration: Partial<ConfigurationV1 | Configuration> =
-				params.settings.somesass;
-
-			const editorConfiguration: Partial<EditorConfiguration> =
-				params.settings.editor;
-
-			applyConfiguration(somesassConfiguration, editorConfiguration);
+			applyConfiguration(params.settings.somesass, params.settings.editor);
 		});
 
 		this.connection.onDidChangeWatchedFiles(async (event) => {

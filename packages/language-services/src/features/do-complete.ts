@@ -92,7 +92,7 @@ export class DoComplete extends LanguageFeature {
 	): Promise<CompletionList> {
 		const result = CompletionList.create([]);
 
-		const upstreamLs = this.getUpstreamLanguageServer();
+		const upstreamLs = this.getUpstreamLanguageServer(document);
 		const context = this.createCompletionContext(document, position);
 
 		const stylesheet = this.ls.parseStylesheet(document);
@@ -185,7 +185,6 @@ export class DoComplete extends LanguageFeature {
 				position,
 				stylesheet,
 				this.getDocumentContext(),
-				this.configuration.completionSettings,
 			);
 			if (upstreamResult.items.length > 0) {
 				result.items.push(...upstreamResult.items);
@@ -286,12 +285,13 @@ export class DoComplete extends LanguageFeature {
 			}
 		}
 
+		const config = this.languageConfiguration(document);
 		// Legacy @import style suggestions
-		if (!this.configuration.completionSettings?.suggestFromUseOnly) {
+		if (!config.completion.suggestFromUseOnly) {
 			const documents = this.cache.documents();
 			for (const currentDocument of documents) {
 				if (
-					!this.configuration.completionSettings?.suggestAllFromOpenDocument &&
+					!config.completion.includeFromCurrentDocument &&
 					currentDocument.uri === document.uri
 				) {
 					continue;
@@ -323,6 +323,7 @@ export class DoComplete extends LanguageFeature {
 							if (!context.isMixinContext) break;
 
 							const items = await this.doMixinCompletion(
+								document,
 								currentDocument,
 								context,
 								symbol,
@@ -358,7 +359,6 @@ export class DoComplete extends LanguageFeature {
 				position,
 				stylesheet,
 				this.getDocumentContext(),
-				this.configuration.completionSettings,
 			);
 			if (upstreamResult.items.length > 0) {
 				result.items.push(...upstreamResult.items);
@@ -495,11 +495,9 @@ export class DoComplete extends LanguageFeature {
 				const lastChar = lineBeforePosition.charAt(
 					lineBeforePosition.length - 1,
 				);
-				const triggers =
-					this.configuration.completionSettings
-						?.suggestFunctionsInStringContextAfterSymbols;
-				if (triggers) {
-					context.isFunctionContext = triggers.includes(lastChar);
+				const functionTriggers = " (+-*%";
+				if (functionTriggers) {
+					context.isFunctionContext = functionTriggers.includes(lastChar);
 				}
 			}
 		} else if (isQuotes) {
@@ -544,7 +542,8 @@ export class DoComplete extends LanguageFeature {
 			items.push(...result);
 		}
 
-		if (!this.configuration.completionSettings?.suggestFromUseOnly) {
+		const config = this.languageConfiguration(initialDocument);
+		if (!config.completion.suggestFromUseOnly) {
 			const documents = this.cache.documents();
 			for (const current of documents) {
 				if (visited.has(current.uri)) {
@@ -754,6 +753,7 @@ export class DoComplete extends LanguageFeature {
 							if (!context.isMixinContext) break;
 
 							const mixs = await this.doMixinCompletion(
+								document,
 								currentDocument,
 								context,
 								symbol,
@@ -906,6 +906,7 @@ export class DoComplete extends LanguageFeature {
 	}
 
 	private async doMixinCompletion(
+		initialDocument: TextDocument,
 		document: TextDocument,
 		context: CompletionContext,
 		symbol: SassDocumentSymbol,
@@ -956,13 +957,12 @@ export class DoComplete extends LanguageFeature {
 			base.filterText = `${context.namespace}.${label}`;
 		}
 
+		const config = this.languageConfiguration(initialDocument);
 		const makeCompletionVariants = (insert: string, detail?: string) => {
 			// Not all mixins have @content, but when they do, be smart about adding brackets
 			// and move the cursor to be ready to add said contents.
 			// Include as separate suggestion since content may not always be needed or wanted.
-			if (
-				this.configuration.completionSettings?.suggestionStyle !== "bracket"
-			) {
+			if (config.completion.mixinStyle !== "bracket") {
 				items.push({
 					...base,
 					labelDetails: detail ? { detail: `(${detail})` } : undefined,
@@ -972,8 +972,7 @@ export class DoComplete extends LanguageFeature {
 
 			if (
 				snippetSupport &&
-				this.configuration.completionSettings?.suggestionStyle !==
-					"nobracket" &&
+				config.completion.mixinStyle !== "nobracket" &&
 				document.languageId === "scss"
 			) {
 				// TODO: test if this works correctly with multiline, I think so from the spec text
@@ -1196,8 +1195,11 @@ export class DoComplete extends LanguageFeature {
 		const url = node.getText().replace(/["']/g, "");
 		const moduleName = getModuleNameFromPath(url);
 
-		const rootFolderUri = this.configuration.workspaceRoot
-			? Utils.joinPath(this.configuration.workspaceRoot, "/").toString(true)
+		const rootFolderUri = this.configuration.workspace.workspaceRoot
+			? Utils.joinPath(
+					this.configuration.workspace.workspaceRoot,
+					"/",
+				).toString(true)
 			: "";
 		const documentFolderUri = Utils.dirname(URI.parse(document.uri)).toString(
 			true,

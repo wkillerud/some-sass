@@ -42,7 +42,7 @@
 	"author": "William Killerud <william@killerud.com> (https://www.williamkillerud.com/)",
 	"license": "MIT",
 	"scripts": {
-		"build": "rspack",
+		"build": "tsc --noEmit && rspack",
 		"clean": "shx rm -rf dist node_modules",
 		"test": "vitest",
 		"coverage": "vitest run --coverage"
@@ -62,5 +62,9 @@
 		"vscode-languageserver-textdocument": "1.0.12",
 		"vscode-languageserver-types": "3.17.5",
 		"vscode-uri": "3.0.8"
+	},
+	"dependencies": {
+		"@types/lodash.merge": "4.6.9",
+		"lodash.merge": "4.6.2"
 	}
 }

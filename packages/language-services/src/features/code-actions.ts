@@ -24,18 +24,13 @@ export class CodeActions extends LanguageFeature {
 		}
 
 		let upstream: CodeAction[] = [];
-		if (
-			document.languageId === "sass" ||
-			this.configuration.completionSettings?.suggestAllFromOpenDocument
-		) {
-			const stylesheet = this.ls.parseStylesheet(document);
-			upstream = this.getUpstreamLanguageServer().doCodeActions2(
-				document,
-				range,
-				context,
-				stylesheet,
-			);
-		}
+		const stylesheet = this.ls.parseStylesheet(document);
+		upstream = this.getUpstreamLanguageServer(document).doCodeActions2(
+			document,
+			range,
+			context,
+			stylesheet,
+		);
 
 		return [
 			this.getExtractVariableAction(document, range),

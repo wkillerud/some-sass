@@ -74,6 +74,14 @@ export interface SassDocumentSymbol extends DocumentSymbol {
 	children?: SassDocumentSymbol[];
 }
 
+export type RecursivePartial<T> = {
+	[P in keyof T]?: T[P] extends (infer U)[]
+		? RecursivePartial<U>[]
+		: T[P] extends object | undefined
+			? RecursivePartial<T[P]>
+			: T[P];
+};
+
 export interface LanguageService {
 	/**
 	 * Clears all cached documents, forcing everything to be reparsed the next time a feature is used.
@@ -86,11 +94,13 @@ export interface LanguageService {
 	 * @example
 	 * ```js
 	 * languageService.configure({
-	 *   workspaceRoot: URI.parse(this.workspace),
+	 *   workspace: {
+	 * 	  workspaceRoot: URI.parse(this.workspace),
+	 *   },
 	 * });
 	 * ```
 	 */
-	configure(settings: LanguageServerConfiguration): void;
+	configure(settings: RecursivePartial<LanguageServerConfiguration>): void;
 	doComplete(
 		document: TextDocument,
 		position: Position,
@@ -108,7 +118,7 @@ export interface LanguageService {
 	doSignatureHelp(
 		document: TextDocument,
 		position: Position,
-	): Promise<SignatureHelp>;
+	): Promise<SignatureHelp | null>;
 	findColors(document: TextDocument): Promise<ColorInformation[]>;
 	findDefinition(
 		document: TextDocument,
@@ -177,7 +187,7 @@ export type Rename =
 
 export type LintLevel = "ignore" | "warning" | "error";
 
-export interface LanguageSettings {
+export interface LanguageConfiguration {
 	/**
 	 * A list of relative file paths pointing to JSON files following the custom data format.
 	 * Some Sass loads custom data on startup to enhance its CSS support for CSS custom properties (variables), at-rules, pseudo-classes, and pseudo-elements you specify in the JSON files.
@@ -189,6 +199,13 @@ export interface LanguageSettings {
 	};
 	colors: {
 		enabled: boolean;
+		/**
+		 * Compatibility setting for VS Code.
+		 *
+		 * By default the built-in SCSS server shows color decorators for colors declared in the current document.
+		 * To avoid duplicates, by default Some Sass (only in VS Code) will only show color decorators where a variable is being used.
+		 */
+		includeFromCurrentDocument: boolean;
 	};
 	completion: {
 		enabled: boolean;
@@ -215,6 +232,13 @@ export interface LanguageSettings {
 		 */
 		triggerPropertyValueCompletion: boolean;
 		completePropertyWithSemicolon?: boolean;
+		/**
+		 * Compatibility setting for VS Code.
+		 *
+		 * By default the built-in SCSS server shows suggestions for variables, mixins and functions declared in the current document.
+		 * To avoid duplicates, by default Some Sass (only in VS Code) will not suggest them.
+		 */
+		includeFromCurrentDocument: boolean;
 	};
 	definition: {
 		enabled: boolean;
@@ -296,9 +320,9 @@ export interface WorkspaceConfiguration {
 }
 
 export interface LanguageServerConfiguration {
-	css: LanguageSettings;
-	sass: LanguageSettings;
-	scss: LanguageSettings;
+	css: LanguageConfiguration;
+	sass: LanguageConfiguration;
+	scss: LanguageConfiguration;
 	editor: EditorConfiguration;
 	workspace: WorkspaceConfiguration;
 	logLevel: "trace" | "debug" | "info" | "warn" | "error" | "fatal" | "silent";
@@ -308,20 +332,19 @@ export interface EditorConfiguration {
 	/**
 	 * Insert spaces rather than tabs.
 	 */
-	insertSpaces?: boolean;
+	insertSpaces: boolean;
 	/**
 	 * If {@link insertSpaces} is true this option determines the number of space characters is inserted per indent level.
 	 */
-	indentSize?: number;
+	indentSize: number;
 	/**
 	 * An older editor setting in VS Code. If both this and {@link indentSize} is set, only `indentSize` will be used.
 	 */
-	tabSize?: number;
+	tabSize: number;
 	/**
 	 * Controls the max number of color decorators that can be rendered in an editor at once.
-	 * @default 500
 	 */
-	colorDecoratorsLimit?: number;
+	colorDecoratorsLimit: number;
 }
 
 export interface AliasSettings {

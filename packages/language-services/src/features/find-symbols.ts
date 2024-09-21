@@ -16,10 +16,9 @@ export class FindSymbols extends LanguageFeature {
 		if (cachedSymbols) return cachedSymbols;
 
 		const stylesheet = this.ls.parseStylesheet(document);
-		const symbols = this.getUpstreamLanguageServer().findDocumentSymbols2(
+		const symbols = this.getUpstreamLanguageServer(
 			document,
-			stylesheet,
-		) as SassDocumentSymbol[];
+		).findDocumentSymbols2(document, stylesheet) as SassDocumentSymbol[];
 
 		const sassdoc: ParseResult[] = this.cache.getSassdoc(document);
 		for (const doc of sassdoc) {

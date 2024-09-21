@@ -1,4 +1,5 @@
 import { getSassLanguageService } from "@somesass/vscode-css-languageservice";
+import { defaultConfiguration } from "./configuration";
 import { CodeActions } from "./features/code-actions";
 import { DoComplete } from "./features/do-complete";
 import { DoDiagnostics } from "./features/do-diagnostics";
@@ -17,7 +18,7 @@ import { LanguageModelCache as LanguageServerCache } from "./language-model-cach
 import {
 	CodeActionContext,
 	LanguageService,
-	LanguageServiceConfiguration,
+	LanguageServerConfiguration,
 	LanguageServiceOptions,
 	Position,
 	TextDocument,
@@ -32,8 +33,9 @@ import {
 import { mapFsProviders } from "./utils/fs-provider";
 
 export {
+	defaultConfiguration,
 	LanguageService,
-	LanguageServiceConfiguration,
+	LanguageServerConfiguration as LanguageServiceConfiguration,
 	FileStat,
 	FileSystemProvider,
 	FileType,
@@ -96,7 +98,7 @@ class LanguageServiceImpl implements LanguageService {
 		this.#selectionRanges = new SelectionRanges(this, options, internal);
 	}
 
-	configure(configuration: LanguageServiceConfiguration): void {
+	configure(configuration: LanguageServerConfiguration): void {
 		this.#codeActions.configure(configuration);
 		this.#doComplete.configure(configuration);
 		this.#doDiagnostics.configure(configuration);

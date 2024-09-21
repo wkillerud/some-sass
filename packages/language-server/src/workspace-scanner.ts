@@ -14,7 +14,7 @@ export default class WorkspaceScanner {
 	constructor(
 		ls: LanguageService,
 		fs: FileSystemProvider,
-		settings = { scannerDepth: 30, scanImportedFiles: true },
+		settings = { scannerDepth: 256, scanImportedFiles: true },
 	) {
 		this.#ls = ls;
 		this.#fs = fs;

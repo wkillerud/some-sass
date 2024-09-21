@@ -21,7 +21,14 @@ import { URI } from "vscode-uri";
 import type { FileSystemProvider } from "./file-system";
 import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";
-import { defaultSettings, IEditorSettings, ISettings } from "./settings";
+import {
+	defaultSettings,
+	EditorSettings as EditorConfiguration,
+	isOldConfiguration,
+	LanguageServerConfiguration as Configuration,
+	ConfigurationV1 as ConfigurationV1,
+	toNewConfiguration,
+} from "./configuration";
 import { getSassRegionsDocument } from "./utils/embedded";
 import WorkspaceScanner from "./workspace-scanner";
 import { createLogger, type Logger } from "./logger";
@@ -29,12 +36,14 @@ import { createLogger, type Logger } from "./logger";
 export class SomeSassServer {
 	private readonly connection: Connection;
 	private readonly runtime: RuntimeEnvironment;
-	private readonly logger: Logger;
+	private readonly log: Logger;
 
 	constructor(connection: Connection, runtime: RuntimeEnvironment) {
 		this.connection = connection;
 		this.runtime = runtime;
-		this.logger = createLogger(connection);
+		this.log = createLogger(connection);
+		this.log.info(`Some Sass language server is starting`);
+		this.log.trace(`Process ID ${process.pid}`);
 	}
 
 	public listen(): void {
@@ -52,15 +61,10 @@ export class SomeSassServer {
 		// Make the text document manager listen on the connection
 		// _for open, change and close text document events
 		documents.listen(this.connection);
-		this.logger.info(`[Server(${process.pid})] Listening`);
 
 		// After the server has started the client sends an initilize request. The server receives
 		// _in the passed params the rootPath of the workspace plus the client capabilites
 		this.connection.onInitialize((params) => {
-			this.logger.trace(
-				`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] got initialize request`,
-			);
-
 			clientCapabilities = params.capabilities;
 
 			fileSystemProvider = getFileSystemProvider(this.connection, this.runtime);
@@ -68,13 +72,14 @@ export class SomeSassServer {
 			ls = getLanguageService({
 				clientCapabilities,
 				fileSystemProvider,
-				logger: this.logger,
+				logger: this.log,
 			});
 
 			// TODO: migrate to workspace folders. Workspace was an unnecessary older workaround of mine.
 			workspaceRoot = URI.parse(
 				params.initializationOptions?.workspace || params.rootUri!,
 			);
+			this.log.info(`Workspace root ${workspaceRoot}`);
 
 			return {
 				capabilities: {
@@ -130,108 +135,116 @@ export class SomeSassServer {
 			};
 		});
 
-		const applySettings = (
-			editorSettings: IEditorSettings,
-			settings: ISettings,
-		) => {
-			if (!ls) return;
-
-			if (settings.logLevel) {
-				this.logger.setLogLevel(settings.logLevel);
+		const applyConfiguration = (
+			somesass: Partial<ConfigurationV1 | Configuration>,
+			editor: Partial<EditorConfiguration>,
+		): Configuration => {
+			if (isOldConfiguration(somesass)) {
+				this.log.warn(
+					`Your somesass configuration uses old setting names. They will continue to work for some time, but it's recommended you change your settings to the new names. See https://wkillerud.github.io/some-sass/user-guide/settings.html`,
+				);
+				somesass = toNewConfiguration(somesass as Partial<ConfigurationV1>);
 			}
 
-			ls.configure({
-				editorSettings,
-				workspaceRoot,
-				loadPaths: settings.loadPaths,
-				completionSettings: {
-					suggestAllFromOpenDocument: settings.suggestAllFromOpenDocument,
-					suggestFromUseOnly: settings.suggestFromUseOnly,
-					suggestionStyle: settings.suggestionStyle,
-					suggestFunctionsInStringContextAfterSymbols:
-						settings.suggestFunctionsInStringContextAfterSymbols,
-				},
-			});
+			const settings: Configuration = {
+				...defaultSettings,
+				...somesass,
+			};
+
+			const editorSettings: EditorConfiguration = {
+				insertSpaces: false,
+				indentSize: undefined,
+				tabSize: 2,
+				...editor,
+			};
+
+			if (settings.logLevel) {
+				this.log.setLogLevel(settings.logLevel);
+			}
+
+			if (ls) {
+				ls.configure({
+					editorSettings,
+					workspaceRoot,
+					loadPaths: settings.workspace.loadPaths,
+					completionSettings: {
+						suggestAllFromOpenDocument: settings.suggestAllFromOpenDocument,
+						suggestFromUseOnly: settings.suggestFromUseOnly,
+						suggestionStyle: settings.suggestionStyle,
+						suggestFunctionsInStringContextAfterSymbols:
+							settings.suggestFunctionsInStringContextAfterSymbols,
+					},
+				});
+			}
+
+			return settings;
 		};
 
 		this.connection.onInitialized(async () => {
-			this.logger.debug(
-				`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] got initialized notification`,
-			);
 			try {
+				// Let other methods await the result of the initial scan before proceeding
 				initialScan = new Promise<void>((resolve, reject) => {
-					Promise.all([
+					const configurationRequests = [
 						this.connection.workspace.getConfiguration("somesass"),
 						this.connection.workspace.getConfiguration("editor"),
-					]).then(
-						([somesassConfiguration, editorConfiguration]: [
-							Partial<ISettings>,
-							Partial<IEditorSettings>,
-						]) => {
-							const settings = {
-								...defaultSettings,
-								...somesassConfiguration,
-							};
+					];
 
-							const editorSettings: IEditorSettings = {
-								insertSpaces: false,
-								indentSize: undefined,
-								tabSize: 2,
-								...editorConfiguration,
-							};
-
-							if (
-								!ls ||
-								!clientCapabilities ||
-								!workspaceRoot ||
-								!fileSystemProvider
-							) {
-								return reject(
-									new Error(
-										"Got onInitialized without onInitialize readying up all required globals",
-									),
-								);
-							}
-
-							applySettings(editorSettings, settings);
-
-							this.logger.debug(
-								`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] scanning workspace for files`,
+					Promise.all(configurationRequests).then((configs) => {
+						if (
+							!ls ||
+							!clientCapabilities ||
+							!workspaceRoot ||
+							!fileSystemProvider
+						) {
+							return reject(
+								new Error(
+									"Got onInitialized without onInitialize readying up all required globals",
+								),
 							);
+						}
 
-							return fileSystemProvider
-								.findFiles(
-									"**/*.{scss,sass,svelte,astro,vue}",
-									settings.scannerExclude,
-								)
-								.then((files) => {
-									this.logger.debug(
-										`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] found ${files.length} files, starting parse`,
-									);
+						let [somesass, editor] = configs as [
+							Partial<Configuration | ConfigurationV1>,
+							Partial<EditorConfiguration>,
+						];
 
-									workspaceScanner = new WorkspaceScanner(
-										ls!,
-										fileSystemProvider!,
-										{
-											scanImportedFiles: settings.scanImportedFiles,
-											scannerDepth: settings.scannerDepth,
-										},
-									);
+						const configuration: Configuration = applyConfiguration(
+							somesass,
+							editor,
+						);
 
-									return workspaceScanner.scan(files);
-								})
-								.then((promises) => {
-									this.logger.debug(
-										`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] parsed ${promises.length} files`,
-									);
-									resolve();
-								});
-						},
-					);
+						this.log.debug(
+							`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] scanning workspace for files`,
+						);
+
+						return fileSystemProvider
+							.findFiles(
+								"**/*.{css,scss,sass,svelte,astro,vue}",
+								configuration.workspace.exclude,
+							)
+							.then((files) => {
+								this.log.debug(
+									`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] found ${files.length} files, starting parse`,
+								);
+
+								workspaceScanner = new WorkspaceScanner(
+									ls!,
+									fileSystemProvider!,
+								);
+
+								return workspaceScanner.scan(files);
+							})
+							.then((promises) => {
+								this.log.debug(
+									`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] parsed ${promises.length} files`,
+								);
+								resolve();
+							});
+					});
 				});
 				await initialScan;
 			} catch (error) {
-				this.logger.fatal(String(error));
+				this.log.fatal(String(error));
 			}
 		});
 
@@ -270,25 +283,13 @@ export class SomeSassServer {
 		this.connection.onDidChangeConfiguration((params) => {
 			if (!ls) return;
 
-			const somesassConfiguration: Partial<ISettings> =
+			const somesassConfiguration: Partial<ConfigurationV1 | Configuration> =
 				params.settings.somesass;
 
-			const editorConfiguration: Partial<IEditorSettings> =
+			const editorConfiguration: Partial<EditorConfiguration> =
 				params.settings.editor;
 
-			const settings: ISettings = {
-				...defaultSettings,
-				...somesassConfiguration,
-			};
-
-			const editorSettings: IEditorSettings = {
-				insertSpaces: false,
-				indentSize: undefined,
-				tabSize: 2,
-				...editorConfiguration,
-			};
-
-			applySettings(editorSettings, settings);
+			applyConfiguration(somesassConfiguration, editorConfiguration);
 		});
 
 		this.connection.onDidChangeWatchedFiles(async (event) => {
@@ -577,5 +578,6 @@ export class SomeSassServer {
 		});
 
 		this.connection.listen();
+		this.log.debug(`Some Sass language server is listening`);
 	}
 }

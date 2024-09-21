@@ -3,7 +3,7 @@ import {
 	CodeAction,
 	CodeActionContext,
 	CodeActionKind,
-	LanguageServiceConfiguration,
+	LanguageServerConfiguration,
 	Position,
 	Range,
 	TextDocument,
@@ -271,14 +271,14 @@ const tab = "	";
 
 function indentText(
 	text: string,
-	settings: LanguageServiceConfiguration,
+	settings: LanguageServerConfiguration,
 ): string {
-	if (settings.editorSettings?.insertSpaces) {
+	if (settings.editor?.insertSpaces) {
 		const numberOfSpaces: number =
-			typeof settings.editorSettings?.indentSize === "number"
-				? settings.editorSettings?.indentSize
-				: typeof settings.editorSettings?.tabSize === "number"
-					? settings.editorSettings?.tabSize
+			typeof settings.editor?.indentSize === "number"
+				? settings.editor?.indentSize
+				: typeof settings.editor?.tabSize === "number"
+					? settings.editor?.tabSize
 					: 2;
 		return `${space.repeat(numberOfSpaces)}${text}`;
 	}

@@ -46,7 +46,11 @@ export const Rules = {
 	),
 	DuplicateDeclarations: new Rule("duplicateProperties", l10n.t("Do not use duplicate style definitions"), Ignore),
 	EmptyRuleSet: new Rule("emptyRules", l10n.t("Do not use empty rulesets"), Warning),
-	ImportStatemement: new Rule("importStatement", l10n.t("Import statements do not load in parallel"), Ignore),
+	ImportStatemement: new Rule(
+		"importStatement",
+		l10n.t("Import statements can lead to sequential loading of CSS"),
+		Ignore,
+	),
 	BewareOfBoxModelSize: new Rule("boxModel", l10n.t("Do not use width or height when using padding or border"), Ignore),
 	UniversalSelector: new Rule("universalSelector", l10n.t("The universal selector (*) is known to be slow"), Ignore),
 	ZeroWithUnit: new Rule("zeroUnits", l10n.t("No unit for zero needed"), Ignore),

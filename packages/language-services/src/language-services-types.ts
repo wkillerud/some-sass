@@ -81,7 +81,7 @@ export interface LanguageService {
 	clearCache(): void;
 	/**
 	 * You may want to use this to set the workspace root.
-	 * @param settings {@link LanguageServiceConfiguration}
+	 * @param settings {@link LanguageServerConfiguration}
 	 *
 	 * @example
 	 * ```js
@@ -90,7 +90,7 @@ export interface LanguageService {
 	 * });
 	 * ```
 	 */
-	configure(settings: LanguageServiceConfiguration): void;
+	configure(settings: LanguageServerConfiguration): void;
 	doComplete(
 		document: TextDocument,
 		position: Position,
@@ -175,21 +175,23 @@ export type Rename =
 	| { range: Range; placeholder: string }
 	| { defaultBehavior: boolean };
 
-export interface LanguageServiceConfiguration {
+export type LintLevel = "ignore" | "warning" | "error";
+
+export interface LanguageSettings {
 	/**
-	 * Pass in [load paths](https://sass-lang.com/documentation/cli/dart-sass/#load-path) that will be used in addition to `node_modules`.
+	 * A list of relative file paths pointing to JSON files following the custom data format.
+	 * Some Sass loads custom data on startup to enhance its CSS support for CSS custom properties (variables), at-rules, pseudo-classes, and pseudo-elements you specify in the JSON files.
+	 * The file paths are relative to workspace and only workspace folder settings are considered.
 	 */
-	loadPaths?: string[];
-	completionSettings?: {
-		/**
-		 * Essentially "Visual Studio Code compat mode".
-		 *
-		 * If false, Some Sass will not give code suggestions based on contents from the current document.
-		 *
-		 * If you use this server as well as vscode-css-languageserver you can set this setting to avoid duplicates.
-		 * Has no effect for Sass Indented.
-		 */
-		suggestAllFromOpenDocument?: boolean;
+	customData?: string[];
+	codeAction: {
+		enabled: boolean;
+	};
+	colors: {
+		enabled: boolean;
+	};
+	completion: {
+		enabled: boolean;
 		/**
 		 * 	Mixins with `@content` SassDoc annotations and `%placeholders` get two suggestions by default:
 		 *   - One without `{ }`.
@@ -199,38 +201,110 @@ export interface LanguageServiceConfiguration {
 		 *   - All suggestions (default).
 		 *   - No brackets.
 		 *   - Only brackets. This still includes other suggestions, where there are no brackets to begin with.
-		 *
-		 * @default "all"
 		 */
-		suggestionStyle?: "all" | "nobracket" | "bracket";
+		mixinStyle?: "all" | "nobracket" | "bracket";
 		/**
-		 * Recommended if you don't rely on `@import`. With this setting turned on,
+		 * Recommended if you don't rely on `@import` in Sass. With this setting turned on,
 		 * Some Sass will only suggest variables, mixins and functions from the
 		 * namespaces that are in use in the open document.
 		 */
 		suggestFromUseOnly?: boolean;
 		/**
-		 * Suggest functions after the specified symbols when in a string context.
-		 * For example, if you add the `/` symbol to this setting, then `background: url(images/he|)`
-		 * could suggest a `hello()` function (`|` in this case indicates cursor position).
-		 *
-		 * @default " (+-*%"
-		 */
-		suggestFunctionsInStringContextAfterSymbols?: string;
-		/**
 		 * By default, Some Sass triggers property value completion after selecting a CSS property.
 		 * Use this setting to disable this behavior.
-		 *
-		 * @default true
 		 */
-		triggerPropertyValueCompletion?: boolean;
-		includePrefixDot?: boolean;
+		triggerPropertyValueCompletion: boolean;
+		completePropertyWithSemicolon?: boolean;
 	};
-	editorSettings?: EditorSettings;
+	definition: {
+		enabled: boolean;
+	};
+	diagnostics: {
+		enabled: boolean;
+		deprecation: {
+			enabled: boolean;
+		};
+		lint: {
+			enabled: boolean;
+			compatibleVendorPrefixes: LintLevel;
+			vendorPrefix: LintLevel;
+			duplicateProperties: LintLevel;
+			emptyRules: LintLevel;
+			importStatement: LintLevel;
+			boxModel: LintLevel;
+			universalSelector: LintLevel;
+			zeroUnits: LintLevel;
+			fontFaceProperties: LintLevel;
+			hexColorLength: LintLevel;
+			argumentsInColorFunction: LintLevel;
+			unknownProperties: LintLevel;
+			validProperties: string[];
+			ieHack: LintLevel;
+			unknownVendorSpecificProperties: LintLevel;
+			propertyIgnoredDueToDisplay: LintLevel;
+			important: LintLevel;
+			float: LintLevel;
+			idSelector: LintLevel;
+			unknownAtRules: LintLevel;
+			[key: string]: any;
+		};
+	};
+	foldingRanges: {
+		enabled: boolean;
+	};
+	highlights: {
+		enabled: boolean;
+	};
+	hover: {
+		enabled: boolean;
+		documentation: boolean;
+		references: boolean;
+	};
+	links: {
+		enabled: boolean;
+	};
+	references: {
+		enabled: boolean;
+	};
+	rename: {
+		enabled: boolean;
+	};
+	selectionRanges: {
+		enabled: boolean;
+	};
+	semanticTokens: {
+		enabled: boolean;
+	};
+	signatureHelp: {
+		enabled: boolean;
+	};
+	workspaceSymbol: {
+		enabled: boolean;
+	};
+}
+
+export interface WorkspaceConfiguration {
+	exclude: string[];
+	importAliases: {
+		[key: string]: any;
+	};
+	/**
+	 * Pass in [load paths](https://sass-lang.com/documentation/cli/dart-sass/#load-path) that will be used in addition to `node_modules`.
+	 */
+	loadPaths: string[];
 	workspaceRoot?: URI;
 }
 
-export interface EditorSettings {
+export interface LanguageServerConfiguration {
+	css: LanguageSettings;
+	sass: LanguageSettings;
+	scss: LanguageSettings;
+	editor: EditorConfiguration;
+	workspace: WorkspaceConfiguration;
+	logLevel: "trace" | "debug" | "info" | "warn" | "error" | "fatal" | "silent";
+}
+
+export interface EditorConfiguration {
 	/**
 	 * Insert spaces rather than tabs.
 	 */

@@ -5,12 +5,14 @@ import {
 	Scanner,
 	SassScanner,
 } from "@somesass/vscode-css-languageservice";
+import merge from "lodash.merge";
+import { defaultConfiguration } from "./configuration";
 import { LanguageModelCache } from "./language-model-cache";
 import {
 	LanguageServiceOptions,
 	TextDocument,
 	LanguageService,
-	LanguageServiceConfiguration,
+	LanguageServerConfiguration,
 	NodeType,
 	Range,
 	SassDocumentSymbol,
@@ -26,7 +28,7 @@ import { asDollarlessVariable } from "./utils/sass";
 
 export type LanguageFeatureInternal = {
 	cache: LanguageModelCache;
-	sassLs: VSCodeLanguageService;
+	vscodeLs: VSCodeLanguageService;
 };
 
 type FindOptions = {
@@ -39,16 +41,6 @@ type FindOptions = {
 	depth?: number;
 };
 
-const defaultConfiguration: LanguageServiceConfiguration = {
-	completionSettings: {
-		suggestAllFromOpenDocument: false,
-		suggestFromUseOnly: false,
-		suggestFunctionsInStringContextAfterSymbols: " (+-*%",
-		suggestionStyle: "all",
-		triggerPropertyValueCompletion: true,
-	},
-};
-
 /**
  * Base class for features. Provides helpers to do the navigation
  * between modules.
@@ -57,7 +49,7 @@ export abstract class LanguageFeature {
 	protected ls;
 	protected options;
 	protected clientCapabilities: ClientCapabilities;
-	protected configuration: LanguageServiceConfiguration = {};
+	protected configuration: LanguageServerConfiguration = defaultConfiguration;
 
 	private _internal: LanguageFeatureInternal;
 
@@ -76,20 +68,15 @@ export abstract class LanguageFeature {
 		this._internal = _internal;
 	}
 
-	configure(configuration: LanguageServiceConfiguration): void {
-		this.configuration = {
-			...defaultConfiguration,
-			...configuration,
-			completionSettings: {
-				...defaultConfiguration.completionSettings,
-				...(configuration.completionSettings || {}),
-			},
-		};
-		this._internal.sassLs.configure(configuration);
+	configure(configuration: LanguageServerConfiguration): void {
+		this.configuration = merge(defaultConfiguration, configuration);
+		this._internal.vscodeLs.configure({
+			validate: false,
+		});
 	}
 
 	protected getUpstreamLanguageServer(): VSCodeLanguageService {
-		return this._internal.sassLs;
+		return this._internal.vscodeLs;
 	}
 
 	protected getDocumentContext() {

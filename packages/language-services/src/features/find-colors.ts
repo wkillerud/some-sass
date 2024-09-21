@@ -33,7 +33,7 @@ export class FindColors extends LanguageFeature {
 
 		if (
 			variables.length >
-			(this.configuration.editorSettings?.colorDecoratorsLimit || 500)
+			(this.configuration.editor?.colorDecoratorsLimit || 500)
 		) {
 			// skip color decorators for large documents
 			return [];

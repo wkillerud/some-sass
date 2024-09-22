@@ -158,8 +158,8 @@ export class SomeSassServer {
 			);
 			settings.workspace.workspaceRoot = workspaceRoot;
 
-			if (settings.logLevel) {
-				this.log.setLogLevel(settings.logLevel);
+			if (settings.workspace.logLevel) {
+				this.log.setLogLevel(settings.workspace.logLevel);
 			}
 
 			if (ls) {

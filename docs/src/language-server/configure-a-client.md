@@ -10,15 +10,19 @@ The language server requests settings via the [`workspace/configuration` message
 
 You can also configure the language server by sending the [`workspace/didChangeConfiguration` message](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_didChangeConfiguration).
 
-While settings keys are documented with dot-notation, the shape of the settings is a nested object.
+While settings keys are documented with dot-notation, the shape of the settings is a nested object. Your editor may be able to translate from dot-notation to a properly formated object, but not every editor allows this.
 
-For example, while we may document `"somesass.loadPaths": []` (and write it this way in `settings.json` in Code), the actual shape of the settings object sent to the server looks like this.
+For example, while we may document `"somesass.scss.workspace.loadPaths": []` (and write it this way in `settings.json` in VS Code), the actual shape of the settings object sent to the server looks like this.
 
 ```json
 {
 	"settings": {
 		"somesass": {
-			"loadPaths": []
+			"scss": {
+				"workspace": {
+					"loadPaths": []
+				}
+			}
 		}
 	}
 }

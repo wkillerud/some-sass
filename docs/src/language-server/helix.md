@@ -8,16 +8,26 @@ You can configure new language servers in [`.config/helix/languages.toml`](https
 [language-server.some-sass-language-server]
 command = "some-sass-language-server"
 args = ["--stdio"]
-config = { somesass = { loadPaths = [] } }
+# see https://wkillerud.github.io/some-sass/user-guide/settings.html for all available settings
+config = { somesass = { workspace = { loadPaths = [] } } }
 
 [[language]]
 name = "scss"
 language-servers = [
-	{ name = "some-sass-language-server" },
-	{ name = "vscode-css-language-server" },
+	{ name = "some-sass-language-server" }
 ]
 ```
 
 The language server will start once you open an SCSS file.
+
+You can also use it for CSS.
+
+```toml
+[[language]]
+name = "css"
+language-servers = [
+	{ name = "some-sass-language-server" }
+]
+```
 
 At time of writing there doesn't seem to be a grammar for Sass indented available in Helix.

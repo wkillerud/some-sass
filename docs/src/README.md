@@ -8,7 +8,7 @@ Some features include:
 - Workspace-wide code navigation and refactoring, such as Rename Symbol.
 - Rich documentation through [SassDoc][sassdoc].
 - Language features for [`%placeholders`][placeholder], both when using them and writing them.
-- Support for both SCSS and intended [syntaxes].
+- Support for both SCSS and intended [syntaxes], as well as CSS.
 
 ![](./images/highlight-reel.gif)
 
@@ -20,11 +20,11 @@ You can find the extension here:
 - On the [Open VSX Registry][openvsx].
 - In the [Releases section on GitHub][ghreleases].
 
-See the User guide section to learn more about what the extension can do.
+See the User guide section to learn more about what the extension can do, or jump into [Settings](./user-guide/settings.md).
 
 ## Some Sass Language Server
 
-Some Sass is also a language server using the [Language Server Protocol (LSP)][lsp].
+Some Sass is also a language server using the [Language Server Protocol (LSP)][lsp]. It can be used for both SCSS, Sass (indented) and CSS.
 
 The language server is [published on npm][npm], and can be used with any editor that has an LSP client. See [Getting started](./language-server/getting-started.md) to learn more.
 

@@ -9,6 +9,7 @@
 		"lsp",
 		"language-server-protocol"
 	],
+	"type": "commonjs",
 	"engines": {
 		"node": ">=20"
 	},
@@ -31,18 +32,13 @@
 	"exports": {
 		".": {
 			"browser": "./dist/browser-server.js",
-			"development": "./dist/development/node-server.js",
 			"default": "./dist/node-server.js"
-		},
-		"./development": {
-			"browser": "./dist/development/browser-server.js",
-			"default": "./dist/development/node-server.js"
 		}
 	},
 	"author": "William Killerud <william@killerud.com> (https://www.williamkillerud.com/)",
 	"license": "MIT",
 	"scripts": {
-		"build": "tsc --noEmit && rspack",
+		"build": "rspack",
 		"clean": "shx rm -rf dist node_modules",
 		"test": "vitest",
 		"coverage": "vitest run --coverage"

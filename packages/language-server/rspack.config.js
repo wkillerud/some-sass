@@ -79,6 +79,10 @@ function defineConfig(config, mode) {
 		resolve: {
 			extensions: [".ts", ".js"],
 		},
+		optimization: {
+			mangleExports: false,
+			minimize: true,
+		},
 		module: {
 			rules: [
 				{
@@ -96,7 +100,7 @@ function defineConfig(config, mode) {
 				},
 			],
 		},
-		devtool: false,
+		devtool: "cheap-source-map",
 	};
 
 	/** @type RspackConfig */
@@ -114,8 +118,6 @@ function defineConfig(config, mode) {
 }
 
 module.exports = [
-	defineConfig(nodeConfig, "development"),
 	defineConfig(nodeConfig, "production"),
-	defineConfig(browserConfig, "development"),
 	defineConfig(browserConfig, "production"),
 ];

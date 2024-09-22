@@ -59,11 +59,6 @@ const config = {
 };
 
 module.exports = (env, argv) => {
-	const baseFrom =
-		argv.mode === "development"
-			? "../node_modules/some-sass-language-server/dist/development"
-			: "../node_modules/some-sass-language-server/dist/";
-
 	config.plugins?.push(
 		new rspack.ProvidePlugin({
 			process: "process/browser",
@@ -71,7 +66,7 @@ module.exports = (env, argv) => {
 		new rspack.CopyRspackPlugin({
 			patterns: [
 				{
-					from: `${baseFrom}/browser-server.*`,
+					from: "../node_modules/some-sass-language-server/dist/browser-server.*",
 					to: "[name][ext]",
 				},
 			],

@@ -29,10 +29,6 @@ Then start the language server like so:
 some-sass-language-server --stdio
 ```
 
-**Options**
-
-`--debug` – runs the development build of the language server, helpful to get more context if the server crashes
-
 ### Workspace configuration
 
 See [how to configure a client](https://wkillerud.github.io/some-sass/language-server/configure-a-client.html) and the [documentation for the available settings](https://wkillerud.github.io/some-sass/user-guide/settings.html).

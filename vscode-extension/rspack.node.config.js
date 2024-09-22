@@ -45,16 +45,11 @@ const config = {
 };
 
 module.exports = (env, argv) => {
-	const baseFrom =
-		argv.mode === "development"
-			? "../node_modules/some-sass-language-server/dist/development"
-			: "../node_modules/some-sass-language-server/dist/";
-
 	config.plugins?.push(
 		new rspack.CopyRspackPlugin({
 			patterns: [
 				{
-					from: `${baseFrom}/node-server.*`,
+					from: "../node_modules/some-sass-language-server/dist/node-server.*",
 					to: "[name][ext]",
 				},
 			],

@@ -1,4 +1,28 @@
 #!/usr/bin/env node
 const path = require("path");
+const fs = require("fs");
+
+const args = process.argv;
+
+if (args.includes("--version") || args.includes("-v") || args.includes("-V")) {
+	try {
+		const pkg = fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf-8");
+		const json = JSON.parse(pkg);
+		if (!json.version) {
+			throw new Error();
+		}
+		console.info(json.version);
+	} catch (e) {
+		console.info("Something went wrong reading the current version number.");
+	}
+	return;
+}
+
+if (args.includes("--help") || args.includes("-h")) {
+	console.info(`some-sass-language-server <--stdio|--node-ipc|--socket={number}> [--loglevel <trace|debug|info|warn|error|fatal|silent>]
+
+For documentation, visit https://wkillerud.github.io/some-sass/language-server/getting-started.html`);
+	return;
+}
 
 require(path.join(__dirname, "..", "dist", "node-server.js"));

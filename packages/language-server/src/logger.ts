@@ -29,15 +29,15 @@ function levelToRank(level: string): number {
 			return error;
 		case "warn":
 			return warn;
-		case "info":
-			return info;
 		case "debug":
 			return debug;
 		case "trace":
 			return trace;
 		case "silent":
-		default:
 			return silent;
+		case "info":
+		default:
+			return info;
 	}
 }
 
@@ -47,6 +47,12 @@ class LoggerImpl implements Logger {
 
 	constructor(connection: Connection) {
 		this.#connection = connection;
+		try {
+			const levelArg = process.argv.indexOf("--loglevel");
+			if (levelArg !== -1) {
+				this.#level = levelToRank(process.argv[levelArg + 1]);
+			}
+		} catch {}
 	}
 
 	setLogLevel(level: string): void {

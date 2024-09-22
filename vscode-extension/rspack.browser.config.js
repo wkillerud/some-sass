@@ -1,5 +1,4 @@
-// @ts-check
-/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable */
 
 const path = require("path");
 const rspack = require("@rspack/core");

@@ -138,7 +138,7 @@ export class DoHover extends LanguageFeature {
 								value: [
 									candidate.annotation,
 									config.hover.references
-										? `\n\n[SassDoc reference](http://sassdoc.com/annotations/#${candidate.annotation.slice(
+										? `\n[SassDoc reference](http://sassdoc.com/annotations/#${candidate.annotation.slice(
 												1,
 											)})`
 										: "",
@@ -264,7 +264,7 @@ export class DoHover extends LanguageFeature {
 									value: [
 										description,
 										config.hover.references
-											? `\n\n[Sass reference](${reference}#${builtinName})`
+											? `\n[Sass reference](${reference}#${builtinName})`
 											: "",
 									]
 										.join("\n")

@@ -9,5 +9,6 @@
 		"strict": true,
 		"allowSyntheticDefaultImports": true,
 		"resolveJsonModule": true
-	}
+	},
+	"exclude": ["**/*.test.ts", "vitest.config.mts"]
 }

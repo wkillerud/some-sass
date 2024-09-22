@@ -311,11 +311,7 @@ test("signature help when given more parameters than are supported", async () =>
 	});
 	const result = await ls.doSignatureHelp(document, Position.create(0, 18));
 
-	assert.deepStrictEqual(result, {
-		signatures: [],
-		activeParameter: 0,
-		activeSignature: 0,
-	});
+	assert.deepStrictEqual(result, null);
 });
 
 test("is not confused by using a function as a parameter", async () => {

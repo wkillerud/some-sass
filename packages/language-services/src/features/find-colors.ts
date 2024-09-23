@@ -71,14 +71,13 @@ export class FindColors extends LanguageFeature {
 			}),
 		);
 
-		if (config.colors.includeFromCurrentDocument === false) {
-			return result.filter((c) => c !== null);
+		if (config.colors.includeFromCurrentDocument) {
+			const upstream = this.getUpstreamLanguageServer(
+				document,
+			).findDocumentColors(document, stylesheet);
+			result.push(...upstream);
 		}
 
-		const upstream = this.getUpstreamLanguageServer(
-			document,
-		).findDocumentColors(document, stylesheet);
-		result.push(...upstream);
 		return result.filter((c) => c !== null);
 	}
 

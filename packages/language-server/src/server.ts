@@ -31,19 +31,22 @@ import {
 import { getSassRegionsDocument } from "./utils/embedded";
 import WorkspaceScanner from "./workspace-scanner";
 import { createLogger, type Logger } from "./logger";
-import { EditorConfiguration } from "@somesass/language-services/dist/language-services-types";
+import {
+	EditorConfiguration,
+	LanguageConfiguration,
+} from "@somesass/language-services/dist/language-services-types";
 import merge from "lodash.merge";
 
 export class SomeSassServer {
 	private readonly connection: Connection;
 	private readonly runtime: RuntimeEnvironment;
 	private readonly log: Logger;
+	private configuration: LanguageServiceConfiguration = defaultConfiguration;
 
 	constructor(connection: Connection, runtime: RuntimeEnvironment) {
 		this.connection = connection;
 		this.runtime = runtime;
 		this.log = createLogger(connection);
-		this.log.info(`Some Sass language server is starting`);
 		this.log.trace(`Process ID ${process.pid}`);
 	}
 
@@ -55,16 +58,9 @@ export class SomeSassServer {
 		let clientCapabilities: ClientCapabilities | undefined = undefined;
 		let initialScan: Promise<void> | null = null;
 
-		// Create a simple text document manager. The text document manager
-		// _supports full document sync only
 		const documents = new TextDocuments(TextDocument);
-
-		// Make the text document manager listen on the connection
-		// _for open, change and close text document events
 		documents.listen(this.connection);
 
-		// After the server has started the client sends an initilize request. The server receives
-		// _in the passed params the rootPath of the workspace plus the client capabilites
 		this.connection.onInitialize((params) => {
 			clientCapabilities = params.capabilities;
 
@@ -76,10 +72,8 @@ export class SomeSassServer {
 				logger: this.log,
 			});
 
-			// TODO: migrate to workspace folders. Workspace was an unnecessary older workaround of mine.
-			workspaceRoot = URI.parse(
-				params.initializationOptions?.workspace || params.rootUri!,
-			);
+			// TODO: migrate to workspace folders
+			workspaceRoot = URI.parse(params.rootUri!);
 			this.log.info(`Workspace root ${workspaceRoot}`);
 
 			return {
@@ -142,7 +136,7 @@ export class SomeSassServer {
 		): LanguageServiceConfiguration => {
 			if (isOldConfiguration(somesass)) {
 				this.log.warn(
-					`Your somesass configuration uses old setting names. They will continue to work for some time, but it's recommended you change your settings to the new names. See https://wkillerud.github.io/some-sass/user-guide/settings.html`,
+					`Your somesass configuration uses old setting names. They will continue to work for some time, but it's recommended you change your settings to the new names. For new setting IDs see https://wkillerud.github.io/some-sass/user-guide/settings.html`,
 				);
 				somesass = toNewConfiguration(somesass as Partial<ConfigurationV1>);
 			}
@@ -162,9 +156,13 @@ export class SomeSassServer {
 				this.log.setLogLevel(settings.workspace.logLevel);
 			}
 
+			this.configuration = settings;
 			if (ls) {
 				ls.configure(settings);
 			}
+
+			this.log.debug("Applied user configuration");
+			this.log.trace(JSON.stringify(this.configuration));
 
 			return settings;
 		};
@@ -199,9 +197,7 @@ export class SomeSassServer {
 
 						const configuration = applyConfiguration(somesass, editor);
 
-						this.log.debug(
-							`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] scanning workspace for files`,
-						);
+						this.log.debug("Scanning workspace for files");
 
 						return fileSystemProvider
 							.findFiles(
@@ -209,9 +205,7 @@ export class SomeSassServer {
 								configuration.workspace.exclude,
 							)
 							.then((files) => {
-								this.log.debug(
-									`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] found ${files.length} files, starting parse`,
-								);
+								this.log.debug(`Found ${files.length} files, starting parse`);
 
 								workspaceScanner = new WorkspaceScanner(
 									ls!,
@@ -222,7 +216,7 @@ export class SomeSassServer {
 							})
 							.then((promises) => {
 								this.log.debug(
-									`[Server${process.pid ? `(${process.pid})` : ""} ${workspaceRoot}] parsed ${promises.length} files`,
+									`Initial scan finished, parsed ${promises.length} files`,
 								);
 								resolve();
 							});
@@ -234,23 +228,29 @@ export class SomeSassServer {
 			}
 		});
 
-		const onDocumentChanged = async (
+		this.connection.onDidChangeConfiguration((params) => {
+			applyConfiguration(params.settings.somesass, params.settings.editor);
+		});
+
+		const doDiagnostics = async (
 			params: TextDocumentChangeEvent<TextDocument>,
-		) => {
-			if (!workspaceScanner || !ls) return;
+		): Promise<void> => {
+			if (!ls) return;
 
-			try {
-				ls.onDocumentChanged(params.document);
+			const document = getSassRegionsDocument(
+				documents.get(params.document.uri),
+			);
+			if (!document) return;
 
-				// TODO: look into this so we can get diagnostics on first open, not working properly
-
-				// Check that no new version has been made while we waited,
-				// in which case the diagnostics may no longer be valid.
+			const config = this.languageConfiguration(document);
+			if (config.diagnostics.enabled) {
 				let latest = documents.get(params.document.uri);
 				if (!latest || latest.version !== params.document.version) return;
 
 				const diagnostics = await ls.doDiagnostics(params.document);
 
+				// Check that no new version has been made while we waited,
+				// in which case the diagnostics may no longer be valid.
 				latest = documents.get(params.document.uri);
 				if (!latest || latest.version !== params.document.version) return;
 
@@ -258,16 +258,28 @@ export class SomeSassServer {
 					uri: latest.uri,
 					diagnostics,
 				});
-			} catch {
-				// Do nothing, the document might have changed
 			}
 		};
 
-		documents.onDidOpen(onDocumentChanged);
-		documents.onDidChangeContent(onDocumentChanged);
+		documents.onDidOpen(async (params) => {
+			try {
+				if (initialScan) {
+					await initialScan;
+				}
+				await doDiagnostics(params);
+			} catch (e) {
+				this.log.debug((e as Error).message);
+			}
+		});
 
-		this.connection.onDidChangeConfiguration((params) => {
-			applyConfiguration(params.settings.somesass, params.settings.editor);
+		documents.onDidChangeContent(async (params) => {
+			if (!workspaceScanner || !ls) return;
+			try {
+				ls.onDocumentChanged(params.document);
+				await doDiagnostics(params);
+			} catch (e) {
+				this.log.debug((e as Error).message);
+			}
 		});
 
 		this.connection.onDidChangeWatchedFiles(async (event) => {
@@ -293,260 +305,388 @@ export class SomeSassServer {
 				}
 
 				await workspaceScanner.scan(newFiles);
-			} catch {
-				// do nothing
+			} catch (e) {
+				this.log.debug((e as Error).message);
 			}
 		});
 
 		this.connection.onCompletion(async (params) => {
 			if (!ls) return null;
+			try {
+				const document = getSassRegionsDocument(
+					documents.get(params.textDocument.uri),
+					params.position,
+				);
+				if (!document) return null;
 
-			const document = getSassRegionsDocument(
-				documents.get(params.textDocument.uri),
-				params.position,
-			);
-			if (!document) return null;
-
-			const result = await ls.doComplete(document, params.position);
-			if (result.items.length === 0) {
-				result.isIncomplete = true;
+				const config = this.languageConfiguration(document);
+				if (config.completion.enabled) {
+					const result = await ls.doComplete(document, params.position);
+					if (result.items.length === 0) {
+						result.isIncomplete = true;
+					}
+					return result;
+				} else {
+					return null;
+				}
+			} catch (e) {
+				this.log.debug((e as Error).message);
+				return null;
 			}
-			return result;
 		});
 
 		this.connection.onHover((params) => {
 			if (!ls) return null;
+			try {
+				const document = getSassRegionsDocument(
+					documents.get(params.textDocument.uri),
+					params.position,
+				);
+				if (!document) return null;
 
-			const document = getSassRegionsDocument(
-				documents.get(params.textDocument.uri),
-				params.position,
-			);
-			if (!document) return null;
-
-			const result = ls.doHover(document, params.position);
-			return result;
+				const config = this.languageConfiguration(document);
+				if (config.hover.enabled) {
+					const result = ls.doHover(document, params.position);
+					return result;
+				} else {
+					return null;
+				}
+			} catch (e) {
+				this.log.debug((e as Error).message);
+				return null;
+			}
 		});
 
 		this.connection.onSignatureHelp(async (params) => {
 			if (!ls) return null;
+			try {
+				const document = getSassRegionsDocument(
+					documents.get(params.textDocument.uri),
+					params.position,
+				);
+				if (!document) return null;
 
-			const document = getSassRegionsDocument(
-				documents.get(params.textDocument.uri),
-				params.position,
-			);
-			if (!document) return null;
-
-			const result = await ls.doSignatureHelp(document, params.position);
-			return result;
+				const config = this.languageConfiguration(document);
+				if (config.signatureHelp.enabled) {
+					const result = await ls.doSignatureHelp(document, params.position);
+					return result;
+				} else {
+					return null;
+				}
+			} catch (e) {
+				this.log.debug((e as Error).message);
+				return null;
+			}
 		});
 
 		this.connection.onDefinition((params) => {
 			if (!ls) return null;
+			try {
+				const document = getSassRegionsDocument(
+					documents.get(params.textDocument.uri),
+					params.position,
+				);
+				if (!document) return null;
 
-			const document = getSassRegionsDocument(
-				documents.get(params.textDocument.uri),
-				params.position,
-			);
-			if (!document) return null;
-
-			const result = ls.findDefinition(document, params.position);
-			return result;
+				const config = this.languageConfiguration(document);
+				if (config.definition.enabled) {
+					const result = ls.findDefinition(document, params.position);
+					return result;
+				} else {
+					return null;
+				}
+			} catch (e) {
+				this.log.debug((e as Error).message);
+				return null;
+			}
 		});
 
 		this.connection.onDocumentHighlight(async (params) => {
 			if (!ls) return null;
-
-			const document = getSassRegionsDocument(
-				documents.get(params.textDocument.uri),
-				params.position,
-			);
-			if (!document) return null;
-
 			try {
-				if (initialScan) {
-					await initialScan;
+				const document = getSassRegionsDocument(
+					documents.get(params.textDocument.uri),
+					params.position,
+				);
+				if (!document) return null;
+
+				const config = this.languageConfiguration(document);
+				if (config.highlights.enabled) {
+					try {
+						if (initialScan) {
+							await initialScan;
+						}
+						const result = ls.findDocumentHighlights(document, params.position);
+						return result;
+					} catch {
+						// Do nothing
+					}
+				} else {
+					return null;
 				}
-				const result = ls.findDocumentHighlights(document, params.position);
-				return result;
-			} catch {
-				// Do nothing
+			} catch (e) {
+				this.log.debug((e as Error).message);
+				return null;
 			}
 		});
 
 		this.connection.onDocumentLinks(async (params) => {
 			if (!ls) return null;
-
-			const document = getSassRegionsDocument(
-				documents.get(params.textDocument.uri),
-			);
-			if (!document) return null;
-
 			try {
-				if (initialScan) {
-					await initialScan;
+				const document = getSassRegionsDocument(
+					documents.get(params.textDocument.uri),
+				);
+				if (!document) return null;
+
+				const config = this.languageConfiguration(document);
+				if (config.links.enabled) {
+					if (initialScan) {
+						await initialScan;
+					}
+					const result = await ls.findDocumentLinks(document);
+					return result;
+				} else {
+					return null;
 				}
-				const result = await ls.findDocumentLinks(document);
-				return result;
-			} catch {
-				// Do nothing
+			} catch (e) {
+				this.log.debug((e as Error).message);
+				return null;
 			}
 		});
 
 		this.connection.onReferences(async (params) => {
 			if (!ls) return null;
+			try {
+				const document = getSassRegionsDocument(
+					documents.get(params.textDocument.uri),
+					params.position,
+				);
+				if (!document) return null;
 
-			const document = getSassRegionsDocument(
-				documents.get(params.textDocument.uri),
-				params.position,
-			);
-			if (!document) return null;
-
-			const references = await ls.findReferences(
-				document,
-				params.position,
-				params.context,
-			);
-			return references;
+				const config = this.languageConfiguration(document);
+				if (config.references.enabled) {
+					const references = await ls.findReferences(
+						document,
+						params.position,
+						params.context,
+					);
+					return references;
+				} else {
+					return null;
+				}
+			} catch (e) {
+				this.log.debug((e as Error).message);
+				return null;
+			}
 		});
 
 		this.connection.onWorkspaceSymbol((params) => {
 			if (!ls) return null;
-
-			const result = ls.findWorkspaceSymbols(params.query);
-			return result;
+			try {
+				const result = ls.findWorkspaceSymbols(params.query);
+				return result;
+			} catch (e) {
+				this.log.debug((e as Error).message);
+				return null;
+			}
 		});
 
 		this.connection.onCodeAction(async (params) => {
 			if (!ls) return null;
+			try {
+				const document = getSassRegionsDocument(
+					documents.get(params.textDocument.uri),
+				);
+				if (!document) return null;
 
-			const document = getSassRegionsDocument(
-				documents.get(params.textDocument.uri),
-			);
-			if (!document) return null;
-
-			const result: (Command | CodeAction)[] = [];
-
-			const actions = await ls.getCodeActions(
-				document,
-				params.range,
-				params.context,
-			);
-
-			for (const action of actions) {
-				if (action.kind?.startsWith("refactor.extract")) {
-					// TODO: can we detect support for the custom command here before we do this?
-
-					// Replace with a custom command that immediately starts a rename after applying the edit.
-					// If this causes problems for other clients, look into passing some kind of client identifier (optional)
-					// with initOptions that indicate this command exists in the client.
-
-					const edit: TextDocumentEdit | undefined = action.edit
-						?.documentChanges?.[0] as TextDocumentEdit;
-
-					const command = Command.create(
-						action.title,
-						"_somesass.applyExtractCodeAction",
-						document.uri,
-						document.version,
-						edit && edit.edits[0],
-					);
-
-					result.push(CodeAction.create(action.title, command, action.kind));
-				} else {
-					result.push(action);
+				const config = this.languageConfiguration(document);
+				if (!config.codeAction.enabled) {
+					return null;
 				}
-			}
 
-			return result;
+				const result: (Command | CodeAction)[] = [];
+
+				const actions = await ls.getCodeActions(
+					document,
+					params.range,
+					params.context,
+				);
+
+				for (const action of actions) {
+					if (action.kind?.startsWith("refactor.extract")) {
+						// TODO: can we detect support for the custom command here before we do this?
+
+						// Replace with a custom command that immediately starts a rename after applying the edit.
+						// If this causes problems for other clients, look into passing some kind of client identifier (optional)
+						// with initOptions that indicate this command exists in the client.
+
+						const edit: TextDocumentEdit | undefined = action.edit
+							?.documentChanges?.[0] as TextDocumentEdit;
+
+						const command = Command.create(
+							action.title,
+							"_somesass.applyExtractCodeAction",
+							document.uri,
+							document.version,
+							edit && edit.edits[0],
+						);
+
+						result.push(CodeAction.create(action.title, command, action.kind));
+					} else {
+						result.push(action);
+					}
+				}
+
+				return result;
+			} catch (e) {
+				this.log.debug((e as Error).message);
+				return null;
+			}
 		});
 
 		this.connection.onPrepareRename(async (params) => {
 			if (!ls) return null;
+			try {
+				const document = getSassRegionsDocument(
+					documents.get(params.textDocument.uri),
+					params.position,
+				);
+				if (!document) return null;
 
-			const document = getSassRegionsDocument(
-				documents.get(params.textDocument.uri),
-				params.position,
-			);
-			if (!document) return null;
-
-			const preparations = await ls.prepareRename(document, params.position);
-			return preparations;
+				const config = this.languageConfiguration(document);
+				if (config.rename.enabled) {
+					const preparations = await ls.prepareRename(
+						document,
+						params.position,
+					);
+					return preparations;
+				} else {
+					return null;
+				}
+			} catch (e) {
+				this.log.debug((e as Error).message);
+				return null;
+			}
 		});
 
 		this.connection.onRenameRequest(async (params) => {
 			if (!ls) return null;
+			try {
+				const document = getSassRegionsDocument(
+					documents.get(params.textDocument.uri),
+					params.position,
+				);
+				if (!document) return null;
 
-			const document = getSassRegionsDocument(
-				documents.get(params.textDocument.uri),
-				params.position,
-			);
-			if (!document) return null;
-
-			const edits = await ls.doRename(
-				document,
-				params.position,
-				params.newName,
-			);
-			return edits;
+				const config = this.languageConfiguration(document);
+				if (config.rename.enabled) {
+					const edits = await ls.doRename(
+						document,
+						params.position,
+						params.newName,
+					);
+					return edits;
+				} else {
+					return null;
+				}
+			} catch (e) {
+				this.log.debug((e as Error).message);
+				return null;
+			}
 		});
 
 		this.connection.onDocumentColor(async (params) => {
 			if (!ls) return null;
-
-			const document = getSassRegionsDocument(
-				documents.get(params.textDocument.uri),
-			);
-			if (!document) return null;
-
 			try {
-				if (initialScan) {
-					await initialScan;
+				const document = getSassRegionsDocument(
+					documents.get(params.textDocument.uri),
+				);
+				if (!document) return null;
+
+				const config = this.languageConfiguration(document);
+				if (config.colors.enabled) {
+					if (initialScan) {
+						await initialScan;
+					}
+					const information = await ls.findColors(document);
+					return information;
+				} else {
+					return null;
 				}
-				const information = await ls.findColors(document);
-				return information;
-			} catch {
-				// Do nothing
+			} catch (e) {
+				this.log.debug((e as Error).message);
+				return null;
 			}
 		});
 
 		this.connection.onColorPresentation((params) => {
 			if (!ls) return null;
+			try {
+				const document = getSassRegionsDocument(
+					documents.get(params.textDocument.uri),
+				);
+				if (!document) return null;
 
-			const document = getSassRegionsDocument(
-				documents.get(params.textDocument.uri),
-			);
-			if (!document) return null;
-
-			const result = ls.getColorPresentations(
-				document,
-				params.color,
-				params.range,
-			);
-			return result;
+				const config = this.languageConfiguration(document);
+				if (config.colors.enabled) {
+					const result = ls.getColorPresentations(
+						document,
+						params.color,
+						params.range,
+					);
+					return result;
+				} else {
+					return null;
+				}
+			} catch (e) {
+				this.log.debug((e as Error).message);
+				return null;
+			}
 		});
 
 		this.connection.onFoldingRanges(async (params) => {
 			if (!ls) return null;
+			try {
+				const document = getSassRegionsDocument(
+					documents.get(params.textDocument.uri),
+				);
+				if (!document) return null;
 
-			const document = getSassRegionsDocument(
-				documents.get(params.textDocument.uri),
-			);
-			if (!document) return null;
-
-			const result = await ls.getFoldingRanges(document);
-			return result;
+				const config = this.languageConfiguration(document);
+				if (config.foldingRanges.enabled) {
+					const result = await ls.getFoldingRanges(document);
+					return result;
+				} else {
+					return null;
+				}
+			} catch (e) {
+				this.log.debug((e as Error).message);
+				return null;
+			}
 		});
 
 		this.connection.onSelectionRanges(async (params) => {
 			if (!ls) return null;
+			try {
+				const document = getSassRegionsDocument(
+					documents.get(params.textDocument.uri),
+				);
+				if (!document) return null;
 
-			const document = getSassRegionsDocument(
-				documents.get(params.textDocument.uri),
-			);
-			if (!document) return null;
-
-			const result = await ls.getSelectionRanges(document, params.positions);
-			return result;
+				const config = this.languageConfiguration(document);
+				if (config.selectionRanges.enabled) {
+					const result = await ls.getSelectionRanges(
+						document,
+						params.positions,
+					);
+					return result;
+				} else {
+					return null;
+				}
+			} catch (e) {
+				this.log.debug((e as Error).message);
+				return null;
+			}
 		});
 
 		this.connection.onShutdown(() => {
@@ -556,6 +696,21 @@ export class SomeSassServer {
 		});
 
 		this.connection.listen();
-		this.log.debug(`Some Sass language server is listening`);
+		this.log.debug(`Some Sass language server is running`);
+	}
+
+	languageConfiguration(document: TextDocument): LanguageConfiguration {
+		switch (document.languageId) {
+			case "css": {
+				return this.configuration.css;
+			}
+			case "sass": {
+				return this.configuration.sass;
+			}
+			case "scss": {
+				return this.configuration.scss;
+			}
+		}
+		throw new Error(`Unsupported language ${document.languageId}`);
 	}
 }

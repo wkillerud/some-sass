@@ -74,12 +74,16 @@ export class DoDiagnostics extends LanguageFeature {
 			return [];
 		}
 
-		// TODO: move cssValidation in here so we can apply settings more easliy (turn off linting globally)
+		const config = this.languageConfiguration(document);
 
 		const stylesheet = this.ls.parseStylesheet(document);
 		const diagnostics = this.getUpstreamLanguageServer(document).doValidation(
 			document,
 			stylesheet,
+			{
+				validate: config.diagnostics.enabled,
+				lint: config.diagnostics.lint.enabled ? config.diagnostics.lint : false,
+			},
 		);
 		return diagnostics;
 	}

@@ -138,10 +138,16 @@ export class FindDefinition extends LanguageFeature {
 		}
 
 		// If not found, go through the old fashioned way and assume everything is in scope via @import
-		const symbols = this.ls.findWorkspaceSymbols(name);
-		for (const symbol of symbols) {
-			if (kinds.includes(symbol.kind)) {
-				return symbol.location;
+		const documents = this.cache.documents();
+		for (const document of documents) {
+			const symbols = this.ls.findDocumentSymbols(document);
+			for (const symbol of symbols) {
+				if (!symbol.name.includes(name)) {
+					continue;
+				}
+				if (kinds.includes(symbol.kind)) {
+					return Location.create(document.uri, symbol.selectionRange);
+				}
 			}
 		}
 

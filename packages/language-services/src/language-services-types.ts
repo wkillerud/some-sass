@@ -317,6 +317,7 @@ export interface WorkspaceConfiguration {
 	 */
 	loadPaths: string[];
 	workspaceRoot?: URI;
+	logLevel: "trace" | "debug" | "info" | "warn" | "error" | "fatal" | "silent";
 }
 
 export interface LanguageServerConfiguration {
@@ -325,7 +326,6 @@ export interface LanguageServerConfiguration {
 	scss: LanguageConfiguration;
 	editor: EditorConfiguration;
 	workspace: WorkspaceConfiguration;
-	logLevel: "trace" | "debug" | "info" | "warn" | "error" | "fatal" | "silent";
 }
 
 export interface EditorConfiguration {

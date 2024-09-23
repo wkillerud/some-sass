@@ -1,11 +1,11 @@
 import { LanguageServerConfiguration } from "./language-services-types";
 
 export const defaultConfiguration: LanguageServerConfiguration = {
-	logLevel: "info",
 	workspace: {
 		exclude: ["**/.git/**", "**/node_modules/**"],
 		importAliases: {},
 		loadPaths: [],
+		logLevel: "info",
 	},
 	editor: {
 		colorDecoratorsLimit: 500,

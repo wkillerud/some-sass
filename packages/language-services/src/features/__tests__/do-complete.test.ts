@@ -9,8 +9,9 @@ const ls = getLanguageService({ fileSystemProvider, ...rest });
 ls.configure({
 	scss: {
 		completion: {
-			suggestAllFromOpenDocument: true,
+			includeFromCurrentDocument: true,
 			suggestFromUseOnly: false,
+			css: false,
 		},
 	},
 });

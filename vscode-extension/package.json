@@ -176,6 +176,13 @@
 							"Where brackets are suggested, don't suggest without brackets"
 						]
 					},
+					"somesass.scss.completion.css": {
+						"order": 33,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Compatibility setting for VS Code. Enable or disable CSS completions (IntelliSense). The built-in SCSS language server provides this, so by default it's turned off in Some Sass."
+					},
 					"somesass.scss.completion.triggerPropertyValueCompletion": {
 						"order": 33,
 						"type": "boolean",
@@ -488,7 +495,7 @@
 						"order": 81,
 						"type": "boolean",
 						"scope": "resource",
-						"default": true,
+						"default": false,
 						"description": "Show property and value documentation in CSS hovers."
 					},
 					"somesass.scss.hover.references": {
@@ -496,7 +503,7 @@
 						"type": "boolean",
 						"scope": "resource",
 						"default": true,
-						"description": "Show references to MDN in CSS hovers, Sass documentation for Sass built-in modules and SassDoc for annotations."
+						"description": "Show references to Sass documentation for Sass built-in modules and SassDoc for annotations."
 					},
 					"somesass.scss.links.enabled": {
 						"order": 90,
@@ -592,6 +599,13 @@
 							"Only show suggestions without brackets",
 							"Where brackets are suggested, omit duplicates without brackets"
 						]
+					},
+					"somesass.sass.completion.css": {
+						"order": 33,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable CSS completions (IntelliSense)."
 					},
 					"somesass.sass.completion.triggerPropertyValueCompletion": {
 						"order": 33,

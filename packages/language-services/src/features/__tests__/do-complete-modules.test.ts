@@ -16,6 +16,7 @@ beforeEach(() => {
 		scss: {
 			completion: {
 				suggestFromUseOnly: true,
+				css: false,
 			},
 		},
 		sass: {

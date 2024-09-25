@@ -353,15 +353,15 @@ export class DoComplete extends LanguageFeature {
 			}
 		}
 
-		if (document.languageId === "sass") {
-			const upstreamResult = await upstreamLs.doComplete2(
+		if (config.completion.css) {
+			const cssResults = await upstreamLs.doComplete2(
 				document,
 				position,
 				stylesheet,
 				this.getDocumentContext(),
 			);
-			if (upstreamResult.items.length > 0) {
-				result.items.push(...upstreamResult.items);
+			if (cssResults.items.length > 0) {
+				result.items.push(...cssResults.items);
 			}
 		}
 
@@ -520,7 +520,7 @@ export class DoComplete extends LanguageFeature {
 		const items: CompletionItem[] = [];
 		const result = await this.findInWorkspace<CompletionItem>((document) => {
 			// keep track of visited to avoid duplicates
-			// if completionSettings?.suggestFromUseOnly is false
+			// if suggestFromUseOnly is false
 			visited.add(document.uri);
 
 			const symbols = this.ls.findDocumentSymbols(document);

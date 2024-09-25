@@ -19,6 +19,7 @@ export const defaultConfiguration: LanguageServerConfiguration = {
 		},
 		completion: {
 			enabled: true,
+			css: true,
 			includeFromCurrentDocument: true,
 			completePropertyWithSemicolon: true,
 			triggerPropertyValueCompletion: true,
@@ -98,6 +99,7 @@ export const defaultConfiguration: LanguageServerConfiguration = {
 		},
 		completion: {
 			enabled: true,
+			css: true,
 			mixinStyle: "all",
 			includeFromCurrentDocument: true,
 			suggestFromUseOnly: false,
@@ -178,6 +180,7 @@ export const defaultConfiguration: LanguageServerConfiguration = {
 		},
 		completion: {
 			enabled: true,
+			css: true,
 			mixinStyle: "all",
 			includeFromCurrentDocument: true,
 			suggestFromUseOnly: false,

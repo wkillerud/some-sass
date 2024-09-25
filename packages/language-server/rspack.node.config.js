@@ -28,6 +28,7 @@ const config = {
 							syntax: "typescript",
 						},
 						externalHelpers: true,
+						target: "es2022",
 					},
 				},
 			},

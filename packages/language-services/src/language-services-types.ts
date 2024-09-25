@@ -210,6 +210,10 @@ export interface LanguageConfiguration {
 	completion: {
 		enabled: boolean;
 		/**
+		 * Include CSS completions.
+		 */
+		css?: boolean;
+		/**
 		 * 	Mixins with `@content` SassDoc annotations and `%placeholders` get two suggestions by default:
 		 *   - One without `{ }`.
 		 *   - One _with_ `{ }`. This one creates a new block, and moves the cursor inside the block.

@@ -136,9 +136,13 @@ export class SomeSassServer {
 		): LanguageServiceConfiguration => {
 			if (isOldConfiguration(somesass)) {
 				this.log.warn(
-					`Your somesass configuration uses old setting names. They will continue to work for some time, but it's recommended you change your settings to the new names. For new setting IDs see https://wkillerud.github.io/some-sass/user-guide/settings.html`,
+					`Your somesass configuration uses old setting names. They will continue to work for some time, but it's recommended you change your settings to the new names. For all the available settings see https://wkillerud.github.io/some-sass/user-guide/settings.html`,
 				);
-				somesass = toNewConfiguration(somesass as Partial<ConfigurationV1>);
+
+				somesass = toNewConfiguration(
+					somesass as Partial<ConfigurationV1>,
+					this.log,
+				);
 			}
 
 			const settings: LanguageServiceConfiguration = merge(

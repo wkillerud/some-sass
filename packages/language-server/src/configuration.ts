@@ -6,7 +6,7 @@ import {
 export function toNewConfiguration(
 	v1: Partial<ConfigurationV1>,
 ): LanguageServiceConfiguration {
-	const newSettings = Object.assign({}, defaultConfiguration);
+	const newSettings = Object.assign({}, defaultConfiguration, v1);
 	if (v1.loadPaths) newSettings.workspace.loadPaths = v1.loadPaths;
 	if (v1.scannerExclude) newSettings.workspace.exclude = v1.scannerExclude;
 

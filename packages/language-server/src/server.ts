@@ -28,7 +28,7 @@ import {
 	isOldConfiguration,
 	toNewConfiguration,
 } from "./configuration";
-import { getSassRegionsDocument } from "./utils/embedded";
+import { getSassRegionsDocument } from "./embedded";
 import WorkspaceScanner from "./workspace-scanner";
 import { createLogger, type Logger } from "./logger";
 import {
@@ -46,7 +46,7 @@ export class SomeSassServer {
 	constructor(connection: Connection, runtime: RuntimeEnvironment) {
 		this.connection = connection;
 		this.runtime = runtime;
-		this.log = createLogger(connection);
+		this.log = createLogger(connection.console);
 		this.log.trace(`Process ID ${process.pid}`);
 	}
 

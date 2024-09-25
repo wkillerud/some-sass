@@ -1,4 +1,9 @@
-import type { Connection } from "vscode-languageserver";
+import type { RemoteConsole } from "vscode-languageserver";
+
+export type RemoteLogger = Pick<
+	RemoteConsole,
+	"debug" | "info" | "warn" | "error"
+>;
 
 export interface Logger {
 	fatal(message: string): void;
@@ -42,11 +47,11 @@ function levelToRank(level: string): number {
 }
 
 class LoggerImpl implements Logger {
-	#connection: Connection;
+	#remoteConsole: RemoteLogger;
 	#level: number = levelToRank("info");
 
-	constructor(connection: Connection) {
-		this.#connection = connection;
+	constructor(remoteConsole: RemoteLogger) {
+		this.#remoteConsole = remoteConsole;
 		try {
 			const levelArg = process.argv.indexOf("--loglevel");
 			if (levelArg !== -1) {
@@ -60,42 +65,42 @@ class LoggerImpl implements Logger {
 	}
 
 	fatal(message: string): void {
-		if (this.#level <= fatal) {
-			this.#connection.console.error(message);
+		if (this.#level >= fatal) {
+			this.#remoteConsole.error(message);
 		}
 	}
 
 	error(message: string): void {
-		if (this.#level <= error) {
-			this.#connection.console.error(message);
+		if (this.#level >= error) {
+			this.#remoteConsole.error(message);
 		}
 	}
 
 	warn(message: string): void {
-		if (this.#level <= warn) {
-			this.#connection.console.warn(message);
+		if (this.#level >= warn) {
+			this.#remoteConsole.warn(message);
 		}
 	}
 
 	info(message: string): void {
-		if (this.#level <= info) {
-			this.#connection.console.info(message);
+		if (this.#level >= info) {
+			this.#remoteConsole.info(message);
 		}
 	}
 
 	debug(message: string): void {
-		if (this.#level <= debug) {
-			this.#connection.console.debug(message);
+		if (this.#level >= debug) {
+			this.#remoteConsole.debug(message);
 		}
 	}
 
 	trace(message: string): void {
-		if (this.#level <= trace) {
-			this.#connection.console.debug(message);
+		if (this.#level >= trace) {
+			this.#remoteConsole.debug(message);
 		}
 	}
 }
 
-export function createLogger(connection: Connection): Logger {
-	return new LoggerImpl(connection);
+export function createLogger(remoteConsole: RemoteLogger): Logger {
+	return new LoggerImpl(remoteConsole);
 }

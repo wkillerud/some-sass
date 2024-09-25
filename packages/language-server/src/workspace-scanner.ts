@@ -4,7 +4,7 @@ import {
 } from "@somesass/language-services";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
-import { getSassRegionsDocument } from "./utils/embedded";
+import { getSassRegionsDocument } from "./embedded";
 
 export default class WorkspaceScanner {
 	#ls: LanguageService;

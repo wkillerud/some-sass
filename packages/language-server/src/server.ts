@@ -143,6 +143,10 @@ export class SomeSassServer {
 					somesass as Partial<ConfigurationV1>,
 					this.log,
 				);
+
+				this.log.info(
+					"Replace old setting IDs with new ones to remove these messages",
+				);
 			}
 
 			const settings: LanguageServiceConfiguration = merge(
@@ -166,7 +170,7 @@ export class SomeSassServer {
 			}
 
 			this.log.debug("Applied user configuration");
-			this.log.trace(JSON.stringify(this.configuration));
+			this.log.trace(JSON.stringify(this.configuration, null, 2));
 
 			return settings;
 		};
@@ -339,7 +343,7 @@ export class SomeSassServer {
 			}
 		});
 
-		this.connection.onHover((params) => {
+		this.connection.onHover(async (params) => {
 			if (!ls) return null;
 			try {
 				const document = getSassRegionsDocument(
@@ -350,7 +354,7 @@ export class SomeSassServer {
 
 				const config = this.languageConfiguration(document);
 				if (config.hover.enabled) {
-					const result = ls.doHover(document, params.position);
+					const result = await ls.doHover(document, params.position);
 					return result;
 				} else {
 					return null;
@@ -383,7 +387,7 @@ export class SomeSassServer {
 			}
 		});
 
-		this.connection.onDefinition((params) => {
+		this.connection.onDefinition(async (params) => {
 			if (!ls) return null;
 			try {
 				const document = getSassRegionsDocument(
@@ -394,7 +398,7 @@ export class SomeSassServer {
 
 				const config = this.languageConfiguration(document);
 				if (config.definition.enabled) {
-					const result = ls.findDefinition(document, params.position);
+					const result = await ls.findDefinition(document, params.position);
 					return result;
 				} else {
 					return null;
@@ -416,15 +420,11 @@ export class SomeSassServer {
 
 				const config = this.languageConfiguration(document);
 				if (config.highlights.enabled) {
-					try {
-						if (initialScan) {
-							await initialScan;
-						}
-						const result = ls.findDocumentHighlights(document, params.position);
-						return result;
-					} catch {
-						// Do nothing
+					if (initialScan) {
+						await initialScan;
 					}
+					const result = ls.findDocumentHighlights(document, params.position);
+					return result;
 				} else {
 					return null;
 				}

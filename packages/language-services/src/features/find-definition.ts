@@ -142,7 +142,7 @@ export class FindDefinition extends LanguageFeature {
 		for (const document of documents) {
 			const symbols = this.ls.findDocumentSymbols(document);
 			for (const symbol of symbols) {
-				if (!symbol.name.includes(name)) {
+				if (symbol.name !== name) {
 					continue;
 				}
 				if (kinds.includes(symbol.kind)) {

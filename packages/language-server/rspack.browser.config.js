@@ -8,7 +8,7 @@ const config = {
 	context: __dirname,
 	target: "webworker",
 	entry: {
-		"browser-server": "./src/browser-server.ts",
+		"browser-main": "./src/browser-main.ts",
 	},
 	output: {
 		libraryTarget: "var",
@@ -42,6 +42,7 @@ const config = {
 	resolve: {
 		extensions: [".ts", ".js"],
 		mainFields: ["browser", "module", "main"],
+		conditionNames: ["import", "require", "default"],
 		fallback: {
 			events: require.resolve("events/"),
 			path: require.resolve("path-browserify"),
@@ -53,6 +54,9 @@ const config = {
 	plugins: [
 		new rspack.ProvidePlugin({
 			process: "process/browser",
+		}),
+		new rspack.optimize.LimitChunkCountPlugin({
+			maxChunks: 1,
 		}),
 		// Only register the plugin when RSDOCTOR is true, as the plugin will increase the build time.
 		process.env.RSDOCTOR && new RsdoctorRspackPlugin(),

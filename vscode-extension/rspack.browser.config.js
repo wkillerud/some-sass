@@ -12,10 +12,9 @@ const config = {
 		"browser-client": "./src/browser-client.ts",
 	},
 	output: {
-		libraryTarget: "commonjs",
-
-		path: path.join(__dirname, "./dist"),
 		filename: "[name].js",
+		path: path.join(__dirname, "./dist"),
+		libraryTarget: "commonjs",
 	},
 	externals: {
 		vscode: "commonjs vscode",
@@ -24,8 +23,8 @@ const config = {
 	devtool: false,
 	resolve: {
 		extensions: [".ts", ".js"],
-
-		mainFields: ["browser", "module", "main"], // prefer `browser` entry point in imported modules
+		mainFields: ["browser", "module", "main"],
+		conditionNames: ["import", "require", "default"],
 		fallback: {
 			events: require.resolve("events/"),
 			assert: require.resolve("assert"),
@@ -55,23 +54,27 @@ const config = {
 			},
 		],
 	},
-};
-
-module.exports = (env, argv) => {
-	config.plugins?.push(
+	plugins: [
 		new rspack.ProvidePlugin({
 			process: "process/browser",
+		}),
+		new rspack.optimize.LimitChunkCountPlugin({
+			maxChunks: 1,
 		}),
 		new rspack.CopyRspackPlugin({
 			patterns: [
 				{
-					from: "../node_modules/some-sass-language-server/dist/browser-server.*",
+					from: "../node_modules/some-sass-language-server/dist/**/*.js",
 					to: "[name][ext]",
 				},
 			],
 		}),
-	);
+		// Only register the plugin when RSDOCTOR is true, as the plugin will increase the build time.
+		process.env.RSDOCTOR && new RsdoctorRspackPlugin(),
+	].filter(Boolean),
+};
 
+module.exports = (env, argv) => {
 	if (argv.mode === "development") {
 		config.devtool = "source-map";
 	}

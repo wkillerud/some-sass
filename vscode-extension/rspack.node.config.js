@@ -2,6 +2,7 @@
 
 const path = require("path");
 const rspack = require("@rspack/core");
+const { RsdoctorRspackPlugin } = require("@rsdoctor/rspack-plugin");
 
 /** @type {import('@rspack/core').Configuration} **/
 const config = {
@@ -21,8 +22,21 @@ const config = {
 	},
 	resolve: {
 		extensions: [".ts", ".js"],
+		conditionNames: ["import", "require", "default"],
+		mainFields: ["module", "main"],
 	},
-	plugins: [],
+	plugins: [
+		new rspack.CopyRspackPlugin({
+			patterns: [
+				{
+					from: "../node_modules/some-sass-language-server/dist/**/*.js",
+					to: "[name][ext]",
+				},
+			],
+		}),
+		// Only register the plugin when RSDOCTOR is true, as the plugin will increase the build time.
+		process.env.RSDOCTOR && new RsdoctorRspackPlugin(),
+	].filter(Boolean),
 	devtool: false,
 	module: {
 		rules: [
@@ -44,17 +58,6 @@ const config = {
 };
 
 module.exports = (env, argv) => {
-	config.plugins?.push(
-		new rspack.CopyRspackPlugin({
-			patterns: [
-				{
-					from: "../node_modules/some-sass-language-server/dist/node-server.*",
-					to: "[name][ext]",
-				},
-			],
-		}),
-	);
-
 	if (argv.mode === "development") {
 		config.devtool = "source-map";
 	}

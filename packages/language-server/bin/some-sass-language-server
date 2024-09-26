@@ -6,7 +6,10 @@ const args = process.argv;
 
 if (args.includes("--version") || args.includes("-v") || args.includes("-V")) {
 	try {
-		const pkg = fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf-8");
+		const pkg = fs.readFileSync(
+			path.join(__dirname, "..", "package.json"),
+			"utf-8",
+		);
 		const json = JSON.parse(pkg);
 		if (!json.version) {
 			throw new Error();
@@ -25,4 +28,4 @@ For documentation, visit https://wkillerud.github.io/some-sass/language-server/g
 	return;
 }
 
-require(path.join(__dirname, "..", "dist", "node-server.js"));
+require(path.join(__dirname, "..", "dist", "node-main.js"));

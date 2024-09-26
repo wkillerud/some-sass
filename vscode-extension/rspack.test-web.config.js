@@ -39,6 +39,9 @@ const browserTestsConfig = {
 			},
 		],
 	},
+	performance: {
+		hints: false,
+	},
 	plugins: [
 		new rspack.ProvidePlugin({
 			process: "process/browser",

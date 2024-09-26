@@ -7,7 +7,7 @@ const { RsdoctorRspackPlugin } = require("@rsdoctor/rspack-plugin");
 const config = {
 	target: "node",
 	entry: {
-		"node-server": "./src/node-server.ts",
+		"node-main": "./src/node-main.ts",
 	},
 	output: {
 		filename: "[name].js",
@@ -16,6 +16,8 @@ const config = {
 	},
 	resolve: {
 		extensions: [".ts", ".js"],
+		conditionNames: ["import", "require", "default"],
+		mainFields: ["module", "main"],
 	},
 	module: {
 		rules: [

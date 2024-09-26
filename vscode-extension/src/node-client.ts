@@ -67,7 +67,7 @@ function getOuterMostWorkspaceFolder(folder: WorkspaceFolder): WorkspaceFolder {
 }
 
 export async function activate(context: ExtensionContext): Promise<void> {
-	const serverModule = context.asAbsolutePath(`./dist/node-server.js`);
+	const serverModule = context.asAbsolutePath(`./dist/node-main.js`);
 
 	async function didOpenTextDocument(document: TextDocument): Promise<void> {
 		if (

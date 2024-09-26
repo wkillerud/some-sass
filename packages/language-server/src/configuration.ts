@@ -1,13 +1,13 @@
 import {
 	defaultConfiguration,
-	type LanguageServiceConfiguration,
+	type LanguageServerConfiguration,
 } from "@somesass/language-services";
 import { Logger } from "./logger";
 
 export function toNewConfiguration(
 	v1: Partial<ConfigurationV1>,
 	log: Logger,
-): LanguageServiceConfiguration {
+): LanguageServerConfiguration {
 	const newSettings = Object.assign({}, defaultConfiguration, v1);
 	if (v1.loadPaths) {
 		log.info("somesass.loadPaths is now somesass.workspace.loadPaths");
@@ -73,7 +73,7 @@ export function toNewConfiguration(
 }
 
 export function isOldConfiguration(
-	maybeV1: Partial<LanguageServiceConfiguration | ConfigurationV1>,
+	maybeV1: Partial<LanguageServerConfiguration | ConfigurationV1>,
 ) {
 	const asV1 = maybeV1 as Partial<ConfigurationV1>;
 	if (typeof asV1.loadPaths !== "undefined") return true;

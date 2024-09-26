@@ -2,7 +2,9 @@ import {
 	defaultConfiguration,
 	getLanguageService,
 	LanguageService,
-	LanguageServiceConfiguration,
+	LanguageServerConfiguration,
+	LanguageConfiguration,
+	EditorConfiguration,
 } from "@somesass/language-services";
 import {
 	ClientCapabilities,
@@ -31,17 +33,13 @@ import {
 import { getSassRegionsDocument } from "./embedded";
 import WorkspaceScanner from "./workspace-scanner";
 import { createLogger, type Logger } from "./logger";
-import {
-	EditorConfiguration,
-	LanguageConfiguration,
-} from "@somesass/language-services/dist/language-services-types";
 import merge from "lodash.merge";
 
 export class SomeSassServer {
 	private readonly connection: Connection;
 	private readonly runtime: RuntimeEnvironment;
 	private readonly log: Logger;
-	private configuration: LanguageServiceConfiguration = defaultConfiguration;
+	private configuration: LanguageServerConfiguration = defaultConfiguration;
 
 	constructor(connection: Connection, runtime: RuntimeEnvironment) {
 		this.connection = connection;
@@ -72,7 +70,6 @@ export class SomeSassServer {
 				logger: this.log,
 			});
 
-			// TODO: migrate to workspace folders
 			workspaceRoot = URI.parse(params.rootUri!);
 			this.log.info(`Workspace root ${workspaceRoot}`);
 
@@ -131,9 +128,9 @@ export class SomeSassServer {
 		});
 
 		const applyConfiguration = (
-			somesass: Partial<ConfigurationV1 | LanguageServiceConfiguration>,
+			somesass: Partial<ConfigurationV1 | LanguageServerConfiguration>,
 			editor: Partial<EditorConfiguration>,
-		): LanguageServiceConfiguration => {
+		): LanguageServerConfiguration => {
 			if (isOldConfiguration(somesass)) {
 				this.log.warn(
 					`Your somesass configuration uses old setting names. They will continue to work for some time, but it's recommended you change your settings to the new names. For all the available settings see https://wkillerud.github.io/some-sass/user-guide/settings.html`,
@@ -149,7 +146,7 @@ export class SomeSassServer {
 				);
 			}
 
-			const settings: LanguageServiceConfiguration = merge(
+			const settings: LanguageServerConfiguration = merge(
 				defaultConfiguration,
 				somesass,
 				{
@@ -158,17 +155,15 @@ export class SomeSassServer {
 					},
 				},
 			);
-			settings.workspace.workspaceRoot = workspaceRoot;
 
-			if (settings.workspace.logLevel) {
-				this.log.setLogLevel(settings.workspace.logLevel);
-			}
+			settings.workspace.workspaceRoot = workspaceRoot;
 
 			this.configuration = settings;
 			if (ls) {
 				ls.configure(settings);
 			}
 
+			this.log.setLogLevel(settings.workspace.logLevel);
 			this.log.debug("Applied user configuration");
 			this.log.trace(JSON.stringify(this.configuration, null, 2));
 
@@ -199,7 +194,7 @@ export class SomeSassServer {
 						}
 
 						let [somesass, editor] = configs as [
-							Partial<LanguageServiceConfiguration | ConfigurationV1>,
+							Partial<LanguageServerConfiguration | ConfigurationV1>,
 							Partial<EditorConfiguration>,
 						];
 
@@ -276,7 +271,9 @@ export class SomeSassServer {
 				}
 				await doDiagnostics(params);
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 			}
 		});
 
@@ -286,7 +283,9 @@ export class SomeSassServer {
 				ls.onDocumentChanged(params.document);
 				await doDiagnostics(params);
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 			}
 		});
 
@@ -314,7 +313,9 @@ export class SomeSassServer {
 
 				await workspaceScanner.scan(newFiles);
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 			}
 		});
 
@@ -338,7 +339,9 @@ export class SomeSassServer {
 					return null;
 				}
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 				return null;
 			}
 		});
@@ -360,7 +363,9 @@ export class SomeSassServer {
 					return null;
 				}
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 				return null;
 			}
 		});
@@ -382,7 +387,9 @@ export class SomeSassServer {
 					return null;
 				}
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 				return null;
 			}
 		});
@@ -404,7 +411,9 @@ export class SomeSassServer {
 					return null;
 				}
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 				return null;
 			}
 		});
@@ -429,7 +438,9 @@ export class SomeSassServer {
 					return null;
 				}
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 				return null;
 			}
 		});
@@ -453,7 +464,9 @@ export class SomeSassServer {
 					return null;
 				}
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 				return null;
 			}
 		});
@@ -479,7 +492,9 @@ export class SomeSassServer {
 					return null;
 				}
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 				return null;
 			}
 		});
@@ -490,7 +505,9 @@ export class SomeSassServer {
 				const result = ls.findWorkspaceSymbols(params.query);
 				return result;
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 				return null;
 			}
 		});
@@ -543,7 +560,9 @@ export class SomeSassServer {
 
 				return result;
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 				return null;
 			}
 		});
@@ -568,7 +587,9 @@ export class SomeSassServer {
 					return null;
 				}
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 				return null;
 			}
 		});
@@ -594,7 +615,9 @@ export class SomeSassServer {
 					return null;
 				}
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 				return null;
 			}
 		});
@@ -618,7 +641,9 @@ export class SomeSassServer {
 					return null;
 				}
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 				return null;
 			}
 		});
@@ -643,7 +668,9 @@ export class SomeSassServer {
 					return null;
 				}
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 				return null;
 			}
 		});
@@ -664,7 +691,9 @@ export class SomeSassServer {
 					return null;
 				}
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 				return null;
 			}
 		});
@@ -688,7 +717,9 @@ export class SomeSassServer {
 					return null;
 				}
 			} catch (e) {
-				this.log.debug((e as Error).message);
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
 				return null;
 			}
 		});

@@ -37,7 +37,7 @@ Once you turn off the built-in language features you can configure Some Sass to 
 
 Now that you disabled the built-in language features you need to turn on those language features in Some Sass.
 
-Open your user settings JSON and paste this configuration. You may want to restart VS Code to make sure the changes apply.
+Open your user settings JSON and paste this configuration. Restart VS Code to make sure the changes apply.
 
 ```json
 {
@@ -81,6 +81,15 @@ Open your user settings JSON and paste this configuration. You may want to resta
 ## Settings reference
 
 You can configure similar settings for both SCSS, Sass (indented) and CSS. There are also some settings that apply to the workspace regardless of syntax.
+
+### Workspace
+
+| Id                             | Description                                                                                                                                                                                                                                                                                                 | Default                                |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `somesass.workspace.loadPaths` | A list of paths relative to the workspace root where the language server should look for stylesheets loaded by `@use` and `@import`. `node_modules` is always included. Note that you will have to [configure your Sass compiler separately](https://sass-lang.com/documentation/cli/dart-sass/#load-path). | `[]`                                   |
+| `somesass.workspace.exclude`   | List of glob patterns for directories that are excluded in the initial scan for Sass files. Files in the exclude list will still be processed if referenced by `@use`, `@forward` and `@import` (for example a depencendy you use from `node_modules`).                                                     | `["**/.git/**", "**/node_modules/**"]` |
+| `somesass.workspace.logLevel`  | Control how much gets logged to the Output window. Possible values are `"silent"`, `"fatal"`, `"error"`, `"warn"`, `"info"`, `"debug"` and `"trace"`.                                                                                                                                                       | `"info"`                               |
+| `some-sass.trace.server`       | Log the messages sent between VS Code and the Some Sass language server. Possible values are `"off"`, `"messages"` and `"verbose"`                                                                                                                                                                          | `"off"`                                |
 
 ### SCSS
 
@@ -171,11 +180,3 @@ For brevity the ID column omits the `somesass.css` prefix. For example, to use t
 | `signatureHelp.enabled`                     | Enable or disable signature help.                                                                                                                                                                                                                                                                                                                                                                                                                                  | `false` |
 | `workspaceSymbol.enabled`                   | Enable or disable workspace symbol.                                                                                                                                                                                                                                                                                                                                                                                                                                | `false` |
 | `customData`                                | A list of relative file paths pointing to JSON files following the [custom data format](https://github.com/microsoft/vscode-css-languageservice/blob/master/docs/customData.md). Some Sass loads custom data on startup to enhance its CSS support for CSS custom properties (variables), at-rules, pseudo-classes, and pseudo-elements you specify in the JSON files. The file paths are relative to workspace and only workspace folder settings are considered. | `[]`    |
-
-### Workspace
-
-| Id                             | Description                                                                                                                                                                                                                                                                                                 | Default                                |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| `somesass.workspace.loadPaths` | A list of paths relative to the workspace root where the language server should look for stylesheets loaded by `@use` and `@import`. `node_modules` is always included. Note that you will have to [configure your Sass compiler separately](https://sass-lang.com/documentation/cli/dart-sass/#load-path). | `[]`                                   |
-| `somesass.workspace.exclude`   | List of glob patterns for directories that are excluded in the initial scan for Sass files. Files in the exclude list will still be processed if referenced by `@use`, `@forward` and `@import` (for example a depencendy you use from `node_modules`).                                                     | `["**/.git/**", "**/node_modules/**"]` |
-| `somesass.workspace.logLevel`  | Control how much gets logged to the Output window.                                                                                                                                                                                                                                                          | `"info"`                               |

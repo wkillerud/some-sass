@@ -1,7 +1,7 @@
 {
 	"name": "some-sass",
 	"displayName": "Some Sass",
-	"description": "Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
+	"description": "Improved support for SCSS, Sass indented and SassDoc. Workspace awareness and full support for Sass modules.",
 	"version": "3.9.3",
 	"private": true,
 	"publisher": "SomewhatStationery",
@@ -1300,14 +1300,14 @@
 						"order": 81,
 						"type": "boolean",
 						"scope": "resource",
-						"default": false,
+						"default": true,
 						"description": "Show property and value documentation in CSS hovers."
 					},
 					"somesass.css.hover.references": {
 						"order": 82,
 						"type": "boolean",
 						"scope": "resource",
-						"default": false,
+						"default": true,
 						"description": "Show references to MDN in CSS hovers."
 					},
 					"somesass.css.links.enabled": {

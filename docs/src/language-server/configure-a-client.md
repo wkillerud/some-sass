@@ -18,10 +18,8 @@ For example, while we may document `"somesass.scss.workspace.loadPaths": []` (an
 {
 	"settings": {
 		"somesass": {
-			"scss": {
-				"workspace": {
-					"loadPaths": []
-				}
+			"workspace": {
+				"loadPaths": []
 			}
 		}
 	}

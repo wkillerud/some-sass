@@ -72,7 +72,6 @@ export class FindSymbols extends LanguageFeature {
 			// This is the exception to the rule that this enabled check
 			// should happen at the server edge. It's only at this point
 			// we know if the document should be included or not.
-			// Maybe a sign that this method should be lifted out of language-services.
 			const config = this.languageConfiguration(document);
 			if (config.workspaceSymbol.enabled) {
 				const symbols = this.findDocumentSymbols(document);

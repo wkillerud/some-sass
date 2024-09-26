@@ -975,7 +975,6 @@ export class DoComplete extends LanguageFeature {
 				config.completion.mixinStyle !== "nobracket" &&
 				document.languageId === "scss"
 			) {
-				// TODO: test if this works correctly with multiline, I think so from the spec text
 				const insertSnippet = `${insert} {\n\t$0\n}`;
 				items.push({
 					...base,

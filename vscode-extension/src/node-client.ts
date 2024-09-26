@@ -74,6 +74,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 			document.uri.scheme !== "file" &&
 			document.uri.scheme !== "untitled" &&
 			document.uri.scheme !== "vscode-vfs" &&
+			document.languageId !== "css" &&
 			document.languageId !== "scss" &&
 			document.languageId !== "sass" &&
 			document.languageId !== "vue" &&

@@ -21,6 +21,8 @@ import { LanguageModelCache as LanguageServerCache } from "./language-model-cach
 import {
 	CodeActionContext,
 	LanguageService,
+	LanguageConfiguration,
+	EditorConfiguration,
 	LanguageServerConfiguration,
 	LanguageServiceOptions,
 	Position,
@@ -38,7 +40,9 @@ import { mapFsProviders } from "./utils/fs-provider";
 export {
 	defaultConfiguration,
 	LanguageService,
-	LanguageServerConfiguration as LanguageServiceConfiguration,
+	LanguageServerConfiguration,
+	LanguageConfiguration,
+	EditorConfiguration,
 	FileStat,
 	FileSystemProvider,
 	FileType,

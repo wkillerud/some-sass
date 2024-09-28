@@ -19,11 +19,12 @@ These are the recommended settings if you're just getting started.
 
 ### Going all in on Some Sass
 
-If you don't need language features for [Less](https://lesscss.org/) and don't rely on the built-in formatter, we recommend turning off the built-in CSS/SCSS/Less language extension in Visual Studio Code. For formating we recommend [Prettier](https://prettier.io/).
+If you don't need language features for [Less](https://lesscss.org/) and don't rely on the built-in formatter, we recommend that you:
 
-Some Sass has all the features of the built-in language extension, though they are turned off by default.
+1. turn off the built-in CSS/SCSS/Less language extension in Visual Studio Code
+2. configure Some Sass to turn on all features for CSS, SCSS and Sass indented
 
-Once you turn off the built-in language features you can configure Some Sass to handle both CSS and Sass for you. This way you get the best experience without Some Sass and VS Code getting in each others way.
+This way you get the best experience without Some Sass and VS Code getting in each others way.
 
 #### How to turn off the built-in language feature
 
@@ -37,7 +38,8 @@ Once you turn off the built-in language features you can configure Some Sass to 
 
 Now that you disabled the built-in language features you need to turn on those language features in Some Sass.
 
-Open your user settings JSON and paste this configuration. Restart VS Code to make sure the changes apply.
+1. Open your [user settings JSON](https://code.visualstudio.com/docs/getstarted/settings#_settings-json-file) and paste the configuration shown below.
+2. Restart VS Code to make sure the changes apply.
 
 ```json
 {

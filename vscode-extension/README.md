@@ -26,32 +26,29 @@ See the [user guide](https://wkillerud.github.io/some-sass/) to get the most out
 
 ## Recommended settings
 
-These are the recommended settings:
+These are the recommended settings if you're just getting started.
 
 ```jsonc
 {
 	// Recommended if you don't rely on @import
-	"somesass.suggestFromUseOnly": true,
+	"somesass.scss.completion.suggestFromUseOnly": true,
+	"somesass.sass.completion.suggestFromUseOnly": true,
 
-	// Optional, if you get suggestions from the current document after namespace.$ (you don't need the $ for narrowing down suggestions)
+	// Optional, if you get suggestions from the current document after namespace.$ (you don't need to type the $ for narrowing down suggestions)
 	"editor.wordBasedSuggestions": false,
 }
 ```
 
-Note that if you have SCSS IntelliSense (`mrmlnc.vscode-scss`) installed you should disable or uninstall it. Otherwise the two extensions will both provide hover information and code suggestions.
+### Going all in on Some Sass
 
-### About word-based suggestions
+If you don't need language features for [Less](https://lesscss.org/) and don't rely on the built-in formatter, we recommend that you:
 
-When you get completion suggestions and type `namespace.$`, Visual Studio Code treats `$` as a fresh start for suggestions. It will start matching any variable in the current document. There are two ways to get around this:
+1. turn off the built-in CSS/SCSS/Less language extension in Visual Studio Code
+2. configure Some Sass to turn on all features for CSS, SCSS and Sass indented
 
-1. Turn off word-based suggestions by setting `"editor.wordBasedSuggestions": false`.
-2. Don't type the `$` when you write the variable name, let completions fill it out for you.
+See the [Settings reference](https://wkillerud.github.io/some-sass/user-guide/settings.html#going-all-in-on-some-sass) for instructions on how to do this.
 
-With the second approach you can keep word-based suggestions turned on.
-
-### Settings reference
-
-See the [settings reference](https://wkillerud.github.io/some-sass/user-guide/settings.html#settings-reference) for more information about the different settings of Some Sass.
+If you have SCSS IntelliSense (`mrmlnc.vscode-scss`) installed you should disable or uninstall it.
 
 ## Changelog
 

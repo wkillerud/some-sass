@@ -26,9 +26,9 @@ async function run() {
 	await call(`npm clean-install`);
 	await call(`npm run build`);
 	await call(`npm run release`);
-	// await call(`git push`);
-	// await call(`git push --tags`);
-	// console.log(`[release] pushed server release, updating client`);
+	await call(`git push`);
+	await call(`git push --tags`);
+	console.log(`[release] pushed server release, updating client`);
 
 	let serverPkgJson = await fs.readFile(
 		path.join(process.cwd(), "packages", "language-server", "package.json"),
@@ -75,8 +75,8 @@ async function run() {
 
 	console.log(`[release] updated client`);
 
-	// await call(`git push`);
-	// await call(`git push --tags`);
+	await call(`git push`);
+	await call(`git push --tags`);
 }
 
 run();

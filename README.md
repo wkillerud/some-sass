@@ -8,7 +8,7 @@ Some features include:
 - Workspace-wide code navigation and refactoring, such as Rename Symbol.
 - Rich documentation through [SassDoc][sassdoc].
 - Language features for [`%placeholders`][placeholder], both when using them and writing them.
-- Support for [both Sass syntaxes](https://sass-lang.com/documentation/syntax/).
+- Support for [both Sass syntaxes](https://sass-lang.com/documentation/syntax/) as well as CSS.
 
 ![](./docs/src/images/highlight-reel.gif)
 

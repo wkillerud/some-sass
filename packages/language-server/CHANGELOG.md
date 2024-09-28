@@ -1,3 +1,10 @@
+## 2.0.1 (2024-09-28)
+
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 2.0.1
+
 # 2.0.0 (2024-09-28)
 
 

@@ -36,8 +36,10 @@ import {
 	URI,
 } from "./language-services-types";
 import { mapFsProviders } from "./utils/fs-provider";
+import { SemanticTokens, legend } from "./features/semantic-tokens";
 
 export {
+	legend,
 	defaultConfiguration,
 	LanguageService,
 	LanguageServerConfiguration,
@@ -70,6 +72,7 @@ class LanguageServiceImpl implements LanguageService {
 	#findSymbols: FindSymbols;
 	#foldingRanges: FoldingRanges;
 	#selectionRanges: SelectionRanges;
+	#semanticTokens: SemanticTokens;
 
 	constructor(options: LanguageServiceOptions) {
 		const vscodeLsOptions = {
@@ -110,6 +113,7 @@ class LanguageServiceImpl implements LanguageService {
 		this.#findSymbols = new FindSymbols(this, options, internal);
 		this.#foldingRanges = new FoldingRanges(this, options, internal);
 		this.#selectionRanges = new SelectionRanges(this, options, internal);
+		this.#semanticTokens = new SemanticTokens(this, options, internal);
 	}
 
 	configure(configuration: LanguageServerConfiguration): void {
@@ -127,6 +131,7 @@ class LanguageServiceImpl implements LanguageService {
 		this.#findSymbols.configure(configuration);
 		this.#foldingRanges.configure(configuration);
 		this.#selectionRanges.configure(configuration);
+		this.#semanticTokens.configure(configuration);
 	}
 
 	parseStylesheet(document: TextDocument) {
@@ -210,6 +215,13 @@ class LanguageServiceImpl implements LanguageService {
 
 	getSelectionRanges(document: TextDocument, positions: Position[]) {
 		return this.#selectionRanges.getSelectionRanges(document, positions);
+	}
+
+	async getSemanticTokens(
+		document: TextDocument,
+		ranges?: Range[],
+	): Promise<number[]> {
+		return this.#semanticTokens.getSemanticTokens(document, ranges);
 	}
 
 	onDocumentChanged(document: TextDocument) {

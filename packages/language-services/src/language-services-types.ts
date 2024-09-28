@@ -154,6 +154,10 @@ export interface LanguageService {
 		document: TextDocument,
 		positions: Position[],
 	): Promise<SelectionRange[]>;
+	getSemanticTokens(
+		document: TextDocument,
+		ranges?: Range[],
+	): Promise<number[]>;
 	getCachedTextDocument(uri: URI): TextDocument | undefined;
 	/**
 	 * Utility function to reparse an updated document.

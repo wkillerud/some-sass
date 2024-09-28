@@ -1,5 +1,6 @@
 import {
 	defaultConfiguration,
+	legend,
 	getLanguageService,
 	LanguageService,
 	LanguageServerConfiguration,
@@ -13,6 +14,7 @@ import {
 	Command,
 	Connection,
 	FileChangeType,
+	SemanticTokensRequest,
 	TextDocumentEdit,
 } from "vscode-languageserver";
 import {
@@ -123,6 +125,16 @@ export class SomeSassServer {
 					colorProvider: {},
 					foldingRangeProvider: true,
 					selectionRangeProvider: true,
+					semanticTokensProvider: {
+						documentSelector: [
+							{
+								language: "sass",
+							},
+						],
+						legend: legend,
+						full: true,
+						range: false,
+					},
 				},
 			};
 		});
@@ -723,6 +735,33 @@ export class SomeSassServer {
 				return null;
 			}
 		});
+
+		this.connection.onRequest(
+			// @ts-expect-error Not sure why
+			SemanticTokensRequest.type,
+			async (params) => {
+				if (!ls) return null;
+				try {
+					const document = getSassRegionsDocument(
+						documents.get(params.textDocument.uri),
+					);
+					if (!document) return null;
+
+					const config = this.languageConfiguration(document);
+					if (config.selectionRanges.enabled) {
+						const result = await ls.getSemanticTokens(document);
+						return result;
+					} else {
+						return null;
+					}
+				} catch (e) {
+					const error = e as Error;
+					this.log.debug(String(error));
+					if (error.stack) this.log.debug(error.stack);
+					return null;
+				}
+			},
+		);
 
 		this.connection.onShutdown(() => {
 			if (!ls) return;

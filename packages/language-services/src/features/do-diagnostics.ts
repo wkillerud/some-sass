@@ -74,11 +74,16 @@ export class DoDiagnostics extends LanguageFeature {
 			return [];
 		}
 
+		const config = this.languageConfiguration(document);
+
 		const stylesheet = this.ls.parseStylesheet(document);
-		const diagnostics = this.getUpstreamLanguageServer().doValidation(
+		const diagnostics = this.getUpstreamLanguageServer(document).doValidation(
 			document,
 			stylesheet,
-			{ validate: true },
+			{
+				validate: config.diagnostics.enabled,
+				lint: config.diagnostics.lint.enabled ? config.diagnostics.lint : false,
+			},
 		);
 		return diagnostics;
 	}
@@ -86,6 +91,11 @@ export class DoDiagnostics extends LanguageFeature {
 	private async doDeprecationDiagnostics(
 		document: TextDocument,
 	): Promise<Diagnostic[]> {
+		const config = this.languageConfiguration(document);
+		if (config.diagnostics.deprecation.enabled === false) {
+			return [];
+		}
+
 		const references = this.getReferences(document);
 
 		const diagnostics: Diagnostic[] = [];

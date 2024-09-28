@@ -24,7 +24,11 @@ export class FindDefinition extends LanguageFeature {
 		const offset = document.offsetAt(position);
 		const node = getNodeAtOffset(stylesheet, offset);
 		if (!node) {
-			return this.goUpstream(document, position, stylesheet);
+			return this.getUpstreamLanguageServer(document).findDefinition(
+				document,
+				position,
+				stylesheet,
+			);
 		}
 
 		// Sometimes we can't tell at position whether an identifier is a Method or a Function
@@ -99,7 +103,11 @@ export class FindDefinition extends LanguageFeature {
 		}
 
 		if (!name || !kinds) {
-			return this.goUpstream(document, position, stylesheet);
+			return this.getUpstreamLanguageServer(document).findDefinition(
+				document,
+				position,
+				stylesheet,
+			);
 		}
 
 		// Traverse the workspace looking for a symbol of kinds.includes(symbol.kind) && name === symbol.name
@@ -130,22 +138,20 @@ export class FindDefinition extends LanguageFeature {
 		}
 
 		// If not found, go through the old fashioned way and assume everything is in scope via @import
-		const symbols = this.ls.findWorkspaceSymbols(name);
-		for (const symbol of symbols) {
-			if (kinds.includes(symbol.kind)) {
-				return symbol.location;
+		const documents = this.cache.documents();
+		for (const document of documents) {
+			const symbols = this.ls.findDocumentSymbols(document);
+			for (const symbol of symbols) {
+				if (symbol.name !== name) {
+					continue;
+				}
+				if (kinds.includes(symbol.kind)) {
+					return Location.create(document.uri, symbol.selectionRange);
+				}
 			}
 		}
 
-		return this.goUpstream(document, position, stylesheet);
-	}
-
-	private goUpstream(
-		document: TextDocument,
-		position: Position,
-		stylesheet: Node,
-	): Location | null {
-		return this.getUpstreamLanguageServer().findDefinition(
+		return this.getUpstreamLanguageServer(document).findDefinition(
 			document,
 			position,
 			stylesheet,

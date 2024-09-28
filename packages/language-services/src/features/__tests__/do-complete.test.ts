@@ -6,19 +6,21 @@ import { getOptions } from "../../utils/test-helpers";
 const { fileSystemProvider, ...rest } = getOptions();
 const ls = getLanguageService({ fileSystemProvider, ...rest });
 
+ls.configure({
+	scss: {
+		completion: {
+			includeFromCurrentDocument: true,
+			suggestFromUseOnly: false,
+			css: false,
+		},
+	},
+});
+
 beforeEach(() => {
 	ls.clearCache();
-	ls.configure({}); // Reset any configuration to default
 });
 
 test("should not suggest mixin or placeholder as a property value", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -38,13 +40,6 @@ test("should not suggest mixin or placeholder as a property value", async () => 
 });
 
 test("should not suggest mixin or placeholder as a variable value", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -64,13 +59,6 @@ test("should not suggest mixin or placeholder as a variable value", async () => 
 });
 
 test("should not suggest function, variable or placeholder after an @include", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -90,13 +78,6 @@ test("should not suggest function, variable or placeholder after an @include", a
 });
 
 test("should not suggest function, variable or mixin after an @extend", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -116,13 +97,6 @@ test("should not suggest function, variable or mixin after an @extend", async ()
 });
 
 test("should suggest variable in @return", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -141,13 +115,6 @@ test("should suggest variable in @return", async () => {
 });
 
 test("should suggest function in @return", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -166,13 +133,6 @@ test("should suggest function in @return", async () => {
 });
 
 test("should suggest variable in @if", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -192,13 +152,6 @@ test("should suggest variable in @if", async () => {
 });
 
 test("should suggest function in @if", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -218,13 +171,6 @@ test("should suggest function in @if", async () => {
 });
 
 test("should suggest variable in @else if", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -245,13 +191,6 @@ test("should suggest variable in @else if", async () => {
 });
 
 test("should suggest function in @else if", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -272,13 +211,6 @@ test("should suggest function in @else if", async () => {
 });
 
 test("should not suggest anything for @each before in", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -295,13 +227,6 @@ test("should not suggest anything for @each before in", async () => {
 });
 
 test("should suggest variable in for @each $foo in", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -321,13 +246,6 @@ test("should suggest variable in for @each $foo in", async () => {
 });
 
 test("should suggest function in for @each $foo in", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -347,13 +265,6 @@ test("should suggest function in for @each $foo in", async () => {
 });
 
 test("should not suggest anything in @for before from", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -370,13 +281,6 @@ test("should not suggest anything in @for before from", async () => {
 });
 
 test("should suggest variable in @for $i from ", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -396,13 +300,6 @@ test("should suggest variable in @for $i from ", async () => {
 });
 
 test("should suggest function in @for $i from ", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -422,13 +319,6 @@ test("should suggest function in @for $i from ", async () => {
 });
 
 test("should suggest variable @for $i from 1 to ", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -448,13 +338,6 @@ test("should suggest variable @for $i from 1 to ", async () => {
 });
 
 test("should suggest function @for $i from 1 to ", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -474,13 +357,6 @@ test("should suggest function @for $i from 1 to ", async () => {
 });
 
 test("should suggest variable in @for $i from 1 through ", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -500,13 +376,6 @@ test("should suggest variable in @for $i from 1 through ", async () => {
 });
 
 test("should suggest function in @for $i from 1 through ", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",
@@ -526,13 +395,6 @@ test("should suggest function in @for $i from 1 through ", async () => {
 });
 
 test("should suggest variable and function as parameter to mixin, not mixin or placeholder", async () => {
-	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
-		},
-	});
-
 	const one = fileSystemProvider.createDocument([
 		'$name: "value";',
 		"@mixin mixin($a: 1, $b) {}",

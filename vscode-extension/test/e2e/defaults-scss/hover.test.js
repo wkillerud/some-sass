@@ -77,7 +77,7 @@ test("shows hover for SassDoc annotations", async () => {
 	// Prefixed symbols are shown with their original names
 	const expectedContents = {
 		contents: [
-			"@type\n____\n[SassDoc reference](http://sassdoc.com/annotations/#type)",
+			"@type\n\n[SassDoc reference](http://sassdoc.com/annotations/#type)",
 		],
 	};
 

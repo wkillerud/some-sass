@@ -1,5 +1,8 @@
 import { test, assert, beforeEach } from "vitest";
-import { getLanguageService } from "../../language-services";
+import {
+	defaultConfiguration,
+	getLanguageService,
+} from "../../language-services";
 import { Position } from "../../language-services-types";
 import { getOptions } from "../../utils/test-helpers";
 
@@ -8,14 +11,16 @@ const ls = getLanguageService({ fileSystemProvider, ...rest });
 
 beforeEach(() => {
 	ls.clearCache();
-	ls.configure({}); // Reset any configuration to default
+	ls.configure(defaultConfiguration);
 });
 
 test("should not suggest mixin or placeholder in string interpolation", async () => {
 	ls.configure({
-		completionSettings: {
-			suggestAllFromOpenDocument: true,
-			suggestFromUseOnly: false,
+		scss: {
+			completion: {
+				suggestAllFromOpenDocument: true,
+				suggestFromUseOnly: false,
+			},
 		},
 	});
 
@@ -39,8 +44,10 @@ test("should not suggest mixin or placeholder in string interpolation", async ()
 
 test("should not suggest module mixin in string interpolation", async () => {
 	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
+		scss: {
+			completion: {
+				suggestFromUseOnly: true,
+			},
 		},
 	});
 
@@ -69,8 +76,10 @@ test("should not suggest module mixin in string interpolation", async () => {
 
 test("should suggest symbol from a different document via @use when in string interpolation", async () => {
 	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
+		scss: {
+			completion: {
+				suggestFromUseOnly: true,
+			},
 		},
 	});
 
@@ -94,8 +103,10 @@ test("should suggest symbol from a different document via @use when in string in
 
 test("should suggest symbols when interpolation is part of CSS selector", async () => {
 	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
+		scss: {
+			completion: {
+				suggestFromUseOnly: true,
+			},
 		},
 	});
 
@@ -119,8 +130,10 @@ test("should suggest symbols when interpolation is part of CSS selector", async 
 
 test("should suggest variables and functions as function parameters in string interpolation ", async () => {
 	ls.configure({
-		completionSettings: {
-			suggestFromUseOnly: true,
+		scss: {
+			completion: {
+				suggestFromUseOnly: true,
+			},
 		},
 	});
 

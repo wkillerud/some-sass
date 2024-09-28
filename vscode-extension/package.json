@@ -1,179 +1,1410 @@
 {
-  "name": "some-sass",
-  "displayName": "Some Sass: extended support for Sass and SassDoc",
-  "description": "Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
-  "version": "3.9.3",
-  "private": true,
-  "publisher": "SomewhatStationery",
-  "license": "MIT",
-  "engines": {
-    "vscode": "^1.86.0"
-  },
-  "icon": "icon.png",
-  "homepage": "https://wkillerud.github.io/some-sass/",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wkillerud/some-sass"
-  },
-  "keywords": [
-    "scss",
-    "sass",
-    "sassdoc",
-    "autocompletion",
-    "intellisense",
-    "refactor"
-  ],
-  "categories": [
-    "Programming Languages"
-  ],
-  "activationEvents": [
-    "onLanguage:scss",
-    "onLanguage:sass",
-    "onLanguage:vue",
-    "onLanguage:svelte",
-    "onLanguage:astro",
-    "onCommand:_somesass.applyExtractCodeAction"
-  ],
-  "capabilities": {
-    "virtualWorkspaces": true
-  },
-  "browser": "./dist/browser-client.js",
-  "main": "./dist/node-client.js",
-  "contributes": {
-    "languages": [
-      {
-        "id": "sass",
-        "aliases": [
-          "Sass",
-          "sass-indented"
-        ],
-        "extensions": [
-          ".sass"
-        ],
-        "configuration": "./languages/sass.configuration.json"
-      }
-    ],
-    "grammars": [
-      {
-        "language": "sass",
-        "scopeName": "source.sass",
-        "path": "./languages/sass.tmLanguage.json"
-      }
-    ],
-    "configuration": {
-      "title": "Some Sass",
-      "properties": {
-        "somesass.loadPaths": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": [],
-          "markdownDescription": "A list of paths relative to the workspace root where the language server should look for stylesheets loaded by `@use` and `@import`. `node_modules` is always included.\n\nNote that you will have to [configure your Sass compiler separately](https://sass-lang.com/documentation/cli/dart-sass/#load-path)."
-        },
-        "somesass.scannerDepth": {
-          "type": "number",
-          "default": 30,
-          "description": "The maximum number of nested directories to scan."
-        },
-        "somesass.scannerExclude": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": [
-            "**/.git/**",
-            "**/node_modules/**",
-            "**/bower_components/**"
-          ],
-          "description": "List of glob patterns for directories that are excluded when scanning."
-        },
-        "somesass.scanImportedFiles": {
-          "type": "boolean",
-          "default": true,
-          "deprecationMessage": "Will be removed at some point after `@import` becomes CSS-only.",
-          "description": "Allows scan imported files. Turning this off will severely limit functionality, and is not recommended."
-        },
-        "somesass.suggestionStyle": {
-          "type": "string",
-          "default": "all",
-          "description": "Controls the style of suggestions for mixins and placeholders.",
-          "enum": [
-            "all",
-            "nobracket",
-            "bracket"
-          ],
-          "enumItemLabels": [
-            "All",
-            "No brackets",
-            "Only brackets"
-          ],
-          "enumDescriptions": [
-            "Show all suggestions",
-            "Only show suggestions without brackets",
-            "Where brackets are suggested, omit duplicates without brackets"
-          ]
-        },
-        "somesass.suggestAllFromOpenDocument": {
-          "type": "boolean",
-          "default": false,
-          "description": "VS Code has built-in code suggestions for (S)CSS symbols declared in the open document. If you prefer the suggestions from Some Sass, you can opt in by turning on this setting. There will be duplicates. No effect for Sass Indented (always on)."
-        },
-        "somesass.suggestFromUseOnly": {
-          "type": "boolean",
-          "default": false,
-          "description": "If your project uses the new module system with @use and @forward, you may want to only include suggestions from your used modules."
-        },
-        "somesass.suggestFunctionsInStringContextAfterSymbols": {
-          "type": "string",
-          "default": " (+-*%",
-          "description": "Allows prompt Functions in String context after specified symbols."
-        },
-        "somesass.triggerPropertyValueCompletion": {
-          "type": "boolean",
-          "default": false,
-          "description": "By default, Some Sass triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."
-        }
-      }
-    }
-  },
-  "dependencies": {
-    "fast-glob": "3.3.2",
-    "some-sass-language-server": "1.8.3",
-    "vscode-css-languageservice": "6.3.1",
-    "vscode-languageclient": "9.0.1",
-    "vscode-uri": "3.0.7"
-  },
-  "devDependencies": {
-    "@types/mocha": "10.0.7",
-    "@types/vscode": "1.86.0",
-    "@vscode/test-electron": "2.4.1",
-    "@vscode/test-web": "0.0.60",
-    "assert": "2.1.0",
-    "mocha": "10.7.3",
-    "shx": "0.3.4"
-  },
-  "scripts": {
-    "vscode:prepublish": "run-s clean build:production:*",
-    "clean": "shx rm -rf dist",
-    "build": "run-s build:development:*",
-    "build:node": "rspack --config ./rspack.node.config.js",
-    "build:browser": "rspack --config ./rspack.browser.config.js",
-    "build:development:node": "npm run build:node -- --mode=development",
-    "build:development:browser": "npm run build:browser -- --mode=development",
-    "build:production:node": "npm run build:node -- --mode=production",
-    "build:production:browser": "npm run build:browser -- --mode=production",
-    "start:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=.",
-    "lint": "eslint \"**/*.ts\" --cache",
-    "pretest:e2e": "run-s clean build:production:*",
-    "test:e2e": "node ./test/e2e/runTest.js",
-    "pretest:web": "rspack --config ./rspack.test-web.config.js ",
-    "test:web": "node ./test/web/runTest.js"
-  },
-  "__metadata": {
-    "id": "6d35099c-3671-464c-ac0b-34a0c3823927",
-    "publisherDisplayName": "Somewhat Stationery",
-    "publisherId": "02638283-c13a-4acf-9f26-24bdcfdfce24",
-    "isPreReleaseVersion": false
-  }
+	"name": "some-sass",
+	"displayName": "Some Sass",
+	"description": "Improved support for SCSS, Sass indented and SassDoc. Workspace awareness and full support for Sass modules.",
+	"version": "3.9.3",
+	"private": true,
+	"publisher": "SomewhatStationery",
+	"license": "MIT",
+	"engines": {
+		"vscode": "^1.86.0"
+	},
+	"icon": "icon.png",
+	"homepage": "https://wkillerud.github.io/some-sass/",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/wkillerud/some-sass"
+	},
+	"keywords": [
+		"scss",
+		"sass",
+		"sassdoc",
+		"autocompletion",
+		"intellisense",
+		"refactor"
+	],
+	"categories": [
+		"Programming Languages"
+	],
+	"activationEvents": [
+		"onLanguage:css",
+		"onLanguage:scss",
+		"onLanguage:sass",
+		"onLanguage:vue",
+		"onLanguage:svelte",
+		"onLanguage:astro",
+		"onCommand:_somesass.applyExtractCodeAction"
+	],
+	"capabilities": {
+		"virtualWorkspaces": true
+	},
+	"browser": "./dist/browser-client.js",
+	"main": "./dist/node-client.js",
+	"contributes": {
+		"languages": [
+			{
+				"id": "sass",
+				"aliases": [
+					"Sass",
+					"sass-indented"
+				],
+				"extensions": [
+					".sass"
+				],
+				"configuration": "./languages/sass.configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "sass",
+				"scopeName": "source.sass",
+				"path": "./languages/sass.tmLanguage.json"
+			}
+		],
+		"configuration": [
+			{
+				"title": "Workspace",
+				"properties": {
+					"somesass.workspace.loadPaths": {
+						"type": "array",
+						"scope": "resource",
+						"items": {
+							"type": "string"
+						},
+						"default": [],
+						"markdownDescription": "A list of paths relative to the workspace root where the language server should look for stylesheets loaded by `@use` and `@import`. `node_modules` is always included.\n\nNote that you will have to [configure your Sass compiler separately](https://sass-lang.com/documentation/cli/dart-sass/#load-path).",
+						"order": 0
+					},
+					"somesass.workspace.exclude": {
+						"type": "array",
+						"scope": "resource",
+						"items": {
+							"type": "string"
+						},
+						"default": [
+							"**/.git/**",
+							"**/node_modules/**"
+						],
+						"description": "List of glob patterns for directories that are excluded when scanning.",
+						"order": 1
+					},
+					"somesass.workspace.logLevel": {
+						"type": "string",
+						"scope": "resource",
+						"default": "info",
+						"enum": [
+							"silent",
+							"fatal",
+							"error",
+							"warn",
+							"info",
+							"debug",
+							"trace"
+						],
+						"description": "Control how much gets logged to the Output window.",
+						"order": 2
+					},
+					"some-sass.trace.server": {
+						"type": "string",
+						"scope": "window",
+						"enum": [
+							"off",
+							"messages",
+							"verbose"
+						],
+						"default": "off",
+						"description": "Log the messages sent between VS Code and the Some Sass language server.",
+						"order": 999
+					}
+				}
+			},
+			{
+				"title": "SCSS",
+				"properties": {
+					"somesass.scss.codeAction.enabled": {
+						"order": 10,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable all code actions."
+					},
+					"somesass.scss.colors.enabled": {
+						"order": 20,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable all color decorators."
+					},
+					"somesass.scss.colors.includeFromCurrentDocument": {
+						"order": 21,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Compatibility setting for VS Code. By default the built-in SCSS server shows color decorators for variables declared in the current document. To avoid duplicates Some Sass will not show them unless you opt in."
+					},
+					"somesass.scss.completion.enabled": {
+						"order": 30,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable all completions (IntelliSense)."
+					},
+					"somesass.scss.completion.suggestFromUseOnly": {
+						"order": 31,
+						"type": "boolean",
+						"default": false,
+						"description": "If your project uses the new module system with @use and @forward, you may want to only include suggestions from your used modules."
+					},
+					"somesass.scss.completion.mixinStyle": {
+						"order": 32,
+						"type": "string",
+						"default": "all",
+						"description": "Controls the style of suggestions for mixins.",
+						"enum": [
+							"all",
+							"nobracket",
+							"bracket"
+						],
+						"enumItemLabels": [
+							"All",
+							"No brackets",
+							"Only brackets"
+						],
+						"enumDescriptions": [
+							"Show all suggestions",
+							"Only show suggestions without brackets",
+							"Where brackets are suggested, don't suggest without brackets"
+						]
+					},
+					"somesass.scss.completion.css": {
+						"order": 33,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Compatibility setting for VS Code. Enable or disable CSS completions (IntelliSense). The built-in SCSS language server provides this, so by default it's turned off in Some Sass."
+					},
+					"somesass.scss.completion.triggerPropertyValueCompletion": {
+						"order": 33,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "By default, Some Sass triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."
+					},
+					"somesass.scss.completion.completePropertyWithSemicolon": {
+						"order": 34,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Insert semicolon at end of line when completing CSS properties."
+					},
+					"somesass.scss.completion.includeFromCurrentDocument": {
+						"order": 35,
+						"type": "boolean",
+						"default": false,
+						"description": "Compatibility setting for VS Code. By default the built-in SCSS server shows suggestions for variables, mixins and functions declared in the current document. To avoid duplicates Some Sass will not suggest them unless you opt in."
+					},
+					"somesass.scss.definition.enabled": {
+						"order": 40,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable Go to Definition."
+					},
+					"somesass.scss.diagnostics.enabled": {
+						"order": 50,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable all diagnostics (deprecation, errors and lint rules)."
+					},
+					"somesass.scss.diagnostics.deprecation.enabled": {
+						"order": 51,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable deprecation diagnostics (strike-through)."
+					},
+					"somesass.scss.diagnostics.lint.enabled": {
+						"order": 52,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable all linting."
+					},
+					"somesass.scss.diagnostics.lint.compatibleVendorPrefixes": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "When using a vendor-specific prefix make sure to also include all other vendor-specific properties."
+					},
+					"somesass.scss.diagnostics.lint.vendorPrefix": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"description": "When using a vendor-specific prefix, also include the standard property."
+					},
+					"somesass.scss.diagnostics.lint.duplicateProperties": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "Do not use duplicate style definitions."
+					},
+					"somesass.scss.diagnostics.lint.emptyRules": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"description": "Do not use empty rulesets."
+					},
+					"somesass.scss.diagnostics.lint.importStatement": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "Import statements can lead to sequential loading of CSS."
+					},
+					"somesass.scss.diagnostics.lint.boxModel": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"markdownDescription": "Do not use `width` or `height` when using `padding` or `border`."
+					},
+					"somesass.scss.diagnostics.lint.universalSelector": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"markdownDescription": "The universal selector (`*`) is known to be slow."
+					},
+					"somesass.scss.diagnostics.lint.zeroUnits": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "No unit needed for zero."
+					},
+					"somesass.scss.diagnostics.lint.fontFaceProperties": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"markdownDescription": "`@font-face` rule must define `src` and `font-family` properties."
+					},
+					"somesass.scss.diagnostics.lint.hexColorLength": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "error",
+						"description": "Hex colors must consist of 3, 4, 6 or 8 hex numbers."
+					},
+					"somesass.scss.diagnostics.lint.argumentsInColorFunction": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "error",
+						"description": "Invalid number of parameters."
+					},
+					"somesass.scss.diagnostics.lint.unknownProperties": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"description": "Unknown vendor specific property."
+					},
+					"somesass.scss.diagnostics.lint.validProperties": {
+						"order": 53,
+						"type": "array",
+						"uniqueItems": true,
+						"items": {
+							"type": "string"
+						},
+						"scope": "resource",
+						"default": [],
+						"description": "A list of properties that are not validated against the `unknownProperties` rule."
+					},
+					"somesass.scss.diagnostics.lint.ieHack": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "IE hacks are only necessary when supporting IE7 and older."
+					},
+					"somesass.scss.diagnostics.lint.unknownVendorSpecificProperties": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "Unknown vendor specific property."
+					},
+					"somesass.scss.diagnostics.lint.propertyIgnoredDueToDisplay": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"markdownDescription": "Property is ignored due to the display. E.g. with `display: inline`, the `width`, `height`, `margin-top`, `margin-bottom`, and `float` properties have no effect."
+					},
+					"somesass.scss.diagnostics.lint.important": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"markdownDescription": "Avoid using `!important`. It is an indication that the specificity of the entire CSS has gotten out of control and needs to be refactored."
+					},
+					"somesass.scss.diagnostics.lint.float": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"markdownDescription": "Avoid using `float`. Floats lead to fragile CSS that is easy to break if one aspect of the layout changes."
+					},
+					"somesass.scss.diagnostics.lint.idSelector": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "Selectors should not contain IDs because these rules are too tightly coupled with the HTML."
+					},
+					"somesass.scss.diagnostics.lint.unknownAtRules": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"description": "Unknown at-rule."
+					},
+					"somesass.scss.foldingRanges.enabled": {
+						"order": 60,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable folding ranges."
+					},
+					"somesass.scss.highlights.enabled": {
+						"order": 70,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable highlights."
+					},
+					"somesass.scss.hover.enabled": {
+						"order": 80,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable all hover information."
+					},
+					"somesass.scss.hover.documentation": {
+						"order": 81,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Show property and value documentation in CSS hovers."
+					},
+					"somesass.scss.hover.references": {
+						"order": 82,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Show references to Sass documentation for Sass built-in modules and SassDoc for annotations."
+					},
+					"somesass.scss.links.enabled": {
+						"order": 90,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable the link provider that lets you click an import and open the file."
+					},
+					"somesass.scss.references.enabled": {
+						"order": 100,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable Find all references."
+					},
+					"somesass.scss.rename.enabled": {
+						"order": 110,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable Rename."
+					},
+					"somesass.scss.selectionRanges.enabled": {
+						"order": 120,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable selection ranges."
+					},
+					"somesass.scss.signatureHelp.enabled": {
+						"order": 130,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable signature help."
+					},
+					"somesass.scss.workspaceSymbol.enabled": {
+						"order": 140,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable workspace symbols."
+					}
+				}
+			},
+			{
+				"title": "Sass (Indented)",
+				"properties": {
+					"somesass.sass.codeAction.enabled": {
+						"order": 10,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable all code actions."
+					},
+					"somesass.sass.colors.enabled": {
+						"order": 20,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable all color decorators."
+					},
+					"somesass.sass.completion.enabled": {
+						"order": 30,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable all completions (IntelliSense)."
+					},
+					"somesass.sass.completion.suggestFromUseOnly": {
+						"order": 31,
+						"type": "boolean",
+						"default": false,
+						"description": "If your project uses the new module system with @use and @forward, you may want to only include suggestions from your used modules."
+					},
+					"somesass.sass.completion.mixinStyle": {
+						"order": 32,
+						"type": "string",
+						"default": "all",
+						"description": "Controls the style of suggestions for mixins and placeholders.",
+						"enum": [
+							"all",
+							"nobracket",
+							"bracket"
+						],
+						"enumItemLabels": [
+							"All",
+							"No brackets",
+							"Only brackets"
+						],
+						"enumDescriptions": [
+							"Show all suggestions",
+							"Only show suggestions without brackets",
+							"Where brackets are suggested, omit duplicates without brackets"
+						]
+					},
+					"somesass.sass.completion.css": {
+						"order": 33,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable CSS completions (IntelliSense)."
+					},
+					"somesass.sass.completion.triggerPropertyValueCompletion": {
+						"order": 33,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "By default, Some Sass triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."
+					},
+					"somesass.sass.definition.enabled": {
+						"order": 40,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable Go to Definition."
+					},
+					"somesass.sass.diagnostics.enabled": {
+						"order": 50,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable all diagnostics (deprecation, errors and lint rules)."
+					},
+					"somesass.sass.diagnostics.deprecation.enabled": {
+						"order": 51,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable deprecation diagnostics (strike-through)."
+					},
+					"somesass.sass.diagnostics.lint.enabled": {
+						"order": 52,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable all linting."
+					},
+					"somesass.sass.diagnostics.lint.compatibleVendorPrefixes": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "When using a vendor-specific prefix make sure to also include all other vendor-specific properties."
+					},
+					"somesass.sass.diagnostics.lint.vendorPrefix": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"description": "When using a vendor-specific prefix, also include the standard property."
+					},
+					"somesass.sass.diagnostics.lint.duplicateProperties": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "Do not use duplicate style definitions."
+					},
+					"somesass.sass.diagnostics.lint.emptyRules": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"description": "Do not use empty rulesets."
+					},
+					"somesass.sass.diagnostics.lint.importStatement": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "Import statements can lead to sequential loading of CSS."
+					},
+					"somesass.sass.diagnostics.lint.boxModel": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"markdownDescription": "Do not use `width` or `height` when using `padding` or `border`."
+					},
+					"somesass.sass.diagnostics.lint.universalSelector": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"markdownDescription": "The universal selector (`*`) is known to be slow."
+					},
+					"somesass.sass.diagnostics.lint.zeroUnits": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "No unit needed for zero."
+					},
+					"somesass.sass.diagnostics.lint.fontFaceProperties": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"markdownDescription": "`@font-face` rule must define `src` and `font-family` properties."
+					},
+					"somesass.sass.diagnostics.lint.hexColorLength": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "error",
+						"description": "Hex colors must consist of 3, 4, 6 or 8 hex numbers."
+					},
+					"somesass.sass.diagnostics.lint.argumentsInColorFunction": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "error",
+						"description": "Invalid number of parameters."
+					},
+					"somesass.sass.diagnostics.lint.unknownProperties": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"description": "Unknown vendor specific property."
+					},
+					"somesass.sass.diagnostics.lint.validProperties": {
+						"order": 53,
+						"type": "array",
+						"uniqueItems": true,
+						"items": {
+							"type": "string"
+						},
+						"scope": "resource",
+						"default": [],
+						"description": "A list of properties that are not validated against the `unknownProperties` rule."
+					},
+					"somesass.sass.diagnostics.lint.ieHack": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "IE hacks are only necessary when supporting IE7 and older."
+					},
+					"somesass.sass.diagnostics.lint.unknownVendorSpecificProperties": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "Unknown vendor specific property."
+					},
+					"somesass.sass.diagnostics.lint.propertyIgnoredDueToDisplay": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"markdownDescription": "Property is ignored due to the display. E.g. with `display: inline`, the `width`, `height`, `margin-top`, `margin-bottom`, and `float` properties have no effect."
+					},
+					"somesass.sass.diagnostics.lint.important": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"markdownDescription": "Avoid using `!important`. It is an indication that the specificity of the entire CSS has gotten out of control and needs to be refactored."
+					},
+					"somesass.sass.diagnostics.lint.float": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"markdownDescription": "Avoid using `float`. Floats lead to fragile CSS that is easy to break if one aspect of the layout changes."
+					},
+					"somesass.sass.diagnostics.lint.idSelector": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "Selectors should not contain IDs because these rules are too tightly coupled with the HTML."
+					},
+					"somesass.sass.diagnostics.lint.unknownAtRules": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"description": "Unknown at-rule."
+					},
+					"somesass.sass.foldingRanges.enabled": {
+						"order": 60,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable folding ranges."
+					},
+					"somesass.sass.highlights.enabled": {
+						"order": 70,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable highlights."
+					},
+					"somesass.sass.hover.enabled": {
+						"order": 80,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable all hover information."
+					},
+					"somesass.sass.hover.documentation": {
+						"order": 81,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Show property and value documentation in CSS hovers."
+					},
+					"somesass.sass.hover.references": {
+						"order": 82,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Show references to MDN in CSS hovers, Sass documentation for Sass built-in modules and SassDoc for annotations."
+					},
+					"somesass.sass.links.enabled": {
+						"order": 90,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable the link provider that lets you click an import and open the file."
+					},
+					"somesass.sass.references.enabled": {
+						"order": 100,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable Find all references."
+					},
+					"somesass.sass.rename.enabled": {
+						"order": 110,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable Rename."
+					},
+					"somesass.sass.selectionRanges.enabled": {
+						"order": 120,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable selection ranges."
+					},
+					"somesass.sass.signatureHelp.enabled": {
+						"order": 130,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable selection ranges."
+					},
+					"somesass.sass.workspaceSymbol.enabled": {
+						"order": 140,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable selection ranges."
+					}
+				}
+			},
+			{
+				"title": "CSS",
+				"properties": {
+					"somesass.css.customData": {
+						"order": 999,
+						"type": "array",
+						"markdownDescription": "A list of relative file paths pointing to JSON files following the [custom data format](https://github.com/microsoft/vscode-css-languageservice/blob/master/docs/customData.md).\n\nSome Sass loads custom data on startup to enhance its CSS support for CSS custom properties (variables), at-rules, pseudo-classes, and pseudo-elements you specify in the JSON files.\n\nThe file paths are relative to workspace and only workspace folder settings are considered.",
+						"default": [],
+						"items": {
+							"type": "string"
+						},
+						"scope": "resource"
+					},
+					"somesass.css.codeAction.enabled": {
+						"order": 10,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable all code actions."
+					},
+					"somesass.css.colors.enabled": {
+						"order": 20,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable all color decorators."
+					},
+					"somesass.css.completion.enabled": {
+						"order": 30,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable all completions (IntelliSense)."
+					},
+					"somesass.css.completion.triggerPropertyValueCompletion": {
+						"order": 31,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "By default, Some Sass triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."
+					},
+					"somesass.css.completion.completePropertyWithSemicolon": {
+						"order": 32,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Insert semicolon at end of line when completing CSS properties."
+					},
+					"somesass.css.definition.enabled": {
+						"order": 40,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable Go to Definition."
+					},
+					"somesass.css.diagnostics.enabled": {
+						"order": 50,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable all diagnostics (deprecation, errors and lint rules)."
+					},
+					"somesass.css.diagnostics.deprecation.enabled": {
+						"order": 51,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable deprecation diagnostics (strike-through)."
+					},
+					"somesass.css.diagnostics.lint.enabled": {
+						"order": 52,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Enable or disable all linting."
+					},
+					"somesass.css.diagnostics.lint.compatibleVendorPrefixes": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "When using a vendor-specific prefix make sure to also include all other vendor-specific properties."
+					},
+					"somesass.css.diagnostics.lint.vendorPrefix": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"description": "When using a vendor-specific prefix, also include the standard property."
+					},
+					"somesass.css.diagnostics.lint.duplicateProperties": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "Do not use duplicate style definitions."
+					},
+					"somesass.css.diagnostics.lint.emptyRules": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"description": "Do not use empty rulesets."
+					},
+					"somesass.css.diagnostics.lint.importStatement": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "Import statements can lead to sequential loading of CSS."
+					},
+					"somesass.css.diagnostics.lint.boxModel": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"markdownDescription": "Do not use `width` or `height` when using `padding` or `border`."
+					},
+					"somesass.css.diagnostics.lint.universalSelector": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"markdownDescription": "The universal selector (`*`) is known to be slow."
+					},
+					"somesass.css.diagnostics.lint.zeroUnits": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "No unit needed for zero."
+					},
+					"somesass.css.diagnostics.lint.fontFaceProperties": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"markdownDescription": "`@font-face` rule must define `src` and `font-family` properties."
+					},
+					"somesass.css.diagnostics.lint.hexColorLength": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "error",
+						"description": "Hex colors must consist of 3, 4, 6 or 8 hex numbers."
+					},
+					"somesass.css.diagnostics.lint.argumentsInColorFunction": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "error",
+						"description": "Invalid number of parameters."
+					},
+					"somesass.css.diagnostics.lint.unknownProperties": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"description": "Unknown vendor specific property."
+					},
+					"somesass.css.diagnostics.lint.validProperties": {
+						"order": 53,
+						"type": "array",
+						"uniqueItems": true,
+						"items": {
+							"type": "string"
+						},
+						"scope": "resource",
+						"default": [],
+						"description": "A list of properties that are not validated against the `unknownProperties` rule."
+					},
+					"somesass.css.diagnostics.lint.ieHack": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "IE hacks are only necessary when supporting IE7 and older."
+					},
+					"somesass.css.diagnostics.lint.unknownVendorSpecificProperties": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "Unknown vendor specific property."
+					},
+					"somesass.css.diagnostics.lint.propertyIgnoredDueToDisplay": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"markdownDescription": "Property is ignored due to the display. E.g. with `display: inline`, the `width`, `height`, `margin-top`, `margin-bottom`, and `float` properties have no effect."
+					},
+					"somesass.css.diagnostics.lint.important": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"markdownDescription": "Avoid using `!important`. It is an indication that the specificity of the entire CSS has gotten out of control and needs to be refactored."
+					},
+					"somesass.css.diagnostics.lint.float": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"markdownDescription": "Avoid using `float`. Floats lead to fragile CSS that is easy to break if one aspect of the layout changes."
+					},
+					"somesass.css.diagnostics.lint.idSelector": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "ignore",
+						"description": "Selectors should not contain IDs because these rules are too tightly coupled with the HTML."
+					},
+					"somesass.css.diagnostics.lint.unknownAtRules": {
+						"order": 53,
+						"type": "string",
+						"scope": "resource",
+						"enum": [
+							"ignore",
+							"warning",
+							"error"
+						],
+						"default": "warning",
+						"description": "Unknown at-rule."
+					},
+					"somesass.css.foldingRanges.enabled": {
+						"order": 60,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable folding ranges."
+					},
+					"somesass.css.highlights.enabled": {
+						"order": 70,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable highlights."
+					},
+					"somesass.css.hover.enabled": {
+						"order": 80,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable all hover information."
+					},
+					"somesass.css.hover.documentation": {
+						"order": 81,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Show property and value documentation in CSS hovers."
+					},
+					"somesass.css.hover.references": {
+						"order": 82,
+						"type": "boolean",
+						"scope": "resource",
+						"default": true,
+						"description": "Show references to MDN in CSS hovers."
+					},
+					"somesass.css.links.enabled": {
+						"order": 90,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable the link provider that lets you click an import and open the file."
+					},
+					"somesass.css.references.enabled": {
+						"order": 100,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable Find all references."
+					},
+					"somesass.css.rename.enabled": {
+						"order": 110,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable Rename."
+					},
+					"somesass.css.selectionRanges.enabled": {
+						"order": 120,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable selection ranges."
+					},
+					"somesass.css.signatureHelp.enabled": {
+						"order": 130,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable selection ranges."
+					},
+					"somesass.css.workspaceSymbol.enabled": {
+						"order": 140,
+						"type": "boolean",
+						"scope": "resource",
+						"default": false,
+						"description": "Enable or disable selection ranges."
+					}
+				}
+			}
+		],
+		"jsonValidation": [
+			{
+				"fileMatch": "*.css-data.json",
+				"url": "https://raw.githubusercontent.com/microsoft/vscode-css-languageservice/master/docs/customData.schema.json"
+			},
+			{
+				"fileMatch": "package.json",
+				"url": "./schemas/package.schema.json"
+			}
+		]
+	},
+	"dependencies": {
+		"fast-glob": "3.3.2",
+		"some-sass-language-server": "1.8.3",
+		"vscode-css-languageservice": "6.3.1",
+		"vscode-languageclient": "9.0.1",
+		"vscode-uri": "3.0.8"
+	},
+	"devDependencies": {
+		"@types/mocha": "10.0.7",
+		"@types/vscode": "1.86.0",
+		"@vscode/test-electron": "2.4.1",
+		"@vscode/test-web": "0.0.60",
+		"assert": "2.1.0",
+		"mocha": "10.7.3",
+		"shx": "0.3.4"
+	},
+	"scripts": {
+		"vscode:prepublish": "run-s clean build:production:*",
+		"clean": "shx rm -rf dist",
+		"build": "run-s build:development:*",
+		"build:node": "rspack --config ./rspack.node.config.js",
+		"build:browser": "rspack --config ./rspack.browser.config.js",
+		"build:development:node": "npm run build:node -- --mode=development",
+		"build:development:browser": "npm run build:browser -- --mode=development",
+		"build:production:node": "npm run build:node -- --mode=production",
+		"build:production:browser": "npm run build:browser -- --mode=production",
+		"doctor:node": "RSDOCTOR=true run-s build:production:node",
+		"doctor:browser": "RSDOCTOR=true run-s build:production:browser",
+		"start:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=.",
+		"lint": "eslint \"**/*.ts\" --cache",
+		"pretest:e2e": "run-s clean build:production:*",
+		"test:e2e": "node ./test/e2e/runTest.js",
+		"pretest:web": "rspack --config ./rspack.test-web.config.js ",
+		"test:web": "node ./test/web/runTest.js"
+	},
+	"__metadata": {
+		"id": "6d35099c-3671-464c-ac0b-34a0c3823927",
+		"publisherDisplayName": "Somewhat Stationery",
+		"publisherId": "02638283-c13a-4acf-9f26-24bdcfdfce24",
+		"isPreReleaseVersion": false
+	}
 }

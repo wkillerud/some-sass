@@ -9,6 +9,7 @@
 		"lsp",
 		"language-server-protocol"
 	],
+	"type": "commonjs",
 	"engines": {
 		"node": ">=20"
 	},
@@ -31,33 +32,42 @@
 	"exports": {
 		".": {
 			"browser": "./dist/browser-server.js",
-			"development": "./dist/development/node-server.js",
 			"default": "./dist/node-server.js"
-		},
-		"./development": {
-			"browser": "./dist/development/browser-server.js",
-			"default": "./dist/development/node-server.js"
 		}
 	},
 	"author": "William Killerud <william@killerud.com> (https://www.williamkillerud.com/)",
 	"license": "MIT",
 	"scripts": {
-		"build": "rspack",
+		"prepublishOnly": "run-s build:production:*",
+		"prebuild": "tsc --noEmit",
+		"build": "run-s build:development:*",
+		"build:node": "rspack --config ./rspack.node.config.js",
+		"build:browser": "rspack --config ./rspack.browser.config.js",
+		"build:development:node": "npm run build:node -- --mode=development",
+		"build:development:browser": "npm run build:browser -- --mode=development",
+		"build:production:node": "npm run build:node -- --mode=production",
+		"build:production:browser": "npm run build:browser -- --mode=production",
 		"clean": "shx rm -rf dist node_modules",
 		"test": "vitest",
-		"coverage": "vitest run --coverage"
+		"coverage": "vitest run --coverage",
+		"doctor:node": "RSDOCTOR=true run-s build:production:node",
+		"doctor:browser": "RSDOCTOR=true run-s build:production:browser"
 	},
 	"devDependencies": {
-		"@vitest/coverage-v8": "2.0.5",
+		"@rsdoctor/rspack-plugin": "0.4.4",
 		"@somesass/language-services": "1.7.1",
+		"@types/lodash.merge": "4.6.9",
 		"@types/node": "20.16.5",
+		"@vitest/coverage-v8": "2.0.5",
 		"fast-glob": "3.3.2",
+		"lodash.merge": "4.6.2",
 		"merge-options": "3.0.4",
 		"path-browserify": "1.0.1",
 		"process": "0.11.10",
 		"shx": "0.3.4",
-		"util": "0.12.5",
 		"url": "0.11.4",
+		"util": "0.12.5",
+		"vitest": "2.1.1",
 		"vscode-languageserver": "9.0.1",
 		"vscode-languageserver-textdocument": "1.0.12",
 		"vscode-languageserver-types": "3.17.5",

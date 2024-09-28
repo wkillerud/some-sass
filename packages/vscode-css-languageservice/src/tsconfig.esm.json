@@ -4,6 +4,7 @@
 		"module": "es6",
 		"moduleResolution": "node",
 		"sourceMap": true,
+		"inlineSourceMap": false,
 		"declaration": true,
 		"strict": true,
 		"stripInternal": true,

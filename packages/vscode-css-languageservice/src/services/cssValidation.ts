@@ -35,7 +35,7 @@ export class CSSValidation {
 			LintVisitor.entries(
 				stylesheet,
 				document,
-				new LintConfigurationSettings(settings && settings.lint),
+				new LintConfigurationSettings(settings && settings.lint !== false ? settings.lint : undefined),
 				this.cssDataManager,
 			),
 		);

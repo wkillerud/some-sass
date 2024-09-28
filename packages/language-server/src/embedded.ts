@@ -7,7 +7,11 @@ type Region = {
 };
 
 export function isFileWhereScssCanBeEmbedded(path: string) {
-	if (path.endsWith(".scss") || path.endsWith(".sass")) {
+	if (
+		path.endsWith(".scss") ||
+		path.endsWith(".sass") ||
+		path.endsWith(".css")
+	) {
 		return false;
 	}
 	return true;

@@ -145,10 +145,7 @@ function createWorkerLanguageClient(
 	context: ExtensionContext,
 	clientOptions: LanguageClientOptions,
 ) {
-	const serverMain = Uri.joinPath(
-		context.extensionUri,
-		"dist/browser-server.js",
-	);
+	const serverMain = Uri.joinPath(context.extensionUri, "dist/browser-main.js");
 	const worker = new Worker(serverMain.toString(/* skipEncoding */ true));
 
 	return new LanguageClient(

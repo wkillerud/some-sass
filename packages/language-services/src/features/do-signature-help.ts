@@ -18,21 +18,15 @@ export class DoSignatureHelp extends LanguageFeature {
 	async doSignatureHelp(
 		document: TextDocument,
 		position: Position,
-	): Promise<SignatureHelp> {
+	): Promise<SignatureHelp | null> {
 		const stylesheet = this.ls.parseStylesheet(document);
 		let node = getNodeAtOffset(stylesheet, document.offsetAt(position)) as
 			| Function
 			| MixinReference
 			| null;
 
-		const result: SignatureHelp = {
-			activeSignature: 0,
-			activeParameter: 0,
-			signatures: [],
-		};
-
 		if (!node) {
-			return result;
+			return null;
 		}
 
 		if (
@@ -44,12 +38,17 @@ export class DoSignatureHelp extends LanguageFeature {
 				(node.parent.type !== NodeType.Function &&
 					node.parent.type !== NodeType.MixinReference)
 			) {
-				return result;
+				return null;
 			}
 
 			node = node.parent as Function | MixinReference;
 		}
 
+		const result: SignatureHelp = {
+			activeSignature: 0,
+			activeParameter: 0,
+			signatures: [],
+		};
 		const identifier = node.getIdentifier()!.getText();
 		const parameters = node.getArguments().getChildren();
 		result.activeParameter = parameters.length;

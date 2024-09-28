@@ -22,6 +22,7 @@ async function call(command) {
 async function run() {
 	await call(`git checkout main`);
 	await call(`git pull`);
+	await call(`npm run clean`);
 	await call(`npm clean-install`);
 	await call(`npm run build`);
 	await call(`npm run release`);

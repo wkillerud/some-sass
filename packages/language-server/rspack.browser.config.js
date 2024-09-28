@@ -1,35 +1,20 @@
 /* eslint-disable */
-
 const path = require("path");
 const rspack = require("@rspack/core");
+const { RsdoctorRspackPlugin } = require("@rsdoctor/rspack-plugin");
 
-/** @type {import('@rspack/core').Configuration} **/
+/** @type {import('@rspack/core').Configuration} */
 const config = {
 	context: __dirname,
-	mode: "none",
-	target: "webworker", // web extensions run in a webworker context
+	target: "webworker",
 	entry: {
-		"browser-client": "./src/browser-client.ts",
+		"browser-main": "./src/browser-main.ts",
 	},
 	output: {
+		libraryTarget: "var",
+		library: "serverExportVar",
 		filename: "[name].js",
-		path: path.join(__dirname, "./dist"),
-		libraryTarget: "commonjs",
-	},
-	externals: {
-		vscode: "commonjs vscode",
-	},
-	plugins: [],
-	devtool: false,
-	resolve: {
-		extensions: [".ts", ".js"],
-		mainFields: ["browser", "module", "main"],
-		conditionNames: ["import", "require", "default"],
-		fallback: {
-			events: require.resolve("events/"),
-			assert: require.resolve("assert"),
-			path: require.resolve("path-browserify"),
-		},
+		path: path.join(__dirname, "dist"),
 	},
 	module: {
 		rules: [
@@ -54,6 +39,18 @@ const config = {
 			},
 		],
 	},
+	resolve: {
+		extensions: [".ts", ".js"],
+		mainFields: ["browser", "module", "main"],
+		conditionNames: ["import", "require", "default"],
+		fallback: {
+			events: require.resolve("events/"),
+			path: require.resolve("path-browserify"),
+			util: require.resolve("util/"),
+			url: require.resolve("url/"),
+			"fs/promises": false,
+		},
+	},
 	plugins: [
 		new rspack.ProvidePlugin({
 			process: "process/browser",
@@ -61,23 +58,15 @@ const config = {
 		new rspack.optimize.LimitChunkCountPlugin({
 			maxChunks: 1,
 		}),
-		new rspack.CopyRspackPlugin({
-			patterns: [
-				{
-					from: "../node_modules/some-sass-language-server/dist/**/*.js",
-					to: "[name][ext]",
-				},
-			],
-		}),
 		// Only register the plugin when RSDOCTOR is true, as the plugin will increase the build time.
 		process.env.RSDOCTOR && new RsdoctorRspackPlugin(),
 	].filter(Boolean),
+	devtool: "cheap-source-map",
 };
 
 module.exports = (env, argv) => {
 	if (argv.mode === "development") {
 		config.devtool = "source-map";
 	}
-
 	return config;
 };

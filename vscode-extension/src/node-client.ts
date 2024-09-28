@@ -67,13 +67,14 @@ function getOuterMostWorkspaceFolder(folder: WorkspaceFolder): WorkspaceFolder {
 }
 
 export async function activate(context: ExtensionContext): Promise<void> {
-	const serverModule = context.asAbsolutePath(`./dist/node-server.js`);
+	const serverModule = context.asAbsolutePath(`./dist/node-main.js`);
 
 	async function didOpenTextDocument(document: TextDocument): Promise<void> {
 		if (
 			document.uri.scheme !== "file" &&
 			document.uri.scheme !== "untitled" &&
 			document.uri.scheme !== "vscode-vfs" &&
+			document.languageId !== "css" &&
 			document.languageId !== "scss" &&
 			document.languageId !== "sass" &&
 			document.languageId !== "vue" &&

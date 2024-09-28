@@ -1,4 +1,4 @@
-import { test, assert, beforeEach } from "vitest";
+import { test, assert } from "vitest";
 import { getLanguageService } from "../../language-services";
 import { Position } from "../../language-services-types";
 import { getOptions } from "../../utils/test-helpers";
@@ -6,13 +6,17 @@ import { getOptions } from "../../utils/test-helpers";
 const { fileSystemProvider, ...rest } = getOptions();
 const ls = getLanguageService({ fileSystemProvider, ...rest });
 
-beforeEach(() => {
-	ls.clearCache();
-	ls.configure({
-		completionSettings: {
+ls.configure({
+	scss: {
+		completion: {
 			suggestFromUseOnly: true,
 		},
-	}); // Reset any configuration to default
+	},
+	sass: {
+		completion: {
+			suggestFromUseOnly: true,
+		},
+	},
 });
 
 test("symbols forwarded from node_modules don't get suggested unless used", async () => {

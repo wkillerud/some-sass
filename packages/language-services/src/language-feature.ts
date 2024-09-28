@@ -5,12 +5,14 @@ import {
 	Scanner,
 	SassScanner,
 } from "@somesass/vscode-css-languageservice";
+import merge from "lodash.merge";
+import { defaultConfiguration } from "./configuration";
 import { LanguageModelCache } from "./language-model-cache";
 import {
 	LanguageServiceOptions,
 	TextDocument,
 	LanguageService,
-	LanguageServiceConfiguration,
+	LanguageServerConfiguration,
 	NodeType,
 	Range,
 	SassDocumentSymbol,
@@ -21,12 +23,16 @@ import {
 	URI,
 	Utils,
 	ClientCapabilities,
+	RecursivePartial,
+	LanguageConfiguration,
 } from "./language-services-types";
 import { asDollarlessVariable } from "./utils/sass";
 
 export type LanguageFeatureInternal = {
 	cache: LanguageModelCache;
+	cssLs: VSCodeLanguageService;
 	sassLs: VSCodeLanguageService;
+	scssLs: VSCodeLanguageService;
 };
 
 type FindOptions = {
@@ -39,16 +45,6 @@ type FindOptions = {
 	depth?: number;
 };
 
-const defaultConfiguration: LanguageServiceConfiguration = {
-	completionSettings: {
-		suggestAllFromOpenDocument: false,
-		suggestFromUseOnly: false,
-		suggestFunctionsInStringContextAfterSymbols: " (+-*%",
-		suggestionStyle: "all",
-		triggerPropertyValueCompletion: true,
-	},
-};
-
 /**
  * Base class for features. Provides helpers to do the navigation
  * between modules.
@@ -57,7 +53,7 @@ export abstract class LanguageFeature {
 	protected ls;
 	protected options;
 	protected clientCapabilities: ClientCapabilities;
-	protected configuration: LanguageServiceConfiguration = {};
+	protected configuration: LanguageServerConfiguration = defaultConfiguration;
 
 	private _internal: LanguageFeatureInternal;
 
@@ -76,19 +72,64 @@ export abstract class LanguageFeature {
 		this._internal = _internal;
 	}
 
-	configure(configuration: LanguageServiceConfiguration): void {
-		this.configuration = {
-			...defaultConfiguration,
-			...configuration,
-			completionSettings: {
-				...defaultConfiguration.completionSettings,
-				...(configuration.completionSettings || {}),
-			},
-		};
-		this._internal.sassLs.configure(configuration);
+	languageConfiguration(document: TextDocument): LanguageConfiguration {
+		switch (document.languageId) {
+			case "css": {
+				return this.configuration.css;
+			}
+			case "sass": {
+				return this.configuration.sass;
+			}
+			case "scss": {
+				return this.configuration.scss;
+			}
+		}
+
+		throw new Error(`Unsupported language ${document.languageId}`);
 	}
 
-	protected getUpstreamLanguageServer(): VSCodeLanguageService {
+	configure(
+		configuration: RecursivePartial<LanguageServerConfiguration>,
+	): void {
+		this.configuration = merge(defaultConfiguration, configuration);
+
+		this._internal.sassLs.configure({
+			validate: this.configuration.sass.diagnostics.enabled,
+			lint: this.configuration.sass.diagnostics.lint,
+			completion: this.configuration.sass.completion,
+			hover: this.configuration.sass.hover,
+			importAliases: this.configuration.workspace.importAliases,
+			loadPaths: this.configuration.workspace.loadPaths,
+		});
+
+		this._internal.scssLs.configure({
+			validate: this.configuration.scss.diagnostics.enabled,
+			lint: this.configuration.scss.diagnostics.lint,
+			completion: this.configuration.scss.completion,
+			hover: this.configuration.scss.hover,
+			importAliases: this.configuration.workspace.importAliases,
+			loadPaths: this.configuration.workspace.loadPaths,
+		});
+
+		this._internal.cssLs.configure({
+			validate: this.configuration.css.diagnostics.enabled,
+			lint: this.configuration.css.diagnostics.lint,
+			completion: this.configuration.css.completion,
+			hover: this.configuration.css.hover,
+			importAliases: this.configuration.workspace.importAliases,
+			loadPaths: this.configuration.workspace.loadPaths,
+		});
+	}
+
+	protected getUpstreamLanguageServer(
+		document: TextDocument,
+	): VSCodeLanguageService {
+		if (document.languageId === "scss") {
+			return this._internal.scssLs;
+		}
+		if (document.languageId === "css") {
+			return this._internal.cssLs;
+		}
 		return this._internal.sassLs;
 	}
 
@@ -99,10 +140,11 @@ export abstract class LanguageFeature {
 			 * @returns The resolved path
 			 */
 			resolveReference: (ref: string, base: string) => {
-				if (ref.startsWith("/") && this.configuration.workspaceRoot) {
-					return Utils.joinPath(this.configuration.workspaceRoot, ref).toString(
-						true,
-					);
+				if (ref.startsWith("/") && this.configuration.workspace.workspaceRoot) {
+					return Utils.joinPath(
+						this.configuration.workspace.workspaceRoot,
+						ref,
+					).toString(true);
 				}
 				try {
 					return resolve(base, ref);

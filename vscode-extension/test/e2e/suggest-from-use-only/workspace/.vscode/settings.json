@@ -1,3 +1,4 @@
 {
-	"somesass.suggestFromUseOnly": true
+	"somesass.scss.completion.suggestFromUseOnly": true,
+	"somesass.sass.completion.suggestFromUseOnly": true
 }

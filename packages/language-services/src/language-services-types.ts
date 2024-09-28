@@ -74,6 +74,14 @@ export interface SassDocumentSymbol extends DocumentSymbol {
 	children?: SassDocumentSymbol[];
 }
 
+export type RecursivePartial<T> = {
+	[P in keyof T]?: T[P] extends (infer U)[]
+		? RecursivePartial<U>[]
+		: T[P] extends object | undefined
+			? RecursivePartial<T[P]>
+			: T[P];
+};
+
 export interface LanguageService {
 	/**
 	 * Clears all cached documents, forcing everything to be reparsed the next time a feature is used.
@@ -81,16 +89,18 @@ export interface LanguageService {
 	clearCache(): void;
 	/**
 	 * You may want to use this to set the workspace root.
-	 * @param settings {@link LanguageServiceConfiguration}
+	 * @param settings {@link LanguageServerConfiguration}
 	 *
 	 * @example
 	 * ```js
 	 * languageService.configure({
-	 *   workspaceRoot: URI.parse(this.workspace),
+	 *   workspace: {
+	 * 	  workspaceRoot: URI.parse(this.workspace),
+	 *   },
 	 * });
 	 * ```
 	 */
-	configure(settings: LanguageServiceConfiguration): void;
+	configure(settings: RecursivePartial<LanguageServerConfiguration>): void;
 	doComplete(
 		document: TextDocument,
 		position: Position,
@@ -108,7 +118,7 @@ export interface LanguageService {
 	doSignatureHelp(
 		document: TextDocument,
 		position: Position,
-	): Promise<SignatureHelp>;
+	): Promise<SignatureHelp | null>;
 	findColors(document: TextDocument): Promise<ColorInformation[]>;
 	findDefinition(
 		document: TextDocument,
@@ -175,21 +185,34 @@ export type Rename =
 	| { range: Range; placeholder: string }
 	| { defaultBehavior: boolean };
 
-export interface LanguageServiceConfiguration {
+export type LintLevel = "ignore" | "warning" | "error";
+
+export interface LanguageConfiguration {
 	/**
-	 * Pass in [load paths](https://sass-lang.com/documentation/cli/dart-sass/#load-path) that will be used in addition to `node_modules`.
+	 * A list of relative file paths pointing to JSON files following the custom data format.
+	 * Some Sass loads custom data on startup to enhance its CSS support for CSS custom properties (variables), at-rules, pseudo-classes, and pseudo-elements you specify in the JSON files.
+	 * The file paths are relative to workspace and only workspace folder settings are considered.
 	 */
-	loadPaths?: string[];
-	completionSettings?: {
+	customData?: string[];
+	codeAction: {
+		enabled: boolean;
+	};
+	colors: {
+		enabled: boolean;
 		/**
-		 * Essentially "Visual Studio Code compat mode".
+		 * Compatibility setting for VS Code.
 		 *
-		 * If false, Some Sass will not give code suggestions based on contents from the current document.
-		 *
-		 * If you use this server as well as vscode-css-languageserver you can set this setting to avoid duplicates.
-		 * Has no effect for Sass Indented.
+		 * By default the built-in SCSS server shows color decorators for colors declared in the current document.
+		 * To avoid duplicates, by default Some Sass (only in VS Code) will only show color decorators where a variable is being used.
 		 */
-		suggestAllFromOpenDocument?: boolean;
+		includeFromCurrentDocument: boolean;
+	};
+	completion: {
+		enabled: boolean;
+		/**
+		 * Include CSS completions.
+		 */
+		css?: boolean;
 		/**
 		 * 	Mixins with `@content` SassDoc annotations and `%placeholders` get two suggestions by default:
 		 *   - One without `{ }`.
@@ -199,55 +222,133 @@ export interface LanguageServiceConfiguration {
 		 *   - All suggestions (default).
 		 *   - No brackets.
 		 *   - Only brackets. This still includes other suggestions, where there are no brackets to begin with.
-		 *
-		 * @default "all"
 		 */
-		suggestionStyle?: "all" | "nobracket" | "bracket";
+		mixinStyle?: "all" | "nobracket" | "bracket";
 		/**
-		 * Recommended if you don't rely on `@import`. With this setting turned on,
+		 * Recommended if you don't rely on `@import` in Sass. With this setting turned on,
 		 * Some Sass will only suggest variables, mixins and functions from the
 		 * namespaces that are in use in the open document.
 		 */
 		suggestFromUseOnly?: boolean;
 		/**
-		 * Suggest functions after the specified symbols when in a string context.
-		 * For example, if you add the `/` symbol to this setting, then `background: url(images/he|)`
-		 * could suggest a `hello()` function (`|` in this case indicates cursor position).
-		 *
-		 * @default " (+-*%"
-		 */
-		suggestFunctionsInStringContextAfterSymbols?: string;
-		/**
 		 * By default, Some Sass triggers property value completion after selecting a CSS property.
 		 * Use this setting to disable this behavior.
-		 *
-		 * @default true
 		 */
-		triggerPropertyValueCompletion?: boolean;
-		includePrefixDot?: boolean;
+		triggerPropertyValueCompletion: boolean;
+		completePropertyWithSemicolon?: boolean;
+		/**
+		 * Compatibility setting for VS Code.
+		 *
+		 * By default the built-in SCSS server shows suggestions for variables, mixins and functions declared in the current document.
+		 * To avoid duplicates, by default Some Sass (only in VS Code) will not suggest them.
+		 */
+		includeFromCurrentDocument: boolean;
 	};
-	editorSettings?: EditorSettings;
-	workspaceRoot?: URI;
+	definition: {
+		enabled: boolean;
+	};
+	diagnostics: {
+		enabled: boolean;
+		deprecation: {
+			enabled: boolean;
+		};
+		lint: {
+			enabled: boolean;
+			compatibleVendorPrefixes: LintLevel;
+			vendorPrefix: LintLevel;
+			duplicateProperties: LintLevel;
+			emptyRules: LintLevel;
+			importStatement: LintLevel;
+			boxModel: LintLevel;
+			universalSelector: LintLevel;
+			zeroUnits: LintLevel;
+			fontFaceProperties: LintLevel;
+			hexColorLength: LintLevel;
+			argumentsInColorFunction: LintLevel;
+			unknownProperties: LintLevel;
+			validProperties: string[];
+			ieHack: LintLevel;
+			unknownVendorSpecificProperties: LintLevel;
+			propertyIgnoredDueToDisplay: LintLevel;
+			important: LintLevel;
+			float: LintLevel;
+			idSelector: LintLevel;
+			unknownAtRules: LintLevel;
+			[key: string]: any;
+		};
+	};
+	foldingRanges: {
+		enabled: boolean;
+	};
+	highlights: {
+		enabled: boolean;
+	};
+	hover: {
+		enabled: boolean;
+		documentation: boolean;
+		references: boolean;
+	};
+	links: {
+		enabled: boolean;
+	};
+	references: {
+		enabled: boolean;
+	};
+	rename: {
+		enabled: boolean;
+	};
+	selectionRanges: {
+		enabled: boolean;
+	};
+	semanticTokens: {
+		enabled: boolean;
+	};
+	signatureHelp: {
+		enabled: boolean;
+	};
+	workspaceSymbol: {
+		enabled: boolean;
+	};
 }
 
-export interface EditorSettings {
+export interface WorkspaceConfiguration {
+	exclude: string[];
+	importAliases: {
+		[key: string]: any;
+	};
+	/**
+	 * Pass in [load paths](https://sass-lang.com/documentation/cli/dart-sass/#load-path) that will be used in addition to `node_modules`.
+	 */
+	loadPaths: string[];
+	workspaceRoot?: URI;
+	logLevel: "trace" | "debug" | "info" | "warn" | "error" | "fatal" | "silent";
+}
+
+export interface LanguageServerConfiguration {
+	css: LanguageConfiguration;
+	sass: LanguageConfiguration;
+	scss: LanguageConfiguration;
+	editor: EditorConfiguration;
+	workspace: WorkspaceConfiguration;
+}
+
+export interface EditorConfiguration {
 	/**
 	 * Insert spaces rather than tabs.
 	 */
-	insertSpaces?: boolean;
+	insertSpaces: boolean;
 	/**
 	 * If {@link insertSpaces} is true this option determines the number of space characters is inserted per indent level.
 	 */
-	indentSize?: number;
+	indentSize: number;
 	/**
 	 * An older editor setting in VS Code. If both this and {@link indentSize} is set, only `indentSize` will be used.
 	 */
-	tabSize?: number;
+	tabSize: number;
 	/**
 	 * Controls the max number of color decorators that can be rendered in an editor at once.
-	 * @default 500
 	 */
-	colorDecoratorsLimit?: number;
+	colorDecoratorsLimit: number;
 }
 
 export interface AliasSettings {
@@ -269,6 +370,15 @@ export interface ClientCapabilities {
 	};
 }
 
+export type Logger = {
+	fatal(message: string): void;
+	error(message: string): void;
+	warn(message: string): void;
+	info(message: string): void;
+	debug(message: string): void;
+	trace(message: string): void;
+};
+
 export interface LanguageServiceOptions {
 	clientCapabilities: ClientCapabilities;
 	/**
@@ -280,6 +390,7 @@ export interface LanguageServiceOptions {
 	 */
 	fileSystemProvider: FileSystemProvider;
 	languageModelCache?: LanguageModelCacheOptions;
+	logger?: Logger;
 }
 
 export type LanguageModelCacheOptions = {

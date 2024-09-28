@@ -10,7 +10,7 @@ export class FoldingRanges extends LanguageFeature {
 		document: TextDocument,
 		context?: FoldingRangeContext,
 	): Promise<FoldingRange[]> {
-		const result = this.getUpstreamLanguageServer().getFoldingRanges(
+		const result = this.getUpstreamLanguageServer(document).getFoldingRanges(
 			document,
 			context,
 		);

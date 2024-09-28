@@ -11,7 +11,7 @@ export class SelectionRanges extends LanguageFeature {
 		positions: Position[],
 	): Promise<SelectionRange[]> {
 		const stylesheet = this.ls.parseStylesheet(document);
-		const result = this.getUpstreamLanguageServer().getSelectionRanges(
+		const result = this.getUpstreamLanguageServer(document).getSelectionRanges(
 			document,
 			positions,
 			stylesheet,

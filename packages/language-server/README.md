@@ -9,13 +9,9 @@ The language server provides:
 - Rich documentation through [SassDoc](http://sassdoc.com).
 - Language features for `%placeholder-selectors`, both when using them and writing them.
 - Suggestions and hover info for built-in Sass modules, when used with `@use`.
-- Support for [both Sass syntaxes](https://sass-lang.com/documentation/syntax/).
-
-This language server is designed to run alongside the [VS Code CSS language server](https://github.com/hrsh7th/vscode-langservers-extracted). See [the settings documentation](https://wkillerud.github.io/some-sass/user-guide/settings.html#suggest-variables-mixins-and-functions-from-the-open-document) for information on tweaking the user experience.
+- Support for [both Sass syntaxes](https://sass-lang.com/documentation/syntax/) as well as CSS.
 
 ## Usage
-
-See [Editors with clients](https://github.com/wkillerud/some-sass/blob/main/README.md#editors-with-clients). If your editor is not listed, refer to your editor's documentation for integrating with a language server using the Language Server Protocol (LSP).
 
 You can install the language server with `npm`:
 
@@ -23,19 +19,7 @@ You can install the language server with `npm`:
 npm install --global some-sass-language-server
 ```
 
-Then start the language server like so:
-
-```sh
-some-sass-language-server --stdio
-```
-
-**Options**
-
-`--debug` – runs the development build of the language server, helpful to get more context if the server crashes
-
-### Workspace configuration
-
-See [how to configure a client](https://wkillerud.github.io/some-sass/language-server/configure-a-client.html) and the [documentation for the available settings](https://wkillerud.github.io/some-sass/user-guide/settings.html).
+Then see [how to configure a client](https://wkillerud.github.io/some-sass/language-server/configure-a-client.html).
 
 ## Capabilities
 

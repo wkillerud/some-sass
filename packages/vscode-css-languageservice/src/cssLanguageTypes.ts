@@ -96,7 +96,7 @@ export interface CompletionSettings {
 
 export interface LanguageSettings {
 	validate?: boolean;
-	lint?: LintSettings;
+	lint?: false | LintSettings;
 	completion?: CompletionSettings;
 	hover?: HoverSettings;
 	importAliases?: AliasSettings;

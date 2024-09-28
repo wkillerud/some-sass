@@ -4,140 +4,181 @@ This document describes the settings available in Some Sass.
 
 ## Recommended settings
 
-These are the recommended settings:
+These are the recommended settings if you're just getting started.
 
 ```jsonc
 {
 	// Recommended if you don't rely on @import
-	"somesass.suggestFromUseOnly": true,
+	"somesass.scss.completion.suggestFromUseOnly": true,
+	"somesass.sass.completion.suggestFromUseOnly": true,
 
-	// Optional, if you get suggestions from the current document after namespace.$ (you don't need the $ for narrowing down suggestions)
+	// Optional, if you get suggestions from the current document after namespace.$ (you don't need to type the $ for narrowing down suggestions)
 	"editor.wordBasedSuggestions": false,
 }
 ```
 
-### About word-based suggestions
+### Going all in on Some Sass
 
-When you get completion suggestions and type `namespace.$`, Visual Studio Code treats `$` as a fresh start for suggestions. It will start matching any variable in the current document. There are two ways to get around this:
+If you don't need language features for [Less](https://lesscss.org/) and don't rely on the built-in formatter, we recommend that you:
 
-1. Turn off word-based suggestions by setting `"editor.wordBasedSuggestions": false`.
-2. Don't type the `$` when you write the variable name, let completions fill it out for you.
+1. turn off the built-in CSS/SCSS/Less language extension in Visual Studio Code
+2. configure Some Sass to turn on all features for CSS, SCSS and Sass indented
 
-With the second approach you can keep word-based suggestions turned on.
+This way you get the best experience without Some Sass and VS Code getting in each others way.
 
-## Settings reference
+#### How to turn off the built-in language feature
 
-These are the settings you can use to tune Some Sass.
+1. Go to the Extensions tab and search for `@builtin css language features`.
+2. Click the settings icon and pick Disable from the list.
+3. Click Restart extension to turn it off.
 
-### Code suggestion
+![Screenshot showing the Extension tab filtered to show the css language features](../images/usage/settings-built-in.png)
 
-#### Only include suggestions from used modules
+#### How to turn on Some Sass language features
 
-If your project is on the modern module syntax (`@use` and `@forward` instead of `@import`), you may want to turn
-on this setting.
+Now that you disabled the built-in language features you need to turn on those language features in Some Sass.
 
-With this setting turned on, Some Sass will only suggest variables, mixins and functions from the namespaces that are
-in use in the open document. This setting will be turned on by default at some point after `@import` becomes CSS-only.
-
-- JSON key: `somesass.suggestFromUseOnly`.
-- Default value: `false`.
-
-#### Suggest variables, mixins, and functions from the open document
-
-Visual Studio Code has built-in suggestions for variables, mixins and functions created in the open document.
-
-By default Some Sass will _not_ send suggestions for the same symbols.
-If you prefer the suggestions from Some Sass (for instance if you use SassDoc), you can opt in by turning on this setting.
-There will unfortunately be duplicates.
-
-- JSON key: `somesass.suggestAllFromOpenDocument`
-- Default value: `false`.
-
-#### Suggestion style
-
-Mixins with `@content` SassDoc annotations and `%placeholders` get two suggestions by default:
-
-- One without `{ }`.
-- One _with_ `{ }`. This one creates a new block, and moves the cursor inside the block.
-
-If you find this noisy, you can control which suggestions you would like to see:
-
-- All suggestions (default).
-- No brackets.
-- Only brackets. This still includes other suggestions, where there are no brackets to begin with.
-
-#### Decide when function suggestions should kick in
-
-Suggest functions after the specified symbols when in a string context.
-For example, if you add the `/` symbol to this setting, then `background: url(images/he|)`
-could suggest a `hello()` function (`|` in this case indicates cursor position).
-
-- JSON key: `somesass.suggestFunctionsInStringContextAfterSymbols`.
-- Default value: `" (+-*%"`.
-
-#### Suggest values for CSS properties
-
-By default, Some Sass triggers property value completion after selecting a CSS property.
-Use this setting to disable this behavior.
-
-An example would be accepting a suggestion for `display:` and immediately see suggestions like
-`inline-block` for the value.
-
-Note that for SCSS this only applies if `somesass.suggestAllFromOpenDocument` is true,
-which is not the case by default in VS Code.
-Use `scss.completion.triggerPropertyValueCompletion` to configure the feature built in
-to VS Code.
-
-- JSON key: `somesass.triggerPropertyValueCompletion`.
-- Default value: `true`.
-
-### Workspace
-
-#### Load paths
-
-A list of paths relative to the workspace root where the language server should look for stylesheets loaded by `@use` and `@import`. `node_modules` is always included.
-
-This feature can also be seen referred to as `includePaths`.
-
-Note that you will have to [configure your Sass compiler separately](https://sass-lang.com/documentation/cli/dart-sass/#load-path).
-
-As an example, say you have a stylesheet `shared/my-lib/variables.scss` and would like to import it as `my-lib/variables` in your other stylesheets.
-
-Add this to your settings and restart Visual Studio Code.
+1. Open your [user settings JSON](https://code.visualstudio.com/docs/getstarted/settings#_settings-json-file) and paste the configuration shown below.
+2. Restart VS Code to make sure the changes apply.
 
 ```json
 {
-	"somesass.loadPaths": ["shared/"]
+	"somesass.css.codeAction.enabled": true,
+	"somesass.css.colors.enabled": true,
+	"somesass.css.completion.enabled": true,
+	"somesass.css.definition.enabled": true,
+	"somesass.css.diagnostics.enabled": true,
+	"somesass.css.foldingRanges.enabled": true,
+	"somesass.css.highlights.enabled": true,
+	"somesass.css.hover.enabled": true,
+	"somesass.css.links.enabled": true,
+	"somesass.css.references.enabled": true,
+	"somesass.css.rename.enabled": true,
+	"somesass.css.selectionRanges.enabled": true,
+	"somesass.css.signatureHelp.enabled": true,
+	"somesass.css.workspaceSymbol.enabled": true,
+
+	"somesass.scss.codeAction.enabled": true,
+	"somesass.scss.colors.enabled": true,
+	"somesass.scss.colors.includeFromCurrentDocument": true,
+	"somesass.scss.completion.enabled": true,
+	"somesass.scss.completion.css": true,
+	"somesass.scss.completion.includeFromCurrentDocument": true,
+	"somesass.scss.definition.enabled": true,
+	"somesass.scss.diagnostics.enabled": true,
+	"somesass.scss.diagnostics.lint.enabled": true,
+	"somesass.scss.foldingRanges.enabled": true,
+	"somesass.scss.highlights.enabled": true,
+	"somesass.scss.hover.enabled": true,
+	"somesass.scss.hover.documentation": true,
+	"somesass.scss.links.enabled": true,
+	"somesass.scss.references.enabled": true,
+	"somesass.scss.rename.enabled": true,
+	"somesass.scss.selectionRanges.enabled": true,
+	"somesass.scss.signatureHelp.enabled": true,
+	"somesass.scss.workspaceSymbol.enabled": true
 }
 ```
 
-In a different stylesheet you can then get `shared/my-lib/variables.scss` like this:
+## Settings reference
 
-```scss
-@use "my-lib/variables";
-```
+You can configure similar settings for both SCSS, Sass (indented) and CSS. There are also some settings that apply to the workspace regardless of syntax.
 
-#### Exclude files or folders
+### Workspace
 
-List of [micromatch](https://github.com/micromatch/micromatch) patterns for directories that are excluded when scanning.
+| Id                             | Description                                                                                                                                                                                                                                                                                                 | Default                                |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `somesass.workspace.loadPaths` | A list of paths relative to the workspace root where the language server should look for stylesheets loaded by `@use` and `@import`. `node_modules` is always included. Note that you will have to [configure your Sass compiler separately](https://sass-lang.com/documentation/cli/dart-sass/#load-path). | `[]`                                   |
+| `somesass.workspace.exclude`   | List of glob patterns for directories that are excluded in the initial scan for Sass files. Files in the exclude list will still be processed if referenced by `@use`, `@forward` and `@import` (for example a depencendy you use from `node_modules`).                                                     | `["**/.git/**", "**/node_modules/**"]` |
+| `somesass.workspace.logLevel`  | Control how much gets logged to the Output window. Possible values are `"silent"`, `"fatal"`, `"error"`, `"warn"`, `"info"`, `"debug"` and `"trace"`.                                                                                                                                                       | `"info"`                               |
+| `some-sass.trace.server`       | Log the messages sent between VS Code and the Some Sass language server. Possible values are `"off"`, `"messages"` and `"verbose"`                                                                                                                                                                          | `"off"`                                |
 
-- JSON key: `somesass.scannerExclude`.
-- Default value: `["**/.git/**", "**/node_modules/**", "**/bower_components/**"]`.
+### SCSS
 
-#### Adjust scanner depth
+For brevity the ID column omits the `somesass.scss` prefix. For example, to use the setting `codeAction.enabled` use the ID `somesass.scss.codeAction.enabled`.
 
-Depending on your project size, you may want to tweak this setting to control how many files are included.
+| Id                                          | Description                                                                                                                                                                                                                           | Default |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `codeAction.enabled`                        | Enable or disable all code actions.                                                                                                                                                                                                   | `true`  |
+| `colors.enabled`                            | Enable or disable all color decorators.                                                                                                                                                                                               | `true`  |
+| `colors.includeFromCurrentDocument`         | Compatibility setting for VS Code. By default the built-in SCSS server shows color decorators for variables declared in the current document. To avoid duplicates Some Sass will not show them unless you opt in.                     | `false` |
+| `completion.enabled`                        | Enable or disable all completions (IntelliSense).                                                                                                                                                                                     | `true`  |
+| `completion.includeFromCurrentDocument`     | Compatibility setting for VS Code. By default the built-in SCSS server shows suggestions for variables, mixins and functions declared in the current document. To avoid duplicates Some Sass will not suggest them unless you opt in. | `false` |
+| `completion.suggestFromUseOnly`             | If your project uses the new module system with @use and @forward, you may want to only include suggestions from your used modules.                                                                                                   | `false` |
+| `completion.mixinStyle`                     | Controls the style of suggestions for mixins. Options are `"all"`, `"nobracket"` (only show suggestions without brackets) and `"bracket"` (where brackets are suggested, don't suggest without brackets).                             | `"all"` |
+| `completion.triggerPropertyValueCompletion` | By default, Some Sass triggers property value completion after selecting a CSS property. Use this setting to disable this behavior.                                                                                                   | `true`  |
+| `completion.completePropertyWithSemicolon`  | Insert semicolon at end of line when completing CSS properties.                                                                                                                                                                       | `true`  |
+| `definition.enabled`                        | Enable or disable Go to Definition.                                                                                                                                                                                                   | `true`  |
+| `diagnostics.enabled`                       | Enable or disable all diagnostics (deprecation, errors and lint rules).                                                                                                                                                               | `true`  |
+| `diagnostics.deprecation.enabled`           | Enable or disable deprecation diagnostics (strike-through).                                                                                                                                                                           | `true`  |
+| `diagnostics.lint.enabled`                  | Enable or disable all linting.                                                                                                                                                                                                        | `false` |
+| `diagnostics.lint.*`                        | For the available lint rules and what they do, see the [VS Code docs for CSS and SCSS lint settings](https://code.visualstudio.com/docs/languages/css#_customizing-css-scss-and-less-settings)                                        |         |
+| `foldingRanges.enabled`                     | Enable or disable folding ranges.                                                                                                                                                                                                     | `false` |
+| `highlights.enabled`                        | Enable or disable highlights.                                                                                                                                                                                                         | `false` |
+| `hover.enabled`                             | Enable or disable all hover information.                                                                                                                                                                                              | `true`  |
+| `hover.documentation`                       | Show property and value documentation in CSS hovers.                                                                                                                                                                                  | `true`  |
+| `hover.references`                          | Show references to MDN in CSS hovers, Sass documentation for Sass built-in modules and SassDoc for annotations.                                                                                                                       | `true`  |
+| `links.enabled`                             | Enable or disable the link provider that lets you click an import and open the file.                                                                                                                                                  | `false` |
+| `references.enabled`                        | Enable or disable Find all references.                                                                                                                                                                                                | `true`  |
+| `rename.enabled`                            | Enable or disable Rename.                                                                                                                                                                                                             | `true`  |
+| `selectionRanges.enabled`                   | Enable or disable selection ranges.                                                                                                                                                                                                   | `false` |
+| `signatureHelp.enabled`                     | Enable or disable signature help.                                                                                                                                                                                                     | `true`  |
+| `workspaceSymbol.enabled`                   | Enable or disable workspace symbol.                                                                                                                                                                                                   | `true`  |
 
-- JSON key: `somesass.scannerDepth`.
-- Default: `30`.
+### Sass indented
 
-#### Stop scanner from following links
+For brevity the ID column omits the `somesass.sass` prefix. For example, to use the setting `codeAction.enabled` use the ID `somesass.sass.codeAction.enabled`.
 
-`@deprecated`
+| Id                                          | Description                                                                                                                                                                                               | Default |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `codeAction.enabled`                        | Enable or disable all code actions.                                                                                                                                                                       | `true`  |
+| `colors.enabled`                            | Enable or disable all color decorators.                                                                                                                                                                   | `true`  |
+| `completion.enabled`                        | Enable or disable all completions (IntelliSense).                                                                                                                                                         | `true`  |
+| `completion.suggestFromUseOnly`             | If your project uses the new module system with @use and @forward, you may want to only include suggestions from your used modules.                                                                       | `false` |
+| `completion.mixinStyle`                     | Controls the style of suggestions for mixins. Options are `"all"`, `"nobracket"` (only show suggestions without brackets) and `"bracket"` (where brackets are suggested, don't suggest without brackets). | `"all"` |
+| `completion.triggerPropertyValueCompletion` | By default, Some Sass triggers property value completion after selecting a CSS property. Use this setting to disable this behavior.                                                                       | `true`  |
+| `definition.enabled`                        | Enable or disable Go to Definition.                                                                                                                                                                       | `true`  |
+| `diagnostics.enabled`                       | Enable or disable all diagnostics (deprecation, errors and lint rules).                                                                                                                                   | `true`  |
+| `diagnostics.deprecation.enabled`           | Enable or disable deprecation diagnostics (strike-through).                                                                                                                                               | `true`  |
+| `diagnostics.lint.enabled`                  | Enable or disable all linting.                                                                                                                                                                            | `true`  |
+| `diagnostics.lint.*`                        | For the available lint rules and what they do, see the [VS Code docs for CSS and SCSS lint settings](https://code.visualstudio.com/docs/languages/css#_customizing-css-scss-and-less-settings)            |         |
+| `foldingRanges.enabled`                     | Enable or disable folding ranges.                                                                                                                                                                         | `true`  |
+| `highlights.enabled`                        | Enable or disable highlights.                                                                                                                                                                             | `true`  |
+| `hover.enabled`                             | Enable or disable all hover information.                                                                                                                                                                  | `true`  |
+| `hover.documentation`                       | Show property and value documentation in CSS hovers.                                                                                                                                                      | `true`  |
+| `hover.references`                          | Show references to MDN in CSS hovers, Sass documentation for Sass built-in modules and SassDoc for annotations.                                                                                           | `true`  |
+| `links.enabled`                             | Enable or disable the link provider that lets you click an import and open the file.                                                                                                                      | `true`  |
+| `references.enabled`                        | Enable or disable Find all references.                                                                                                                                                                    | `true`  |
+| `rename.enabled`                            | Enable or disable Rename.                                                                                                                                                                                 | `true`  |
+| `selectionRanges.enabled`                   | Enable or disable selection ranges.                                                                                                                                                                       | `true`  |
+| `signatureHelp.enabled`                     | Enable or disable signature help.                                                                                                                                                                         | `true`  |
+| `workspaceSymbol.enabled`                   | Enable or disable workspace symbol.                                                                                                                                                                       | `true`  |
 
-If you don't want Some Sass to follow `@import`, `@use` or `@forward` links you can turn this setting off.
-This will limit functionality, and is not recommended. This setting will be removed at some point
-after `@import` becomes CSS-only.
+### CSS
 
-- JSON key: `somesass.scanImportedFiles`.
-- Default: `true`.
+For brevity the ID column omits the `somesass.css` prefix. For example, to use the setting `codeAction.enabled` use the ID `somesass.css.codeAction.enabled`.
+
+| Id                                          | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Default |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| `codeAction.enabled`                        | Enable or disable all code actions.                                                                                                                                                                                                                                                                                                                                                                                                                                | `false` |
+| `colors.enabled`                            | Enable or disable all color decorators.                                                                                                                                                                                                                                                                                                                                                                                                                            | `false` |
+| `completion.enabled`                        | Enable or disable all completions (IntelliSense).                                                                                                                                                                                                                                                                                                                                                                                                                  | `false` |
+| `completion.triggerPropertyValueCompletion` | By default, Some Sass triggers property value completion after selecting a CSS property. Use this setting to disable this behavior.                                                                                                                                                                                                                                                                                                                                | `true`  |
+| `completion.completePropertyWithSemicolon`  | Insert semicolon at end of line when completing CSS properties.                                                                                                                                                                                                                                                                                                                                                                                                    | `true`  |
+| `definition.enabled`                        | Enable or disable Go to Definition.                                                                                                                                                                                                                                                                                                                                                                                                                                | `false` |
+| `diagnostics.enabled`                       | Enable or disable all diagnostics (deprecation, errors and lint rules).                                                                                                                                                                                                                                                                                                                                                                                            | `false` |
+| `diagnostics.deprecation.enabled`           | Enable or disable deprecation diagnostics (strike-through).                                                                                                                                                                                                                                                                                                                                                                                                        | `false` |
+| `diagnostics.lint.enabled`                  | Enable or disable all linting.                                                                                                                                                                                                                                                                                                                                                                                                                                     | `false` |
+| `diagnostics.lint.*`                        | For the available lint rules and what they do, see the [VS Code docs for CSS and SCSS lint settings](https://code.visualstudio.com/docs/languages/css#_customizing-css-scss-and-less-settings)                                                                                                                                                                                                                                                                     |         |
+| `foldingRanges.enabled`                     | Enable or disable folding ranges.                                                                                                                                                                                                                                                                                                                                                                                                                                  | `false` |
+| `highlights.enabled`                        | Enable or disable highlights.                                                                                                                                                                                                                                                                                                                                                                                                                                      | `false` |
+| `hover.enabled`                             | Enable or disable all hover information.                                                                                                                                                                                                                                                                                                                                                                                                                           | `false` |
+| `hover.documentation`                       | Show property and value documentation in CSS hovers.                                                                                                                                                                                                                                                                                                                                                                                                               | `false` |
+| `hover.references`                          | Show references to MDN in CSS hovers, Sass documentation for Sass built-in modules and SassDoc for annotations.                                                                                                                                                                                                                                                                                                                                                    | `false` |
+| `links.enabled`                             | Enable or disable the link provider that lets you click an import and open the file.                                                                                                                                                                                                                                                                                                                                                                               | `false` |
+| `references.enabled`                        | Enable or disable Find all references.                                                                                                                                                                                                                                                                                                                                                                                                                             | `false` |
+| `rename.enabled`                            | Enable or disable Rename.                                                                                                                                                                                                                                                                                                                                                                                                                                          | `false` |
+| `selectionRanges.enabled`                   | Enable or disable selection ranges.                                                                                                                                                                                                                                                                                                                                                                                                                                | `false` |
+| `signatureHelp.enabled`                     | Enable or disable signature help.                                                                                                                                                                                                                                                                                                                                                                                                                                  | `false` |
+| `workspaceSymbol.enabled`                   | Enable or disable workspace symbol.                                                                                                                                                                                                                                                                                                                                                                                                                                | `false` |
+| `customData`                                | A list of relative file paths pointing to JSON files following the [custom data format](https://github.com/microsoft/vscode-css-languageservice/blob/master/docs/customData.md). Some Sass loads custom data on startup to enhance its CSS support for CSS custom properties (variables), at-rules, pseudo-classes, and pseudo-elements you specify in the JSON files. The file paths are relative to workspace and only workspace folder settings are considered. | `[]`    |

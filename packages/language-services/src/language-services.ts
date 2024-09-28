@@ -1,4 +1,8 @@
-import { getSassLanguageService } from "@somesass/vscode-css-languageservice";
+import {
+	getCSSLanguageService,
+	getSassLanguageService,
+} from "@somesass/vscode-css-languageservice";
+import { defaultConfiguration } from "./configuration";
 import { CodeActions } from "./features/code-actions";
 import { DoComplete } from "./features/do-complete";
 import { DoDiagnostics } from "./features/do-diagnostics";
@@ -17,7 +21,9 @@ import { LanguageModelCache as LanguageServerCache } from "./language-model-cach
 import {
 	CodeActionContext,
 	LanguageService,
-	LanguageServiceConfiguration,
+	LanguageConfiguration,
+	EditorConfiguration,
+	LanguageServerConfiguration,
 	LanguageServiceOptions,
 	Position,
 	TextDocument,
@@ -32,8 +38,11 @@ import {
 import { mapFsProviders } from "./utils/fs-provider";
 
 export {
+	defaultConfiguration,
 	LanguageService,
-	LanguageServiceConfiguration,
+	LanguageServerConfiguration,
+	LanguageConfiguration,
+	EditorConfiguration,
 	FileStat,
 	FileSystemProvider,
 	FileType,
@@ -63,18 +72,25 @@ class LanguageServiceImpl implements LanguageService {
 	#selectionRanges: SelectionRanges;
 
 	constructor(options: LanguageServiceOptions) {
-		const sassLs = getSassLanguageService({
+		const vscodeLsOptions = {
 			clientCapabilities: options.clientCapabilities,
 			fileSystemProvider: mapFsProviders(options.fileSystemProvider),
-		});
+		};
+		const sassLs = getSassLanguageService(vscodeLsOptions);
+
 		const cache = new LanguageServerCache({
 			sassLs,
 			...options.languageModelCache,
 		});
+
 		const internal = {
-			sassLs,
 			cache,
+			sassLs,
+			cssLs: getCSSLanguageService(vscodeLsOptions),
+			// The server code is the same as sassLs, but separate on syntax in case the user has different settings
+			scssLs: getSassLanguageService(vscodeLsOptions),
 		};
+
 		this.#cache = cache;
 		this.#codeActions = new CodeActions(this, options, internal);
 		this.#doComplete = new DoComplete(this, options, internal);
@@ -96,7 +112,7 @@ class LanguageServiceImpl implements LanguageService {
 		this.#selectionRanges = new SelectionRanges(this, options, internal);
 	}
 
-	configure(configuration: LanguageServiceConfiguration): void {
+	configure(configuration: LanguageServerConfiguration): void {
 		this.#codeActions.configure(configuration);
 		this.#doComplete.configure(configuration);
 		this.#doDiagnostics.configure(configuration);

@@ -16,10 +16,9 @@ export class FindSymbols extends LanguageFeature {
 		if (cachedSymbols) return cachedSymbols;
 
 		const stylesheet = this.ls.parseStylesheet(document);
-		const symbols = this.getUpstreamLanguageServer().findDocumentSymbols2(
+		const symbols = this.getUpstreamLanguageServer(
 			document,
-			stylesheet,
-		) as SassDocumentSymbol[];
+		).findDocumentSymbols2(document, stylesheet) as SassDocumentSymbol[];
 
 		const sassdoc: ParseResult[] = this.cache.getSassdoc(document);
 		for (const doc of sassdoc) {
@@ -70,16 +69,22 @@ export class FindSymbols extends LanguageFeature {
 		const documents = this.cache.documents();
 		const result: SymbolInformation[] = [];
 		for (const document of documents) {
-			const symbols = this.findDocumentSymbols(document);
-			for (const symbol of symbols) {
-				if (query && !symbol.name.includes(query)) {
-					continue;
+			// This is the exception to the rule that this enabled check
+			// should happen at the server edge. It's only at this point
+			// we know if the document should be included or not.
+			const config = this.languageConfiguration(document);
+			if (config.workspaceSymbol.enabled) {
+				const symbols = this.findDocumentSymbols(document);
+				for (const symbol of symbols) {
+					if (query && !symbol.name.includes(query)) {
+						continue;
+					}
+					result.push({
+						name: symbol.name,
+						kind: symbol.kind,
+						location: Location.create(document.uri, symbol.selectionRange),
+					});
 				}
-				result.push({
-					name: symbol.name,
-					kind: symbol.kind,
-					location: Location.create(document.uri, symbol.selectionRange),
-				});
 			}
 		}
 		return result;

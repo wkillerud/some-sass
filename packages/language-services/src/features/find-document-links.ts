@@ -13,11 +13,10 @@ export class FindDocumentLinks extends LanguageFeature {
 		if (cached) return cached;
 
 		const stylesheet = this.ls.parseStylesheet(document);
-		const links = await this.getUpstreamLanguageServer().findDocumentLinks2(
+		const links = await this.getUpstreamLanguageServer(
 			document,
-			stylesheet,
-			this.getDocumentContext(),
-		);
+		).findDocumentLinks2(document, stylesheet, this.getDocumentContext());
+
 		for (const link of links) {
 			if (link.target && !link.target.includes("sass:")) {
 				// For monorepos, resolve the real path behind a symlink, since multiple links in `node_modules/` can point to the same file.

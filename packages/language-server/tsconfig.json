@@ -5,9 +5,10 @@
 		"sourceMap": true,
 		"module": "commonjs",
 		"moduleResolution": "node",
-		"rootDir": ".",
 		"outDir": "out",
 		"strict": true,
+		"allowSyntheticDefaultImports": true,
 		"resolveJsonModule": true
-	}
+	},
+	"exclude": ["**/*.test.ts", "vitest.config.mts"]
 }

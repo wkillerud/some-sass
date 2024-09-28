@@ -1,6 +1,9 @@
 import { EOL } from "node:os";
 import { test, assert, beforeEach } from "vitest";
-import { getLanguageService } from "../../language-services";
+import {
+	defaultConfiguration,
+	getLanguageService,
+} from "../../language-services";
 import {
 	CodeAction,
 	Position,
@@ -15,7 +18,7 @@ const ls = getLanguageService({ fileSystemProvider, ...rest });
 
 beforeEach(() => {
 	ls.clearCache();
-	ls.configure({}); // Reset any configuration to default
+	ls.configure(defaultConfiguration);
 });
 
 const getEdit = (result: CodeAction): TextEdit[] => {
@@ -117,7 +120,8 @@ test("extraction for multiline variable", async () => {
 
 test("extraction for mixin with tab indents", async () => {
 	ls.configure({
-		editorSettings: {
+		...defaultConfiguration,
+		editor: {
 			insertSpaces: false,
 		},
 	});
@@ -164,7 +168,8 @@ a.cta {
 
 test("extraction for mixin with space indents", async () => {
 	ls.configure({
-		editorSettings: {
+		...defaultConfiguration,
+		editor: {
 			insertSpaces: true,
 			indentSize: 4,
 		},
@@ -212,7 +217,8 @@ a.cta {
 
 test("indented: extraction for mixin", async () => {
 	ls.configure({
-		editorSettings: {
+		...defaultConfiguration,
+		editor: {
 			insertSpaces: true,
 			indentSize: 2,
 		},
@@ -260,7 +266,8 @@ a.cta
 
 test("extraction for function with tab indents", async () => {
 	ls.configure({
-		editorSettings: {
+		...defaultConfiguration,
+		editor: {
 			insertSpaces: false,
 		},
 	});
@@ -298,7 +305,8 @@ box-shadow: _function();`,
 
 test("extraction for function with space indents", async () => {
 	ls.configure({
-		editorSettings: {
+		...defaultConfiguration,
+		editor: {
 			insertSpaces: true,
 			indentSize: 2,
 		},
@@ -337,7 +345,8 @@ box-shadow: _function();`,
 
 test("indented: extraction for function", async () => {
 	ls.configure({
-		editorSettings: {
+		...defaultConfiguration,
+		editor: {
 			insertSpaces: true,
 			indentSize: 2,
 		},

@@ -311,7 +311,11 @@ test("signature help when given more parameters than are supported", async () =>
 	});
 	const result = await ls.doSignatureHelp(document, Position.create(0, 18));
 
-	assert.deepStrictEqual(result, null);
+	assert.deepStrictEqual(result, {
+		activeParameter: 2,
+		activeSignature: 0,
+		signatures: [],
+	});
 });
 
 test("is not confused by using a function as a parameter", async () => {
@@ -554,6 +558,72 @@ test("provides signature help for sass built-ins with named parameters in signat
 			},
 		],
 		activeParameter: 3,
+		activeSignature: 0,
+	});
+});
+
+test("provides signature help with numeric parameter", async () => {
+	const document = fileSystemProvider.createDocument(
+		[
+			"@use 'sass:color';",
+			".foo {",
+			"  $_primary: #303030;",
+			"  background-color: color.adjust($_primary, 100, 1);",
+			"}",
+		],
+		{ uri: "builtins.scss" },
+	);
+
+	const help = await ls.doSignatureHelp(document, Position.create(3, 50));
+
+	assert.deepStrictEqual(help, {
+		signatures: [
+			{
+				documentation: {
+					kind: "markdown",
+					value:
+						"Increases or decreases one or more properties of `$color` by fixed amounts. All optional arguments must be numbers.\n\nIt's an error to specify an RGB property at the same time as an HSL property, or either of those at the same time as an HWB property.\n\n[Sass reference](https://sass-lang.com/documentation/modules/color#adjust)",
+				},
+				label:
+					"adjust($color, $red: null, $green: null, $blue: null, $hue: null, $saturation: null, $lightness: null, $whiteness: null, $blackness: null, $alpha: null, $space: null)",
+				parameters: [
+					{
+						label: "$color",
+					},
+					{
+						label: "$red",
+					},
+					{
+						label: "$green",
+					},
+					{
+						label: "$blue",
+					},
+					{
+						label: "$hue",
+					},
+					{
+						label: "$saturation",
+					},
+					{
+						label: "$lightness",
+					},
+					{
+						label: "$whiteness",
+					},
+					{
+						label: "$blackness",
+					},
+					{
+						label: "$alpha",
+					},
+					{
+						label: "$space",
+					},
+				],
+			},
+		],
+		activeParameter: 2,
 		activeSignature: 0,
 	});
 });

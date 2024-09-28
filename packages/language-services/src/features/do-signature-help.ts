@@ -1,4 +1,4 @@
-import { getNodeAtOffset } from "@somesass/vscode-css-languageservice";
+import { getNodeAtOffset, Range } from "@somesass/vscode-css-languageservice";
 import { sassBuiltInModules } from "../facts/sass";
 import { LanguageFeature } from "../language-feature";
 import {
@@ -33,25 +33,39 @@ export class DoSignatureHelp extends LanguageFeature {
 			node.type !== NodeType.Function &&
 			node.type !== NodeType.MixinReference
 		) {
-			if (
-				!node.parent ||
-				(node.parent.type !== NodeType.Function &&
-					node.parent.type !== NodeType.MixinReference)
-			) {
+			const parent = node.findAParent(
+				NodeType.Function,
+				NodeType.MixinReference,
+			);
+			if (!parent) {
 				return null;
 			}
-
-			node = node.parent as Function | MixinReference;
+			node = parent as Function | MixinReference;
 		}
 
-		const result: SignatureHelp = {
+		const result: Required<SignatureHelp> = {
 			activeSignature: 0,
 			activeParameter: 0,
 			signatures: [],
 		};
 		const identifier = node.getIdentifier()!.getText();
 		const parameters = node.getArguments().getChildren();
-		result.activeParameter = parameters.length;
+		if (parameters.length) {
+			result.activeParameter = parameters.length - 1;
+
+			// Figure out how to se if we have a , after the last parameter. If so, add one to result.activeParameter.
+			const lastParamEndOffset = parameters[parameters.length - 1].end;
+			const lastParamEndPosition = document.positionAt(lastParamEndOffset);
+			const characterAfterLastParam = document.getText(
+				Range.create(lastParamEndPosition, {
+					line: lastParamEndPosition.line,
+					character: lastParamEndPosition.character + 1,
+				}),
+			);
+			if (characterAfterLastParam === ",") {
+				result.activeParameter = result.activeParameter + 1;
+			}
+		}
 
 		const definition = await this.ls.findDefinition(
 			document,
@@ -63,7 +77,11 @@ export class DoSignatureHelp extends LanguageFeature {
 			if (!symbol) return result;
 
 			const allParameters = getParametersFromDetail(symbol.detail);
-			if (allParameters.length >= (result.activeParameter || 0)) {
+			// activeParameter is 0 index
+			if (
+				allParameters.length === 0 ||
+				allParameters.length > result.activeParameter
+			) {
 				const signatureInfo = SignatureInformation.create(
 					`${identifier}${symbol.detail || "()"}`,
 				);

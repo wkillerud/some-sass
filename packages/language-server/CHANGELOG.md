@@ -1,3 +1,19 @@
+# 2.0.0 (2024-09-28)
+
+
+### 🚀 Features
+
+- ⚠️  handle all features for css and scss by default
+
+
+### ⚠️  Breaking Changes
+
+- All language features are now turned on by default for SCSS, Sass indented and CSS.
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 2.0.0
+
 ## 1.8.3 (2024-09-19)
 
 

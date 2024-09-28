@@ -1,6 +1,6 @@
 {
 	"name": "some-sass-language-server",
-	"version": "1.8.3",
+	"version": "2.0.0",
 	"description": "LSP server for SCSS and Sass indented. Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
 	"keywords": [
 		"sass",
@@ -55,7 +55,7 @@
 	},
 	"devDependencies": {
 		"@rsdoctor/rspack-plugin": "0.4.4",
-		"@somesass/language-services": "1.7.1",
+		"@somesass/language-services": "2.0.0",
 		"@types/lodash.merge": "4.6.9",
 		"@types/node": "20.16.5",
 		"@vitest/coverage-v8": "2.0.5",

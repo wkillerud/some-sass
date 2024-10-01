@@ -44,7 +44,7 @@ jobs:
 
       - name: Run e2e tests
         if: runner.os != 'Linux'
-        uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+        uses: nick-fields/retry@dfb235ae84ed15b9e1a7ce71e611dcc1e300339d
         with:
           timeout_minutes: 5
           max_attempts: 3
@@ -52,7 +52,7 @@ jobs:
 
       - name: Run web e2e tests
         if: runner.os != 'macOS'
-        uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+        uses: nick-fields/retry@dfb235ae84ed15b9e1a7ce71e611dcc1e300339d
         with:
           timeout_minutes: 5
           max_attempts: 3

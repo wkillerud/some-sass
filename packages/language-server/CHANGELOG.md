@@ -1,3 +1,10 @@
+## 2.0.2 (2024-10-01)
+
+
+### 🩹 Fixes
+
+- deprecation diagnostics in vue, astro, svelte
+
 ## 2.0.1 (2024-09-28)
 
 

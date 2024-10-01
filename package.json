@@ -44,7 +44,7 @@
 		"@rspack/core": "1.0.3",
 		"@swc-node/register": "1.10.9",
 		"@swc/core": "1.7.24",
-		"@swc/helpers": "0.5.12",
+		"@swc/helpers": "0.5.13",
 		"@types/eslint__js": "8.42.3",
 		"@types/node": "20.16.5",
 		"@types/vscode": "1.86.0",

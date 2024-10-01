@@ -250,7 +250,7 @@ export class SomeSassServer {
 				let latest = documents.get(params.document.uri);
 				if (!latest || latest.version !== params.document.version) return;
 
-				const diagnostics = await ls.doDiagnostics(params.document);
+				const diagnostics = await ls.doDiagnostics(document);
 
 				// Check that no new version has been made while we waited,
 				// in which case the diagnostics may no longer be valid.

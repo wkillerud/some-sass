@@ -19,7 +19,7 @@ nx reads the commit messages to determine what the new version should be, and to
 | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `docs: add guide for configuring sublime`                                                                                                 | No new release.                                                                                                                                                      |
 | `fix: update css-languageservice`                                                                                                         | Patch. Bugfix release, updates for runtime dependencies.                                                                                                             |
-| `feat: add support for show keyword in forward`                                                                                           | Minor. New feature release.                                                                                                                                          |
+| `feat: add support for show keyword in fo÷rward`                                                                                           | Minor. New feature release.                                                                                                                                          |
 | `refactor: remove reduntant options for latest language version`<br><br>`BREAKING CHANGE: The scanImportedFiles option has been removed.` | Major. Breaking release, like removing an option or changing `engines` version. <br /> (Note that the `BREAKING CHANGE: ` token must be in the footer of the commit) |
 
 ## Release process
@@ -31,7 +31,7 @@ To start a new release, run `node .scripts/release.mjs`. This script:
 3. Runs `npm run release` which updates versions, generates changelogs and Git tags.
 4. Pushes the changes and tags with `git push && git push --tags`.
 
-GitHub Actions does the actual publishing when there are new tags.  Create a [new GitHub release](https://github.com/wkillerud/some-sass/releases/new?title=some-sass-language-server@x.y.z) for the latest tag.
+GitHub Actions does the actual publishing when there are new tags.
 
 The script continues to:
 
@@ -41,7 +41,7 @@ The script continues to:
 4. Commit the changes and run `git tag some-sass@<version from package.json>`.
 5. Run `git push && git push --tags`.
 
-Again, GitHub Actions is does the actual publishing (including GitHub release) when there are new tags.
+Again, GitHub Actions is does the actual publishing when there are new tags.
 
 ### Manual release process
 

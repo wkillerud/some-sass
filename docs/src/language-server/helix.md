@@ -8,7 +8,7 @@ You can configure new language servers in [`.config/helix/languages.toml`](https
 [language-server.some-sass-language-server]
 command = "some-sass-language-server"
 args = ["--stdio"]
-# see https://wkillerud.github.io/some-sass/user-guide/settings.html for all available settings
+# see https://wkillerud.github.io/some-sass/language-server/settings.html for all available settings
 config = { somesass = { workspace = { loadPaths = [] } } }
 
 [[language]]

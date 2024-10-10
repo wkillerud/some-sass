@@ -20,7 +20,7 @@ Now you can open a Sass file, then open the Output panel (View menu -> Output) t
 
 ## Settings
 
-The language server requests [settings](https://wkillerud.github.io/some-sass/user-guide/settings.html) via the [`workspace/configuration` message](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_configuration), on the `somesass` key. All fields are optional.
+The language server requests [settings](./settings.md) via the [`workspace/configuration` message](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_configuration), on the `somesass` key. All fields are optional.
 
 You can also configure the language server by sending the [`workspace/didChangeConfiguration` message](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_didChangeConfiguration).
 

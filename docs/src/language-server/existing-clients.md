@@ -7,3 +7,4 @@ these are editors with ready-configured clients, maintained by the community.
 
 - [Helix](./helix.md)
 - [Neovim](./neovim.md)
+- [Sublime Text](./sublime-text.md)

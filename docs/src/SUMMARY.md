@@ -19,6 +19,7 @@
 - [Existing clients](language-server/existing-clients.md)
   - [Helix](language-server/helix.md)
   - [Neovim](language-server/neovim.md)
+  - [Sublime Text](language-server/sublime-text.md)
   <!-- Sort alphabetically. Add new pages to existing-clients.md as well. -->
 - [Settings](language-server/settings.md)
 

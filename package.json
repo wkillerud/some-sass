@@ -57,7 +57,7 @@
 		"lint-staged": "15.2.10",
 		"npm-run-all2": "6.2.3",
 		"nx": "19.8.4",
-		"ovsx": "0.9.5",
+		"ovsx": "0.10.0",
 		"patch-package": "8.0.0",
 		"prettier": "3.3.3",
 		"shx": "0.3.4",

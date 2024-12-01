@@ -54,7 +54,7 @@
 		"doctor:browser": "RSDOCTOR=true run-s build:production:browser"
 	},
 	"devDependencies": {
-		"@rsdoctor/rspack-plugin": "0.4.7",
+		"@rsdoctor/rspack-plugin": "0.4.9",
 		"@somesass/language-services": "2.0.1",
 		"@types/lodash.merge": "4.6.9",
 		"@types/node": "22.9.0",

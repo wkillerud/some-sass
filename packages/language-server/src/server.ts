@@ -79,6 +79,7 @@ export class SomeSassServer {
 					documentLinkProvider: {
 						resolveProvider: false,
 					},
+					documentSymbolProvider: true,
 					referencesProvider: true,
 					completionProvider: {
 						resolveProvider: false,
@@ -334,6 +335,29 @@ export class SomeSassServer {
 					if (result.items.length === 0) {
 						result.isIncomplete = true;
 					}
+					return result;
+				} else {
+					return null;
+				}
+			} catch (e) {
+				const error = e as Error;
+				this.log.debug(String(error));
+				if (error.stack) this.log.debug(error.stack);
+				return null;
+			}
+		});
+
+		this.connection.onDocumentSymbol(async (params) => {
+			if (!ls) return null;
+			try {
+				const document = getSassRegionsDocument(
+					documents.get(params.textDocument.uri),
+				);
+				if (!document) return null;
+
+				const config = this.languageConfiguration(document);
+				if (config.documentSymbols.enabled) {
+					const result = ls.findDocumentSymbols(document);
 					return result;
 				} else {
 					return null;

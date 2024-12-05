@@ -17,7 +17,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "22.10.1",
-		"@vscode/web-custom-data": "0.4.12",
+		"@vscode/web-custom-data": "0.4.13",
 		"rimraf": "6.0.1",
 		"source-map-support": "0.5.21",
 		"typescript": "5.7.2"

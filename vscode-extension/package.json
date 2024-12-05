@@ -470,6 +470,13 @@
             "default": "warning",
             "description": "Unknown at-rule."
           },
+          "somesass.scss.documentSymbols.enabled": {
+            "order": 58,
+            "type": "boolean",
+            "scope": "resource",
+            "default": false,
+            "description": "Enable or disable document symbols."
+          },
           "somesass.scss.foldingRanges.enabled": {
             "order": 60,
             "type": "boolean",
@@ -881,6 +888,13 @@
             "default": "warning",
             "description": "Unknown at-rule."
           },
+          "somesass.sass.documentSymbols.enabled": {
+            "order": 58,
+            "type": "boolean",
+            "scope": "resource",
+            "default": true,
+            "description": "Enable or disable document symbols."
+          },
           "somesass.sass.foldingRanges.enabled": {
             "order": 60,
             "type": "boolean",
@@ -1275,6 +1289,13 @@
             "default": "warning",
             "description": "Unknown at-rule."
           },
+          "somesass.css.documentSymbols.enabled": {
+            "order": 58,
+            "type": "boolean",
+            "scope": "resource",
+            "default": false,
+            "description": "Enable or disable document symbols."
+          },
           "somesass.css.foldingRanges.enabled": {
             "order": 60,
             "type": "boolean",
@@ -1369,7 +1390,7 @@
   "dependencies": {
     "fast-glob": "3.3.2",
     "some-sass-language-server": "2.0.2",
-    "vscode-css-languageservice": "6.3.1",
+    "vscode-css-languageservice": "6.3.2",
     "vscode-languageclient": "9.0.1",
     "vscode-uri": "3.0.8"
   },
@@ -1392,8 +1413,6 @@
     "build:development:browser": "npm run build:browser -- --mode=development",
     "build:production:node": "npm run build:node -- --mode=production",
     "build:production:browser": "npm run build:browser -- --mode=production",
-    "doctor:node": "RSDOCTOR=true run-s build:production:node",
-    "doctor:browser": "RSDOCTOR=true run-s build:production:browser",
     "start:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=.",
     "lint": "eslint \"**/*.ts\" --cache",
     "pretest:e2e": "run-s clean build:production:*",

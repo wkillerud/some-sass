@@ -78,7 +78,7 @@ export function createLanguageClientOptions(
 	const clientOptions: LanguageClientOptions = {
 		documentSelector,
 		synchronize: {
-			configurationSection: ["somesass"],
+			configurationSection: ["somesass", "editor"],
 			fileEvents: currentWorkspace
 				? workspace.createFileSystemWatcher({
 						baseUri: currentWorkspace.uri,

@@ -49,12 +49,9 @@
 		"build:production:browser": "npm run build:browser -- --mode=production",
 		"clean": "shx rm -rf dist node_modules",
 		"test": "vitest",
-		"coverage": "vitest run --coverage",
-		"doctor:node": "RSDOCTOR=true run-s build:production:node",
-		"doctor:browser": "RSDOCTOR=true run-s build:production:browser"
+		"coverage": "vitest run --coverage"
 	},
 	"devDependencies": {
-		"@rsdoctor/rspack-plugin": "0.4.9",
 		"@somesass/language-services": "2.0.1",
 		"@types/lodash.merge": "4.6.9",
 		"@types/node": "22.10.1",

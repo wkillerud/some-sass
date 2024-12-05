@@ -277,6 +277,9 @@ export interface LanguageConfiguration {
 			[key: string]: any;
 		};
 	};
+	documentSymbols: {
+		enabled: boolean;
+	};
 	foldingRanges: {
 		enabled: boolean;
 	};

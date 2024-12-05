@@ -60,6 +60,9 @@ export const defaultConfiguration: LanguageServerConfiguration = {
 				unknownAtRules: "warning",
 			},
 		},
+		documentSymbols: {
+			enabled: true,
+		},
 		foldingRanges: {
 			enabled: true,
 		},
@@ -141,6 +144,9 @@ export const defaultConfiguration: LanguageServerConfiguration = {
 				unknownAtRules: "warning",
 			},
 		},
+		documentSymbols: {
+			enabled: true,
+		},
 		foldingRanges: {
 			enabled: true,
 		},
@@ -221,6 +227,9 @@ export const defaultConfiguration: LanguageServerConfiguration = {
 				idSelector: "ignore",
 				unknownAtRules: "warning",
 			},
+		},
+		documentSymbols: {
+			enabled: true,
 		},
 		foldingRanges: {
 			enabled: true,

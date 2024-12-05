@@ -1413,8 +1413,6 @@
 		"build:development:browser": "npm run build:browser -- --mode=development",
 		"build:production:node": "npm run build:node -- --mode=production",
 		"build:production:browser": "npm run build:browser -- --mode=production",
-		"doctor:node": "RSDOCTOR=true run-s build:production:node",
-		"doctor:browser": "RSDOCTOR=true run-s build:production:browser",
 		"start:web": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=.",
 		"lint": "eslint \"**/*.ts\" --cache",
 		"pretest:e2e": "run-s clean build:production:*",

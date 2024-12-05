@@ -1,7 +1,6 @@
 /* eslint-disable */
 const path = require("path");
 const rspack = require("@rspack/core");
-const { RsdoctorRspackPlugin } = require("@rsdoctor/rspack-plugin");
 
 /** @type {import('@rspack/core').Configuration} */
 const config = {
@@ -58,9 +57,7 @@ const config = {
 		new rspack.optimize.LimitChunkCountPlugin({
 			maxChunks: 1,
 		}),
-		// Only register the plugin when RSDOCTOR is true, as the plugin will increase the build time.
-		process.env.RSDOCTOR && new RsdoctorRspackPlugin(),
-	].filter(Boolean),
+	],
 	devtool: "cheap-source-map",
 };
 

@@ -40,17 +40,7 @@
 		}
 	},
 	"defaultBase": "main",
-	"plugins": [
-		{
-			"plugin": "@nx/webpack/plugin",
-			"options": {
-				"buildTargetName": "webpack:build",
-				"serveTargetName": "serve",
-				"previewTargetName": "preview",
-				"serveStaticTargetName": "serve-static"
-			}
-		}
-	],
+	"plugins": [],
 	"release": {
 		"version": {
 			"conventionalCommits": true

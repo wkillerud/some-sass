@@ -48,6 +48,7 @@ Now that you disabled the built-in language features you need to turn on those l
 	"somesass.css.completion.enabled": true,
 	"somesass.css.definition.enabled": true,
 	"somesass.css.diagnostics.enabled": true,
+	"somesass.css.documentSymbols.enabled": true,
 	"somesass.css.foldingRanges.enabled": true,
 	"somesass.css.highlights.enabled": true,
 	"somesass.css.hover.enabled": true,
@@ -67,6 +68,7 @@ Now that you disabled the built-in language features you need to turn on those l
 	"somesass.scss.definition.enabled": true,
 	"somesass.scss.diagnostics.enabled": true,
 	"somesass.scss.diagnostics.lint.enabled": true,
+	"somesass.scss.documentSymbols.enabled": true,
 	"somesass.scss.foldingRanges.enabled": true,
 	"somesass.scss.highlights.enabled": true,
 	"somesass.scss.hover.enabled": true,
@@ -113,6 +115,7 @@ For brevity the ID column omits the `somesass.scss` prefix. For example, to use 
 | `diagnostics.deprecation.enabled`           | Enable or disable deprecation diagnostics (strike-through).                                                                                                                                                                           | `true`  |
 | `diagnostics.lint.enabled`                  | Enable or disable all linting.                                                                                                                                                                                                        | `false` |
 | `diagnostics.lint.*`                        | For the available lint rules and what they do, see the [VS Code docs for CSS and SCSS lint settings](https://code.visualstudio.com/docs/languages/css#_customizing-css-scss-and-less-settings)                                        |         |
+| `documentSymbols.enabled`                   | Enable or disable document/editor symbols.                                                                                                                                                                                            | `false` |
 | `foldingRanges.enabled`                     | Enable or disable folding ranges.                                                                                                                                                                                                     | `false` |
 | `highlights.enabled`                        | Enable or disable highlights.                                                                                                                                                                                                         | `false` |
 | `hover.enabled`                             | Enable or disable all hover information.                                                                                                                                                                                              | `true`  |

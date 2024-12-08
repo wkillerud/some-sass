@@ -1,3 +1,13 @@
+## 2.1.1 (2024-12-08)
+
+### 🩹 Fixes
+
+- apply customData option ([e6e5cc75](https://github.com/wkillerud/some-sass/commit/e6e5cc75))
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/language-services to 2.1.1
+
 ## 2.1.0 (2024-12-05)
 
 ### 🚀 Features

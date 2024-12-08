@@ -1,3 +1,13 @@
+## 2.1.1 (2024-12-08)
+
+### 🩹 Fixes
+
+- respect `somesass.*.diagnostics.lint.enabled` ([9bb800bc](https://github.com/wkillerud/some-sass/commit/9bb800bc))
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 2.0.1
+
 ## 2.1.0 (2024-12-05)
 
 ### 🚀 Features

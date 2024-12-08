@@ -1,3 +1,11 @@
+## 2.0.1 (2024-12-08)
+
+### 🩹 Fixes
+
+- respect `somesass.*.diagnostics.lint.enabled` ([9bb800bc](https://github.com/wkillerud/some-sass/commit/9bb800bc))
+- **deps:** update dependency fast-glob to v3.3.2 ([4d050e27](https://github.com/wkillerud/some-sass/commit/4d050e27))
+- **deps:** update dependencies (non-major) ([3c3bb0c9](https://github.com/wkillerud/some-sass/commit/3c3bb0c9))
+
 # 2.0.0 (2024-09-28)
 
 

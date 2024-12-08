@@ -25,6 +25,7 @@ import {
 	FoldingRange,
 	FoldingRangeKind,
 	SelectionRange,
+	ICSSDataProvider,
 } from "@somesass/vscode-css-languageservice";
 import type { ParseResult } from "sassdoc-parser";
 import { TextDocument } from "vscode-languageserver-textdocument";
@@ -63,6 +64,7 @@ import {
 } from "vscode-languageserver-types";
 import { URI, Utils } from "vscode-uri";
 import { FoldingRangeContext } from "./features/folding-ranges";
+import { LanguageModelCache } from "./language-model-cache";
 
 /**
  * The root of the abstract syntax tree.
@@ -83,6 +85,11 @@ export type RecursivePartial<T> = {
 };
 
 export interface LanguageService {
+	readonly cache: LanguageModelCache;
+	readonly clientCapabilities: ClientCapabilities;
+	readonly configuration: LanguageServerConfiguration;
+	readonly fs: FileSystemProvider;
+
 	/**
 	 * Clears all cached documents, forcing everything to be reparsed the next time a feature is used.
 	 */
@@ -179,7 +186,20 @@ export interface LanguageService {
 	): Promise<
 		null | { defaultBehavior: boolean } | { range: Range; placeholder: string }
 	>;
+	/**
+	 * Load custom data sets, for example custom at-rules, for use in completions and diagnostics.
+	 *
+	 * @see https://github.com/microsoft/vscode-css-languageservice/blob/main/docs/customData.md
+	 */
+	setDataProviders(
+		customDataProviders: ICSSDataProvider[],
+		options?: SetDataProvidersOptions,
+	): void;
 }
+
+export type SetDataProvidersOptions = {
+	useDefaultProviders: boolean;
+};
 
 export type Rename =
 	| { range: Range; placeholder: string }

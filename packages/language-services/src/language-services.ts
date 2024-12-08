@@ -1,7 +1,10 @@
 import {
 	getCSSLanguageService,
 	getSassLanguageService,
+	ICSSDataProvider,
+	LanguageService as UpstreamLanguageService,
 } from "@somesass/vscode-css-languageservice";
+import merge from "lodash.merge";
 import { defaultConfiguration } from "./configuration";
 import { CodeActions } from "./features/code-actions";
 import { DoComplete } from "./features/do-complete";
@@ -17,7 +20,7 @@ import { FindReferences } from "./features/find-references";
 import { FindSymbols } from "./features/find-symbols";
 import { FoldingRangeContext, FoldingRanges } from "./features/folding-ranges";
 import { SelectionRanges } from "./features/selection-ranges";
-import { LanguageModelCache as LanguageServerCache } from "./language-model-cache";
+import { LanguageModelCache } from "./language-model-cache";
 import {
 	CodeActionContext,
 	LanguageService,
@@ -34,6 +37,9 @@ import {
 	Range,
 	ReferenceContext,
 	URI,
+	SetDataProvidersOptions,
+	RecursivePartial,
+	ClientCapabilities,
 } from "./language-services-types";
 import { mapFsProviders } from "./utils/fs-provider";
 
@@ -55,7 +61,6 @@ export function getLanguageService(
 }
 
 class LanguageServiceImpl implements LanguageService {
-	#cache: LanguageServerCache;
 	#codeActions: CodeActions;
 	#doComplete: DoComplete;
 	#doDiagnostics: DoDiagnostics;
@@ -71,27 +76,55 @@ class LanguageServiceImpl implements LanguageService {
 	#foldingRanges: FoldingRanges;
 	#selectionRanges: SelectionRanges;
 
+	#configuration = defaultConfiguration;
+	get configuration(): LanguageServerConfiguration {
+		return this.#configuration;
+	}
+
+	#cache: LanguageModelCache;
+	get cache(): LanguageModelCache {
+		return this.#cache;
+	}
+
+	#clientCapabilities: ClientCapabilities;
+	get clientCapabilities(): ClientCapabilities {
+		return this.#clientCapabilities;
+	}
+
+	#fs: FileSystemProvider;
+	get fs(): FileSystemProvider {
+		return this.#fs;
+	}
+
+	#cssLs: UpstreamLanguageService;
+	#sassLs: UpstreamLanguageService;
+	#scssLs: UpstreamLanguageService;
+
 	constructor(options: LanguageServiceOptions) {
+		this.#clientCapabilities = options.clientCapabilities;
+		this.#fs = options.fileSystemProvider;
+
 		const vscodeLsOptions = {
-			clientCapabilities: options.clientCapabilities,
+			clientCapabilities: this.clientCapabilities,
 			fileSystemProvider: mapFsProviders(options.fileSystemProvider),
 		};
-		const sassLs = getSassLanguageService(vscodeLsOptions);
 
-		const cache = new LanguageServerCache({
-			sassLs,
+		this.#cssLs = getCSSLanguageService(vscodeLsOptions);
+		this.#sassLs = getSassLanguageService(vscodeLsOptions);
+		// The server code is the same as sassLs, but separate on syntax in case the user has different settings
+		this.#scssLs = getSassLanguageService(vscodeLsOptions);
+
+		this.#cache = new LanguageModelCache({
+			sassLs: this.#sassLs,
 			...options.languageModelCache,
 		});
 
 		const internal = {
-			cache,
-			sassLs,
-			cssLs: getCSSLanguageService(vscodeLsOptions),
-			// The server code is the same as sassLs, but separate on syntax in case the user has different settings
-			scssLs: getSassLanguageService(vscodeLsOptions),
+			cssLs: this.#cssLs,
+			sassLs: this.#sassLs,
+			scssLs: this.#scssLs,
 		};
 
-		this.#cache = cache;
 		this.#codeActions = new CodeActions(this, options, internal);
 		this.#doComplete = new DoComplete(this, options, internal);
 		this.#doDiagnostics = new DoDiagnostics(this, options, internal);
@@ -112,21 +145,46 @@ class LanguageServiceImpl implements LanguageService {
 		this.#selectionRanges = new SelectionRanges(this, options, internal);
 	}
 
-	configure(configuration: LanguageServerConfiguration): void {
-		this.#codeActions.configure(configuration);
-		this.#doComplete.configure(configuration);
-		this.#doDiagnostics.configure(configuration);
-		this.#doHover.configure(configuration);
-		this.#doRename.configure(configuration);
-		this.#doSignatureHelp.configure(configuration);
-		this.#findColors.configure(configuration);
-		this.#findDefinition.configure(configuration);
-		this.#findDocumentHighlights.configure(configuration);
-		this.#findDocumentLinks.configure(configuration);
-		this.#findReferences.configure(configuration);
-		this.#findSymbols.configure(configuration);
-		this.#foldingRanges.configure(configuration);
-		this.#selectionRanges.configure(configuration);
+	configure(
+		configuration: RecursivePartial<LanguageServerConfiguration>,
+	): void {
+		this.#configuration = merge(defaultConfiguration, configuration);
+
+		this.#sassLs.configure({
+			validate: this.configuration.sass.diagnostics.enabled,
+			lint: this.configuration.sass.diagnostics.lint,
+			completion: this.configuration.sass.completion,
+			hover: this.configuration.sass.hover,
+			importAliases: this.configuration.workspace.importAliases,
+			loadPaths: this.configuration.workspace.loadPaths,
+		});
+
+		this.#scssLs.configure({
+			validate: this.configuration.scss.diagnostics.enabled,
+			lint: this.configuration.scss.diagnostics.lint,
+			completion: this.configuration.scss.completion,
+			hover: this.configuration.scss.hover,
+			importAliases: this.configuration.workspace.importAliases,
+			loadPaths: this.configuration.workspace.loadPaths,
+		});
+
+		this.#cssLs.configure({
+			validate: this.configuration.css.diagnostics.enabled,
+			lint: this.configuration.css.diagnostics.lint,
+			completion: this.configuration.css.completion,
+			hover: this.configuration.css.hover,
+			importAliases: this.configuration.workspace.importAliases,
+			loadPaths: this.configuration.workspace.loadPaths,
+		});
+	}
+
+	setDataProviders(
+		providers: ICSSDataProvider[],
+		options: SetDataProvidersOptions = { useDefaultProviders: true },
+	): void {
+		this.#cssLs.setDataProviders(options.useDefaultProviders, providers);
+		this.#sassLs.setDataProviders(options.useDefaultProviders, providers);
+		this.#scssLs.setDataProviders(options.useDefaultProviders, providers);
 	}
 
 	parseStylesheet(document: TextDocument) {

@@ -5,14 +5,11 @@ import {
 	Scanner,
 	SassScanner,
 } from "@somesass/vscode-css-languageservice";
-import merge from "lodash.merge";
-import { defaultConfiguration } from "./configuration";
 import { LanguageModelCache } from "./language-model-cache";
 import {
 	LanguageServiceOptions,
 	TextDocument,
 	LanguageService,
-	LanguageServerConfiguration,
 	NodeType,
 	Range,
 	SassDocumentSymbol,
@@ -22,14 +19,13 @@ import {
 	VariableDeclaration,
 	URI,
 	Utils,
-	ClientCapabilities,
-	RecursivePartial,
 	LanguageConfiguration,
+	LanguageServerConfiguration,
+	ClientCapabilities,
 } from "./language-services-types";
 import { asDollarlessVariable } from "./utils/sass";
 
 export type LanguageFeatureInternal = {
-	cache: LanguageModelCache;
 	cssLs: VSCodeLanguageService;
 	sassLs: VSCodeLanguageService;
 	scssLs: VSCodeLanguageService;
@@ -52,13 +48,19 @@ type FindOptions = {
 export abstract class LanguageFeature {
 	protected ls;
 	protected options;
-	protected clientCapabilities: ClientCapabilities;
-	protected configuration: LanguageServerConfiguration = defaultConfiguration;
 
 	private _internal: LanguageFeatureInternal;
 
 	protected get cache(): LanguageModelCache {
-		return this._internal.cache;
+		return this.ls.cache;
+	}
+
+	protected get configuration(): LanguageServerConfiguration {
+		return this.ls.configuration;
+	}
+
+	protected get clientCapabilities(): ClientCapabilities {
+		return this.ls.clientCapabilities;
 	}
 
 	constructor(
@@ -68,57 +70,23 @@ export abstract class LanguageFeature {
 	) {
 		this.ls = ls;
 		this.options = options;
-		this.clientCapabilities = options.clientCapabilities;
 		this._internal = _internal;
 	}
 
 	languageConfiguration(document: TextDocument): LanguageConfiguration {
 		switch (document.languageId) {
 			case "css": {
-				return this.configuration.css;
+				return this.ls.configuration.css;
 			}
 			case "sass": {
-				return this.configuration.sass;
+				return this.ls.configuration.sass;
 			}
 			case "scss": {
-				return this.configuration.scss;
+				return this.ls.configuration.scss;
 			}
 		}
 
 		throw new Error(`Unsupported language ${document.languageId}`);
-	}
-
-	configure(
-		configuration: RecursivePartial<LanguageServerConfiguration>,
-	): void {
-		this.configuration = merge(defaultConfiguration, configuration);
-
-		this._internal.sassLs.configure({
-			validate: this.configuration.sass.diagnostics.enabled,
-			lint: this.configuration.sass.diagnostics.lint,
-			completion: this.configuration.sass.completion,
-			hover: this.configuration.sass.hover,
-			importAliases: this.configuration.workspace.importAliases,
-			loadPaths: this.configuration.workspace.loadPaths,
-		});
-
-		this._internal.scssLs.configure({
-			validate: this.configuration.scss.diagnostics.enabled,
-			lint: this.configuration.scss.diagnostics.lint,
-			completion: this.configuration.scss.completion,
-			hover: this.configuration.scss.hover,
-			importAliases: this.configuration.workspace.importAliases,
-			loadPaths: this.configuration.workspace.loadPaths,
-		});
-
-		this._internal.cssLs.configure({
-			validate: this.configuration.css.diagnostics.enabled,
-			lint: this.configuration.css.diagnostics.lint,
-			completion: this.configuration.css.completion,
-			hover: this.configuration.css.hover,
-			importAliases: this.configuration.workspace.importAliases,
-			loadPaths: this.configuration.workspace.loadPaths,
-		});
 	}
 
 	protected getUpstreamLanguageServer(
@@ -140,9 +108,12 @@ export abstract class LanguageFeature {
 			 * @returns The resolved path
 			 */
 			resolveReference: (ref: string, base: string) => {
-				if (ref.startsWith("/") && this.configuration.workspace.workspaceRoot) {
+				if (
+					ref.startsWith("/") &&
+					this.ls.configuration.workspace.workspaceRoot
+				) {
 					return Utils.joinPath(
-						this.configuration.workspace.workspaceRoot,
+						this.ls.configuration.workspace.workspaceRoot,
 						ref,
 					).toString(true);
 				}

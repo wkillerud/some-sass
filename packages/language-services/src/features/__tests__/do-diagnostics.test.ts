@@ -41,6 +41,29 @@ test("reports an unknown at-rule", async () => {
 	]);
 });
 
+test("does not lint if configured", async () => {
+	const document = fileSystemProvider.createDocument(`
+@tailwind base;
+`);
+
+	ls.configure({
+		...defaultConfiguration,
+		scss: {
+			...defaultConfiguration.scss,
+			diagnostics: {
+				...defaultConfiguration.scss.diagnostics,
+				lint: {
+					...defaultConfiguration.scss.diagnostics.lint,
+					enabled: false,
+				},
+			},
+		},
+	});
+	const result = await ls.doDiagnostics(document);
+
+	assert.deepStrictEqual(result, []);
+});
+
 test("ignores unknown at-rules if configured", async () => {
 	const document = fileSystemProvider.createDocument(`
 @tailwind base;

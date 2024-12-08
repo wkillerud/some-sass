@@ -21,7 +21,7 @@ import {
 	TextDocumentChangeEvent,
 } from "vscode-languageserver/node";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { URI } from "vscode-uri";
+import { URI, Utils } from "vscode-uri";
 import type { FileSystemProvider } from "./file-system";
 import { getFileSystemProvider } from "./file-system-provider";
 import { RuntimeEnvironment } from "./runtime";
@@ -34,6 +34,10 @@ import { getSassRegionsDocument } from "./embedded";
 import WorkspaceScanner from "./workspace-scanner";
 import { createLogger, type Logger } from "./logger";
 import merge from "lodash.merge";
+import {
+	ICSSDataProvider,
+	newCSSDataProvider,
+} from "@somesass/vscode-css-languageservice";
 
 export class SomeSassServer {
 	private readonly connection: Connection;
@@ -171,61 +175,107 @@ export class SomeSassServer {
 			return settings;
 		};
 
+		const applyCustomData = async (
+			configuration: LanguageServerConfiguration,
+		) => {
+			const paths: string[] = [];
+			if (configuration.css.customData) {
+				paths.push(...configuration.css.customData);
+			}
+			if (configuration.sass.customData) {
+				paths.push(...configuration.sass.customData);
+			}
+			if (configuration.scss.customData) {
+				paths.push(...configuration.scss.customData);
+			}
+
+			const customDataProviders = await Promise.all(
+				paths.map(async (path) => {
+					try {
+						let uri = path.startsWith("/")
+							? URI.parse(path)
+							: Utils.joinPath(workspaceRoot!, path);
+
+						const content = await fileSystemProvider!.readFile(uri, "utf-8");
+						const rawData = JSON.parse(content);
+
+						return newCSSDataProvider({
+							version: rawData.version || 1,
+							properties: rawData.properties || [],
+							atDirectives: rawData.atDirectives || [],
+							pseudoClasses: rawData.pseudoClasses || [],
+							pseudoElements: rawData.pseudoElements || [],
+						});
+					} catch (error) {
+						this.log.debug(String(error));
+						return newCSSDataProvider({ version: 1 });
+					}
+				}),
+			);
+
+			ls!.setDataProviders(customDataProviders);
+		};
+
 		this.connection.onInitialized(async () => {
 			try {
 				// Let other methods await the result of the initial scan before proceeding
-				initialScan = new Promise<void>((resolve, reject) => {
-					const configurationRequests = [
-						this.connection.workspace.getConfiguration("somesass"),
-						this.connection.workspace.getConfiguration("editor"),
-					];
-
-					Promise.all(configurationRequests).then((configs) => {
-						if (
-							!ls ||
-							!clientCapabilities ||
-							!workspaceRoot ||
-							!fileSystemProvider
-						) {
-							return reject(
-								new Error(
-									"Got onInitialized without onInitialize readying up all required globals",
-								),
-							);
-						}
-
-						let [somesass, editor] = configs as [
-							Partial<LanguageServerConfiguration | ConfigurationV1>,
-							Partial<EditorConfiguration>,
+				initialScan = new Promise<void>(
+					(resolveInitialScan, rejectInitialScan) => {
+						const configurationRequests = [
+							this.connection.workspace.getConfiguration("somesass"),
+							this.connection.workspace.getConfiguration("editor"),
 						];
 
-						const configuration = applyConfiguration(somesass, editor);
+						Promise.all(configurationRequests)
+							.then((configs) => {
+								if (
+									!ls ||
+									!clientCapabilities ||
+									!workspaceRoot ||
+									!fileSystemProvider
+								) {
+									throw new Error(
+										"Got onInitialized without onInitialize readying up all required globals",
+									);
+								}
 
-						this.log.debug("Scanning workspace for files");
+								let [somesass, editor] = configs as [
+									Partial<LanguageServerConfiguration | ConfigurationV1>,
+									Partial<EditorConfiguration>,
+								];
 
-						return fileSystemProvider
-							.findFiles(
-								"**/*.{css,scss,sass,svelte,astro,vue}",
-								configuration.workspace.exclude,
-							)
-							.then((files) => {
-								this.log.debug(`Found ${files.length} files, starting parse`);
+								const configuration = applyConfiguration(somesass, editor);
 
-								workspaceScanner = new WorkspaceScanner(
-									ls!,
-									fileSystemProvider!,
-								);
+								return applyCustomData(configuration)
+									.then(() =>
+										fileSystemProvider!.findFiles(
+											"**/*.{css,scss,sass,svelte,astro,vue}",
+											configuration.workspace.exclude,
+										),
+									)
+									.then((files) => {
+										this.log.debug(
+											`Found ${files.length} files, starting parse`,
+										);
 
-								return workspaceScanner.scan(files);
+										workspaceScanner = new WorkspaceScanner(
+											ls!,
+											fileSystemProvider!,
+										);
+
+										return workspaceScanner.scan(files);
+									})
+									.then((promises) => {
+										this.log.debug(
+											`Initial scan finished, parsed ${promises.length} files`,
+										);
+										resolveInitialScan();
+									})
+									.catch((reason) => rejectInitialScan(reason));
 							})
-							.then((promises) => {
-								this.log.debug(
-									`Initial scan finished, parsed ${promises.length} files`,
-								);
-								resolve();
-							});
-					});
-				});
+							.catch((reason) => rejectInitialScan(reason));
+					},
+				);
 				await initialScan;
 			} catch (error) {
 				this.log.fatal(String(error));

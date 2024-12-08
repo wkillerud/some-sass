@@ -9,7 +9,6 @@
 	],
 	"scripts": {
 		"prepare": "husky",
-		"postinstall": "patch-package",
 		"build": "nx run-many -t build",
 		"preclean": "nx reset",
 		"clean": "nx run-many -t clean",
@@ -57,7 +56,6 @@
 		"npm-run-all2": "7.0.1",
 		"nx": "20.1.4",
 		"ovsx": "0.10.1",
-		"patch-package": "8.0.0",
 		"prettier": "3.4.2",
 		"shx": "0.3.4",
 		"ts-loader": "9.5.1",

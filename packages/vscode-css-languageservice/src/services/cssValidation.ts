@@ -30,15 +30,12 @@ export class CSSValidation {
 
 		const entries: nodes.IMarker[] = [];
 		entries.push.apply(entries, nodes.ParseErrorCollector.entries(stylesheet));
-		entries.push.apply(
-			entries,
-			LintVisitor.entries(
-				stylesheet,
-				document,
-				new LintConfigurationSettings(settings && settings.lint !== false ? settings.lint : undefined),
-				this.cssDataManager,
-			),
-		);
+		if (settings && settings.lint !== false) {
+			entries.push.apply(
+				entries,
+				LintVisitor.entries(stylesheet, document, new LintConfigurationSettings(settings.lint), this.cssDataManager),
+			);
+		}
 
 		const ruleIds: string[] = [];
 		for (const r in Rules) {

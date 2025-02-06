@@ -61,6 +61,6 @@
 		"ts-loader": "9.5.1",
 		"typescript": "5.7.2",
 		"typescript-eslint": "8.19.0",
-		"vitest": "3.0.4"
+		"vitest": "3.0.5"
 	}
 }

@@ -18,7 +18,6 @@ suite("Sass - Parser", () => {
 	test("@charset", () => {
 		assertNode('@charset "demo"', parser, parser._parseStylesheet.bind(parser));
 		assertError("@charset", parser, parser._parseStylesheet.bind(parser), ParseError.IdentifierExpected);
-		assertError('@charset "demo";', parser, parser._parseStylesheet.bind(parser), ParseError.UnexpectedSemicolon);
 	});
 
 	test("newline before at-rule", () => {
@@ -3346,7 +3345,43 @@ body
 		);
 	});
 
-	test("flags semicolon as error in variable declaration", async () => {
-		assertError(`$font-size: 20px;`, parser, parser._parseStylesheet.bind(parser), ParseError.UnexpectedSemicolon);
+	test("allows semicolon to explicitly end statements", () => {
+		assertNode('@charset "demo";', parser, parser._parseStylesheet.bind(parser));
+		assertNode(`$font-size: 20px;`, parser, parser._parseStylesheet.bind(parser));
+	});
+
+	suite("multiline", () => {
+		test("where statements can't end", () => {
+			assertNode(
+				`
+@each $item in
+		1 2 3
+	.item-#{
+		$item
+	}
+		content: $item *
+				10
+	`,
+				parser,
+				parser._parseStylesheet.bind(parser),
+			);
+		});
+
+		test("with parentheses", () => {
+			assertNode(
+				`
+@font-face
+  font-family: "Leatherman"
+  src: (
+    local("Leatherman"),
+    url("leatherman-COLRv1.otf") format("opentype") tech(color-COLRv1),
+    url("leatherman-outline.otf") format("opentype"),
+    url("leatherman-outline.woff") format("woff")
+  )
+		`,
+				parser,
+				parser._parseStylesheet.bind(parser),
+			);
+		});
 	});
 });

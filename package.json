@@ -43,7 +43,6 @@
 		"@swc-node/register": "1.10.9",
 		"@swc/core": "1.11.5",
 		"@swc/helpers": "0.5.15",
-		"@types/eslint__js": "8.42.3",
 		"@types/node": "22.13.8",
 		"@types/vscode": "1.86.0",
 		"@vscode/vsce": "3.2.2",

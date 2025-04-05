@@ -56,7 +56,7 @@
 		"nx": "20.7.1",
 		"ovsx": "0.10.1",
 		"prettier": "3.5.3",
-		"shx": "0.3.4",
+		"shx": "0.4.0",
 		"ts-loader": "9.5.2",
 		"typescript": "5.8.3",
 		"typescript-eslint": "8.29.0",

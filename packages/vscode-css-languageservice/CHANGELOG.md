@@ -1,3 +1,11 @@
+## 2.0.2 (2025-04-06)
+
+### 🩹 Fixes
+
+- upgrade vscode-css-languageservices ([5e246830](https://github.com/wkillerud/some-sass/commit/5e246830))
+- update vscode/web-custom-data ([ea3c0b61](https://github.com/wkillerud/some-sass/commit/ea3c0b61))
+- **deps:** update dependency fast-glob to v3.3.3 ([#282](https://github.com/wkillerud/some-sass/pull/282))
+
 ## 2.0.1 (2024-12-08)
 
 ### 🩹 Fixes

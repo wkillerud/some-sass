@@ -8,16 +8,27 @@ import { suite, test, assert } from "vitest";
 import {
 	isColorValue,
 	getColorValue,
-	getBrowserLabel,
 	colorFrom256RGB,
 	colorFromHex,
 	hexDigit,
 	hslFromColor,
 	HSLA,
+	XYZ,
+	LAB,
+	xyzToRGB,
+	xyzFromLAB,
 	hwbFromColor,
 	HWBA,
 	colorFromHWB,
 	colorFromHSL,
+	colorFromLAB,
+	labFromLCH,
+	colorFromLCH,
+	labFromColor,
+	RGBtoXYZ,
+	lchFromColor,
+	LCH,
+	getMissingBaselineBrowsers,
 } from "../../languageFacts/facts";
 import { Parser } from "../../parser/cssParser";
 import * as nodes from "../../parser/cssNodes";
@@ -32,17 +43,6 @@ export function assertColor(
 	isColor = expected !== null,
 ): void {
 	let document = TextDocument.create("test://test/test.css", "css", 0, text);
-	assertColor2(parser, document, selection, expected, isColor);
-}
-
-export function assertColor2(
-	parser: Parser,
-	document: TextDocument,
-	selection: string,
-	expected: Color | null,
-	isColor = expected !== null,
-) {
-	const text = document.getText();
 	let stylesheet = parser.parseStylesheet(document);
 	assert.equal(nodes.ParseErrorCollector.entries(stylesheet).length, 0, "compile errors");
 
@@ -60,7 +60,7 @@ function assertColorFromHex(s: string, expected: Color | null) {
 	assertColorValue(colorFromHex(s), expected, s);
 }
 
-function assertColorValue(actual: Color | null, expected: Color | null, message: string) {
+export function assertColorValue(actual: Color | null, expected: Color | null, message: string) {
 	if (actual && expected) {
 		let rDiff = Math.abs((actual.red - expected.red) * 255);
 		let gDiff = Math.abs((actual.green - expected.green) * 255);
@@ -99,26 +99,72 @@ function assertHWBValue(actual: HWBA, expected: HWBA) {
 	assert.deepEqual(actual, expected);
 }
 
+function assertXYZValue(actual: XYZ, expected: XYZ) {
+	if (actual && expected) {
+		const xDiff = Math.abs(actual.x - expected.x);
+		const yDiff = Math.abs(actual.y - expected.y);
+		const zDiff = Math.abs(actual.z - expected.z);
+		const aDiff = Math.abs((actual.alpha - expected.alpha) * 100);
+		if (xDiff < 1 && yDiff < 1 && zDiff < 1 && aDiff < 1) {
+			return;
+		}
+	}
+	assert.deepEqual(actual, expected);
+}
+
+function assertLABValue(actual: LAB, expected: LAB) {
+	if (actual && expected) {
+		const lDiff = Math.abs(actual.l - expected.l);
+		const aDiff = Math.abs(actual.a - expected.a);
+		const bDiff = Math.abs(actual.b - expected.b);
+		let alphaDiff = 0;
+		if (actual.alpha && expected.alpha) {
+			alphaDiff = Math.abs((actual.alpha - expected.alpha) * 100);
+		}
+		if (lDiff < 1 && aDiff < 1 && bDiff < 1 && alphaDiff < 1) {
+			return;
+		}
+	}
+	assert.deepEqual(actual, expected);
+}
+
+function assertLCHValue(actual: LCH, expected: LCH) {
+	if (actual && expected) {
+		const lDiff = Math.abs(actual.l - expected.l);
+		const cDiff = Math.abs(actual.c - expected.c);
+		const hDiff = Math.abs(actual.h - expected.h);
+		let alphaDiff = 0;
+		if (actual.alpha && expected.alpha) {
+			alphaDiff = Math.abs((actual.alpha - expected.alpha) * 100);
+		}
+		if (lDiff < 1 && cDiff < 1 && hDiff < 1 && alphaDiff < 1) {
+			return;
+		}
+	}
+	assert.deepEqual(actual, expected);
+}
+
 suite("CSS - Language Facts", () => {
 	const cssDataManager = new CSSDataManager({ useDefaultDataProvider: true });
 
 	test("properties", function () {
-		let alignLast = cssDataManager.getProperty("text-decoration-color");
-		if (!alignLast) {
-			assert.ok(alignLast);
+		let textDecorationColor = cssDataManager.getProperty("text-decoration-color");
+		if (!textDecorationColor) {
+			assert.ok(textDecorationColor);
 			return;
 		}
-		assert.equal(alignLast.name, "text-decoration-color");
+		assert.equal(textDecorationColor.name, "text-decoration-color");
 
-		assert.ok(alignLast.browsers!.indexOf("E79") !== -1);
-		assert.ok(alignLast.browsers!.indexOf("FF36") !== -1);
-		assert.ok(alignLast.browsers!.indexOf("C57") !== -1);
-		assert.ok(alignLast.browsers!.indexOf("S12.1") !== -1);
-		assert.ok(alignLast.browsers!.indexOf("O44") !== -1);
+		assert.ok(textDecorationColor.baseline!.status! === "high");
+		assert.ok(textDecorationColor.browsers!.indexOf("E79") !== -1);
+		assert.ok(textDecorationColor.browsers!.indexOf("FF36") !== -1);
+		assert.ok(textDecorationColor.browsers!.indexOf("C57") !== -1);
+		assert.ok(textDecorationColor.browsers!.indexOf("S12.1") !== -1);
+		assert.ok(textDecorationColor.browsers!.indexOf("O44") !== -1);
 
-		assert.equal(getBrowserLabel(alignLast.browsers!), "Edge 79, Firefox 36, Safari 12, Chrome 57, Opera 44");
+		assert.equal(getMissingBaselineBrowsers(textDecorationColor.browsers!), "");
 
-		let r = alignLast.restrictions;
+		let r = textDecorationColor.restrictions;
 
 		assert.equal(r!.length, 1);
 		assert.equal(r![0], "color");
@@ -171,6 +217,11 @@ suite("CSS - Language Facts", () => {
 		assertColor(parser, "#main { color: hsla(240 100% 50% / .05) }", "hsl", colorFrom256RGB(0, 0, 255, 0.05));
 		assertColor(parser, "#main { color: hwb(120 0% 0% / .05) }", "hwb", colorFrom256RGB(0, 255, 0, 0.05));
 		assertColor(parser, "#main { color: hwb(36 33% 35%) }", "hwb", colorFrom256RGB(166, 133, 84));
+		assertColor(parser, "#main { color: lab(90 100 100) }", "lab", colorFrom256RGB(255, 112, 0));
+		assertColor(parser, "#main { color: lab(90% 50 -50) }", "lab", colorFrom256RGB(255, 195, 255));
+		assertColor(parser, "#main { color: lab(46.41 39.24 33.51) }", "lab", colorFrom256RGB(180, 79, 56));
+		assertColor(parser, "#main { color: lab(46.41 -39.24 33.51) }", "lab", colorFrom256RGB(50, 125, 50));
+		assertColor(parser, "#main { color: lch(46.41, 51.60, 139.50) }", "lch", colorFrom256RGB(50, 125, 50));
 	});
 
 	test("hexDigit", function () {
@@ -272,5 +323,45 @@ suite("CSS - Language Facts", () => {
 		assertColorValue(colorFromHSL(350, 0.7, 0.3), colorFrom256RGB(130, 23, 41), "hsl(350, 70%, 30%)");
 		assertColorValue(colorFromHSL(118, 0.98, 0.5), colorFrom256RGB(11, 252, 3), "hsl(118, 98%, 50%)");
 		assertColorValue(colorFromHSL(120, 0.83, 0.95), colorFrom256RGB(232, 253, 232), "hsl(120, 83%, 95%)");
+	});
+
+	test("xyzFromLAB", function () {
+		// verified with https://www.colorspaceconverter.com/converter/lab-to-xyz
+		assertXYZValue(xyzFromLAB({ l: 46.41, a: -39.24, b: 33.51 }), { x: 9.22, y: 15.58, z: 5.54, alpha: 1 });
+		assertXYZValue(xyzFromLAB({ l: 50, a: -50, b: 50 }), { x: 9.8, y: 18.42, z: 3.53, alpha: 1 });
+		assertXYZValue(xyzFromLAB({ l: 90, a: 50, b: -50 }), { x: 99.03, y: 76.3, z: 171.63, alpha: 1 });
+	});
+
+	test("xyzToRGB", function () {
+		// verified with https://www.colorspaceconverter.com/converter/xyz-to-rgb
+		assertColorValue(
+			xyzToRGB({ x: 9.22, y: 15.58, z: 5.54, alpha: 1 }),
+			{ red: 50, green: 125, blue: 50, alpha: 1 },
+			"xyz(9.22, 15.58, 5.54)",
+		);
+		assertColorValue(
+			xyzToRGB({ x: 9.8, y: 18.42, z: 3.53, alpha: 1 }),
+			{ red: 35, green: 137, blue: 16, alpha: 1 },
+			"2",
+		);
+		assertColorValue(xyzToRGB({ x: 99, y: 76, z: 71, alpha: 1 }), { red: 255, green: 187, blue: 211, alpha: 1 }, "3");
+	});
+	test("LABToRGB", function () {
+		assertColorValue(colorFromLAB(46.41, -39.24, 33.51), colorFrom256RGB(50, 125, 50), "lab(46.41, -39.24, 33.51)");
+	});
+	test("labFromLCH", function () {
+		assertLABValue(labFromLCH(46.41, 51.6, 139.5), { l: 46.41, a: -39.24, b: 33.51, alpha: 1 });
+	});
+	test("LCHtoRGB", function () {
+		assertColorValue(colorFromLCH(46.41, 51.6, 139.5), colorFrom256RGB(50, 125, 50), "lch(46.41, 51.60, 139.50)");
+	});
+	test("labFromColor", function () {
+		assertLABValue(labFromColor(colorFrom256RGB(50, 125, 50)), { l: 46.41, a: -39.24, b: 33.51, alpha: 1 });
+	});
+	test("RGBToXYZ", function () {
+		assertXYZValue(RGBtoXYZ(colorFrom256RGB(50, 125, 50)), { x: 9.22, y: 15.58, z: 5.54, alpha: 1 });
+	});
+	test("RGBToLCH", function () {
+		assertLCHValue(lchFromColor(colorFrom256RGB(50, 125, 50)), { l: 46.41, c: 51.6, h: 139.5 });
 	});
 });

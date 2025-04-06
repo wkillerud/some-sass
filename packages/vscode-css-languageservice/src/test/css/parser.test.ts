@@ -320,6 +320,15 @@ suite("CSS - Parser", () => {
 		);
 	});
 
+	test("@starting-style", function () {
+		const parser = new Parser();
+		// These assertions would still hold if @starting-style blocks were being processed as unknown at-rules
+		// Parsing into the expected AST is instead tested in nodes.test.ts
+		assertNode(`@starting-style { p { background-color: skyblue; } }`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(`p { @starting-style { background-color: skyblue; } }`, parser, parser._parseStylesheet.bind(parser));
+		assertNode(`p { @starting-style { @layer {} } }`, parser, parser._parseStylesheet.bind(parser));
+	});
+
 	test("@container query length units", function () {
 		const parser = new Parser();
 		assertNode(

@@ -3,13 +3,14 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 "use strict";
-import { suite, test } from "vitest";
-
+import { assert, suite, test } from "vitest";
+import * as nodes from "../../parser/cssNodes";
 import { SassParser } from "../../parser/sassParser";
-import { assertColor2 } from "../css/languageFacts.test";
-import { colorFrom256RGB as newColor } from "../../languageFacts/facts";
+import { getColorValue, isColorValue, colorFrom256RGB as newColor } from "../../languageFacts/facts";
 import { Color } from "vscode";
 import { TextDocument } from "vscode-languageserver-textdocument";
+import { Parser } from "../../parser/cssParser";
+import { assertColorValue } from "../css/languageFacts.test";
 
 function assertColor(text: string, selection: string, expected: Color | null, isColor = expected !== null) {
 	let parser = new SassParser();
@@ -21,6 +22,27 @@ function assertColorSass(text: string, selection: string, expected: Color | null
 	let parser = new SassParser();
 	let document = TextDocument.create(`test://test/test.sass`, "sass", 1, text);
 	assertColor2(parser, document, selection, expected, isColor);
+}
+
+export function assertColor2(
+	parser: Parser,
+	document: TextDocument,
+	selection: string,
+	expected: Color | null,
+	isColor = expected !== null,
+) {
+	const text = document.getText();
+	let stylesheet = parser.parseStylesheet(document);
+	assert.equal(nodes.ParseErrorCollector.entries(stylesheet).length, 0, "compile errors");
+
+	let node = nodes.getNodeAtOffset(stylesheet, text.indexOf(selection));
+	assert(node);
+	if (node!.parent && node!.parent.type === nodes.NodeType.Function) {
+		node = node!.parent;
+	}
+
+	assert.equal(isColorValue(node!), isColor);
+	assertColorValue(getColorValue(node!), expected, text);
 }
 
 suite("SCSS - Language facts", () => {

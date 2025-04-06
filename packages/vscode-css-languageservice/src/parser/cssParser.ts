@@ -441,6 +441,7 @@ export class Parser {
 			this._parseSupports(true) ||
 			this._parseLayer(true) ||
 			this._parseContainer(true) ||
+			this._parseStartingStyleAtRule(true) ||
 			this._parseUnknownAtRule()
 		);
 	}
@@ -1060,6 +1061,28 @@ export class Parser {
 		}
 
 		return this._parseBody(node, this._parseDeclaration.bind(this));
+	}
+
+	_parseStartingStyleAtRule(isNested = false) {
+		if (!this.peekKeyword("@starting-style")) {
+			return null;
+		}
+
+		const node = this.create(nodes.StartingStyleAtRule);
+		this.consumeToken(); // @starting-style
+
+		return this._parseBody(node, this._parseStartingStyleDeclaration.bind(this, isNested));
+	}
+
+	// this method is the same as ._parseContainerDeclaration()
+	// which is the same as ._parseMediaDeclaration(),
+	// _parseSupportsDeclaration, and ._parseLayerDeclaration()
+	_parseStartingStyleDeclaration(isNested = false) {
+		if (isNested) {
+			// if nested, the body can contain rulesets, but also declarations
+			return this._tryParseRuleset(true) || this._tryToParseDeclaration() || this._parseStylesheetStatement(true);
+		}
+		return this._parseStylesheetStatement(false);
 	}
 
 	public _parseLayer(isNested: boolean = false): nodes.Node | null {
@@ -1877,7 +1900,7 @@ export class Parser {
 		if (node) {
 			if (!this.hasWhitespace() && this.accept(TokenType.ParenthesisL)) {
 				const tryAsSelector = () => {
-					const selectors = this.create(nodes.Node);
+					const selectors = this.createNode(nodes.NodeType.SelectorList);
 					if (!selectors.addChild(this._parseSelector(true))) {
 						return null;
 					}
@@ -1893,11 +1916,11 @@ export class Parser {
 
 				let hasSelector = node.addChild(this.try(tryAsSelector));
 				if (!hasSelector) {
-					if (
-						node.addChild(this._parseBinaryExpr()) &&
-						this.acceptIdent("of") &&
-						!node.addChild(this.try(tryAsSelector))
-					) {
+					// accept the <an+b> syntax (not a proper expression) https://drafts.csswg.org/css-syntax/#anb
+					while (!this.peekIdent("of") && (node.addChild(this._parseTerm()) || node.addChild(this._parseOperator()))) {
+						// loop
+					}
+					if (this.acceptIdent("of") && !node.addChild(this.try(tryAsSelector))) {
 						return this.finish(node, ParseError.SelectorExpected);
 					}
 				}

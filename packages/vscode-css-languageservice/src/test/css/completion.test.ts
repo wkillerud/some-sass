@@ -26,6 +26,7 @@ import {
 	ICSSDataProvider,
 	newCSSDataProvider,
 } from "../../cssLanguageService";
+import { BaselineImages } from "../../languageFacts/facts";
 import { getDocumentContext } from "../testUtil/documentContext";
 import { URI } from "vscode-uri";
 import { getFsProvider } from "../testUtil/fsProvider";
@@ -771,16 +772,14 @@ suite("CSS - Completion", () => {
 					label: "text-decoration-skip",
 					documentation: {
 						kind: "markdown",
-						value:
-							"⚠️ Property is experimental. Be cautious when using it.️\n\nThe text\\-decoration\\-skip CSS property specifies what parts of the element’s content any text decoration affecting the element must skip over\\. It controls all text decoration lines drawn by the element and also any text decoration lines drawn by its ancestors\\.\n\n(Safari 12, Chrome 57, Opera 44)\n\nSyntax: none | \\[ objects || \\[ spaces | \\[ leading\\-spaces || trailing\\-spaces \\] \\] || edges || box\\-decoration \\]\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/CSS/text-decoration-skip)",
+						value: `The text\\-decoration\\-skip CSS property specifies what parts of the element’s content any text decoration affecting the element must skip over\\. It controls all text decoration lines drawn by the element and also any text decoration lines drawn by its ancestors\\.\n\n![Baseline icon](${BaselineImages.BASELINE_LIMITED}) _Limited availability across major browsers (Not fully implemented in Chrome, Edge, or Firefox)_\n\nSyntax: none | \\[ objects || \\[ spaces | \\[ leading\\-spaces || trailing\\-spaces \\] \\] || edges || box\\-decoration \\]\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/CSS/text-decoration-skip)`,
 					},
 				},
 				{
 					label: "box-ordinal-group",
 					documentation: {
 						kind: "markdown",
-						value:
-							"🚨️️️ Property is obsolete. Avoid using it.\n\nThe box\\-ordinal\\-group CSS property assigns the flexbox's child elements to an ordinal group\\.\n\n(Edge 12, Firefox 49, Safari 3, Chrome 1, Opera 15)\n\nSyntax: &lt;integer&gt;\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/CSS/box-ordinal-group)",
+						value: `🚨️️️ Property is obsolete. Avoid using it.\n\nThe box\\-ordinal\\-group CSS property assigns the flexbox\'s child elements to an ordinal group\\.\n\nSyntax: &lt;integer&gt;\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/CSS/box-ordinal-group)`,
 					},
 				},
 				{
@@ -788,7 +787,7 @@ suite("CSS - Completion", () => {
 					documentation: {
 						kind: "markdown",
 						value:
-							"🚨️ Property is nonstandard. Avoid using it.\n\nSets the mask layer image of an element\\.\n\n(Chrome, Opera 15, Safari 4)\n\nSyntax: &lt;mask\\-reference&gt;\\#",
+							"🚨️ Property is nonstandard. Avoid using it.\n\nSets the mask layer image of an element\\.\n\nSyntax: &lt;mask\\-reference&gt;\\#",
 					},
 				},
 			],

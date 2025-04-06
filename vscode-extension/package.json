@@ -1390,7 +1390,7 @@
 	"dependencies": {
 		"fast-glob": "3.3.3",
 		"some-sass-language-server": "2.1.1",
-		"vscode-css-languageservice": "6.3.2",
+		"vscode-css-languageservice": "6.3.4",
 		"vscode-languageclient": "9.0.1",
 		"vscode-uri": "3.0.8"
 	},

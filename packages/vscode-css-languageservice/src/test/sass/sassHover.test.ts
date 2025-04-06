@@ -7,6 +7,7 @@ import { suite, test } from "vitest";
 import { Hover } from "../../cssLanguageService";
 import { HoverSettings } from "../../cssLanguageTypes";
 import { assertHover as assertCssHover } from "../css/hover.test";
+import { BaselineImages } from "../../languageFacts/facts";
 
 function assertHover(value: string, expected: Hover, hoverSettings?: HoverSettings): void {
 	assertCssHover(value, expected, "sass", hoverSettings);
@@ -17,8 +18,7 @@ suite("Sass hover", () => {
 		assertHover(`.test\n\t|color: blue`, {
 			contents: {
 				kind: "markdown",
-				value:
-					"Sets the color of an element's text\n\n(Edge 12, Firefox 1, Safari 1, Chrome 1, IE 3, Opera 3)\n\nSyntax: &lt;color&gt;\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/CSS/color)",
+				value: `Sets the color of an element's text\n\n![Baseline icon](${BaselineImages.BASELINE_HIGH}) _Widely available across major browsers (Baseline since 2015)_\n\nSyntax: &lt;color&gt;\n\n[MDN Reference](https://developer.mozilla.org/docs/Web/CSS/color)`,
 			},
 		});
 		assertHover(
@@ -36,8 +36,7 @@ suite("Sass hover", () => {
 			{
 				contents: {
 					kind: "markdown",
-					value:
-						"Sets the color of an element's text\n\n(Edge 12, Firefox 1, Safari 1, Chrome 1, IE 3, Opera 3)\n\nSyntax: &lt;color&gt;",
+					value: `Sets the color of an element's text\n\n![Baseline icon](${BaselineImages.BASELINE_HIGH}) _Widely available across major browsers (Baseline since 2015)_\n\nSyntax: &lt;color&gt;`,
 				},
 			},
 			{ references: false },

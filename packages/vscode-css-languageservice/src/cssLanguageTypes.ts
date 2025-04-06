@@ -241,6 +241,7 @@ export interface IPropertyData {
 	name: string;
 	description?: string | MarkupContent;
 	browsers?: string[];
+	baseline?: BaselineStatus;
 	restrictions?: string[];
 	status?: EntryStatus;
 	syntax?: string;
@@ -253,6 +254,7 @@ export interface IAtDirectiveData {
 	name: string;
 	description?: string | MarkupContent;
 	browsers?: string[];
+	baseline?: BaselineStatus;
 	status?: EntryStatus;
 	references?: IReference[];
 }
@@ -260,6 +262,7 @@ export interface IPseudoClassData {
 	name: string;
 	description?: string | MarkupContent;
 	browsers?: string[];
+	baseline?: BaselineStatus;
 	status?: EntryStatus;
 	references?: IReference[];
 }
@@ -267,6 +270,7 @@ export interface IPseudoElementData {
 	name: string;
 	description?: string | MarkupContent;
 	browsers?: string[];
+	baseline?: BaselineStatus;
 	status?: EntryStatus;
 	references?: IReference[];
 }
@@ -275,6 +279,7 @@ export interface IValueData {
 	name: string;
 	description?: string | MarkupContent;
 	browsers?: string[];
+	baseline?: BaselineStatus;
 	status?: EntryStatus;
 	references?: IReference[];
 }
@@ -286,6 +291,14 @@ export interface CSSDataV1 {
 	pseudoClasses?: IPseudoClassData[];
 	pseudoElements?: IPseudoElementData[];
 }
+
+export interface BaselineStatus {
+	status: Baseline;
+	baseline_low_date?: string;
+	baseline_high_date?: string;
+}
+
+export type Baseline = "false" | "low" | "high";
 
 export interface ICSSDataProvider {
 	provideProperties(): IPropertyData[];

@@ -28,7 +28,7 @@ import {
 import * as l10n from "@vscode/l10n";
 import * as nodes from "../parser/cssNodes";
 import { Symbols } from "../parser/cssSymbolScope";
-import { getColorValue, hslFromColor, hwbFromColor } from "../languageFacts/facts";
+import { getColorValue, hslFromColor, hwbFromColor, labFromColor, lchFromColor } from "../languageFacts/facts";
 import { startsWith } from "../utils/strings";
 import { dirname, joinPath } from "../utils/resources";
 
@@ -493,6 +493,22 @@ export class CSSNavigation {
 			label = `hwb(${hwb.h} ${Math.round(hwb.w * 100)}% ${Math.round(hwb.b * 100)}%)`;
 		} else {
 			label = `hwb(${hwb.h} ${Math.round(hwb.w * 100)}% ${Math.round(hwb.b * 100)}% / ${hwb.a})`;
+		}
+		result.push({ label: label, textEdit: TextEdit.replace(range, label) });
+
+		const lab = labFromColor(color);
+		if (lab.alpha === 1) {
+			label = `lab(${lab.l}% ${lab.a} ${lab.b})`;
+		} else {
+			label = `lab(${lab.l}% ${lab.a} ${lab.b} / ${lab.alpha})`;
+		}
+		result.push({ label: label, textEdit: TextEdit.replace(range, label) });
+
+		const lch = lchFromColor(color);
+		if (lab.alpha === 1) {
+			label = `lch(${lch.l}% ${lch.c} ${lch.h})`;
+		} else {
+			label = `lch(${lch.l}% ${lch.c} ${lch.h} / ${lch.alpha})`;
 		}
 		result.push({ label: label, textEdit: TextEdit.replace(range, label) });
 

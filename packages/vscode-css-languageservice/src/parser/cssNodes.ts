@@ -99,6 +99,8 @@ export enum NodeType {
 	PropertyAtRule,
 	Container,
 	ModuleConfig,
+	SelectorList,
+	StartingStyleAtRule,
 }
 
 export enum ReferenceType {
@@ -1190,6 +1192,16 @@ export class PropertyAtRule extends BodyDeclaration {
 
 	public getName(): Identifier | undefined {
 		return this.name;
+	}
+}
+
+export class StartingStyleAtRule extends BodyDeclaration {
+	constructor(offset: number, length: number) {
+		super(offset, length);
+	}
+
+	get type(): NodeType {
+		return NodeType.StartingStyleAtRule;
 	}
 }
 

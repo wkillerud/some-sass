@@ -143,6 +143,19 @@ suite("CSS - Nodes", () => {
 		);
 	});
 
+	test("Starting-style", function () {
+		function fn(input: string): nodes.Node {
+			let parser = new Parser();
+			let node = parser.internalParse(input, parser._parseStartingStyleAtRule)!;
+			return node;
+		}
+		assertNodes(
+			fn,
+			"@starting-style { p { opacity: 0; } }",
+			"startingstyleatrule,declarations,ruleset,...,selector,...,elementnameselector,...,...,...,...,...,...,...,...,...",
+		);
+	});
+
 	test("UnicodeRange", function () {
 		function fn(input: string): nodes.Node {
 			let parser = new Parser();

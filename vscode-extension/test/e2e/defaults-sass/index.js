@@ -1,13 +1,13 @@
 const vscode = require("vscode");
 const { resolve } = require("path");
-const fg = require("fast-glob");
+const { glob } = require("tinyglobby");
 const { runMocha } = require("../mocha");
 
 /**
  * @returns {Promise<void>}
  */
 async function run() {
-	const files = await fg("*.test.js", {
+	const files = await glob("*.test.js", {
 		cwd: resolve(__dirname),
 		absolute: true,
 	});

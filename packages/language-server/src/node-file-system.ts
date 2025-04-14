@@ -1,6 +1,6 @@
 import { promises, constants, existsSync } from "fs";
 import { type FileStat, FileType } from "@somesass/language-services";
-import * as fg from "fast-glob";
+import { glob } from "tinyglobby";
 import { URI, Utils } from "vscode-uri";
 import type { FileSystemProvider } from "./file-system";
 
@@ -9,10 +9,9 @@ export class NodeFileSystem implements FileSystemProvider {
 		pattern: string,
 		exclude?: string | string[] | null | undefined,
 	): Promise<URI[]> {
-		const matches = await fg(pattern, {
+		const matches = await glob(pattern, {
 			absolute: true,
 			dot: true,
-			suppressErrors: true,
 			ignore: exclude
 				? Array.isArray(exclude)
 					? exclude

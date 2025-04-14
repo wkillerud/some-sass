@@ -24,7 +24,8 @@
 		"test": "cross-env CI=true nx run-many -t test",
 		"test:all": "npm run test && npm run test:e2e && npm run test:web",
 		"test:e2e": "nx test:e2e some-sass",
-		"test:web": "nx test:web some-sass"
+		"test:web": "nx test:web some-sass",
+		"knip": "knip"
 	},
 	"lint-staged": {
 		"**/*.ts": [
@@ -52,6 +53,7 @@
 		"eslint-plugin-depend": "1.0.0",
 		"eslint-plugin-prettier": "5.2.6",
 		"husky": "9.1.7",
+		"knip": "5.50.3",
 		"lint-staged": "15.5.0",
 		"npm-run-all2": "7.0.2",
 		"nx": "20.7.1",

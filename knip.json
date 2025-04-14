@@ -1,0 +1,12 @@
+{
+	"workspaces": {
+		"packages/*": {
+			"entry": "src/{main,browser-main,language-services,cssLanguageService}.ts",
+			"project": "**/*.ts"
+		},
+		"vscode-extension": {
+			"entry": "src/{browser-client,node-client}.ts",
+			"project": "**/*.ts"
+		}
+	}
+}

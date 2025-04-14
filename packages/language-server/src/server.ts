@@ -1,11 +1,13 @@
 import {
 	defaultConfiguration,
-	getLanguageService,
-	LanguageService,
-	LanguageServerConfiguration,
-	LanguageConfiguration,
 	EditorConfiguration,
+	getLanguageService,
+	LanguageConfiguration,
+	LanguageServerConfiguration,
+	LanguageService,
 } from "@somesass/language-services";
+import { newCSSDataProvider } from "@somesass/vscode-css-languageservice";
+import { merge } from "es-toolkit/object";
 import {
 	ClientCapabilities,
 	CodeAction,
@@ -15,29 +17,24 @@ import {
 	FileChangeType,
 	TextDocumentEdit,
 } from "vscode-languageserver";
+import { TextDocument } from "vscode-languageserver-textdocument";
 import {
+	TextDocumentChangeEvent,
 	TextDocuments,
 	TextDocumentSyncKind,
-	TextDocumentChangeEvent,
 } from "vscode-languageserver/node";
-import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI, Utils } from "vscode-uri";
-import type { FileSystemProvider } from "./file-system";
-import { getFileSystemProvider } from "./file-system-provider";
-import { RuntimeEnvironment } from "./runtime";
 import {
 	ConfigurationV1,
 	isOldConfiguration,
 	toNewConfiguration,
 } from "./configuration";
 import { getSassRegionsDocument } from "./embedded";
-import WorkspaceScanner from "./workspace-scanner";
+import type { FileSystemProvider } from "./file-system";
+import { getFileSystemProvider } from "./file-system-provider";
 import { createLogger, type Logger } from "./logger";
-import merge from "lodash.merge";
-import {
-	ICSSDataProvider,
-	newCSSDataProvider,
-} from "@somesass/vscode-css-languageservice";
+import { RuntimeEnvironment } from "./runtime";
+import WorkspaceScanner from "./workspace-scanner";
 
 export class SomeSassServer {
 	private readonly connection: Connection;
@@ -152,8 +149,7 @@ export class SomeSassServer {
 			}
 
 			const settings: LanguageServerConfiguration = merge(
-				defaultConfiguration,
-				somesass,
+				merge(defaultConfiguration, somesass),
 				{
 					editor: {
 						...editor,

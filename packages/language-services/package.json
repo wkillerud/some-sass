@@ -49,9 +49,8 @@
 	},
 	"dependencies": {
 		"@somesass/vscode-css-languageservice": "2.0.2",
-		"@types/lodash.merge": "4.6.9",
 		"colorjs.io": "0.5.2",
-		"lodash.merge": "4.6.2",
+		"es-toolkit": "1.34.1",
 		"sassdoc-parser": "3.4.1"
 	},
 	"devDependencies": {

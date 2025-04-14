@@ -4,7 +4,7 @@ import {
 	ICSSDataProvider,
 	LanguageService as UpstreamLanguageService,
 } from "@somesass/vscode-css-languageservice";
-import merge from "lodash.merge";
+import { merge } from "es-toolkit/object";
 import { defaultConfiguration } from "./configuration";
 import { CodeActions } from "./features/code-actions";
 import { DoComplete } from "./features/do-complete";
@@ -22,36 +22,36 @@ import { FoldingRangeContext, FoldingRanges } from "./features/folding-ranges";
 import { SelectionRanges } from "./features/selection-ranges";
 import { LanguageModelCache } from "./language-model-cache";
 import {
+	ClientCapabilities,
 	CodeActionContext,
-	LanguageService,
-	LanguageConfiguration,
+	Color,
 	EditorConfiguration,
+	FileStat,
+	FileSystemProvider,
+	FileType,
+	LanguageConfiguration,
 	LanguageServerConfiguration,
+	LanguageService,
 	LanguageServiceOptions,
 	Position,
-	TextDocument,
-	FileSystemProvider,
-	FileStat,
-	FileType,
-	Color,
 	Range,
-	ReferenceContext,
-	URI,
-	SetDataProvidersOptions,
 	RecursivePartial,
-	ClientCapabilities,
+	ReferenceContext,
+	SetDataProvidersOptions,
+	TextDocument,
+	URI,
 } from "./language-services-types";
 import { mapFsProviders } from "./utils/fs-provider";
 
 export {
 	defaultConfiguration,
-	LanguageService,
-	LanguageServerConfiguration,
-	LanguageConfiguration,
 	EditorConfiguration,
 	FileStat,
 	FileSystemProvider,
 	FileType,
+	LanguageConfiguration,
+	LanguageServerConfiguration,
+	LanguageService,
 };
 
 export function getLanguageService(

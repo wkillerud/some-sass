@@ -1397,10 +1397,10 @@
   "devDependencies": {
     "@types/mocha": "10.0.10",
     "@types/vscode": "1.86.0",
-    "@vscode/test-electron": "2.4.1",
+    "@vscode/test-electron": "2.5.2",
     "@vscode/test-web": "0.0.68",
     "assert": "2.1.0",
-    "mocha": "11.1.0",
+    "mocha": "11.2.2",
     "shx": "0.3.4"
   },
   "scripts": {

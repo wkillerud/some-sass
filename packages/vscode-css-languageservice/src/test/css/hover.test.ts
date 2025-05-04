@@ -77,6 +77,35 @@ suite("CSS Hover", () => {
 			],
 		});
 	});
+
+	assertHover(
+		"@scope (.foo) to (.bar) { .|baz{ } }",
+		{
+			contents: [
+				{
+					language: "html",
+					value: '@scope .foo → .bar\n<element class="baz">',
+				},
+				"[Selector Specificity](https://developer.mozilla.org/docs/Web/CSS/Specificity): (0, 1, 0)",
+			],
+		},
+		"css",
+	);
+
+	assertHover(
+		"@scope (.from) to (.to) { .foo { @media print { .bar { @media only screen{ .|bar{ } } } } } }",
+		{
+			contents: [
+				{
+					language: "html",
+					value:
+						'@scope .from → .to\n@media print\n@media only screen\n<element class="foo">\n  …\n    <element class="bar">\n      …\n        <element class="bar">',
+				},
+				"[Selector Specificity](https://developer.mozilla.org/docs/Web/CSS/Specificity): (0, 1, 0)",
+			],
+		},
+		"css",
+	);
 });
 
 suite("SCSS Hover", () => {
@@ -98,7 +127,7 @@ suite("SCSS Hover", () => {
 					{
 						language: "html",
 						value:
-							'@media only screen\n … <element class="foo">\n  …\n    <element class="bar">\n      …\n        <element class="bar">',
+							'@media only screen\n<element class="foo">\n  …\n    <element class="bar">\n      …\n        <element class="bar">',
 					},
 					"[Selector Specificity](https://developer.mozilla.org/docs/Web/CSS/Specificity): (0, 1, 0)",
 				],

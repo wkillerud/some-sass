@@ -63,7 +63,7 @@ suite("Sass hover", () => {
 					{
 						language: "html",
 						value:
-							'@media only screen\n … <element class="foo">\n  …\n    <element class="bar">\n      …\n        <element class="bar">',
+							'@media only screen\n<element class="foo">\n  …\n    <element class="bar">\n      …\n        <element class="bar">',
 					},
 					"[Selector Specificity](https://developer.mozilla.org/docs/Web/CSS/Specificity): (0, 1, 0)",
 				],

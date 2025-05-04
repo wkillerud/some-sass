@@ -1165,6 +1165,22 @@ suite("CSS - Completion", () => {
 			workspaceFolderUri,
 		);
 	});
+
+	test("@scope selector completion", async function () {
+		await testCompletionFor(`@scope (|) {`, {
+			items: [
+				{ label: "html", resultText: "@scope (html) {" },
+				{ label: ":has", resultText: "@scope (:has) {" },
+			],
+		});
+
+		await testCompletionFor(`@scope to (|) {`, {
+			items: [
+				{ label: "html", resultText: "@scope to (html) {" },
+				{ label: ":has", resultText: "@scope to (:has) {" },
+			],
+		});
+	});
 });
 
 function newRange(start: number, end: number) {

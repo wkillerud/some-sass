@@ -1,73 +1,72 @@
 {
-	"name": "some-sass-language-server",
-	"version": "2.1.2",
-	"description": "LSP server for SCSS and Sass indented. Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
-	"keywords": [
-		"sass",
-		"scss",
-		"sass-indented",
-		"lsp",
-		"language-server-protocol"
-	],
-	"type": "commonjs",
-	"engines": {
-		"node": ">=20"
-	},
-	"homepage": "https://github.com/wkillerud/some-sass/blob/main/packages/language-server#readme",
-	"repository": {
-		"type": "git",
-		"url": "git+ssh://git@github.com/wkillerud/some-sass.git"
-	},
-	"bugs": {
-		"url": "https://github.com/wkillerud/some-sass/issues"
-	},
-	"main": "dist/node-server.js",
-	"files": [
-		"dist/",
-		"bin/"
-	],
-	"bin": {
-		"some-sass-language-server": "bin/some-sass-language-server"
-	},
-	"exports": {
-		".": {
-			"browser": "./dist/browser-server.js",
-			"default": "./dist/node-server.js"
-		}
-	},
-	"author": "William Killerud <william@killerud.com> (https://www.williamkillerud.com/)",
-	"license": "MIT",
-	"scripts": {
-		"prepublishOnly": "run-s build:production:*",
-		"prebuild": "tsc --noEmit",
-		"build": "run-s build:development:*",
-		"build:node": "rspack --config ./rspack.node.config.js",
-		"build:browser": "rspack --config ./rspack.browser.config.js",
-		"build:development:node": "npm run build:node -- --mode=development",
-		"build:development:browser": "npm run build:browser -- --mode=development",
-		"build:production:node": "npm run build:node -- --mode=production",
-		"build:production:browser": "npm run build:browser -- --mode=production",
-		"clean": "shx rm -rf dist node_modules",
-		"test": "vitest",
-		"coverage": "vitest run --coverage"
-	},
-	"devDependencies": {
-		"@somesass/language-services": "2.1.2",
-		"@types/lodash.merge": "4.6.9",
-		"@types/node": "22.15.3",
-		"@vitest/coverage-v8": "3.1.2",
-		"fast-glob": "3.3.2",
-		"lodash.merge": "4.6.2",
-		"merge-options": "3.0.4",
-		"path-browserify": "1.0.1",
-		"process": "0.11.10",
-		"shx": "0.3.4",
-		"url": "0.11.4",
-		"util": "0.12.5",
-		"vitest": "3.1.2",
-		"vscode-languageserver": "9.0.1",
-		"vscode-languageserver-textdocument": "1.0.12",
-		"vscode-languageserver-types": "3.17.5",
-		"vscode-uri": "3.1.0"
-	}
+  "name": "some-sass-language-server",
+  "version": "2.1.2",
+  "description": "LSP server for SCSS and Sass indented. Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
+  "keywords": [
+    "sass",
+    "scss",
+    "sass-indented",
+    "lsp",
+    "language-server-protocol"
+  ],
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "homepage": "https://github.com/wkillerud/some-sass/blob/main/packages/language-server#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/wkillerud/some-sass.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wkillerud/some-sass/issues"
+  },
+  "main": "dist/node-server.js",
+  "files": [
+    "dist/",
+    "bin/"
+  ],
+  "bin": {
+    "some-sass-language-server": "bin/some-sass-language-server"
+  },
+  "exports": {
+    ".": {
+      "browser": "./dist/browser-server.js",
+      "default": "./dist/node-server.js"
+    }
+  },
+  "author": "William Killerud <william@killerud.com> (https://www.williamkillerud.com/)",
+  "license": "MIT",
+  "scripts": {
+    "prepublishOnly": "run-s build:production:*",
+    "prebuild": "tsc --noEmit",
+    "build": "run-s build:development:*",
+    "build:node": "rspack --config ./rspack.node.config.js",
+    "build:browser": "rspack --config ./rspack.browser.config.js",
+    "build:development:node": "npm run build:node -- --mode=development",
+    "build:development:browser": "npm run build:browser -- --mode=development",
+    "build:production:node": "npm run build:node -- --mode=production",
+    "build:production:browser": "npm run build:browser -- --mode=production",
+    "clean": "shx rm -rf dist node_modules",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@somesass/language-services": "2.1.2",
+    "@types/node": "22.15.3",
+    "@vitest/coverage-v8": "3.1.2",
+    "es-toolkit": "1.37.2",
+    "merge-options": "3.0.4",
+    "path-browserify": "1.0.1",
+    "process": "0.11.10",
+    "shx": "0.4.0",
+    "tinyglobby": "0.2.13",
+    "url": "0.11.4",
+    "util": "0.12.5",
+    "vitest": "3.1.2",
+    "vscode-languageserver": "9.0.1",
+    "vscode-languageserver-textdocument": "1.0.12",
+    "vscode-languageserver-types": "3.17.5",
+    "vscode-uri": "3.1.0"
+  }
 }

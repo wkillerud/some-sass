@@ -311,6 +311,36 @@ $color: #F5F5F5`,
 		);
 	});
 
+	test("@scope", () => {
+		assertNode("@scope\n\t", parser, parser._parseScope.bind(parser));
+		assertNode("@scope (.foo)\n\t", parser, parser._parseScope.bind(parser));
+		assertNode("@scope to (.bar)\n\t", parser, parser._parseScope.bind(parser));
+		assertNode("@scope (.foo) to (.bar)\n\t", parser, parser._parseScope.bind(parser));
+		assertNode("@scope (#foo) to (:has(> link))\n\t", parser, parser._parseScope.bind(parser));
+
+		assertError("@scope ( \n\t", parser, parser._parseScope.bind(parser), ParseError.SelectorExpected);
+		assertError("@scope () \n\t", parser, parser._parseScope.bind(parser), ParseError.SelectorExpected);
+		assertError("@scope () to (.bar) \n\t", parser, parser._parseScope.bind(parser), ParseError.SelectorExpected);
+		assertError("@scope to () \n\t", parser, parser._parseScope.bind(parser), ParseError.SelectorExpected);
+		assertError("@scope (.foo) to () \n\t", parser, parser._parseScope.bind(parser), ParseError.SelectorExpected);
+
+		assertError("@scope to (.bar \n\t", parser, parser._parseScope.bind(parser), ParseError.RightParenthesisExpected);
+		assertError(
+			"@scope (.foo to (.bar) \n\t",
+			parser,
+			parser._parseScope.bind(parser),
+			ParseError.RightParenthesisExpected,
+		);
+		assertError(
+			"@scope (.foo) to (.bar \n\t",
+			parser,
+			parser._parseScope.bind(parser),
+			ParseError.RightParenthesisExpected,
+		);
+
+		assertError("@scope (.foo) to \n\t", parser, parser._parseScope.bind(parser), ParseError.LeftParenthesisExpected);
+	});
+
 	test("selectors", () => {
 		assertNode(
 			`

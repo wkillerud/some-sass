@@ -2,11 +2,21 @@
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import eslintConfigPrettier from "eslint-plugin-prettier/recommended";
+import depend from "eslint-plugin-depend";
 
 export default tseslint.config(
 	eslint.configs.recommended,
 	...tseslint.configs.recommended,
 	eslintConfigPrettier,
+	{
+		files: ["**/*.ts"],
+		plugins: {
+			depend,
+		},
+		rules: {
+			"depend/ban-dependencies": "error",
+		},
+	},
 	{
 		ignores: [
 			"vscode-extension/.vscode-test/",

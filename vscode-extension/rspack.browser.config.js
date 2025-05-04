@@ -67,10 +67,6 @@ const config = {
 					from: "../node_modules/some-sass-language-server/dist/**/*.js",
 					to: "[name][ext]",
 				},
-				{
-					from: "../node_modules/some-sass-language-server/dist/**/*.js.map",
-					to: "[name][ext]",
-				},
 			],
 		}),
 	],

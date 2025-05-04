@@ -58,7 +58,7 @@ const config = {
 			maxChunks: 1,
 		}),
 	],
-	devtool: "cheap-source-map",
+	devtool: false,
 };
 
 module.exports = (env, argv) => {

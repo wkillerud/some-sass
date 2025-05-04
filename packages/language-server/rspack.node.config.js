@@ -36,7 +36,7 @@ const config = {
 			},
 		],
 	},
-	devtool: "cheap-source-map",
+	devtool: false,
 };
 
 module.exports = (env, argv) => {

@@ -1,61 +1,61 @@
 {
-	"name": "@somesass/language-services",
-	"version": "2.1.2",
-	"private": true,
-	"description": "The features powering some-sass-language-server",
-	"keywords": [
-		"scss",
-		"sass"
-	],
-	"engines": {
-		"node": ">=20"
-	},
-	"homepage": "https://github.com/wkillerud/some-sass/blob/main/packages/language-services#readme",
-	"repository": {
-		"type": "git",
-		"url": "git+ssh://git@github.com/wkillerud/some-sass.git"
-	},
-	"bugs": {
-		"url": "https://github.com/wkillerud/some-sass/issues"
-	},
-	"files": [
-		"dist/",
-		"!dist/test/",
-		"!dist/**/*.test.js"
-	],
-	"main": "dist/language-services.js",
-	"types": "dist/language-services.d.ts",
-	"exports": {
-		".": {
-			"types": "./dist/language-services.d.ts",
-			"default": "./dist/language-services.js"
-		},
-		"./*": {
-			"types": "./dist/*.d.ts",
-			"default": "./dist/*.js"
-		},
-		"./feature/*": {
-			"types": "./dist/feature/*.d.ts",
-			"default": "./dist/feature/*.js"
-		}
-	},
-	"author": "William Killerud <william@killerud.com> (https://www.williamkillerud.com/)",
-	"license": "MIT",
-	"scripts": {
-		"build": "tsc",
-		"clean": "shx rm -rf dist node_modules",
-		"test": "vitest",
-		"coverage": "vitest run --coverage"
-	},
-	"dependencies": {
-		"@somesass/vscode-css-languageservice": "2.0.2",
-		"colorjs.io": "0.5.2",
-		"es-toolkit": "1.37.2",
-		"sassdoc-parser": "3.4.1"
-	},
-	"devDependencies": {
-		"@vitest/coverage-v8": "3.1.2",
-		"shx": "0.4.0",
-		"typescript": "5.8.3"
-	}
+  "name": "@somesass/language-services",
+  "version": "2.2.0",
+  "private": true,
+  "description": "The features powering some-sass-language-server",
+  "keywords": [
+    "scss",
+    "sass"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "homepage": "https://github.com/wkillerud/some-sass/blob/main/packages/language-services#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/wkillerud/some-sass.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wkillerud/some-sass/issues"
+  },
+  "files": [
+    "dist/",
+    "!dist/test/",
+    "!dist/**/*.test.js"
+  ],
+  "main": "dist/language-services.js",
+  "types": "dist/language-services.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/language-services.d.ts",
+      "default": "./dist/language-services.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
+    },
+    "./feature/*": {
+      "types": "./dist/feature/*.d.ts",
+      "default": "./dist/feature/*.js"
+    }
+  },
+  "author": "William Killerud <william@killerud.com> (https://www.williamkillerud.com/)",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "clean": "shx rm -rf dist node_modules",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@somesass/vscode-css-languageservice": "2.1.0",
+    "colorjs.io": "0.5.2",
+    "es-toolkit": "1.37.2",
+    "sassdoc-parser": "3.4.1"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "3.1.2",
+    "shx": "0.4.0",
+    "typescript": "5.8.3"
+  }
 }

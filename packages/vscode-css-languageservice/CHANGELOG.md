@@ -1,3 +1,9 @@
+## 2.1.0 (2025-05-04)
+
+### 🚀 Features
+
+- support `@scope` ([#308](https://github.com/wkillerud/some-sass/pull/308))
+
 ## 2.0.2 (2025-04-06)
 
 ### 🩹 Fixes

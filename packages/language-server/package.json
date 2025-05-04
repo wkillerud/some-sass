@@ -38,9 +38,12 @@
   "author": "William Killerud <william@killerud.com> (https://www.williamkillerud.com/)",
   "license": "MIT",
   "scripts": {
-    "prepublishOnly": "run-s build:production:*",
+    "preprepublishOnly": "shx rm -rf dist",
+    "prepublishOnly": "npm run build:production",
     "prebuild": "tsc --noEmit",
     "build": "run-s build:development:*",
+    "prebuild:production": "shx rm -rf dist",
+    "build:production": "run-s build:production:*",
     "build:node": "rspack --config ./rspack.node.config.js",
     "build:browser": "rspack --config ./rspack.browser.config.js",
     "build:development:node": "npm run build:node -- --mode=development",

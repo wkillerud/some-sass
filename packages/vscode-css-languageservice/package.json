@@ -30,6 +30,7 @@
 	},
 	"scripts": {
 		"build": "run-s compile compile-esm",
+    "build:production": "npm run build",
 		"compile": "tsc -p ./src/tsconfig.json",
 		"compile-esm": "tsc -p ./src/tsconfig.esm.json",
 		"clean": "rimraf lib node_modules",

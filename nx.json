@@ -6,6 +6,11 @@
 			"outputs": ["{projectRoot}/dist"],
 			"cache": true
 		},
+    "build:production": {
+			"dependsOn": ["^build:production"],
+			"outputs": ["{projectRoot}/dist"],
+			"cache": true
+		},
 		"test": {
 			"dependsOn": ["^test"],
 			"cache": true

@@ -1405,9 +1405,11 @@
     "shx": "0.4.0"
   },
   "scripts": {
-    "vscode:prepublish": "run-s clean build:production:*",
+    "vscode:prepublish": "npm run build:production",
     "clean": "shx rm -rf dist",
     "build": "run-s build:development:*",
+    "prebuild:production": "shx rm -rf dist",
+    "build:production": "run-s clean build:production:*",
     "build:node": "rspack --config ./rspack.node.config.js",
     "build:browser": "rspack --config ./rspack.browser.config.js",
     "build:development:node": "npm run build:node -- --mode=development",

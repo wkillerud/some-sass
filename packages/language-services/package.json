@@ -43,6 +43,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
+    "build:production": "tsc",
     "clean": "shx rm -rf dist node_modules",
     "test": "vitest",
     "coverage": "vitest run --coverage"

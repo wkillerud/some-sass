@@ -55,7 +55,7 @@
     "sassdoc-parser": "3.4.1"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "3.1.2",
+    "@vitest/coverage-v8": "3.2.1",
     "shx": "0.4.0",
     "typescript": "5.8.3"
   }

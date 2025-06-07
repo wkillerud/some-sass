@@ -21,6 +21,10 @@ suite("Sass - Parser", () => {
 		assertError('@charset "demo";', parser, parser._parseStylesheet.bind(parser), ParseError.UnexpectedSemicolon);
 	});
 
+	test("at-rule after @charset", () => {
+		assertNode('@charset "demo"\n\n@use "sass:list"', parser, parser._parseStylesheet.bind(parser));
+	});
+
 	test("newline before at-rule", () => {
 		assertNode(
 			`

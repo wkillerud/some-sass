@@ -315,6 +315,12 @@ export class Parser {
 			// Parse statements only valid at the beginning of stylesheets.
 		}
 
+		if (this.syntax === "indented") {
+			while (this.accept(TokenType.Newline)) {
+				// allow empty statements after stylesheet start
+			}
+		}
+
 		let inRecovery = false;
 		do {
 			let hasMatch = false;

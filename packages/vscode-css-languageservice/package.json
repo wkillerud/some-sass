@@ -1,6 +1,6 @@
 {
 	"name": "@somesass/vscode-css-languageservice",
-	"version": "2.1.0",
+	"version": "2.1.1",
 	"private": true,
 	"description": "Language service for CSS, LESS and SCSS",
 	"main": "./lib/umd/cssLanguageService.js",
@@ -30,7 +30,7 @@
 	},
 	"scripts": {
 		"build": "run-s compile compile-esm",
-    "build:production": "npm run build",
+		"build:production": "npm run build",
 		"compile": "tsc -p ./src/tsconfig.json",
 		"compile-esm": "tsc -p ./src/tsconfig.esm.json",
 		"clean": "rimraf lib node_modules",

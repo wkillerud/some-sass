@@ -1,3 +1,11 @@
+## 2.1.1 (2025-06-07)
+
+### 🩹 Fixes
+
+- handle newlines after charset in indented syntax ([#318](https://github.com/wkillerud/some-sass/pull/318))
+- **deps:** update dependency es-toolkit to v1.38.0  [skip ci] ([#313](https://github.com/wkillerud/some-sass/pull/313))
+- **deps:** update dependency tinyglobby to v0.2.14 ([#310](https://github.com/wkillerud/some-sass/pull/310))
+
 ## 2.1.0 (2025-05-04)
 
 ### 🚀 Features

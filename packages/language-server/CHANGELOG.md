@@ -1,3 +1,15 @@
+## 2.2.1 (2025-06-07)
+
+### 🩹 Fixes
+
+- **deps:** update dependency es-toolkit to v1.38.0  [skip ci] ([#313](https://github.com/wkillerud/some-sass/pull/313))
+- **deps:** update dependency tinyglobby to v0.2.14 ([#310](https://github.com/wkillerud/some-sass/pull/310))
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 2.1.1
+- Updated @somesass/language-services to 2.2.1
+
 ## 2.2.0 (2025-05-04)
 
 ### 🚀 Features

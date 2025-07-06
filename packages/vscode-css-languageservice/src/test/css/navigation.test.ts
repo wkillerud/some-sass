@@ -682,7 +682,7 @@ suite("CSS - Navigation", () => {
 		});
 
 		test("color presentations", function () {
-			let ls = getCSSLS();
+			const ls = getCSSLS();
 			assertColorPresentations(
 				ls,
 				colorFrom256RGB(255, 0, 0),
@@ -692,6 +692,8 @@ suite("CSS - Navigation", () => {
 				"hwb(0 0% 0%)",
 				"lab(53.23% 80.11 67.22)",
 				"lch(53.23% 104.58 40)",
+				"oklab(62.793% 0.22489 0.1258)",
+				"oklch(62.793% 0.25768 29.223)",
 			);
 			assertColorPresentations(
 				ls,
@@ -702,6 +704,8 @@ suite("CSS - Navigation", () => {
 				"hwb(274 13% 56% / 0.5)",
 				"lab(23.04% 35.9 -36.96 / 0.5)",
 				"lch(23.04% 51.53 314.16 / 0.5)",
+				"oklab(35.231% 0.0782 -0.10478 / 0.5)",
+				"oklch(35.231% 0.13074 306.734 / 0.5)",
 			);
 		});
 	});

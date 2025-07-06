@@ -250,6 +250,17 @@ export interface IPropertyData {
 	relevance?: number;
 	atRule?: string;
 }
+export interface IDescriptorData {
+	name: string;
+	description?: string;
+	references?: IReference[];
+	syntax?: string;
+	type?: string;
+	values?: IValueData[];
+	browsers?: string[];
+	baseline?: BaselineStatus;
+	status?: EntryStatus;
+}
 export interface IAtDirectiveData {
 	name: string;
 	description?: string | MarkupContent;
@@ -257,6 +268,7 @@ export interface IAtDirectiveData {
 	baseline?: BaselineStatus;
 	status?: EntryStatus;
 	references?: IReference[];
+	descriptors?: IDescriptorData[];
 }
 export interface IPseudoClassData {
 	name: string;

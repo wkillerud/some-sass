@@ -85,7 +85,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "normal | <baseline-position> | <content-distribution> | <overflow-position>? <content-position>",
-			relevance: 67,
+			relevance: 68,
 			references: [
 				{
 					name: "MDN Reference",
@@ -161,7 +161,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "normal | stretch | <baseline-position> | [ <overflow-position>? <self-position> ]",
-			relevance: 88,
+			relevance: 89,
 			references: [
 				{
 					name: "MDN Reference",
@@ -402,7 +402,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "auto | normal | stretch | <baseline-position> | <overflow-position>? <self-position>",
-			relevance: 75,
+			relevance: 74,
 			references: [
 				{
 					name: "MDN Reference",
@@ -422,7 +422,7 @@ export const cssData: CSSDataV1 = {
 			browsers: ["E79", "FF27", "FFA27", "S9.1", "SM9.3", "C37", "CA37", "O24"],
 			values: [],
 			syntax: "initial | inherit | unset | revert | revert-layer",
-			relevance: 56,
+			relevance: 55,
 			references: [
 				{
 					name: "MDN Reference",
@@ -514,7 +514,7 @@ export const cssData: CSSDataV1 = {
 			name: "animation-delay",
 			browsers: ["E12", "FF16", "FFA16", "S9", "SM9", "C43", "CA43", "IE10", "O30"],
 			syntax: "<time>#",
-			relevance: 67,
+			relevance: 66,
 			references: [
 				{
 					name: "MDN Reference",
@@ -554,7 +554,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<single-animation-direction>#",
-			relevance: 58,
+			relevance: 56,
 			references: [
 				{
 					name: "MDN Reference",
@@ -573,7 +573,7 @@ export const cssData: CSSDataV1 = {
 			name: "animation-duration",
 			browsers: ["E12", "FF16", "FFA16", "S9", "SM9", "C43", "CA43", "IE10", "O30"],
 			syntax: "<time>#",
-			relevance: 72,
+			relevance: 71,
 			references: [
 				{
 					name: "MDN Reference",
@@ -613,7 +613,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<single-animation-fill-mode>#",
-			relevance: 65,
+			relevance: 64,
 			references: [
 				{
 					name: "MDN Reference",
@@ -638,7 +638,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<single-animation-iteration-count>#",
-			relevance: 66,
+			relevance: 65,
 			references: [
 				{
 					name: "MDN Reference",
@@ -713,7 +713,7 @@ export const cssData: CSSDataV1 = {
 			name: "animation-timing-function",
 			browsers: ["E12", "FF16", "FFA16", "S9", "SM9", "C43", "CA43", "IE10", "O30"],
 			syntax: "<easing-function>#",
-			relevance: 73,
+			relevance: 72,
 			references: [
 				{
 					name: "MDN Reference",
@@ -742,7 +742,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "visible | hidden",
-			relevance: 59,
+			relevance: 60,
 			references: [
 				{
 					name: "MDN Reference",
@@ -915,7 +915,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<blend-mode>#",
-			relevance: 53,
+			relevance: 54,
 			references: [
 				{
 					name: "MDN Reference",
@@ -934,7 +934,7 @@ export const cssData: CSSDataV1 = {
 			name: "background-clip",
 			browsers: ["E12", "FF4", "FFA4", "S5", "SM5", "C1", "CA18", "IE9", "O10.5"],
 			syntax: "<bg-clip>#",
-			relevance: 70,
+			relevance: 69,
 			references: [
 				{
 					name: "MDN Reference",
@@ -978,7 +978,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<bg-image>#",
-			relevance: 89,
+			relevance: 88,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1091,7 +1091,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "[ center | [ [ top | bottom | y-start | y-end ]? <length-percentage>? ]! ]#",
-			relevance: 53,
+			relevance: 54,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1218,7 +1218,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-block-end",
 			browsers: ["E79", "FF41", "FFA41", "S12.1", "SM12.2", "C69", "CA69", "O56"],
 			syntax: "<'border-top-width'> || <'border-top-style'> || <color>",
-			relevance: 54,
+			relevance: 53,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1378,7 +1378,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-bottom",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE4", "O3.5"],
 			syntax: "<line-width> || <line-style> || <color>",
-			relevance: 88,
+			relevance: 87,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1397,7 +1397,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-bottom-color",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE4", "O3.5"],
 			syntax: "<'border-top-color'>",
-			relevance: 70,
+			relevance: 69,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1416,7 +1416,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-bottom-left-radius",
 			browsers: ["E12", "FF4", "FFA4", "S5", "SM4.2", "C4", "CA18", "IE9", "O10.5"],
 			syntax: "<length-percentage>{1,2}",
-			relevance: 76,
+			relevance: 75,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1435,7 +1435,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-bottom-right-radius",
 			browsers: ["E12", "FF4", "FFA4", "S5", "SM4.2", "C4", "CA18", "IE9", "O10.5"],
 			syntax: "<length-percentage>{1,2}",
-			relevance: 76,
+			relevance: 75,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1454,7 +1454,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-bottom-style",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE5.5", "O9.2"],
 			syntax: "<line-style>",
-			relevance: 59,
+			relevance: 58,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1473,7 +1473,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-bottom-width",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE4", "O3.5"],
 			syntax: "<line-width>",
-			relevance: 64,
+			relevance: 62,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1502,7 +1502,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "collapse | separate",
-			relevance: 74,
+			relevance: 72,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1522,7 +1522,7 @@ export const cssData: CSSDataV1 = {
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE4", "O3.5"],
 			values: [],
 			syntax: "<color>{1,4}",
-			relevance: 88,
+			relevance: 87,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1737,7 +1737,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-inline-end",
 			browsers: ["E79", "FF41", "FFA41", "S12.1", "SM12.2", "C69", "CA69", "O56"],
 			syntax: "<'border-top-width'> || <'border-top-style'> || <color>",
-			relevance: 54,
+			relevance: 53,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1757,7 +1757,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-inline-start",
 			browsers: ["E79", "FF41", "FFA41", "S12.1", "SM12.2", "C69", "CA69", "O56"],
 			syntax: "<'border-top-width'> || <'border-top-style'> || <color>",
-			relevance: 54,
+			relevance: 53,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1897,7 +1897,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-left",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE4", "O3.5"],
 			syntax: "<line-width> || <line-style> || <color>",
-			relevance: 82,
+			relevance: 81,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1916,7 +1916,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-left-color",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE4", "O3.5"],
 			syntax: "<color>",
-			relevance: 67,
+			relevance: 66,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1954,7 +1954,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-left-width",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE4", "O3.5"],
 			syntax: "<line-width>",
-			relevance: 65,
+			relevance: 64,
 			references: [
 				{
 					name: "MDN Reference",
@@ -1992,7 +1992,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-right",
 			browsers: ["E12", "FF1", "FFA14", "S1", "SM1", "C1", "CA18", "IE5.5", "O9.2"],
 			syntax: "<line-width> || <line-style> || <color>",
-			relevance: 81,
+			relevance: 80,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2011,7 +2011,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-right-color",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE4", "O3.5"],
 			syntax: "<color>",
-			relevance: 66,
+			relevance: 65,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2030,7 +2030,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-right-style",
 			browsers: ["E12", "FF1", "FFA14", "S1", "SM1", "C1", "CA18", "IE5.5", "O9.2"],
 			syntax: "<line-style>",
-			relevance: 54,
+			relevance: 53,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2049,7 +2049,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-right-width",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE4", "O3.5"],
 			syntax: "<line-width>",
-			relevance: 64,
+			relevance: 63,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2068,7 +2068,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-spacing",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE8", "O4"],
 			syntax: "<length> <length>?",
-			relevance: 66,
+			relevance: 65,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2089,7 +2089,7 @@ export const cssData: CSSDataV1 = {
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE4", "O3.5"],
 			values: [],
 			syntax: "<line-style>{1,4}",
-			relevance: 80,
+			relevance: 79,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2108,7 +2108,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-top",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE4", "O3.5"],
 			syntax: "<line-width> || <line-style> || <color>",
-			relevance: 86,
+			relevance: 85,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2127,7 +2127,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-top-color",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE4", "O3.5"],
 			syntax: "<color>",
-			relevance: 71,
+			relevance: 70,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2146,7 +2146,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-top-left-radius",
 			browsers: ["E12", "FF4", "FFA4", "S5", "SM4.2", "C4", "CA18", "IE9", "O10.5"],
 			syntax: "<length-percentage>{1,2}",
-			relevance: 76,
+			relevance: 75,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2165,7 +2165,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-top-right-radius",
 			browsers: ["E12", "FF4", "FFA4", "S5", "SM4.2", "C4", "CA18", "IE9", "O10.5"],
 			syntax: "<length-percentage>{1,2}",
-			relevance: 76,
+			relevance: 75,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2184,7 +2184,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-top-style",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE5.5", "O9.2"],
 			syntax: "<line-style>",
-			relevance: 56,
+			relevance: 55,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2203,7 +2203,7 @@ export const cssData: CSSDataV1 = {
 			name: "border-top-width",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE4", "O3.5"],
 			syntax: "<line-width>",
-			relevance: 63,
+			relevance: 61,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2223,7 +2223,7 @@ export const cssData: CSSDataV1 = {
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM3", "C1", "CA18", "IE4", "O3.5"],
 			values: [],
 			syntax: "<line-width>{1,4}",
-			relevance: 83,
+			relevance: 82,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2528,7 +2528,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "top | bottom",
-			relevance: 53,
+			relevance: 52,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2554,7 +2554,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "auto | <color>",
-			relevance: 56,
+			relevance: 55,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2594,7 +2594,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "none | left | right | both | inline-start | inline-end",
-			relevance: 82,
+			relevance: 81,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2625,7 +2625,7 @@ export const cssData: CSSDataV1 = {
 			],
 			status: "obsolete",
 			syntax: "<shape> | auto",
-			relevance: 25,
+			relevance: 24,
 			references: [
 				{
 					name: "MDN Reference",
@@ -2705,7 +2705,7 @@ export const cssData: CSSDataV1 = {
 			name: "color",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE3", "O3.5"],
 			syntax: "<color>",
-			relevance: 95,
+			relevance: 94,
 			references: [
 				{
 					name: "MDN Reference",
@@ -3349,7 +3349,7 @@ export const cssData: CSSDataV1 = {
 			],
 			syntax:
 				"[ [ <url> [ <x> <y> ]? , ]* [ auto | default | none | context-menu | help | pointer | progress | wait | cell | crosshair | text | vertical-text | alias | copy | move | no-drop | not-allowed | e-resize | n-resize | ne-resize | nw-resize | s-resize | se-resize | sw-resize | w-resize | ew-resize | ns-resize | nesw-resize | nwse-resize | col-resize | row-resize | all-scroll | zoom-in | zoom-out | grab | grabbing ] ]",
-			relevance: 92,
+			relevance: 91,
 			references: [
 				{
 					name: "MDN Reference",
@@ -3611,7 +3611,7 @@ export const cssData: CSSDataV1 = {
 			],
 			syntax:
 				"[ <display-outside> || <display-inside> ] | <display-listitem> | <display-internal> | <display-box> | <display-legacy>",
-			relevance: 96,
+			relevance: 95,
 			references: [
 				{
 					name: "MDN Reference",
@@ -3826,7 +3826,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "none | <filter-value-list>",
-			relevance: 72,
+			relevance: 73,
 			references: [
 				{
 					name: "MDN Reference",
@@ -4002,7 +4002,7 @@ export const cssData: CSSDataV1 = {
 			name: "flex-grow",
 			browsers: ["E12", "FF20", "FFA20", "S9", "SM9", "C29", "CA29", "IE11", "O12.1"],
 			syntax: "<number>",
-			relevance: 79,
+			relevance: 78,
 			references: [
 				{
 					name: "MDN Reference",
@@ -4102,7 +4102,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "left | right | none | inline-start | inline-end",
-			relevance: 88,
+			relevance: 87,
 			references: [
 				{
 					name: "MDN Reference",
@@ -4356,7 +4356,7 @@ export const cssData: CSSDataV1 = {
 			],
 			atRule: "@font-palette-values",
 			syntax: "<family-name>#",
-			relevance: 94,
+			relevance: 93,
 			references: [
 				{
 					name: "MDN Reference",
@@ -4865,7 +4865,7 @@ export const cssData: CSSDataV1 = {
 			],
 			atRule: "@font-face",
 			syntax: "normal | <feature-tag-value>#",
-			relevance: 60,
+			relevance: 59,
 			references: [
 				{
 					name: "MDN Reference",
@@ -5396,7 +5396,7 @@ export const cssData: CSSDataV1 = {
 			],
 			syntax:
 				"normal | none | [ <common-lig-values> || <discretionary-lig-values> || <historical-lig-values> || <contextual-alt-values> ]",
-			relevance: 53,
+			relevance: 52,
 			references: [
 				{
 					name: "MDN Reference",
@@ -5780,7 +5780,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<grid-line> [ / <grid-line> ]?",
-			relevance: 62,
+			relevance: 61,
 			references: [
 				{
 					name: "MDN Reference",
@@ -5832,7 +5832,7 @@ export const cssData: CSSDataV1 = {
 			browsers: ["FF52", "C57", "S10.1", "O44"],
 			status: "obsolete",
 			syntax: "<length-percentage>",
-			relevance: 5,
+			relevance: 4,
 			description: "Specifies the gutters between grid columns. Replaced by 'column-gap' property.",
 			restrictions: ["length"],
 		},
@@ -6020,7 +6020,7 @@ export const cssData: CSSDataV1 = {
 			],
 			syntax:
 				"none | [ <'grid-template-rows'> / <'grid-template-columns'> ] | [ <line-names>? <string> <track-size>? <line-names>? ]+ [ / <explicit-track-list> ]?",
-			relevance: 51,
+			relevance: 50,
 			references: [
 				{
 					name: "MDN Reference",
@@ -6190,7 +6190,7 @@ export const cssData: CSSDataV1 = {
 			],
 			syntax:
 				"auto | <length-percentage [0,∞]> | min-content | max-content | fit-content | fit-content(<length-percentage [0,∞]>) | <calc-size()> | <anchor-size()>",
-			relevance: 96,
+			relevance: 95,
 			references: [
 				{
 					name: "MDN Reference",
@@ -6396,7 +6396,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "auto | isolate",
-			relevance: 56,
+			relevance: 55,
 			references: [
 				{
 					name: "MDN Reference",
@@ -6489,7 +6489,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "normal | <content-distribution> | <overflow-position>? [ <content-position> | left | right ]",
-			relevance: 88,
+			relevance: 89,
 			references: [
 				{
 					name: "MDN Reference",
@@ -6645,7 +6645,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "normal | <number> | <length> | <percentage>",
-			relevance: 93,
+			relevance: 92,
 			references: [
 				{
 					name: "MDN Reference",
@@ -6875,7 +6875,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<counter-style> | <string> | none",
-			relevance: 73,
+			relevance: 72,
 			references: [
 				{
 					name: "MDN Reference",
@@ -6924,7 +6924,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<'margin-top'>",
-			relevance: 56,
+			relevance: 55,
 			references: [
 				{
 					name: "MDN Reference",
@@ -6949,7 +6949,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<'margin-top'>",
-			relevance: 54,
+			relevance: 53,
 			references: [
 				{
 					name: "MDN Reference",
@@ -6999,7 +6999,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<'margin-top'>",
-			relevance: 59,
+			relevance: 58,
 			references: [
 				{
 					name: "MDN Reference",
@@ -7024,7 +7024,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<'margin-top'>",
-			relevance: 60,
+			relevance: 59,
 			references: [
 				{
 					name: "MDN Reference",
@@ -7099,7 +7099,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<length-percentage> | auto",
-			relevance: 94,
+			relevance: 93,
 			references: [
 				{
 					name: "MDN Reference",
@@ -7246,7 +7246,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<mask-reference>#",
-			relevance: 58,
+			relevance: 59,
 			references: [
 				{
 					name: "MDN Reference",
@@ -7367,7 +7367,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<bg-size>#",
-			relevance: 54,
+			relevance: 55,
 			references: [
 				{
 					name: "MDN Reference",
@@ -7420,7 +7420,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<'max-width'>",
-			relevance: 54,
+			relevance: 53,
 			references: [
 				{
 					name: "MDN Reference",
@@ -7487,7 +7487,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<'max-width'>",
-			relevance: 54,
+			relevance: 53,
 			references: [
 				{
 					name: "MDN Reference",
@@ -7547,7 +7547,7 @@ export const cssData: CSSDataV1 = {
 			name: "min-block-size",
 			browsers: ["E79", "FF41", "FFA41", "S12.1", "SM12.2", "C57", "CA57", "O44"],
 			syntax: "<'min-width'>",
-			relevance: 54,
+			relevance: 53,
 			references: [
 				{
 					name: "MDN Reference",
@@ -7608,7 +7608,7 @@ export const cssData: CSSDataV1 = {
 			name: "min-inline-size",
 			browsers: ["E79", "FF41", "FFA41", "S12.1", "SM12.2", "C57", "CA57", "O44"],
 			syntax: "<'min-width'>",
-			relevance: 54,
+			relevance: 53,
 			references: [
 				{
 					name: "MDN Reference",
@@ -11173,7 +11173,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "fill | contain | cover | none | scale-down",
-			relevance: 74,
+			relevance: 75,
 			references: [
 				{
 					name: "MDN Reference",
@@ -11312,7 +11312,7 @@ export const cssData: CSSDataV1 = {
 			name: "order",
 			browsers: ["E12", "FF20", "FFA20", "S9", "SM9", "C29", "CA29", "IE11", "O12.1"],
 			syntax: "<integer>",
-			relevance: 68,
+			relevance: 69,
 			references: [
 				{
 					name: "MDN Reference",
@@ -11645,7 +11645,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "auto | <color>",
-			relevance: 63,
+			relevance: 62,
 			references: [
 				{
 					name: "MDN Reference",
@@ -11664,7 +11664,7 @@ export const cssData: CSSDataV1 = {
 			name: "outline-offset",
 			browsers: ["E15", "FF1.5", "FFA4", "S1.2", "SM1", "C1", "CA18", "O9.5"],
 			syntax: "<length>",
-			relevance: 71,
+			relevance: 70,
 			references: [
 				{
 					name: "MDN Reference",
@@ -11689,7 +11689,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "auto | <outline-line-style>",
-			relevance: 61,
+			relevance: 60,
 			references: [
 				{
 					name: "MDN Reference",
@@ -11788,7 +11788,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "normal | break-word | anywhere",
-			relevance: 67,
+			relevance: 66,
 			references: [
 				{
 					name: "MDN Reference",
@@ -11829,7 +11829,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "visible | hidden | clip | scroll | auto",
-			relevance: 82,
+			relevance: 81,
 			references: [
 				{
 					name: "MDN Reference",
@@ -11979,7 +11979,7 @@ export const cssData: CSSDataV1 = {
 			name: "padding-inline-end",
 			browsers: ["E79", "FF41", "FFA41", "S12.1", "SM12.2", "C69", "CA69", "O56"],
 			syntax: "<'padding-top'>",
-			relevance: 57,
+			relevance: 56,
 			references: [
 				{
 					name: "MDN Reference",
@@ -11999,7 +11999,7 @@ export const cssData: CSSDataV1 = {
 			name: "padding-inline-start",
 			browsers: ["E79", "FF41", "FFA41", "S12.1", "SM12.2", "C69", "CA69", "O56"],
 			syntax: "<'padding-top'>",
-			relevance: 59,
+			relevance: 58,
 			references: [
 				{
 					name: "MDN Reference",
@@ -12059,7 +12059,7 @@ export const cssData: CSSDataV1 = {
 			name: "padding-top",
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE4", "O3.5"],
 			syntax: "<length-percentage [0,∞]>",
-			relevance: 90,
+			relevance: 89,
 			references: [
 				{
 					name: "MDN Reference",
@@ -12474,7 +12474,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "none | both | horizontal | vertical | block | inline",
-			relevance: 67,
+			relevance: 65,
 			references: [
 				{
 					name: "MDN Reference",
@@ -12750,7 +12750,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "auto | smooth",
-			relevance: 57,
+			relevance: 58,
 			references: [
 				{
 					name: "MDN Reference",
@@ -12852,7 +12852,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "none | [ x | y | block | inline | both ] [ mandatory | proximity ]?",
-			relevance: 56,
+			relevance: 57,
 			references: [
 				{
 					name: "MDN Reference",
@@ -13003,7 +13003,7 @@ export const cssData: CSSDataV1 = {
 			],
 			atRule: "@font-face",
 			syntax: "[ <url> [ format( <string># ) ]? | local( <family-name> ) ]#",
-			relevance: 86,
+			relevance: 85,
 			description:
 				"@font-face descriptor. Specifies the resource containing font data. It is required, whether the font is downloadable or locally installed.",
 			restrictions: ["enum", "url", "identifier"],
@@ -13012,7 +13012,7 @@ export const cssData: CSSDataV1 = {
 			name: "stop-color",
 			browsers: ["E15", "FF3", "FFA4", "S4", "SM3.2", "C1", "CA18", "O15"],
 			syntax: "<'color'>",
-			relevance: 51,
+			relevance: 50,
 			references: [
 				{
 					name: "MDN Reference",
@@ -13061,7 +13061,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<paint>",
-			relevance: 70,
+			relevance: 68,
 			references: [
 				{
 					name: "MDN Reference",
@@ -13086,7 +13086,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "none | <dasharray>",
-			relevance: 63,
+			relevance: 61,
 			references: [
 				{
 					name: "MDN Reference",
@@ -13105,7 +13105,7 @@ export const cssData: CSSDataV1 = {
 			name: "stroke-dashoffset",
 			browsers: ["E15", "FF1.5", "FFA4", "S4", "SM3.2", "C1", "CA18", "O15"],
 			syntax: "<length-percentage> | <number>",
-			relevance: 64,
+			relevance: 63,
 			references: [
 				{
 					name: "MDN Reference",
@@ -13173,7 +13173,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "miter | miter-clip | round | bevel | arcs",
-			relevance: 52,
+			relevance: 51,
 			references: [
 				{
 					name: "MDN Reference",
@@ -13231,7 +13231,7 @@ export const cssData: CSSDataV1 = {
 			name: "stroke-width",
 			browsers: ["E15", "FF1.5", "FFA4", "S4", "SM3.2", "C1", "CA18", "O15"],
 			syntax: "<length-percentage> | <number>",
-			relevance: 70,
+			relevance: 69,
 			references: [
 				{
 					name: "MDN Reference",
@@ -13325,7 +13325,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "auto | fixed",
-			relevance: 59,
+			relevance: 58,
 			references: [
 				{
 					name: "MDN Reference",
@@ -13344,7 +13344,7 @@ export const cssData: CSSDataV1 = {
 			name: "tab-size",
 			browsers: ["E79", "FF91", "FFA91", "S7", "SM7", "C21", "CA25", "O15"],
 			syntax: "<integer> | <length>",
-			relevance: 55,
+			relevance: 54,
 			references: [
 				{
 					name: "MDN Reference",
@@ -13552,7 +13552,7 @@ export const cssData: CSSDataV1 = {
 			name: "text-decoration-color",
 			browsers: ["E79", "FF36", "FFA36", "S12.1", "SM12.2", "C57", "CA57", "O44"],
 			syntax: "<color>",
-			relevance: 57,
+			relevance: 58,
 			references: [
 				{
 					name: "MDN Reference",
@@ -13590,7 +13590,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "none | [ underline || overline || line-through || blink ] | spelling-error | grammar-error",
-			relevance: 58,
+			relevance: 60,
 			references: [
 				{
 					name: "MDN Reference",
@@ -13635,7 +13635,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "solid | double | dotted | dashed | wavy",
-			relevance: 51,
+			relevance: 54,
 			references: [
 				{
 					name: "MDN Reference",
@@ -13655,7 +13655,7 @@ export const cssData: CSSDataV1 = {
 			browsers: ["E12", "FF1", "FFA4", "S1", "SM1", "C1", "CA18", "IE3", "O3.5"],
 			values: [],
 			syntax: "<length-percentage> && hanging? && each-line?",
-			relevance: 69,
+			relevance: 67,
 			references: [
 				{
 					name: "MDN Reference",
@@ -13818,7 +13818,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "auto | optimizeSpeed | optimizeLegibility | geometricPrecision",
-			relevance: 67,
+			relevance: 66,
 			references: [
 				{
 					name: "MDN Reference",
@@ -13941,7 +13941,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "<length> | <percentage> | auto",
-			relevance: 95,
+			relevance: 94,
 			references: [
 				{
 					name: "MDN Reference",
@@ -14144,7 +14144,7 @@ export const cssData: CSSDataV1 = {
 			browsers: ["E12", "FF16", "FFA16", "S9", "SM9", "C36", "CA36", "IE10", "O23"],
 			syntax:
 				"[ <length-percentage> | left | center | right | top | bottom ] | [ [ <length-percentage> | left | center | right ] && [ <length-percentage> | top | center | bottom ] ] <length>?",
-			relevance: 76,
+			relevance: 75,
 			references: [
 				{
 					name: "MDN Reference",
@@ -14174,7 +14174,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "flat | preserve-3d",
-			relevance: 55,
+			relevance: 56,
 			references: [
 				{
 					name: "MDN Reference",
@@ -14222,7 +14222,7 @@ export const cssData: CSSDataV1 = {
 			name: "transition-delay",
 			browsers: ["E12", "FF16", "FFA16", "S9", "SM9", "C26", "CA26", "IE10", "O12.1"],
 			syntax: "<time>#",
-			relevance: 65,
+			relevance: 64,
 			references: [
 				{
 					name: "MDN Reference",
@@ -14242,7 +14242,7 @@ export const cssData: CSSDataV1 = {
 			name: "transition-duration",
 			browsers: ["E12", "FF16", "FFA16", "S9", "SM9", "C26", "CA26", "IE10", "O12.1"],
 			syntax: "<time>#",
-			relevance: 70,
+			relevance: 69,
 			references: [
 				{
 					name: "MDN Reference",
@@ -14710,7 +14710,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "auto | text | none | all",
-			relevance: 83,
+			relevance: 82,
 			references: [
 				{
 					name: "MDN Reference",
@@ -14773,7 +14773,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "baseline | sub | super | text-top | text-bottom | middle | top | bottom | <percentage> | <length>",
-			relevance: 91,
+			relevance: 90,
 			references: [
 				{
 					name: "MDN Reference",
@@ -14809,7 +14809,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "visible | hidden | collapse",
-			relevance: 88,
+			relevance: 87,
 			references: [
 				{
 					name: "MDN Reference",
@@ -16804,7 +16804,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "normal | break-word",
-			relevance: 78,
+			relevance: 77,
 			description:
 				"Specifies whether the UA may break within a word to prevent overflow when an otherwise-unbreakable string is too long to fit.",
 			restrictions: ["enum"],
@@ -16839,7 +16839,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "horizontal-tb | vertical-rl | vertical-lr | sideways-rl | sideways-lr",
-			relevance: 51,
+			relevance: 53,
 			references: [
 				{
 					name: "MDN Reference",
@@ -16890,7 +16890,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			syntax: "normal | reset | <number [0,∞]> || <percentage [0,∞]>",
-			relevance: 66,
+			relevance: 65,
 			references: [
 				{
 					name: "MDN Reference",
@@ -17402,7 +17402,7 @@ export const cssData: CSSDataV1 = {
 			name: "accent-color",
 			syntax: "auto | <color>",
 			relevance: 50,
-			browsers: ["E93", "FF92", "FFA92", "S15.4", "SM15.4", "C93", "CA93", "O79"],
+			browsers: ["E93", "FF92", "FFA92", "C93", "O79"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -17410,9 +17410,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			baseline: {
-				status: "high",
-				baseline_low_date: "2022-03-14",
-				baseline_high_date: "2024-09-14",
+				status: "false",
 			},
 			description: "Sets the color of the elements accent",
 		},
@@ -17590,7 +17588,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "appearance",
 			syntax: "none | auto | textfield | menulist-button | <compat-auto>",
-			relevance: 73,
+			relevance: 72,
 			browsers: ["E84", "FF80", "FFA80", "S15.4", "SM15.4", "C84", "CA84", "O70"],
 			references: [
 				{
@@ -17608,7 +17606,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "aspect-ratio",
 			syntax: "auto || <ratio>",
-			relevance: 63,
+			relevance: 64,
 			browsers: ["E88", "FF89", "FFA89", "S15", "SM15", "C88", "CA88", "O74"],
 			references: [
 				{
@@ -17627,7 +17625,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "backdrop-filter",
 			syntax: "none | <filter-value-list>",
-			relevance: 62,
+			relevance: 63,
 			browsers: ["E79", "FF103", "FFA103", "S18", "SM18", "C76", "CA76", "O63"],
 			references: [
 				{
@@ -17731,7 +17729,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "border-end-end-radius",
 			syntax: "<'border-top-left-radius'>",
-			relevance: 55,
+			relevance: 54,
 			browsers: ["E89", "FF66", "FFA66", "S15", "SM15", "C89", "CA89", "O75"],
 			references: [
 				{
@@ -17750,7 +17748,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "border-end-start-radius",
 			syntax: "<'border-top-left-radius'>",
-			relevance: 55,
+			relevance: 54,
 			browsers: ["E89", "FF66", "FFA66", "S15", "SM15", "C89", "CA89", "O75"],
 			references: [
 				{
@@ -17845,7 +17843,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "border-start-end-radius",
 			syntax: "<'border-top-left-radius'>",
-			relevance: 55,
+			relevance: 54,
 			browsers: ["E89", "FF66", "FFA66", "S15", "SM15", "C89", "CA89", "O75"],
 			references: [
 				{
@@ -17864,7 +17862,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "border-start-start-radius",
 			syntax: "<'border-top-left-radius'>",
-			relevance: 55,
+			relevance: 54,
 			browsers: ["E89", "FF66", "FFA66", "S15", "SM15", "C89", "CA89", "O75"],
 			references: [
 				{
@@ -18488,8 +18486,9 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			baseline: {
-				status: "low",
+				status: "high",
 				baseline_low_date: "2022-11-15",
+				baseline_high_date: "2025-05-15",
 			},
 			description:
 				"The font-palette CSS property allows specifying one of the many palettes contained in a font that a user agent should use for the font. Users can also override the values in a palette or create a new palette by using the @font-palette-values at-rule.",
@@ -18680,7 +18679,7 @@ export const cssData: CSSDataV1 = {
 					name: "preserve-parent-color",
 				},
 			],
-			relevance: 59,
+			relevance: 58,
 			browsers: ["E79", "FF113", "FFA113", "C89", "CA89", "IE10", "O75"],
 			references: [
 				{
@@ -18874,7 +18873,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "inset-inline",
 			syntax: "<'top'>{1,2}",
-			relevance: 54,
+			relevance: 53,
 			browsers: ["E87", "FF63", "FFA63", "S14.1", "SM14.5", "C87", "CA87", "O73"],
 			references: [
 				{
@@ -18893,7 +18892,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "inset-inline-end",
 			syntax: "<'top'>",
-			relevance: 55,
+			relevance: 54,
 			browsers: ["E87", "FF63", "FFA63", "S14.1", "SM14.5", "C87", "CA87", "O73"],
 			references: [
 				{
@@ -18912,7 +18911,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "inset-inline-start",
 			syntax: "<'top'>",
-			relevance: 56,
+			relevance: 55,
 			browsers: ["E87", "FF63", "FFA63", "S14.1", "SM14.5", "C87", "CA87", "O73"],
 			references: [
 				{
@@ -18984,16 +18983,6 @@ export const cssData: CSSDataV1 = {
 			status: "experimental",
 			syntax: "<length>",
 			relevance: 50,
-			browsers: ["O47"],
-			references: [
-				{
-					name: "MDN Reference",
-					url: "https://developer.mozilla.org/docs/Web/CSS/line-height-step",
-				},
-			],
-			baseline: {
-				status: "false",
-			},
 			description:
 				"The line-height-step CSS property defines the step units for line box heights. When the step unit is positive, line box heights are rounded up to the closest multiple of the unit. Negative values are invalid.",
 		},
@@ -19019,7 +19008,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "margin-inline",
 			syntax: "<'margin-top'>{1,2}",
-			relevance: 56,
+			relevance: 55,
 			browsers: ["E87", "FF66", "FFA66", "S14.1", "SM14.5", "C87", "CA87", "O73"],
 			references: [
 				{
@@ -19219,7 +19208,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "mask-composite",
 			syntax: "<compositing-operator>#",
-			relevance: 53,
+			relevance: 54,
 			browsers: ["E120", "FF53", "FFA53", "S15.4", "SM15.4", "C120", "CA120", "O106"],
 			references: [
 				{
@@ -19450,7 +19439,7 @@ export const cssData: CSSDataV1 = {
 					name: "none",
 				},
 			],
-			relevance: 53,
+			relevance: 52,
 			browsers: ["E79", "FF66", "FFA66", "Spreview", "C56", "CA56", "O43"],
 			references: [
 				{
@@ -19485,7 +19474,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			relevance: 50,
-			browsers: ["E135", "FF69", "FFA79", "C135", "CA135"],
+			browsers: ["E135", "FF69", "FFA79", "C135", "CA135", "O120"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -19552,7 +19541,7 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			relevance: 50,
-			browsers: ["E135", "FF69", "FFA79", "C135", "CA135"],
+			browsers: ["E135", "FF69", "FFA79", "C135", "CA135", "O120"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -19624,7 +19613,7 @@ export const cssData: CSSDataV1 = {
 					name: "auto",
 				},
 			],
-			relevance: 51,
+			relevance: 50,
 			browsers: ["E79", "FF73", "FFA79", "S16", "SM16", "C77", "CA77", "O64"],
 			references: [
 				{
@@ -19752,7 +19741,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "padding-inline",
 			syntax: "<'padding-top'>{1,2}",
-			relevance: 58,
+			relevance: 57,
 			browsers: ["E87", "FF66", "FFA66", "S14.1", "SM14.5", "C87", "CA87", "O73"],
 			references: [
 				{
@@ -19961,8 +19950,8 @@ export const cssData: CSSDataV1 = {
 					name: "exact",
 				},
 			],
-			relevance: 50,
-			browsers: ["FF97", "FFA97", "S15.4", "SM15.4", "O15"],
+			relevance: 51,
+			browsers: ["FF97", "FFA97", "S15.4", "SM15.4", "C136", "CA136", "O15"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -20016,7 +20005,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "row-gap",
 			syntax: "normal | <length-percentage>",
-			relevance: 61,
+			relevance: 60,
 			browsers: ["E16", "FF52", "FFA52", "S10.1", "SM10.3", "C47", "CA47", "O34"],
 			references: [
 				{
@@ -20570,7 +20559,7 @@ export const cssData: CSSDataV1 = {
 					name: "always",
 				},
 			],
-			relevance: 51,
+			relevance: 52,
 			browsers: ["E79", "FF103", "FFA103", "S15", "SM15", "C75", "CA75", "O62"],
 			references: [
 				{
@@ -20695,7 +20684,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "scrollbar-gutter",
 			syntax: "auto | stable && both-edges?",
-			relevance: 52,
+			relevance: 54,
 			browsers: ["E94", "FF97", "FFA97", "S18.2", "SM18.2", "C94", "CA94", "O80"],
 			references: [
 				{
@@ -20724,7 +20713,7 @@ export const cssData: CSSDataV1 = {
 					name: "none",
 				},
 			],
-			relevance: 67,
+			relevance: 68,
 			browsers: ["E121", "FF64", "FFA64", "S18.2", "SM18.2", "C121", "CA121", "O107"],
 			references: [
 				{
@@ -20892,7 +20881,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "text-decoration-thickness",
 			syntax: "auto | from-font | <length> | <percentage> ",
-			relevance: 53,
+			relevance: 55,
 			browsers: ["E89", "FF70", "FFA79", "S12.1", "SM12.2", "C89", "CA89", "O75"],
 			references: [
 				{
@@ -20988,7 +20977,7 @@ export const cssData: CSSDataV1 = {
 			name: "text-size-adjust",
 			status: "experimental",
 			syntax: "none | auto | <percentage>",
-			relevance: 60,
+			relevance: 61,
 			browsers: ["E79", "C54", "CA54", "O41"],
 			references: [
 				{
@@ -21037,7 +21026,7 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "text-underline-offset",
 			syntax: "auto | <length> | <percentage> ",
-			relevance: 53,
+			relevance: 55,
 			browsers: ["E87", "FF70", "FFA79", "S12.1", "SM12.2", "C87", "CA87", "O73"],
 			references: [
 				{
@@ -21330,17 +21319,24 @@ export const cssData: CSSDataV1 = {
 			name: "view-transition-class",
 			syntax: "none | <custom-ident>+",
 			relevance: 50,
-			browsers: ["E125", "S18.2", "SM18.2", "C125", "CA125", "O111"],
+			browsers: ["E125", "FFpreview", "S18.2", "SM18.2", "C125", "CA125", "O111"],
+			references: [
+				{
+					name: "MDN Reference",
+					url: "https://developer.mozilla.org/docs/Web/CSS/view-transition-class",
+				},
+			],
 			baseline: {
 				status: "false",
 			},
-			description: "",
+			description:
+				"The view-transition-class CSS property provides the selected elements with an identifying class (a custom-ident), providing an additional method of styling the view transitions for those elements.",
 		},
 		{
 			name: "view-transition-name",
 			syntax: "none | <custom-ident>",
 			relevance: 50,
-			browsers: ["E111", "S18", "SM18", "C111", "CA111", "O97"],
+			browsers: ["E111", "FFpreview", "S18", "SM18", "C111", "CA111", "O97"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -21478,7 +21474,7 @@ export const cssData: CSSDataV1 = {
 					name: "optional",
 				},
 			],
-			relevance: 74,
+			relevance: 75,
 			description:
 				"The font-display descriptor determines how a font face is displayed based on whether and when it is downloaded and ready to use.",
 		},
@@ -21706,6 +21702,1378 @@ export const cssData: CSSDataV1 = {
 		{
 			name: "@media",
 			browsers: ["E12", "FF1", "FFA4", "S3", "SM1", "C1", "CA18", "IE6", "O9.2"],
+			descriptors: [
+				{
+					name: "width",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-width",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/width",
+						},
+					],
+					type: "range",
+					syntax: "<length>",
+					description:
+						"The width CSS media feature can be used to test the width of the viewport (or the page box, for paged media).",
+					browsers: ["E12", "FF2", "FFA4", "S3", "SM1", "C1", "CA18", "IE9", "O10"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2015-07-29",
+						baseline_high_date: "2018-01-29",
+					},
+				},
+				{
+					name: "height",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-height",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/height",
+						},
+					],
+					type: "range",
+					syntax: "<length>",
+					description:
+						"The height CSS media feature can be used to apply styles based on the height of the viewport (or the page box, for paged media).",
+					browsers: ["E12", "FF2", "FFA4", "S3", "SM1", "C1", "CA18", "IE9", "O10"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2015-07-29",
+						baseline_high_date: "2018-01-29",
+					},
+				},
+				{
+					name: "aspect-ratio",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-aspect-ratio",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/aspect-ratio",
+						},
+					],
+					type: "range",
+					syntax: "<ratio>",
+					description: "The aspect-ratio CSS media feature can be used to test the aspect ratio of the viewport.",
+					browsers: ["E12", "FF3.5", "FFA4", "S5", "SM4.2", "C3", "CA18", "IE9", "O10"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2015-07-29",
+						baseline_high_date: "2018-01-29",
+					},
+				},
+				{
+					name: "orientation",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-orientation",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/orientation",
+						},
+					],
+					type: "discrete",
+					syntax: "portrait | landscape",
+					values: [
+						{
+							name: "portrait",
+							description:
+								"The orientation media feature is portrait when the value of the height media feature is greater than or equal to the value of the width media feature.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-orientation-portrait",
+								},
+							],
+						},
+						{
+							name: "landscape",
+							description: "Otherwise orientation is landscape.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-orientation-landscape",
+								},
+							],
+						},
+					],
+					description:
+						"The orientation CSS media feature can be used to test the orientation of the viewport (or the page box, for paged media).",
+					browsers: ["E12", "FF2", "FFA4", "S5", "SM4.2", "C3", "CA18", "IE9", "O10.6"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2015-07-29",
+						baseline_high_date: "2018-01-29",
+					},
+				},
+				{
+					name: "overflow-block",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-overflow-block",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/overflow-block",
+						},
+					],
+					type: "discrete",
+					syntax: "none | scroll | paged",
+					values: [
+						{
+							name: "none",
+							description:
+								"There is no affordance for overflow in the block axis; any overflowing content is simply not displayed. Examples: billboards",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-overflow-block-none",
+								},
+							],
+						},
+						{
+							name: "scroll",
+							description:
+								"Overflowing content in the block axis is exposed by allowing users to scroll to it. Examples: computer screens",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-overflow-block-scroll",
+								},
+							],
+						},
+						{
+							name: "paged",
+							description:
+								"Content is broken up into discrete pages; content that overflows one page in the block axis is displayed on the following page. Examples: printers, ebook readers",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-overflow-block-paged",
+								},
+							],
+						},
+					],
+					description:
+						"The overflow-block CSS media feature can be used to test how the output device handles content that overflows the initial containing block along the block axis.",
+					browsers: ["E113", "FF66", "FFA66", "S17", "SM17", "C113", "CA113", "O99"],
+					baseline: {
+						status: "low",
+						baseline_low_date: "2023-09-18",
+					},
+				},
+				{
+					name: "overflow-inline",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-overflow-inline",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/overflow-inline",
+						},
+					],
+					type: "discrete",
+					syntax: "none | scroll",
+					values: [
+						{
+							name: "none",
+							description:
+								"There is no affordance for overflow in the inline axis; any overflowing content is simply not displayed.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-overflow-inline-none",
+								},
+							],
+						},
+						{
+							name: "scroll",
+							description: "Overflowing content in the inline axis is exposed by allowing users to scroll to it.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-overflow-inline-scroll",
+								},
+							],
+						},
+					],
+					description:
+						"The overflow-inline CSS media feature can be used to test how the output device handles content that overflows the initial containing block along the inline axis.",
+					browsers: ["E113", "FF66", "FFA66", "S17", "SM17", "C113", "CA113", "O99"],
+					baseline: {
+						status: "low",
+						baseline_low_date: "2023-09-18",
+					},
+				},
+				{
+					name: "horizontal-viewport-segments",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-horizontal-viewport-segments",
+						},
+					],
+					type: "range",
+					syntax: "<integer>",
+					description: "",
+				},
+				{
+					name: "vertical-viewport-segments",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-vertical-viewport-segments",
+						},
+					],
+					type: "range",
+					syntax: "<integer>",
+					description: "",
+				},
+				{
+					name: "display-mode",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-display-mode",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/display-mode",
+						},
+					],
+					type: "discrete",
+					syntax: "fullscreen | standalone | minimal-ui | browser | picture-in-picture",
+					values: [
+						{
+							name: "fullscreen",
+							description:
+								"The browsing context is displayed with browser UI elements hidden and takes up the entirety of the available display area. The fullscreen context may have been caused by the fullscreen display mode in the application manifest, by the requestFullscreen() method of the Fullscreen API, or through some other means (such as the user manually activating fullscreen mode using the user agent’s built-in controls). Corresponds to the fullscreen display mode.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-display-mode-fullscreen",
+								},
+							],
+						},
+						{
+							name: "standalone",
+							description: "The standalone display mode is in use. Only applicable in an application context.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-display-mode-standalone",
+								},
+							],
+						},
+						{
+							name: "minimal-ui",
+							description: "The minimal-ui display mode is in use. Only applicable in an application context.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-display-mode-minimal-ui",
+								},
+							],
+						},
+						{
+							name: "browser",
+							description:
+								"The browsing context is displayed using the platform-specific convention for opening hyperlinks in the user agent (e.g., in a browser tab or web browser window with controls such as an address bar). This should be used for non-application contexts where no other display mode is appropriate. Corresponds to the browser display mode.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-display-mode-browser",
+								},
+							],
+						},
+						{
+							name: "picture-in-picture",
+							description:
+								'This mode allows users to continue consuming media while they interact with other sites or applications on their device. The browsing context is displayed in a floating and always-on-top window. A user agent may include other platform specific UI elements, such as "back-to-tab" and "site information" buttons or whatever is customary on the platform and user agent.',
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-display-mode-picture-in-picture",
+								},
+							],
+						},
+					],
+					description:
+						"The display-mode CSS media feature can be used to test whether a web app is being displayed in a normal browser tab or in some alternative way, such as a standalone app or fullscreen mode.",
+					browsers: ["E79", "FF47", "S13", "SM12.2", "C42", "CA42", "O29"],
+					baseline: {
+						status: "false",
+					},
+				},
+				{
+					name: "resolution",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-resolution",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/resolution",
+						},
+					],
+					type: "range",
+					syntax: "<resolution> | infinite",
+					values: [
+						{
+							name: "infinite",
+							description:
+								"For output mediums that have no physical constraints on resolution (such as outputting to vector graphics), this feature must match the infinite value. For the purpose of evaluating this media feature in the range context, infinite must be treated as larger than any possible <resolution>. (That is, a query like (resolution > 1000dpi) will be true for an infinite media.)",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-resolution-infinite",
+								},
+							],
+						},
+					],
+					description: "The resolution CSS media feature can be used to test the pixel density of the output device.",
+					browsers: ["E12", "FF8", "FFA8", "S16", "SM16", "C29", "CA29", "IE9", "O16"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2022-09-12",
+						baseline_high_date: "2025-03-12",
+					},
+				},
+				{
+					name: "scan",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-scan",
+						},
+					],
+					type: "discrete",
+					syntax: "interlace | progressive",
+					values: [
+						{
+							name: "interlace",
+							description:
+								"CRT and some types of plasma TV screens used “interlaced” rendering, where video frames alternated between specifying only the “even” lines on the screen and only the “odd” lines, exploiting various automatic mental image-correction abilities to produce smooth motion. This allowed them to simulate a higher FPS broadcast at half the bandwidth cost. When displaying on interlaced screens, authors should avoid very fast movement across the screen to avoid “combing”, and should ensure that details on the screen are wider than 1px to avoid “twitter”.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-scan-interlace",
+								},
+							],
+						},
+						{
+							name: "progressive",
+							description:
+								"A screen using “progressive” rendering displays each screen fully, and needs no special treatment. Most modern screens, and all computer screens, use progressive rendering.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-scan-progressive",
+								},
+							],
+						},
+					],
+					description:
+						"The scan CSS media feature is used to apply CSS styles based on the scanning process of the output device.",
+				},
+				{
+					name: "grid",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-grid",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/grid",
+						},
+					],
+					type: "discrete",
+					syntax: "<mq-boolean>",
+					description:
+						"The grid CSS media feature can be used to test whether the output device uses a grid-based screen.",
+					browsers: ["E12", "FF2", "FFA4", "S3", "SM1", "C1", "CA18", "IE10", "O10"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2015-07-29",
+						baseline_high_date: "2018-01-29",
+					},
+				},
+				{
+					name: "update",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-update",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/update",
+						},
+					],
+					type: "discrete",
+					syntax: "none | slow | fast",
+					values: [
+						{
+							name: "none",
+							description:
+								"Once it has been rendered, the layout can no longer be updated. Example: documents printed on paper.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-update-none",
+								},
+							],
+						},
+						{
+							name: "slow",
+							description:
+								"The layout may change dynamically according to the usual rules of CSS, but the output device is not able to render or display changes quickly enough for them to be perceived as a smooth animation. Example: E-ink screens or severely under-powered devices.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-update-slow",
+								},
+							],
+						},
+						{
+							name: "fast",
+							description:
+								"The layout may change dynamically according to the usual rules of CSS, and the output device is not unusually constrained in speed, so regularly-updating things like CSS Animations can be used. Example: computer screens.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-update-fast",
+								},
+							],
+						},
+					],
+					description:
+						"The update CSS media feature can be used to test how frequently (if at all) the output device is able to modify the appearance of content once rendered.",
+					browsers: ["E113", "FF102", "FFA102", "S17", "SM17", "C113", "CA113", "O99"],
+					baseline: {
+						status: "low",
+						baseline_low_date: "2023-09-18",
+					},
+				},
+				{
+					name: "environment-blending",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-environment-blending",
+						},
+					],
+					type: "discrete",
+					syntax: "opaque | additive | subtractive",
+					values: [
+						{
+							name: "opaque",
+							description:
+								"The document is rendered on an opaque medium, such as a traditional monitor or paper. Black is dark and white is 100% light.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-environment-blending-opaque",
+								},
+							],
+						},
+						{
+							name: "additive",
+							description:
+								"The display blends the colors of the canvas with the real world using additive mixing. Black is fully transparent and white is 100% light. For example: a head-up display in a car.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-environment-blending-additive",
+								},
+							],
+						},
+						{
+							name: "subtractive",
+							description:
+								"The display blends the colors of the canvas with the real world using subtractive mixing. White is fully transparent and dark colors have the most contrast. For example: an LCD display embedded in a bathroom mirror.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-environment-blending-subtractive",
+								},
+							],
+						},
+					],
+					description: "",
+				},
+				{
+					name: "color",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-color",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/color",
+						},
+					],
+					type: "range",
+					syntax: "<integer>",
+					description:
+						"The color CSS media feature can be used to test the number of bits per color component (red, green, blue) of the output device.",
+					browsers: ["E12", "FF2", "FFA4", "S3", "SM1", "C1", "CA18", "IE9", "O10"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2015-07-29",
+						baseline_high_date: "2018-01-29",
+					},
+				},
+				{
+					name: "color-index",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-color-index",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/color-index",
+						},
+					],
+					type: "range",
+					syntax: "<integer>",
+					description:
+						"The color-index CSS media feature can be used to test the number of entries in the output device's color lookup table.",
+					browsers: ["E79", "S8", "SM8", "C29", "CA29", "O16"],
+					baseline: {
+						status: "false",
+					},
+				},
+				{
+					name: "monochrome",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-monochrome",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/monochrome",
+						},
+					],
+					type: "range",
+					syntax: "<integer>",
+					description:
+						"The monochrome CSS media feature can be used to test the number of bits per pixel in the monochrome frame buffer of the output device.",
+					browsers: ["E79", "FF2", "FFA4", "S3", "SM1", "C1", "CA18", "O10"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2020-01-15",
+						baseline_high_date: "2022-07-15",
+					},
+				},
+				{
+					name: "color-gamut",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-color-gamut",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/color-gamut",
+						},
+					],
+					type: "discrete",
+					syntax: "srgb | p3 | rec2020",
+					values: [
+						{
+							name: "srgb",
+							description: "The UA and output device can support approximately the sRGB gamut or more.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-color-gamut-srgb",
+								},
+							],
+						},
+						{
+							name: "p3",
+							description:
+								"The UA and output device can support approximately the gamut specified by the Display P3 [Display-P3] Color Space or more.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-color-gamut-p3",
+								},
+							],
+						},
+						{
+							name: "rec2020",
+							description:
+								"The UA and output device can support approximately the gamut specified by the ITU-R Recommendation BT.2020 Color Space or more.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-color-gamut-rec2020",
+								},
+							],
+						},
+					],
+					description:
+						"The color-gamut CSS media feature is used to apply CSS styles based on the approximate range of color gamut supported by the user agent and the output device.",
+					browsers: ["E79", "FF110", "FFA110", "S10", "SM10", "C58", "CA58", "O45"],
+					baseline: {
+						status: "low",
+						baseline_low_date: "2023-02-14",
+					},
+				},
+				{
+					name: "dynamic-range",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-dynamic-range",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/dynamic-range",
+						},
+					],
+					type: "discrete",
+					syntax: "standard | high",
+					values: [
+						{
+							name: "high",
+							description:
+								"The user agent and the output device fulfill all of the following criteria: they support a high peak brightness they support a high contrast ratio the color depth is greater than 24 bit or 8 bit per color component of RGB",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-dynamic-range-high",
+								},
+							],
+						},
+						{
+							name: "standard",
+							description: "This value matches on any visual device, and not on devices lacking visual capabilities.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-dynamic-range-standard",
+								},
+							],
+						},
+					],
+					description:
+						"The dynamic-range CSS media feature can be used to test the combination of brightness, contrast ratio, and color depth that are supported by the user agent and the output device.",
+					browsers: ["E98", "FF100", "FFA100", "S13.1", "SM13.4", "C98", "CA98", "O84"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2022-05-03",
+						baseline_high_date: "2024-11-03",
+					},
+				},
+				{
+					name: "inverted-colors",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-inverted-colors",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/inverted-colors",
+						},
+					],
+					type: "discrete",
+					syntax: "none | inverted",
+					values: [
+						{
+							name: "none",
+							description: "Colors are displayed normally.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-inverted-colors-none",
+								},
+							],
+						},
+						{
+							name: "inverted",
+							description:
+								"All pixels within the displayed area have been inverted. This value must not match if the user agent has done some kind of content aware inversion such as one that preserves the images.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-inverted-colors-inverted",
+								},
+							],
+						},
+					],
+					description:
+						"The inverted-colors CSS media feature is used to test if the user agent or the underlying operating system has inverted all colors.",
+					browsers: ["S9.1", "SM10"],
+					baseline: {
+						status: "false",
+					},
+				},
+				{
+					name: "pointer",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-pointer",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/pointer",
+						},
+					],
+					type: "discrete",
+					syntax: "none | coarse | fine",
+					values: [
+						{
+							name: "none",
+							description: "The primary input mechanism of the device does not include a pointing device.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-pointer-none",
+								},
+							],
+						},
+						{
+							name: "coarse",
+							description:
+								"The primary input mechanism of the device includes a pointing device of limited accuracy. Examples include touchscreens and motion-detection sensors (like the Kinect peripheral for the Xbox.)",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-pointer-coarse",
+								},
+							],
+						},
+						{
+							name: "fine",
+							description:
+								"The primary input mechanism of the device includes an accurate pointing device. Examples include mice, touchpads, and drawing styluses.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-pointer-fine",
+								},
+							],
+						},
+					],
+					description:
+						"The pointer CSS media feature tests whether the user has a pointing device (such as a mouse), and if so, how accurate the primary pointing device is.",
+					browsers: ["E12", "FF64", "FFA64", "S9", "SM9", "C41", "CA50", "O28"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2018-12-11",
+						baseline_high_date: "2021-06-11",
+					},
+				},
+				{
+					name: "hover",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-hover",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/hover",
+						},
+					],
+					type: "discrete",
+					syntax: "none | hover",
+					values: [
+						{
+							name: "none",
+							description:
+								"Indicates that the primary pointing device can’t hover, or that there is no pointing device. Examples include touchscreens and screens that use a basic drawing stylus. Pointing devices that can hover, but for which doing so is inconvenient and not part of the normal way they are used, also match this value. For example, a touchscreen where a long press is treated as hovering would match hover: none.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-hover-none",
+								},
+							],
+						},
+						{
+							name: "hover",
+							description:
+								"Indicates that the primary pointing device can easily hover over parts of the page. Examples include mice and devices that physically point at the screen, like the Nintendo Wii controller.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-hover-hover",
+								},
+							],
+						},
+					],
+					description:
+						"The hover CSS media feature can be used to test whether the user's primary input mechanism can hover over elements.",
+					browsers: ["E12", "FF64", "FFA64", "S9", "SM9", "C38", "CA50", "O25"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2018-12-11",
+						baseline_high_date: "2021-06-11",
+					},
+				},
+				{
+					name: "any-pointer",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-any-pointer",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/any-pointer",
+						},
+					],
+					type: "discrete",
+					syntax: "none | coarse | fine",
+					description:
+						"The any-pointer CSS media feature tests whether the user has any pointing device (such as a mouse), and if so, how accurate it is.",
+					browsers: ["E12", "FF64", "FFA64", "S9", "SM9", "C41", "CA41", "O28"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2018-12-11",
+						baseline_high_date: "2021-06-11",
+					},
+				},
+				{
+					name: "any-hover",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-any-hover",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/any-hover",
+						},
+					],
+					type: "discrete",
+					syntax: "none | hover",
+					description:
+						"The any-hover CSS media feature can be used to test whether any available input mechanism can hover over elements.",
+					browsers: ["E16", "FF64", "FFA64", "S9", "SM9", "C41", "CA41", "O28"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2018-12-11",
+						baseline_high_date: "2021-06-11",
+					},
+				},
+				{
+					name: "nav-controls",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-nav-controls",
+						},
+					],
+					type: "discrete",
+					syntax: "none | back",
+					values: [
+						{
+							name: "none",
+							description:
+								"The user agent does not have any obviously discoverable navigation controls, and in particular none that cause the user agent to move back one page in the joint session history.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-nav-controls-none",
+								},
+							],
+						},
+						{
+							name: "back",
+							description:
+								"The user agent provides navigation controls, including at least an obviously discoverable control causing the user agent to move back one page in the joint session history (typically, a “back” button).",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-nav-controls-back",
+								},
+							],
+						},
+					],
+					description: "",
+				},
+				{
+					name: "video-color-gamut",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-video-color-gamut",
+						},
+					],
+					type: "discrete",
+					syntax: "srgb | p3 | rec2020",
+					description: "",
+				},
+				{
+					name: "video-dynamic-range",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-video-dynamic-range",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/video-dynamic-range",
+						},
+					],
+					type: "discrete",
+					syntax: "standard | high",
+					description:
+						"The video-dynamic-range CSS media feature can be used to test the combination of brightness, contrast ratio, and color depth that are supported by the video plane of the user agent and the output device.",
+					browsers: ["FF100", "FFA100", "O84"],
+					baseline: {
+						status: "false",
+					},
+				},
+				{
+					name: "scripting",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-scripting",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/scripting",
+						},
+					],
+					type: "discrete",
+					syntax: "none | initial-only | enabled",
+					values: [
+						{
+							name: "enabled",
+							description:
+								"Indicates that the user agent supports scripting of the page, and that scripting in the current document is enabled for the lifetime of the document.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-scripting-enabled",
+								},
+							],
+						},
+						{
+							name: "initial-only",
+							description:
+								"Indicates that the user agent supports scripting of the page, and that scripting in the current document is enabled during the initial page load, but is not supported afterwards. Examples are printed pages, or pre-rendering network proxies that render a page on a server and send a nearly-static version of the page to the user. Should there be an explicit minimum threshold to meet before a UA is allowed to claim initial-only? Having one would mean authors would know what they can depend on, and could tailor their scripts accordingly. On the other hand, pinpointing that threshold is difficult: if it is set too low, the scripting facilities that authors can depend on may be to constrained to be practical, even though actual UAs may potentially all support significantly more. But trying to set it higher may cause us to exclude UAs that do support scripting at loading time, but restrict it in some cases based on complex heuristics. For instance, conservative definitions likely include at least running all inline scripts and firing the DOMContentLoaded event. But it does not seem useful for authors to constrain themselves to this if most (or maybe all) initial-only UAs also load external scripts (including async and defer) and fire the load event. On the other hand, requiring external scripts to be loaded and the load event to be fired could exclude UAs like Opera mini, which typically do run them, but may decide not to based on timeouts and other heuristics. [Issue #503]",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-scripting-initial-only",
+								},
+							],
+						},
+						{
+							name: "none",
+							description:
+								"Indicates that the user agent will not run scripts for this document; either it doesn’t support a scripting language, or the support isn’t active for the current document.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-scripting-none",
+								},
+							],
+						},
+					],
+					description:
+						"The scripting CSS media feature can be used to test whether scripting (such as JavaScript) is available.",
+					browsers: ["E120", "FF113", "FFA113", "S17", "SM17", "C120", "CA120", "O106"],
+					baseline: {
+						status: "low",
+						baseline_low_date: "2023-12-07",
+					},
+				},
+				{
+					name: "prefers-reduced-motion",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-prefers-reduced-motion",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-motion",
+						},
+					],
+					type: "discrete",
+					syntax: "no-preference | reduce",
+					values: [
+						{
+							name: "no-preference",
+							description:
+								"Indicates that the user has made no preference known to the system. This keyword value evaluates as false in the boolean context.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-prefers-reduced-motion-no-preference",
+								},
+							],
+						},
+						{
+							name: "reduce",
+							description:
+								"Indicates that user has notified the system that they prefer an interface that removes or replaces the types of motion-based animation that either trigger discomfort for those with vestibular motion sensitivity, or distraction for those with attention deficits.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-prefers-reduced-motion-reduce",
+								},
+							],
+						},
+					],
+					description:
+						"The prefers-reduced-motion CSS media feature is used to detect if a user has enabled a setting on their device to minimize the amount of non-essential motion. The setting is used to convey to the browser on the device that the user prefers an interface that removes, reduces, or replaces motion-based animations.",
+					browsers: ["E79", "FF63", "FFA64", "S10.1", "SM10.3", "C74", "CA74", "O62"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2020-01-15",
+						baseline_high_date: "2022-07-15",
+					},
+				},
+				{
+					name: "prefers-reduced-transparency",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-prefers-reduced-transparency",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-transparency",
+						},
+					],
+					type: "discrete",
+					syntax: "no-preference | reduce",
+					values: [
+						{
+							name: "no-preference",
+							description:
+								"Indicates that the user has made no preference known to the system. This keyword value evaluates as false in the boolean context.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-prefers-reduced-transparency-no-preference",
+								},
+							],
+						},
+						{
+							name: "reduce",
+							description:
+								"Indicates that user has notified the system that they prefer an interface that minimizes the amount of transparent or translucent layer effects.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-prefers-reduced-transparency-reduce",
+								},
+							],
+						},
+					],
+					description:
+						"The prefers-reduced-transparency CSS media feature is used to detect if a user has enabled a setting on their device to reduce the transparent or translucent layer effects used on the device. Switching on such a setting can help improve contrast and readability for some users.",
+					status: "experimental",
+					browsers: ["E118", "C118", "CA118", "O104"],
+					baseline: {
+						status: "false",
+					},
+				},
+				{
+					name: "prefers-contrast",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-prefers-contrast",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/prefers-contrast",
+						},
+					],
+					type: "discrete",
+					syntax: "no-preference | less | more | custom",
+					values: [
+						{
+							name: "no-preference",
+							description:
+								"Indicates that the user has made no preference known to the system. This keyword value evaluates as false in the boolean context.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-prefers-contrast-no-preference",
+								},
+							],
+						},
+						{
+							name: "less",
+							description:
+								"Indicates that user has notified the system that they prefer an interface that has a lower level of contrast.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-prefers-contrast-less",
+								},
+							],
+						},
+						{
+							name: "more",
+							description:
+								"Indicates that user has notified the system that they prefer an interface that has a higher level of contrast.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-prefers-contrast-more",
+								},
+							],
+						},
+						{
+							name: "custom",
+							description:
+								"Indicates that the user has indicated wanting a specific set of colors to be used, but the contrast implied by these particular colors is such that neither more nor less match. A user calling for cyan text over a rust background is not—​at least in terms of luminosity—​expressing a need for particularly high or low contrast, but this is not a lack of a preference either.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-prefers-contrast-custom",
+								},
+							],
+						},
+					],
+					description:
+						"The prefers-contrast CSS media feature is used to detect whether the user has requested the web content to be presented with a lower or higher contrast.",
+					browsers: ["E96", "FF101", "FFA101", "S14.1", "SM14.5", "C96", "CA96", "O82"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2022-05-31",
+						baseline_high_date: "2024-11-30",
+					},
+				},
+				{
+					name: "forced-colors",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-forced-colors",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/forced-colors",
+						},
+					],
+					type: "discrete",
+					syntax: "none | active",
+					values: [
+						{
+							name: "active",
+							description:
+								"Indicates that forced colors mode is active: the user agent enforces a user-chosen limited color palette on the page, The UA will provide the color palette to authors through the CSS system color keywords. See CSS Color Adjustment 1 § 3 Forced Color Palettes for details. This does not necessarily indicate a preference for more contrast. The colors have been forcibly adjusted to match the preference of the user, but that preference can be for less or more contrast, or some other arrangement that is neither particularly low or high contrast. In addition to forced-colors: active, the user agent must also match one of prefers-contrast: more or prefers-contrast: less if it can determine that the forced color palette chosen by the user has a particularly high or low contrast, and must make prefers-contrast: custom match otherwise. Similarly, if the forced color palette chosen by the user fits within one of the color schemes described by prefers-color-scheme, the corresponding value must also match.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-forced-colors-active",
+								},
+							],
+						},
+						{
+							name: "none",
+							description: "Forced colors mode is not active.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-forced-colors-none",
+								},
+							],
+						},
+					],
+					description:
+						"The forced-colors CSS media feature is used to detect if the user agent has enabled a forced colors mode where it enforces a user-chosen limited color palette on the page. An example of a forced colors mode is Windows High Contrast mode.",
+					browsers: ["E79", "FF89", "FFA89", "S16", "SM16", "C89", "CA89", "O75"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2022-09-12",
+						baseline_high_date: "2025-03-12",
+					},
+				},
+				{
+					name: "prefers-color-scheme",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-prefers-color-scheme",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/prefers-color-scheme",
+						},
+					],
+					type: "discrete",
+					syntax: "light | dark",
+					values: [
+						{
+							name: "light",
+							description:
+								'Indicates that user has expressed the preference for a page that has a light theme (dark text on light background), or has not expressed an active preference (and thus should receive the "web default" of a light theme).',
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-prefers-color-scheme-light",
+								},
+							],
+						},
+						{
+							name: "dark",
+							description:
+								"Indicates that user has expressed the preference for a page that has a dark theme (light text on dark background).",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-prefers-color-scheme-dark",
+								},
+							],
+						},
+					],
+					description:
+						"The prefers-color-scheme CSS media feature is used to detect if a user has requested light or dark color themes.",
+					browsers: ["E79", "FF67", "FFA67", "S12.1", "SM13", "C76", "CA76", "O62"],
+					baseline: {
+						status: "high",
+						baseline_low_date: "2020-01-15",
+						baseline_high_date: "2022-07-15",
+					},
+				},
+				{
+					name: "prefers-reduced-data",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-prefers-reduced-data",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-data",
+						},
+					],
+					type: "discrete",
+					syntax: "no-preference | reduce",
+					values: [
+						{
+							name: "no-preference",
+							description:
+								"Indicates that the user has made no preference known to the system. This keyword value evaluates as false in the boolean context.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-prefers-reduced-data-no-preference",
+								},
+							],
+						},
+						{
+							name: "reduce",
+							description: "Indicates that user has expressed the preference for lightweight alternate content.",
+							references: [
+								{
+									name: "W3C Reference",
+									url: "https://drafts.csswg.org/mediaqueries-5/#valdef-media-prefers-reduced-data-reduce",
+								},
+							],
+						},
+					],
+					description:
+						"The prefers-reduced-data CSS media feature is used to detect if the user has requested the web content that consumes less internet traffic.",
+					status: "experimental",
+					browsers: ["O71"],
+					baseline: {
+						status: "false",
+					},
+				},
+				{
+					name: "device-width",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-device-width",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/device-width",
+						},
+					],
+					type: "range",
+					syntax: "<length>",
+					description:
+						"The device-width CSS media feature can be used to test the width of an output device's rendering surface.",
+					status: "obsolete",
+					browsers: ["E12", "FF2", "FFA4", "S3", "SM1", "C1", "CA18", "IE9", "O10"],
+					baseline: {
+						status: "false",
+					},
+				},
+				{
+					name: "device-height",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-device-height",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/device-height",
+						},
+					],
+					type: "range",
+					syntax: "<length>",
+					description:
+						"The device-height CSS media feature can be used to test the height of an output device's rendering surface.",
+					status: "obsolete",
+					browsers: ["E12", "FF2", "FFA4", "S3", "SM1", "C1", "CA18", "IE9", "O10"],
+					baseline: {
+						status: "false",
+					},
+				},
+				{
+					name: "device-aspect-ratio",
+					references: [
+						{
+							name: "W3C Reference",
+							url: "https://drafts.csswg.org/mediaqueries-5/#descdef-media-device-aspect-ratio",
+						},
+						{
+							name: "MDN Reference",
+							url: "https://developer.mozilla.org/docs/Web/CSS/@media/device-aspect-ratio",
+						},
+					],
+					type: "range",
+					syntax: "<ratio>",
+					description:
+						"The device-aspect-ratio CSS media feature can be used to test the width-to-height aspect ratio of an output device.",
+					status: "obsolete",
+					browsers: ["E12", "FF2", "FFA4", "S3", "SM1", "C1", "CA18", "IE9", "O10"],
+					baseline: {
+						status: "false",
+					},
+				},
+			],
 			references: [
 				{
 					name: "MDN Reference",
@@ -21815,6 +23183,8 @@ export const cssData: CSSDataV1 = {
 		},
 		{
 			name: "@container",
+			description:
+				"The @container CSS at-rule is a conditional group rule that applies styles to a containment context.",
 			browsers: ["E105", "FF110", "FFA110", "S16", "SM16", "C105", "CA105", "O91"],
 			references: [
 				{
@@ -21826,11 +23196,11 @@ export const cssData: CSSDataV1 = {
 				status: "low",
 				baseline_low_date: "2023-02-14",
 			},
-			description:
-				"The @container CSS at-rule is a conditional group rule that applies styles to a containment context.",
 		},
 		{
 			name: "@document",
+			description:
+				"The @document CSS at-rule restricts the style rules contained within it based on the URL of the document. It is designed primarily for user-defined style sheets (see userchrome.org for more information), though it can be used on author-defined style sheets, too.",
 			references: [
 				{
 					name: "MDN Reference",
@@ -21840,11 +23210,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The @document CSS at-rule restricts the style rules contained within it based on the URL of the document. It is designed primarily for user-defined style sheets (see userchrome.org for more information), though it can be used on author-defined style sheets, too.",
 		},
 		{
 			name: "@font-palette-values",
+			description:
+				"The @font-palette-values CSS at-rule allows you to customize the default values of font-palette created by the font-maker.",
 			browsers: ["E101", "FF107", "FFA107", "S15.4", "SM15.4", "C101", "CA101", "O87"],
 			references: [
 				{
@@ -21853,14 +23223,15 @@ export const cssData: CSSDataV1 = {
 				},
 			],
 			baseline: {
-				status: "low",
+				status: "high",
 				baseline_low_date: "2022-11-15",
+				baseline_high_date: "2025-05-15",
 			},
-			description:
-				"The @font-palette-values CSS at-rule allows you to customize the default values of font-palette created by the font-maker.",
 		},
 		{
 			name: "@position-try",
+			description:
+				"The @position-try CSS at-rule is used to define a custom position try fallback option, which can be used to define positioning and alignment for anchor-positioned elements. One or more sets of position try fallback options can be applied to the anchored element via the position-try-fallbacks property or position-try shorthand. When the positioned element is moved to a position where it starts to overflow its containing block or the viewport, the browser will select the first position try fallback option it finds that places the positioned element fully back on-screen.",
 			browsers: ["E125", "C125", "CA125", "O111"],
 			references: [
 				{
@@ -21871,11 +23242,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The @position-try CSS at-rule is used to define a custom position try fallback option, which can be used to define positioning and alignment for anchor-positioned elements. One or more sets of position try fallback options can be applied to the anchored element via the position-try-fallbacks property or position-try shorthand. When the positioned element is moved to a position where it starts to overflow its containing block or the viewport, the browser will select the first position try fallback option it finds that places the positioned element fully back on-screen.",
 		},
 		{
 			name: "@scope",
+			description:
+				"The @scope CSS at-rule enables you to select elements in specific DOM subtrees, targeting elements precisely without writing overly-specific selectors that are hard to override, and without coupling your selectors too tightly to the DOM structure.",
 			browsers: ["E118", "S17.4", "SM17.4", "C118", "CA118", "O104"],
 			references: [
 				{
@@ -21886,11 +23257,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The @scope CSS at-rule enables you to select elements in specific DOM subtrees, targeting elements precisely without writing overly-specific selectors that are hard to override, and without coupling your selectors too tightly to the DOM structure.",
 		},
 		{
 			name: "@starting-style",
+			description:
+				"The @starting-style CSS at-rule is used to define starting values for properties set on an element that you want to transition from when the element receives its first style update, i.e., when an element is first displayed on a previously loaded page.",
 			browsers: ["E117", "FF129", "FFA129", "S17.5", "SM17.5", "C117", "CA117", "O103"],
 			references: [
 				{
@@ -21902,11 +23273,11 @@ export const cssData: CSSDataV1 = {
 				status: "low",
 				baseline_low_date: "2024-08-06",
 			},
-			description:
-				"The @starting-style CSS at-rule is used to define starting values for properties set on an element that you want to transition from when the element receives its first style update, i.e., when an element is first displayed on a previously loaded page.",
 		},
 		{
 			name: "@view-transition",
+			description:
+				"The @view-transition CSS at-rule is used to opt in the current and destination documents to undergo a view transition, in the case of a cross-document navigation.",
 			browsers: ["E126", "S18.2", "SM18.2", "C126", "CA126", "O112"],
 			references: [
 				{
@@ -21917,8 +23288,6 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The @view-transition CSS at-rule is used to opt in the current and destination documents to undergo a view transition, in the case of a cross-document navigation.",
 		},
 	],
 	pseudoClasses: [
@@ -22889,22 +24258,24 @@ export const cssData: CSSDataV1 = {
 		},
 		{
 			name: ":active-view-transition",
+			description: "",
 			browsers: ["E125", "S18", "SM18", "C125", "CA125", "O111"],
 			baseline: {
 				status: "false",
 			},
-			description: "",
 		},
 		{
 			name: ":active-view-transition-type",
+			description: "",
 			browsers: ["E125", "S18.2", "SM18.2", "C125", "CA125", "O111"],
 			baseline: {
 				status: "false",
 			},
-			description: "",
 		},
 		{
 			name: ":autofill",
+			description:
+				"The :autofill CSS pseudo-class matches when an input element has its value autofilled by the browser. The class stops matching if the user edits the field.",
 			browsers: ["E110", "FF86", "FFA86", "S15", "SM15", "C110", "CA110", "O96"],
 			references: [
 				{
@@ -22916,16 +24287,16 @@ export const cssData: CSSDataV1 = {
 				status: "low",
 				baseline_low_date: "2023-02-09",
 			},
-			description:
-				"The :autofill CSS pseudo-class matches when an input element has its value autofilled by the browser. The class stops matching if the user edits the field.",
 		},
 		{
 			name: ":blank",
-			status: "experimental",
 			description: "The :blank CSS pseudo-class selects empty user input elements (eg. <input> or <textarea>).",
+			status: "experimental",
 		},
 		{
 			name: ":buffering",
+			description:
+				"The :buffering CSS pseudo-class selector represents an element that is playable, such as audio or video, when the playable element is buffering a media resource.",
 			browsers: ["S15.4", "SM15.4"],
 			references: [
 				{
@@ -22936,17 +24307,17 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The :buffering CSS pseudo-class selector represents an element that is playable, such as audio or video, when the playable element is buffering a media resource.",
 		},
 		{
 			name: ":current",
-			status: "experimental",
 			description:
 				"The :current CSS pseudo-class selector is a time-dimensional pseudo-class that represents the element, or an ancestor of the element, that is currently being displayed",
+			status: "experimental",
 		},
 		{
 			name: ":defined",
+			description:
+				"The :defined CSS pseudo-class represents any element that has been defined. This includes any standard element built in to the browser, and custom elements that have been successfully defined (i.e. with the CustomElementRegistry.define() method).",
 			browsers: ["E79", "FF63", "FFA63", "S10", "SM10", "C54", "CA54", "O41"],
 			references: [
 				{
@@ -22959,11 +24330,11 @@ export const cssData: CSSDataV1 = {
 				baseline_low_date: "2020-01-15",
 				baseline_high_date: "2022-07-15",
 			},
-			description:
-				"The :defined CSS pseudo-class represents any element that has been defined. This includes any standard element built in to the browser, and custom elements that have been successfully defined (i.e. with the CustomElementRegistry.define() method).",
 		},
 		{
 			name: ":dir",
+			description:
+				"The :dir() CSS pseudo-class matches elements based on the directionality of the text contained in them.",
 			browsers: ["E120", "FF49", "FFA49", "S16.4", "SM16.4", "C120", "CA120", "O106"],
 			references: [
 				{
@@ -22975,11 +24346,11 @@ export const cssData: CSSDataV1 = {
 				status: "low",
 				baseline_low_date: "2023-12-07",
 			},
-			description:
-				"The :dir() CSS pseudo-class matches elements based on the directionality of the text contained in them.",
 		},
 		{
 			name: ":focus-visible",
+			description:
+				"The :focus-visible pseudo-class applies while an element matches the :focus pseudo-class and the UA determines via heuristics that the focus should be made evident on the element.",
 			browsers: ["E86", "FF85", "FFA85", "S15.4", "SM15.4", "C86", "CA86", "O72"],
 			references: [
 				{
@@ -22992,11 +24363,11 @@ export const cssData: CSSDataV1 = {
 				baseline_low_date: "2022-03-14",
 				baseline_high_date: "2024-09-14",
 			},
-			description:
-				"The :focus-visible pseudo-class applies while an element matches the :focus pseudo-class and the UA determines via heuristics that the focus should be made evident on the element.",
 		},
 		{
 			name: ":focus-within",
+			description:
+				"The :focus-within pseudo-class applies to any element for which the :focus pseudo class applies as well as to an element whose descendant in the flat tree (including non-element nodes, such as text nodes) matches the conditions for matching :focus.",
 			browsers: ["E79", "FF52", "FFA52", "S10.1", "SM10.3", "C60", "CA60", "O47"],
 			references: [
 				{
@@ -23009,11 +24380,11 @@ export const cssData: CSSDataV1 = {
 				baseline_low_date: "2020-01-15",
 				baseline_high_date: "2022-07-15",
 			},
-			description:
-				"The :focus-within pseudo-class applies to any element for which the :focus pseudo class applies as well as to an element whose descendant in the flat tree (including non-element nodes, such as text nodes) matches the conditions for matching :focus.",
 		},
 		{
 			name: ":has",
+			description:
+				"The functional :has() CSS pseudo-class represents an element if any of the relative selectors that are passed as an argument match at least one element when anchored against this element. ",
 			browsers: ["E105", "FF121", "FFA121", "S15.4", "SM15.4", "C105", "CA105", "O91"],
 			references: [
 				{
@@ -23025,12 +24396,12 @@ export const cssData: CSSDataV1 = {
 				status: "low",
 				baseline_low_date: "2023-12-19",
 			},
-			description:
-				"The functional :has() CSS pseudo-class represents an element if any of the relative selectors that are passed as an argument match at least one element when anchored against this element. ",
 		},
 		{
 			name: ":has-slotted",
-			browsers: ["E134", "FF136", "FFA136", "C134", "CA134"],
+			description:
+				"The :has-slotted CSS pseudo-class matches when the content of a slot element is not empty or not using the default value (see Using templates and slots for more information).",
+			browsers: ["E134", "FF136", "FFA136", "C134", "CA134", "O119"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -23040,11 +24411,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The :has-slotted CSS pseudo-class matches when the content of a slot element is not empty or not using the default value (see Using templates and slots for more information).",
 		},
 		{
 			name: ":is",
+			description:
+				"The :is() CSS pseudo-class function takes a selector list as its argument, and selects any element that can be selected by one of the selectors in that list. This is useful for writing large selectors in a more compact form.",
 			browsers: ["E88", "FF78", "FFA79", "S14", "SM14", "C88", "CA88", "O74"],
 			references: [
 				{
@@ -23057,16 +24428,16 @@ export const cssData: CSSDataV1 = {
 				baseline_low_date: "2021-01-21",
 				baseline_high_date: "2023-07-21",
 			},
-			description:
-				"The :is() CSS pseudo-class function takes a selector list as its argument, and selects any element that can be selected by one of the selectors in that list. This is useful for writing large selectors in a more compact form.",
 		},
 		{
 			name: ":local-link",
-			status: "experimental",
 			description: "The :local-link CSS pseudo-class represents an link to the same document",
+			status: "experimental",
 		},
 		{
 			name: ":modal",
+			description:
+				"The :modal CSS pseudo-class matches an element that is in a state in which it excludes all interaction with elements outside it until the interaction has been dismissed. Multiple elements can be selected by the :modal pseudo-class at the same time, but only one of them will be active and able to receive input.",
 			browsers: ["E105", "FF103", "FFA103", "S15.6", "SM15.6", "C105", "CA105", "O91"],
 			references: [
 				{
@@ -23079,11 +24450,11 @@ export const cssData: CSSDataV1 = {
 				baseline_low_date: "2022-09-02",
 				baseline_high_date: "2025-03-02",
 			},
-			description:
-				"The :modal CSS pseudo-class matches an element that is in a state in which it excludes all interaction with elements outside it until the interaction has been dismissed. Multiple elements can be selected by the :modal pseudo-class at the same time, but only one of them will be active and able to receive input.",
 		},
 		{
 			name: ":muted",
+			description:
+				"The :muted CSS pseudo-class selector represents an element that is capable of making sound, such as audio or video, but is muted (forced silent).",
 			browsers: ["S15.4", "SM15.4"],
 			references: [
 				{
@@ -23094,11 +24465,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The :muted CSS pseudo-class selector represents an element that is capable of making sound, such as audio or video, but is muted (forced silent).",
 		},
 		{
 			name: ":open",
+			description:
+				"The :open CSS pseudo-class represents an element that has open and closed states, only when it is currently in the open state.",
 			browsers: ["E133", "FF136", "FFA136", "C133", "CA133", "O118"],
 			references: [
 				{
@@ -23109,11 +24480,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The :open CSS pseudo-class represents an element that has open and closed states, only when it is currently in the open state.",
 		},
 		{
 			name: ":paused",
+			description:
+				"The :paused CSS pseudo-class selector is a resource state pseudo-class that will match an audio, video, or similar resource that is capable of being “played” or “paused”, when that element is “paused”.",
 			browsers: ["S15.4", "SM15.4"],
 			references: [
 				{
@@ -23124,11 +24495,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The :paused CSS pseudo-class selector is a resource state pseudo-class that will match an audio, video, or similar resource that is capable of being “played” or “paused”, when that element is “paused”.",
 		},
 		{
 			name: ":picture-in-picture",
+			description:
+				"The :picture-in-picture CSS pseudo-class matches the element which is currently in picture-in-picture mode.",
 			browsers: ["E110", "S13.1", "SM13.4", "C110", "CA110", "O96"],
 			references: [
 				{
@@ -23139,11 +24510,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The :picture-in-picture CSS pseudo-class matches the element which is currently in picture-in-picture mode.",
 		},
 		{
 			name: ":placeholder-shown",
+			description:
+				"The :placeholder-shown CSS pseudo-class represents any <input> or <textarea> element that is currently displaying placeholder text.",
 			browsers: ["E79", "FF51", "FFA51", "S9", "SM9", "C47", "CA47", "IE10", "O34"],
 			references: [
 				{
@@ -23156,11 +24527,11 @@ export const cssData: CSSDataV1 = {
 				baseline_low_date: "2020-01-15",
 				baseline_high_date: "2022-07-15",
 			},
-			description:
-				"The :placeholder-shown CSS pseudo-class represents any <input> or <textarea> element that is currently displaying placeholder text.",
 		},
 		{
 			name: ":playing",
+			description:
+				"The :playing CSS pseudo-class selector is a resource state pseudo-class that will match an audio, video, or similar resource that is capable of being “played” or “paused”, when that element is “playing”. ",
 			browsers: ["S15.4", "SM15.4"],
 			references: [
 				{
@@ -23171,11 +24542,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The :playing CSS pseudo-class selector is a resource state pseudo-class that will match an audio, video, or similar resource that is capable of being “played” or “paused”, when that element is “playing”. ",
 		},
 		{
 			name: ":popover-open",
+			description:
+				'The :popover-open CSS pseudo-class represents a {{domxref("Popover API", "popover", "", "nocode")}} element (i.e. one with a popover attribute) that is in the showing state. You can use this to apply style to popover elements only when they are shown.',
 			browsers: ["E114", "FF125", "FFA125", "S17", "SM17", "C114", "CA114", "O100"],
 			references: [
 				{
@@ -23187,11 +24558,11 @@ export const cssData: CSSDataV1 = {
 				status: "low",
 				baseline_low_date: "2024-04-16",
 			},
-			description:
-				'The :popover-open CSS pseudo-class represents a {{domxref("Popover API", "popover", "", "nocode")}} element (i.e. one with a popover attribute) that is in the showing state. You can use this to apply style to popover elements only when they are shown.',
 		},
 		{
 			name: ":seeking",
+			description:
+				"The :seeking CSS pseudo-class selector represents an element that is playable, such as audio or video, when the playable element is seeking a playback position in the media resource.",
 			browsers: ["S15.4", "SM15.4"],
 			references: [
 				{
@@ -23202,11 +24573,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The :seeking CSS pseudo-class selector represents an element that is playable, such as audio or video, when the playable element is seeking a playback position in the media resource.",
 		},
 		{
 			name: ":stalled",
+			description:
+				"The :stalled CSS pseudo-class selector represents an element that is playable, such as audio or video, when playback is stalled.",
 			browsers: ["S15.4", "SM15.4"],
 			references: [
 				{
@@ -23217,11 +24588,10 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The :stalled CSS pseudo-class selector represents an element that is playable, such as audio or video, when playback is stalled.",
 		},
 		{
 			name: ":state",
+			description: "The :state() CSS pseudo-class matches custom elements that have the specified custom state.",
 			browsers: ["E125", "FF126", "FFA126", "S17.4", "SM17.4", "C125", "CA125", "O111"],
 			references: [
 				{
@@ -23233,12 +24603,13 @@ export const cssData: CSSDataV1 = {
 				status: "low",
 				baseline_low_date: "2024-05-17",
 			},
-			description: "The :state() CSS pseudo-class matches custom elements that have the specified custom state.",
 		},
 		{
 			name: ":target-current",
+			description:
+				"The :target-current CSS pseudo-class selects the active scroll marker — the ::scroll-marker pseudo-element of a scroll-marker-group that is currently scrolled to. This selector can be used to style the active navigation position within a scroll marker group.",
 			status: "experimental",
-			browsers: ["E135", "C135"],
+			browsers: ["E135", "C135", "O120"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -23248,17 +24619,17 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The :target-current CSS pseudo-class selects the active scroll marker — the ::scroll-marker pseudo-element of a scroll-marker-group that is currently scrolled to. This selector can be used to style the active navigation position within a scroll marker group.",
 		},
 		{
 			name: ":target-within",
-			status: "experimental",
 			description:
 				"The :target-within CSS pseudo-class represents an element that is a target element or contains an element that is a target. A target element is a unique element with an id matching the URL's fragment.",
+			status: "experimental",
 		},
 		{
 			name: ":user-invalid",
+			description:
+				"The :user-invalid CSS pseudo-class represents any validated form element whose value isn't valid based on their validation constraints, after the user has interacted with it.",
 			browsers: ["E119", "FF88", "FFA88", "S16.5", "SM16.5", "C119", "CA119", "O105"],
 			references: [
 				{
@@ -23270,11 +24641,11 @@ export const cssData: CSSDataV1 = {
 				status: "low",
 				baseline_low_date: "2023-11-02",
 			},
-			description:
-				"The :user-invalid CSS pseudo-class represents any validated form element whose value isn't valid based on their validation constraints, after the user has interacted with it.",
 		},
 		{
 			name: ":user-valid",
+			description:
+				"The :user-valid CSS pseudo-class represents any validated form element whose value validates correctly based on its validation constraints. However, unlike :valid it only matches once the user has interacted with it.",
 			browsers: ["E119", "FF88", "FFA88", "S16.5", "SM16.5", "C119", "CA119", "O105"],
 			references: [
 				{
@@ -23286,11 +24657,11 @@ export const cssData: CSSDataV1 = {
 				status: "low",
 				baseline_low_date: "2023-11-02",
 			},
-			description:
-				"The :user-valid CSS pseudo-class represents any validated form element whose value validates correctly based on its validation constraints. However, unlike :valid it only matches once the user has interacted with it.",
 		},
 		{
 			name: ":volume-locked",
+			description:
+				'The :volume-locked CSS pseudo-class selector represents an element that is capable of making sound, such as audio or video, but the audio volume of the media element is currently "locked" by the user.',
 			browsers: ["S15.4", "SM15.4"],
 			references: [
 				{
@@ -23301,11 +24672,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				'The :volume-locked CSS pseudo-class selector represents an element that is capable of making sound, such as audio or video, but the audio volume of the media element is currently "locked" by the user.',
 		},
 		{
 			name: ":where",
+			description:
+				"The :where() CSS pseudo-class function takes a selector list as its argument, and selects any element that can be selected by one of the selectors in that list.",
 			browsers: ["E88", "FF78", "FFA79", "S14", "SM14", "C88", "CA88", "O74"],
 			references: [
 				{
@@ -23318,17 +24689,15 @@ export const cssData: CSSDataV1 = {
 				baseline_low_date: "2021-01-21",
 				baseline_high_date: "2023-07-21",
 			},
-			description:
-				"The :where() CSS pseudo-class function takes a selector list as its argument, and selects any element that can be selected by one of the selectors in that list.",
 		},
 		{
 			name: ":xr-overlay",
+			description: "",
 			status: "experimental",
 			browsers: ["E83", "C83", "CA83", "O69"],
 			baseline: {
 				status: "false",
 			},
-			description: "",
 		},
 	],
 	pseudoElements: [
@@ -23930,6 +25299,8 @@ export const cssData: CSSDataV1 = {
 		},
 		{
 			name: "::-moz-range-progress",
+			description:
+				'The ::-moz-range-progress CSS pseudo-element is a Mozilla extension that represents the lower portion of the track (i.e., groove) in which the indicator slides in an <input> of type="range". This portion corresponds to values lower than the value currently selected by the thumb (i.e., virtual knob).',
 			status: "nonstandard",
 			browsers: ["FF22", "FFA22"],
 			references: [
@@ -23941,11 +25312,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				'The ::-moz-range-progress CSS pseudo-element is a Mozilla extension that represents the lower portion of the track (i.e., groove) in which the indicator slides in an <input> of type="range". This portion corresponds to values lower than the value currently selected by the thumb (i.e., virtual knob).',
 		},
 		{
 			name: "::-moz-range-thumb",
+			description:
+				'The ::-moz-range-thumb CSS pseudo-element is a Mozilla extension that represents the thumb (i.e., virtual knob) of an <input> of type="range". The user can move the thumb along the input\'s track to alter its numerical value.',
 			status: "nonstandard",
 			browsers: ["FF21", "FFA21"],
 			references: [
@@ -23957,11 +25328,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				'The ::-moz-range-thumb CSS pseudo-element is a Mozilla extension that represents the thumb (i.e., virtual knob) of an <input> of type="range". The user can move the thumb along the input\'s track to alter its numerical value.',
 		},
 		{
 			name: "::-moz-range-track",
+			description:
+				'The ::-moz-range-track CSS pseudo-element is a Mozilla extension that represents the track (i.e., groove) in which the indicator slides in an <input> of type="range".',
 			status: "nonstandard",
 			browsers: ["FF21", "FFA21"],
 			references: [
@@ -23973,18 +25344,18 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				'The ::-moz-range-track CSS pseudo-element is a Mozilla extension that represents the track (i.e., groove) in which the indicator slides in an <input> of type="range".',
 		},
 		{
 			name: "::-webkit-progress-inner-value",
-			status: "nonstandard",
 			description:
 				"The ::-webkit-progress-value CSS pseudo-element represents the filled-in portion of the bar of a <progress> element. It is a child of the ::-webkit-progress-bar pseudo-element.\n\nIn order to let ::-webkit-progress-value take effect, -webkit-appearance needs to be set to none on the <progress> element.",
+			status: "nonstandard",
 		},
 		{
 			name: "::checkmark",
-			browsers: ["E134", "C134", "CA134"],
+			description:
+				"The ::checkmark CSS pseudo-element targets the checkmark placed inside the currently-selected option element of a customizable select element. It can be used to provide a visual indication of which option is selected.",
+			browsers: ["E133", "C133", "CA133", "O118"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -23994,11 +25365,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The ::checkmark CSS pseudo-element targets the checkmark placed inside the currently-selected option element of a customizable select element. It can be used to provide a visual indication of which option is selected.",
 		},
 		{
 			name: "::details-content",
+			description:
+				"The ::details-content CSS pseudo-element represents the expandable/collapsible contents of a details element.",
 			browsers: ["E131", "S18.4", "SM18.4", "C131", "CA131", "O116"],
 			references: [
 				{
@@ -24009,11 +25380,10 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The ::details-content CSS pseudo-element represents the expandable/collapsible contents of a details element.",
 		},
 		{
 			name: "::file-selector-button",
+			description: 'The ::file-selector-button CSS pseudo-element represents the button of an input of type="file".',
 			browsers: ["E89", "FF82", "FFA82", "S14.1", "SM14.5", "C89", "CA89", "IE10", "O75"],
 			references: [
 				{
@@ -24026,10 +25396,11 @@ export const cssData: CSSDataV1 = {
 				baseline_low_date: "2021-04-26",
 				baseline_high_date: "2023-10-26",
 			},
-			description: 'The ::file-selector-button CSS pseudo-element represents the button of an input of type="file".',
 		},
 		{
 			name: "::grammar-error",
+			description:
+				"The ::grammar-error CSS pseudo-element represents a text segment which the user agent has flagged as grammatically incorrect.",
 			browsers: ["E121", "S17.4", "SM17.4", "C121", "CA121", "O107"],
 			references: [
 				{
@@ -24040,12 +25411,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The ::grammar-error CSS pseudo-element represents a text segment which the user agent has flagged as grammatically incorrect.",
 		},
 		{
 			name: "::highlight",
-			browsers: ["E105", "FFpreview", "S17.2", "SM17.2", "C105", "CA105", "O91"],
+			description: "The ::highlight() CSS pseudo-element applies styles to a custom highlight.",
+			browsers: ["E105", "S17.2", "SM17.2", "C105", "CA105", "O91"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -24055,10 +25425,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description: "The ::highlight() CSS pseudo-element applies styles to a custom highlight.",
 		},
 		{
 			name: "::marker",
+			description:
+				"The ::marker CSS pseudo-element selects the marker box of a list item, which typically contains a bullet or number. It works on any element or pseudo-element set to display: list-item, such as the <li> and <summary> elements.",
 			browsers: ["E86", "FF68", "FFA68", "C86", "CA86", "O72"],
 			references: [
 				{
@@ -24069,11 +25440,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The ::marker CSS pseudo-element selects the marker box of a list item, which typically contains a bullet or number. It works on any element or pseudo-element set to display: list-item, such as the <li> and <summary> elements.",
 		},
 		{
 			name: "::part",
+			description:
+				"The ::part CSS pseudo-element represents any element within a shadow tree that has a matching part attribute.",
 			browsers: ["E79", "FF72", "FFA79", "S13.1", "SM13.4", "C73", "CA73", "O60"],
 			references: [
 				{
@@ -24086,12 +25457,12 @@ export const cssData: CSSDataV1 = {
 				baseline_low_date: "2020-07-28",
 				baseline_high_date: "2023-01-28",
 			},
-			description:
-				"The ::part CSS pseudo-element represents any element within a shadow tree that has a matching part attribute.",
 		},
 		{
 			name: "::picker-icon",
-			browsers: ["E134", "C134", "CA134"],
+			description:
+				"The ::picker-icon CSS pseudo-element targets the picker icon inside form controls that have an icon associated with them. In the case of a customizable select element, it selects the arrow icon shown on the <select> element that points down when it is closed.",
+			browsers: ["E133", "C133", "CA133", "O118"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -24101,12 +25472,12 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The ::picker-icon CSS pseudo-element targets the picker icon inside form controls that have an icon associated with them. In the case of a customizable select element, it selects the arrow icon shown on the <select> element that points down when it is closed.",
 		},
 		{
 			name: "::picker",
-			browsers: ["E134", "C134", "CA134"],
+			description:
+				"The ::picker() CSS pseudo-element targets the picker part of an element, for example the drop-down picker of a customizable select element.",
+			browsers: ["E134", "C134", "CA134", "O119"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -24116,10 +25487,10 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description: "",
 		},
 		{
 			name: "::placeholder",
+			description: "The ::placeholder CSS pseudo-element represents the placeholder text of a form element.",
 			browsers: ["E79", "FF51", "FFA51", "S10.1", "SM10.3", "C57", "CA57", "O44"],
 			references: [
 				{
@@ -24132,12 +25503,13 @@ export const cssData: CSSDataV1 = {
 				baseline_low_date: "2020-01-15",
 				baseline_high_date: "2022-07-15",
 			},
-			description: "The ::placeholder CSS pseudo-element represents the placeholder text of a form element.",
 		},
 		{
 			name: "::scroll-marker",
+			description:
+				"The ::scroll-marker CSS pseudo-element can be generated inside any element and represents its scroll marker. All elements can have a ::scroll-marker pseudo-element, which is placed into the ::scroll-marker-group of the nearest scroll container ancestor. A scroll marker behaves like an anchor (a element) whose scroll target is the marker's originating element — and scrolls the scroll container to that element when activated.",
 			status: "experimental",
-			browsers: ["E135", "C135"],
+			browsers: ["E135", "C135", "O120"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -24147,13 +25519,13 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The ::scroll-marker CSS pseudo-element can be generated inside any element and represents its scroll marker. All elements can have a ::scroll-marker pseudo-element, which is placed into the ::scroll-marker-group of the nearest scroll container ancestor. A scroll marker behaves like an anchor (a element) whose scroll target is the marker's originating element — and scrolls the scroll container to that element when activated.",
 		},
 		{
 			name: "::scroll-marker-group",
+			description:
+				"The ::scroll-marker-group CSS pseudo-element is generated inside a scroll container and contains any ::scroll-marker pseudo-elements generated on descendants of the scroll container.",
 			status: "experimental",
-			browsers: ["E135", "C135"],
+			browsers: ["E135", "C135", "O120"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -24163,11 +25535,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The ::scroll-marker-group CSS pseudo-element is generated inside a scroll container and contains any ::scroll-marker pseudo-elements generated on descendants of the scroll container.",
 		},
 		{
 			name: "::slotted",
+			description:
+				"The ::slotted() CSS pseudo-element represents any element that has been placed into a slot inside an HTML template (see Using templates and slots for more information).",
 			browsers: ["E79", "FF63", "FFA63", "S10", "SM10", "C50", "CA50", "O37"],
 			references: [
 				{
@@ -24180,11 +25552,11 @@ export const cssData: CSSDataV1 = {
 				baseline_low_date: "2020-01-15",
 				baseline_high_date: "2022-07-15",
 			},
-			description:
-				"The ::slotted() CSS pseudo-element represents any element that has been placed into a slot inside an HTML template (see Using templates and slots for more information).",
 		},
 		{
 			name: "::spelling-error",
+			description:
+				"The ::spelling-error CSS pseudo-element represents a text segment which the user agent has flagged as incorrectly spelled.",
 			browsers: ["E121", "S17.4", "SM17.4", "C121", "CA121", "O107"],
 			references: [
 				{
@@ -24195,11 +25567,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The ::spelling-error CSS pseudo-element represents a text segment which the user agent has flagged as incorrectly spelled.",
 		},
 		{
 			name: "::target-text",
+			description:
+				"The ::target-text CSS pseudo-element represents the text that has been scrolled to if the browser supports scroll-to-text fragments. It allows authors to choose how to highlight that section of text.",
 			browsers: ["E89", "FF131", "FFA131", "S18.2", "SM18.2", "C89", "CA89", "O75"],
 			references: [
 				{
@@ -24211,12 +25583,12 @@ export const cssData: CSSDataV1 = {
 				status: "low",
 				baseline_low_date: "2024-12-11",
 			},
-			description:
-				"The ::target-text CSS pseudo-element represents the text that has been scrolled to if the browser supports scroll-to-text fragments. It allows authors to choose how to highlight that section of text.",
 		},
 		{
 			name: "::view-transition",
-			browsers: ["E109", "S18", "SM18", "C109", "CA109", "O95"],
+			description:
+				"The ::view-transition CSS pseudo-element represents the root of the view transitions overlay, which contains all view transitions and sits over the top of all other page content.",
+			browsers: ["E109", "FFpreview", "S18", "SM18", "C109", "CA109", "O95"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -24226,12 +25598,11 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				"The ::view-transition CSS pseudo-element represents the root of the view transitions overlay, which contains all view transitions and sits over the top of all other page content.",
 		},
 		{
 			name: "::view-transition-group",
-			browsers: ["E109", "S18", "SM18", "C109", "CA109", "O95"],
+			description: "The ::view-transition-group CSS pseudo-element represents a single view transition snapshot group.",
+			browsers: ["E109", "FFpreview", "S18", "SM18", "C109", "CA109", "O95"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -24241,11 +25612,12 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description: "The ::view-transition-group CSS pseudo-element represents a single view transition snapshot group.",
 		},
 		{
 			name: "::view-transition-image-pair",
-			browsers: ["E109", "S18", "SM18", "C109", "CA109", "O95"],
+			description:
+				'The ::view-transition-image-pair CSS pseudo-element represents a container for a view transition\'s "old" and "new" view states — before and after the transition.',
+			browsers: ["E109", "FFpreview", "S18", "SM18", "C109", "CA109", "O95"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -24255,12 +25627,12 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				'The ::view-transition-image-pair CSS pseudo-element represents a container for a view transition\'s "old" and "new" view states — before and after the transition.',
 		},
 		{
 			name: "::view-transition-new",
-			browsers: ["E109", "S18", "SM18", "C109", "CA109", "O95"],
+			description:
+				'The ::view-transition-new CSS pseudo-element represents the "new" view state of a view transition — a snapshot live representation of the state after the transition.',
+			browsers: ["E109", "FFpreview", "S18", "SM18", "C109", "CA109", "O95"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -24270,12 +25642,12 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				'The ::view-transition-new CSS pseudo-element represents the "new" view state of a view transition — a snapshot live representation of the state after the transition.',
 		},
 		{
 			name: "::view-transition-old",
-			browsers: ["E109", "S18", "SM18", "C109", "CA109", "O95"],
+			description:
+				'The ::view-transition-old CSS pseudo-element represents the "old" view state of a view transition — a static snapshot of the old view, before the transition.',
+			browsers: ["E109", "FFpreview", "S18", "SM18", "C109", "CA109", "O95"],
 			references: [
 				{
 					name: "MDN Reference",
@@ -24285,8 +25657,6 @@ export const cssData: CSSDataV1 = {
 			baseline: {
 				status: "false",
 			},
-			description:
-				'The ::view-transition-old CSS pseudo-element represents the "old" view state of a view transition — a static snapshot of the old view, before the transition.',
 		},
 	],
 };

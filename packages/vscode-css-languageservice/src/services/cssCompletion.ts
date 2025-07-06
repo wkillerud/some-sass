@@ -25,6 +25,7 @@ import {
 	LanguageServiceOptions,
 	IPropertyData,
 	CompletionSettings,
+	IDescriptorData,
 } from "../cssLanguageTypes";
 
 import * as l10n from "@vscode/l10n";
@@ -190,6 +191,8 @@ export class CSSCompletion {
 					this.getCompletionsForSupports(<nodes.Supports>node, result);
 				} else if (node instanceof nodes.SupportsCondition) {
 					this.getCompletionsForSupportsCondition(<nodes.SupportsCondition>node, result);
+				} else if (node instanceof nodes.MediaCondition) {
+					this.getCompletionsForMediaCondition(node, result);
 				} else if (node instanceof nodes.ExtendsReference) {
 					this.getCompletionsForExtendsReference(<nodes.ExtendsReference>node, null, result);
 				} else if (node.type === nodes.NodeType.URILiteral) {
@@ -409,7 +412,7 @@ export class CSSCompletion {
 	}
 
 	public getValueEnumProposals(
-		entry: IPropertyData,
+		entry: IPropertyData | IDescriptorData,
 		existingNode: nodes.Node | null,
 		result: CompletionList,
 	): CompletionList {
@@ -1131,6 +1134,48 @@ export class CSSCompletion {
 			return result;
 		}
 		return this.getCompletionForTopLevel(result);
+	}
+
+	public getCompletionsForMediaCondition(mediaCondition: nodes.MediaCondition, result: CompletionList): CompletionList {
+		const child = mediaCondition.findFirstChildBeforeOffset(this.offset);
+		if (child) {
+			if (child instanceof nodes.MediaFeature) {
+				const featureName = child.getChild(0);
+				if (featureName && this.offset > featureName.end) {
+					const name = featureName.getText();
+					const media = this.cssDataManager
+						.getAtDirective("@media")
+						?.descriptors?.find((descriptor) => descriptor.name === name);
+					if (media) {
+						return this.getValueEnumProposals(media, null, result);
+					}
+				}
+			} else if (child instanceof nodes.MediaCondition) {
+				return this.getCompletionsForMediaCondition(child, result);
+			}
+		}
+		// Return all media descriptors
+		const media = this.cssDataManager.getAtDirective("@media");
+		for (const descriptor of media?.descriptors || []) {
+			let command = undefined;
+			let text = descriptor.name;
+			if (descriptor.type === "discrete") {
+				// Change this check when we support auto completes for other types
+				if (descriptor.values) {
+					command = retriggerCommand;
+				}
+				text = `${descriptor.name}: `;
+			}
+			result.items.push({
+				label: descriptor.name,
+				textEdit: TextEdit.replace(this.getCompletionRange(null), text),
+				documentation: languageFacts.getEntryDescription(descriptor, this.doesSupportMarkdown()),
+				tags: isDeprecated(descriptor) ? [CompletionItemTag.Deprecated] : [],
+				kind: CompletionItemKind.Keyword,
+				command,
+			});
+		}
+		return result;
 	}
 
 	public getCompletionsForExtendsReference(

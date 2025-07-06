@@ -2,7 +2,7 @@
   "name": "some-sass",
   "displayName": "Some Sass",
   "description": "Improved support for SCSS, Sass indented and SassDoc. Workspace awareness and full support for Sass modules.",
-  "version": "4.2.1",
+  "version": "4.3.0",
   "private": true,
   "publisher": "SomewhatStationery",
   "license": "MIT",
@@ -23,7 +23,9 @@
     "intellisense",
     "refactor"
   ],
-  "categories": ["Programming Languages"],
+  "categories": [
+    "Programming Languages"
+  ],
   "activationEvents": [
     "onLanguage:css",
     "onLanguage:scss",
@@ -42,8 +44,13 @@
     "languages": [
       {
         "id": "sass",
-        "aliases": ["Sass", "sass-indented"],
-        "extensions": [".sass"],
+        "aliases": [
+          "Sass",
+          "sass-indented"
+        ],
+        "extensions": [
+          ".sass"
+        ],
         "configuration": "./languages/sass.configuration.json"
       }
     ],
@@ -74,7 +81,10 @@
             "items": {
               "type": "string"
             },
-            "default": ["**/.git/**", "**/node_modules/**"],
+            "default": [
+              "**/.git/**",
+              "**/node_modules/**"
+            ],
             "description": "List of glob patterns for directories that are excluded when scanning.",
             "order": 1
           },
@@ -97,7 +107,11 @@
           "some-sass.trace.server": {
             "type": "string",
             "scope": "window",
-            "enum": ["off", "messages", "verbose"],
+            "enum": [
+              "off",
+              "messages",
+              "verbose"
+            ],
             "default": "off",
             "description": "Log the messages sent between VS Code and the Some Sass language server.",
             "order": 999
@@ -146,8 +160,16 @@
             "type": "string",
             "default": "all",
             "description": "Controls the style of suggestions for mixins.",
-            "enum": ["all", "nobracket", "bracket"],
-            "enumItemLabels": ["All", "No brackets", "Only brackets"],
+            "enum": [
+              "all",
+              "nobracket",
+              "bracket"
+            ],
+            "enumItemLabels": [
+              "All",
+              "No brackets",
+              "Only brackets"
+            ],
             "enumDescriptions": [
               "Show all suggestions",
               "Only show suggestions without brackets",
@@ -213,7 +235,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "When using a vendor-specific prefix make sure to also include all other vendor-specific properties."
           },
@@ -221,7 +247,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "description": "When using a vendor-specific prefix, also include the standard property."
           },
@@ -229,7 +259,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "Do not use duplicate style definitions."
           },
@@ -237,7 +271,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "description": "Do not use empty rulesets."
           },
@@ -245,7 +283,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "Import statements can lead to sequential loading of CSS."
           },
@@ -253,7 +295,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "markdownDescription": "Do not use `width` or `height` when using `padding` or `border`."
           },
@@ -261,7 +307,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "markdownDescription": "The universal selector (`*`) is known to be slow."
           },
@@ -269,7 +319,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "No unit needed for zero."
           },
@@ -277,7 +331,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "markdownDescription": "`@font-face` rule must define `src` and `font-family` properties."
           },
@@ -285,7 +343,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "error",
             "description": "Hex colors must consist of 3, 4, 6 or 8 hex numbers."
           },
@@ -293,7 +355,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "error",
             "description": "Invalid number of parameters."
           },
@@ -301,7 +367,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "description": "Unknown vendor specific property."
           },
@@ -320,7 +390,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "IE hacks are only necessary when supporting IE7 and older."
           },
@@ -328,7 +402,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "Unknown vendor specific property."
           },
@@ -336,7 +414,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "markdownDescription": "Property is ignored due to the display. E.g. with `display: inline`, the `width`, `height`, `margin-top`, `margin-bottom`, and `float` properties have no effect."
           },
@@ -344,7 +426,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "markdownDescription": "Avoid using `!important`. It is an indication that the specificity of the entire CSS has gotten out of control and needs to be refactored."
           },
@@ -352,7 +438,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "markdownDescription": "Avoid using `float`. Floats lead to fragile CSS that is easy to break if one aspect of the layout changes."
           },
@@ -360,7 +450,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "Selectors should not contain IDs because these rules are too tightly coupled with the HTML."
           },
@@ -368,7 +462,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "description": "Unknown at-rule."
           },
@@ -493,8 +591,16 @@
             "type": "string",
             "default": "all",
             "description": "Controls the style of suggestions for mixins and placeholders.",
-            "enum": ["all", "nobracket", "bracket"],
-            "enumItemLabels": ["All", "No brackets", "Only brackets"],
+            "enum": [
+              "all",
+              "nobracket",
+              "bracket"
+            ],
+            "enumItemLabels": [
+              "All",
+              "No brackets",
+              "Only brackets"
+            ],
             "enumDescriptions": [
               "Show all suggestions",
               "Only show suggestions without brackets",
@@ -547,7 +653,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "When using a vendor-specific prefix make sure to also include all other vendor-specific properties."
           },
@@ -555,7 +665,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "description": "When using a vendor-specific prefix, also include the standard property."
           },
@@ -563,7 +677,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "Do not use duplicate style definitions."
           },
@@ -571,7 +689,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "description": "Do not use empty rulesets."
           },
@@ -579,7 +701,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "Import statements can lead to sequential loading of CSS."
           },
@@ -587,7 +713,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "markdownDescription": "Do not use `width` or `height` when using `padding` or `border`."
           },
@@ -595,7 +725,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "markdownDescription": "The universal selector (`*`) is known to be slow."
           },
@@ -603,7 +737,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "No unit needed for zero."
           },
@@ -611,7 +749,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "markdownDescription": "`@font-face` rule must define `src` and `font-family` properties."
           },
@@ -619,7 +761,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "error",
             "description": "Hex colors must consist of 3, 4, 6 or 8 hex numbers."
           },
@@ -627,7 +773,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "error",
             "description": "Invalid number of parameters."
           },
@@ -635,7 +785,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "description": "Unknown vendor specific property."
           },
@@ -654,7 +808,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "IE hacks are only necessary when supporting IE7 and older."
           },
@@ -662,7 +820,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "Unknown vendor specific property."
           },
@@ -670,7 +832,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "markdownDescription": "Property is ignored due to the display. E.g. with `display: inline`, the `width`, `height`, `margin-top`, `margin-bottom`, and `float` properties have no effect."
           },
@@ -678,7 +844,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "markdownDescription": "Avoid using `!important`. It is an indication that the specificity of the entire CSS has gotten out of control and needs to be refactored."
           },
@@ -686,7 +856,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "markdownDescription": "Avoid using `float`. Floats lead to fragile CSS that is easy to break if one aspect of the layout changes."
           },
@@ -694,7 +868,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "Selectors should not contain IDs because these rules are too tightly coupled with the HTML."
           },
@@ -702,7 +880,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "description": "Unknown at-rule."
           },
@@ -872,7 +1054,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "When using a vendor-specific prefix make sure to also include all other vendor-specific properties."
           },
@@ -880,7 +1066,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "description": "When using a vendor-specific prefix, also include the standard property."
           },
@@ -888,7 +1078,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "Do not use duplicate style definitions."
           },
@@ -896,7 +1090,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "description": "Do not use empty rulesets."
           },
@@ -904,7 +1102,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "Import statements can lead to sequential loading of CSS."
           },
@@ -912,7 +1114,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "markdownDescription": "Do not use `width` or `height` when using `padding` or `border`."
           },
@@ -920,7 +1126,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "markdownDescription": "The universal selector (`*`) is known to be slow."
           },
@@ -928,7 +1138,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "No unit needed for zero."
           },
@@ -936,7 +1150,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "markdownDescription": "`@font-face` rule must define `src` and `font-family` properties."
           },
@@ -944,7 +1162,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "error",
             "description": "Hex colors must consist of 3, 4, 6 or 8 hex numbers."
           },
@@ -952,7 +1174,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "error",
             "description": "Invalid number of parameters."
           },
@@ -960,7 +1186,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "description": "Unknown vendor specific property."
           },
@@ -979,7 +1209,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "IE hacks are only necessary when supporting IE7 and older."
           },
@@ -987,7 +1221,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "Unknown vendor specific property."
           },
@@ -995,7 +1233,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "markdownDescription": "Property is ignored due to the display. E.g. with `display: inline`, the `width`, `height`, `margin-top`, `margin-bottom`, and `float` properties have no effect."
           },
@@ -1003,7 +1245,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "markdownDescription": "Avoid using `!important`. It is an indication that the specificity of the entire CSS has gotten out of control and needs to be refactored."
           },
@@ -1011,7 +1257,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "markdownDescription": "Avoid using `float`. Floats lead to fragile CSS that is easy to break if one aspect of the layout changes."
           },
@@ -1019,7 +1269,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "ignore",
             "description": "Selectors should not contain IDs because these rules are too tightly coupled with the HTML."
           },
@@ -1027,7 +1281,11 @@
             "order": 53,
             "type": "string",
             "scope": "resource",
-            "enum": ["ignore", "warning", "error"],
+            "enum": [
+              "ignore",
+              "warning",
+              "error"
+            ],
             "default": "warning",
             "description": "Unknown at-rule."
           },
@@ -1130,7 +1388,7 @@
     ]
   },
   "dependencies": {
-    "some-sass-language-server": "2.2.1",
+    "some-sass-language-server": "2.3.0",
     "tinyglobby": "0.2.14",
     "vscode-css-languageservice": "6.3.7",
     "vscode-languageclient": "9.0.1",

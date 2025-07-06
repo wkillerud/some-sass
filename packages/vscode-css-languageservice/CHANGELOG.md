@@ -1,3 +1,9 @@
+## 2.2.0 (2025-07-06)
+
+### 🚀 Features
+
+- add support for oklab and oklch color functions ([#327](https://github.com/wkillerud/some-sass/pull/327))
+
 ## 2.1.1 (2025-06-07)
 
 ### 🩹 Fixes

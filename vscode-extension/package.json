@@ -1401,7 +1401,7 @@
     "@vscode/test-web": "0.0.71",
     "assert": "2.1.0",
     "events": "3.3.0",
-    "mocha": "11.5.0",
+    "mocha": "11.7.1",
     "shx": "0.4.0"
   },
   "scripts": {

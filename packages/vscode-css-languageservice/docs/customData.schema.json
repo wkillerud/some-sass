@@ -5,11 +5,16 @@
 	"title": "VS Code CSS Custom Data format",
 	"description": "Format for loading Custom Data in VS Code's CSS support",
 	"type": "object",
-	"required": ["version"],
+	"required": [
+		"version"
+	],
 	"definitions": {
 		"references": {
 			"type": "object",
-			"required": ["name", "url"],
+			"required": [
+				"name",
+				"url"
+			],
 			"properties": {
 				"name": {
 					"type": "string",
@@ -25,16 +30,58 @@
 		},
 		"markupDescription": {
 			"type": "object",
-			"required": ["kind", "value"],
+			"required": [
+				"kind",
+				"value"
+			],
 			"properties": {
 				"kind": {
 					"type": "string",
 					"description": "Whether `description.value` should be rendered as plaintext or markdown",
-					"enum": ["plaintext", "markdown"]
+					"enum": [
+						"plaintext",
+						"markdown"
+					]
 				},
 				"value": {
 					"type": "string",
 					"description": "Description shown in completion and hover"
+				}
+			}
+		},
+		"descriptor": {
+			"type": "object",
+			"required": [
+				"name"
+			],
+			"properties": {
+				"name": {
+					"type": "string",
+					"description": "The name of the descriptor."
+				},
+				"description": {
+					"description": "Description of at descriptor shown in completion and hover",
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"$ref": "#/definitions/markupDescription"
+						}
+					]
+				},
+				"status": {
+					"$ref": "#/properties/properties/items/properties/status"
+				},
+				"browsers": {
+					"$ref": "#/properties/properties/items/properties/browsers"
+				},
+				"references": {
+					"type": "array",
+					"description": "A list of references for the descriptor shown in completion and hover",
+					"items": {
+						"$ref": "#/definitions/references"
+					}
 				}
 			}
 		}
@@ -50,7 +97,9 @@
 			"type": "array",
 			"items": {
 				"type": "object",
-				"required": ["name"],
+				"required": [
+					"name"
+				],
 				"defaultSnippets": [
 					{
 						"body": {
@@ -70,13 +119,20 @@
 							{
 								"type": "string"
 							},
-							{ "$ref": "#/definitions/markupDescription" }
+							{
+								"$ref": "#/definitions/markupDescription"
+							}
 						]
 					},
 					"status": {
 						"type": "string",
 						"description": "Browser status",
-						"enum": ["standard", "experimental", "nonstandard", "obsolete"]
+						"enum": [
+							"standard",
+							"experimental",
+							"nonstandard",
+							"obsolete"
+						]
 					},
 					"browsers": {
 						"type": "array",
@@ -94,7 +150,11 @@
 							"status": {
 								"type": "string",
 								"description": "Baseline status",
-								"enum": ["high", "low", "false"]
+								"enum": [
+									"high",
+									"low",
+									"false"
+								]
 							},
 							"baseline_low_date": {
 								"type": "string",
@@ -131,7 +191,9 @@
 			"type": "array",
 			"items": {
 				"type": "object",
-				"required": ["name"],
+				"required": [
+					"name"
+				],
 				"defaultSnippets": [
 					{
 						"body": {
@@ -153,7 +215,9 @@
 							{
 								"type": "string"
 							},
-							{ "$ref": "#/definitions/markupDescription" }
+							{
+								"$ref": "#/definitions/markupDescription"
+							}
 						]
 					},
 					"status": {
@@ -168,6 +232,13 @@
 						"items": {
 							"$ref": "#/definitions/references"
 						}
+					},
+					"descriptors": {
+						"type": "array",
+						"description": "A list of descriptors for the at-directive, for example prefers-reduced-motion for @media",
+						"items": {
+							"$ref": "#/definitions/descriptor"
+						}
 					}
 				}
 			}
@@ -177,7 +248,9 @@
 			"type": "array",
 			"items": {
 				"type": "object",
-				"required": ["name"],
+				"required": [
+					"name"
+				],
 				"defaultSnippets": [
 					{
 						"body": {
@@ -199,7 +272,9 @@
 							{
 								"type": "string"
 							},
-							{ "$ref": "#/definitions/markupDescription" }
+							{
+								"$ref": "#/definitions/markupDescription"
+							}
 						]
 					},
 					"status": {
@@ -223,7 +298,9 @@
 			"type": "array",
 			"items": {
 				"type": "object",
-				"required": ["name"],
+				"required": [
+					"name"
+				],
 				"defaultSnippets": [
 					{
 						"body": {
@@ -245,7 +322,9 @@
 							{
 								"type": "string"
 							},
-							{ "$ref": "#/definitions/markupDescription" }
+							{
+								"$ref": "#/definitions/markupDescription"
+							}
 						]
 					},
 					"status": {

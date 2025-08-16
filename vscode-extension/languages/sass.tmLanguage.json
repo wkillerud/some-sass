@@ -218,6 +218,9 @@
 					"include": "#comment_line"
 				},
 				{
+					"include": "#comment_end_of_line"
+				},
+				{
 					"include": "#comment_block"
 				}
 			]
@@ -313,6 +316,9 @@
 				},
 				{
 					"include": "#comment_line"
+				},
+				{
+					"include": "#comment_end_of_line"
 				}
 			]
 		},
@@ -548,6 +554,9 @@
 						},
 						{
 							"include": "#comment_line"
+						},
+						{
+							"include": "#comment_end_of_line"
 						},
 						{
 							"match": "\\b(only)\\b",
@@ -841,6 +850,9 @@
 					"include": "#comment_line"
 				},
 				{
+					"include": "#comment_end_of_line"
+				},
+				{
 					"include": "#comment_block"
 				},
 				{
@@ -946,13 +958,23 @@
 			"name": "comment.block.sass"
 		},
 		"comment_line": {
-			"begin": "//",
+			"begin": "^([ \\t]*)(//)",
+			"while": "^\\1(\\s|\\t)+.*$",
 			"beginCaptures": {
 				"0": {
 					"name": "punctuation.definition.comment.sass"
 				}
 			},
+			"name": "comment.line.sass"
+		},
+		"comment_end_of_line": {
+			"begin": "//",
 			"end": "\\n",
+			"captures": {
+				"0": {
+					"name": "punctuation.definition.comment.sass"
+				}
+			},
 			"name": "comment.line.sass"
 		},
 		"constant_default": {
@@ -1107,6 +1129,9 @@
 				},
 				{
 					"include": "#comment_line"
+				},
+				{
+					"include": "#comment_end_of_line"
 				}
 			]
 		},
@@ -1174,6 +1199,9 @@
 				},
 				{
 					"include": "#comment_line"
+				},
+				{
+					"include": "#comment_end_of_line"
 				},
 				{
 					"match": "\\b([\\w-]+)\\s*(:)",
@@ -1765,6 +1793,9 @@
 						},
 						{
 							"include": "#comment_line"
+						},
+						{
+							"include": "#comment_end_of_line"
 						},
 						{
 							"include": "#map"

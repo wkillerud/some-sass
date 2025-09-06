@@ -400,7 +400,7 @@ test("finds function used in visibility modifier", async () => {
 		},
 	);
 	const two = fileSystemProvider.createDocument(
-		['@forward "func" as fun-* show hello;'],
+		['@forward "func" as fun-* show fun-hello;'],
 		{
 			uri: "dev.scss",
 		},
@@ -435,7 +435,7 @@ test("finds function used in visibility modifier", async () => {
 		},
 		end: {
 			line: 0,
-			character: 35,
+			character: 39,
 		},
 	});
 });

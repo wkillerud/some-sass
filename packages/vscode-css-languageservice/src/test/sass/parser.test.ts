@@ -431,7 +431,7 @@ suite("SCSS - Parser", () => {
 		assertNode('@forward "test" show this', parser, parser._parseForward.bind(parser));
 		assertNode('@forward "test" show $that', parser, parser._parseForward.bind(parser));
 		assertNode('@forward "test" show this $that', parser, parser._parseForward.bind(parser));
-		assertNode('@forward "test" as foo-* show this $that', parser, parser._parseForward.bind(parser));
+		assertNode('@forward "test" as foo-* show foo-this $foo-that', parser, parser._parseForward.bind(parser));
 
 		assertError("@forward", parser, parser._parseForward.bind(parser), ParseError.StringLiteralExpected);
 		assertError('@forward "test" foo', parser, parser._parseForward.bind(parser), ParseError.SemiColonExpected);

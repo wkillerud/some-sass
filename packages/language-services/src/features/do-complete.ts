@@ -722,14 +722,16 @@ export class DoComplete extends LanguageFeature {
 				const items: CompletionItem[] = [];
 				const symbols = this.ls.findDocumentSymbols(currentDocument);
 				for (const symbol of symbols) {
-					if (show.length > 0 && !show.includes(symbol.name)) {
-						continue;
-					}
-					if (hide.includes(symbol.name)) {
-						continue;
-					}
 					const isPrivate = Boolean(symbol.name.match(rePrivate));
 					if (isPrivate && currentDocument.uri !== document.uri) {
+						continue;
+					}
+
+					const prefixedName = `${prefix}${symbol.name}`;
+					if (show.length > 0 && !show.includes(prefixedName)) {
+						continue;
+					}
+					if (hide.includes(prefixedName)) {
 						continue;
 					}
 

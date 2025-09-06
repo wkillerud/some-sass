@@ -2,7 +2,7 @@
   "name": "some-sass",
   "displayName": "Some Sass",
   "description": "Improved support for SCSS, Sass indented and SassDoc. Workspace awareness and full support for Sass modules.",
-  "version": "4.3.0",
+  "version": "4.3.1",
   "private": true,
   "publisher": "SomewhatStationery",
   "license": "MIT",
@@ -1388,7 +1388,7 @@
     ]
   },
   "dependencies": {
-    "some-sass-language-server": "2.3.0",
+    "some-sass-language-server": "2.3.1",
     "tinyglobby": "0.2.14",
     "vscode-css-languageservice": "6.3.7",
     "vscode-languageclient": "9.0.1",

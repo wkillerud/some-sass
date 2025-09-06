@@ -1,3 +1,14 @@
+## 2.3.1 (2025-09-06)
+
+### 🩹 Fixes
+
+- completions for values forwarded with prefix and show ([#337](https://github.com/wkillerud/some-sass/pull/337))
+- **deps:** update dependency es-toolkit to v1.39.8 ([#332](https://github.com/wkillerud/some-sass/pull/332))
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 2.2.1
+
 ## 2.3.0 (2025-07-06)
 
 ### 🩹 Fixes

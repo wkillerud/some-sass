@@ -1,3 +1,9 @@
+## 2.2.1 (2025-09-06)
+
+### 🩹 Fixes
+
+- completions for values forwarded with prefix and show ([#337](https://github.com/wkillerud/some-sass/pull/337))
+
 ## 2.2.0 (2025-07-06)
 
 ### 🚀 Features

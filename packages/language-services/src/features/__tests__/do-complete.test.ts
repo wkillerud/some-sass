@@ -413,7 +413,7 @@ test("should suggest variable and function as parameter to mixin, not mixin or p
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
 
-test("", async () => {
+test("completions for values forwarded with prefix and show", async () => {
 	const one = fileSystemProvider.createDocument(
 		"@function hello() { @return 1; }",
 		{

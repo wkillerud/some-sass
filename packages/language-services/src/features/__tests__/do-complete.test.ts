@@ -412,3 +412,32 @@ test("should suggest variable and function as parameter to mixin, not mixin or p
 	assert.isUndefined(items.find((item) => item.label === "mixin"));
 	assert.isUndefined(items.find((item) => item.label === "%placeholder"));
 });
+
+test("", async () => {
+	const one = fileSystemProvider.createDocument(
+		"@function hello() { @return 1; }",
+		{
+			uri: "func.scss",
+		},
+	);
+	const two = fileSystemProvider.createDocument(
+		['@forward "func" as fun-* show fun-hello;'],
+		{
+			uri: "dev.scss",
+		},
+	);
+	const three = fileSystemProvider.createDocument([
+		'@use "dev" as d;',
+		":host { --var: d.; }",
+	]);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(three);
+
+	const { items } = await ls.doComplete(three, Position.create(1, 17));
+
+	assert.equal(items.length, 1);
+	assert.equal(items[0].label, "fun-hello");
+});

@@ -1389,7 +1389,7 @@
   },
   "dependencies": {
     "some-sass-language-server": "2.3.1",
-    "tinyglobby": "0.2.14",
+    "tinyglobby": "0.2.15",
     "vscode-css-languageservice": "6.3.7",
     "vscode-languageclient": "9.0.1",
     "vscode-uri": "3.1.0"

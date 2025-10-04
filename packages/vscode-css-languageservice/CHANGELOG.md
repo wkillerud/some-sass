@@ -1,3 +1,9 @@
+## 2.2.2 (2025-10-04)
+
+### 🩹 Fixes
+
+- update web data, value completion for white-space property ([#342](https://github.com/wkillerud/some-sass/pull/342))
+
 ## 2.2.1 (2025-09-06)
 
 ### 🩹 Fixes

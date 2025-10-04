@@ -1,3 +1,14 @@
+## 2.3.2 (2025-10-04)
+
+### 🩹 Fixes
+
+- **deps:** update dependency tinyglobby to v0.2.15 ([#341](https://github.com/wkillerud/some-sass/pull/341))
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 2.2.2
+- Updated @somesass/language-services to 2.3.2
+
 ## 2.3.1 (2025-09-06)
 
 ### 🧱 Updated Dependencies

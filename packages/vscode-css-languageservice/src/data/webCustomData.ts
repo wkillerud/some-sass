@@ -21733,6 +21733,7 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "range",
+					syntax: "<number>",
 					description:
 						"The -webkit-device-pixel-ratio is a non-standard Boolean CSS media feature which is an alternative to the standard resolution media feature.",
 					browsers: ["E12", "FF63", "FFA63", "S3", "SM1", "C1", "CA18", "O15"],
@@ -21755,6 +21756,7 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "<mq-boolean>",
 					description:
 						"The -webkit-transform-3d Boolean CSS media feature is a WebKit extension whose value is true if vendor-prefixed CSS 3D transforms are supported.",
 					browsers: ["E12", "FF49", "FFA49", "S4", "SM3.2", "C2", "CA18", "O15"],
@@ -21777,6 +21779,15 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "none | hover",
+					values: [
+						{
+							name: "none",
+						},
+						{
+							name: "hover",
+						},
+					],
 					description:
 						"The any-hover CSS media feature can be used to test whether any available input mechanism can hover over elements.",
 					browsers: ["E16", "FF64", "FFA64", "S9", "SM9", "C41", "CA41", "O28"],
@@ -21799,6 +21810,18 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "none | coarse | fine",
+					values: [
+						{
+							name: "none",
+						},
+						{
+							name: "coarse",
+						},
+						{
+							name: "fine",
+						},
+					],
 					description:
 						"The any-pointer CSS media feature tests whether the user has any pointing device (such as a mouse), and if so, how accurate it is.",
 					browsers: ["E12", "FF64", "FFA64", "S9", "SM9", "C41", "CA41", "O28"],
@@ -21821,6 +21844,7 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "range",
+					syntax: "<ratio>",
 					description: "The aspect-ratio CSS media feature can be used to test the aspect ratio of the viewport.",
 					browsers: ["E12", "FF3.5", "FFA4", "S5", "SM4.2", "C3", "CA18", "IE9", "O10"],
 					baseline: {
@@ -21842,6 +21866,7 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "range",
+					syntax: "<integer>",
 					description:
 						"The color CSS media feature can be used to test the number of bits per color component (red, green, blue) of the output device.",
 					browsers: ["E12", "FF2", "FFA4", "S3", "SM1", "C1", "CA18", "IE9", "O10"],
@@ -21864,6 +21889,18 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "srgb | p3 | rec2020",
+					values: [
+						{
+							name: "srgb",
+						},
+						{
+							name: "p3",
+						},
+						{
+							name: "rec2020",
+						},
+					],
 					description:
 						"The color-gamut CSS media feature is used to apply CSS styles based on the approximate range of color gamut supported by the user agent and the output device.",
 					browsers: ["E79", "FF110", "FFA110", "S10", "SM10", "C58", "CA58", "O45"],
@@ -21886,6 +21923,7 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "range",
+					syntax: "<integer>",
 					description:
 						"The color-index CSS media feature can be used to test the number of entries in the output device's color lookup table.",
 					browsers: ["E79", "S8", "SM8", "C29", "CA29", "O16"],
@@ -21906,6 +21944,7 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "range",
+					syntax: "<ratio>",
 					description:
 						"The device-aspect-ratio CSS media feature can be used to test the width-to-height aspect ratio of an output device.",
 					status: "obsolete",
@@ -21927,6 +21966,7 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "range",
+					syntax: "<length>",
 					description:
 						"The device-height CSS media feature can be used to test the height of an output device's rendering surface.",
 					status: "obsolete",
@@ -21948,6 +21988,7 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "range",
+					syntax: "<length>",
 					description:
 						"The device-width CSS media feature can be used to test the width of an output device's rendering surface.",
 					status: "obsolete",
@@ -21969,6 +22010,24 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "fullscreen | standalone | minimal-ui | browser | picture-in-picture",
+					values: [
+						{
+							name: "fullscreen",
+						},
+						{
+							name: "standalone",
+						},
+						{
+							name: "minimal-ui",
+						},
+						{
+							name: "browser",
+						},
+						{
+							name: "picture-in-picture",
+						},
+					],
 					description:
 						"The display-mode CSS media feature can be used to test whether a web app is being displayed in a normal browser tab or in some alternative way, such as a standalone app or fullscreen mode.",
 					browsers: ["E79", "FF47", "S13", "SM12.2", "C42", "CA42", "O29"],
@@ -21989,6 +22048,15 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "standard | high",
+					values: [
+						{
+							name: "standard",
+						},
+						{
+							name: "high",
+						},
+					],
 					description:
 						"The dynamic-range CSS media feature can be used to test the combination of brightness, contrast ratio, and color depth that are supported by the user agent and the output device.",
 					browsers: ["E98", "FF100", "FFA100", "S13.1", "SM13.4", "C98", "CA98", "O84"],
@@ -22007,6 +22075,18 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "opaque | additive | subtractive",
+					values: [
+						{
+							name: "opaque",
+						},
+						{
+							name: "additive",
+						},
+						{
+							name: "subtractive",
+						},
+					],
 				},
 				{
 					name: "forced-colors",
@@ -22021,6 +22101,15 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "none | active",
+					values: [
+						{
+							name: "none",
+						},
+						{
+							name: "active",
+						},
+					],
 					description:
 						"The forced-colors CSS media feature is used to detect if the user agent has enabled a forced colors mode where it enforces a user-chosen limited color palette on the page. An example of a forced colors mode is Windows High Contrast mode.",
 					browsers: ["E79", "FF89", "FFA89", "S16", "SM16", "C89", "CA89", "O75"],
@@ -22043,6 +22132,7 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "<mq-boolean>",
 					description:
 						"The grid CSS media feature can be used to test whether the output device uses a grid-based screen.",
 					browsers: ["E12", "FF2", "FFA4", "S3", "SM1", "C1", "CA18", "IE10", "O10"],
@@ -22065,6 +22155,7 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "range",
+					syntax: "<length>",
 					description:
 						"The height CSS media feature can be used to apply styles based on the height of the viewport (or the page box, for paged media).",
 					browsers: ["E12", "FF2", "FFA4", "S3", "SM1", "C1", "CA18", "IE9", "O10"],
@@ -22087,6 +22178,7 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "range",
+					syntax: "<integer>",
 					browsers: ["E138", "C138", "CA138", "O122"],
 					baseline: {
 						status: "false",
@@ -22105,6 +22197,15 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "none | hover",
+					values: [
+						{
+							name: "none",
+						},
+						{
+							name: "hover",
+						},
+					],
 					description:
 						"The hover CSS media feature can be used to test whether the user's primary input mechanism can hover over elements.",
 					browsers: ["E12", "FF64", "FFA64", "S9", "SM9", "C38", "CA50", "O25"],
@@ -22127,6 +22228,15 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "none | inverted",
+					values: [
+						{
+							name: "none",
+						},
+						{
+							name: "inverted",
+						},
+					],
 					description:
 						"The inverted-colors CSS media feature is used to test if the user agent or the underlying operating system has inverted all colors.",
 					browsers: ["S9.1", "SM10"],
@@ -22147,6 +22257,7 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "range",
+					syntax: "<integer>",
 					description:
 						"The monochrome CSS media feature can be used to test the number of bits per pixel in the monochrome frame buffer of the output device.",
 					browsers: ["E79", "FF2", "FFA4", "S3", "SM1", "C1", "CA18", "O10"],
@@ -22165,6 +22276,15 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "none | back",
+					values: [
+						{
+							name: "none",
+						},
+						{
+							name: "back",
+						},
+					],
 				},
 				{
 					name: "orientation",
@@ -22179,6 +22299,15 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "portrait | landscape",
+					values: [
+						{
+							name: "portrait",
+						},
+						{
+							name: "landscape",
+						},
+					],
 					description:
 						"The orientation CSS media feature can be used to test the orientation of the viewport (or the page box, for paged media).",
 					browsers: ["E12", "FF2", "FFA4", "S5", "SM4.2", "C3", "CA18", "IE9", "O10.6"],
@@ -22201,6 +22330,18 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "none | scroll | paged",
+					values: [
+						{
+							name: "none",
+						},
+						{
+							name: "scroll",
+						},
+						{
+							name: "paged",
+						},
+					],
 					description:
 						"The overflow-block CSS media feature can be used to test how the output device handles content that overflows the initial containing block along the block axis.",
 					browsers: ["E113", "FF66", "FFA66", "S17", "SM17", "C113", "CA113", "O99"],
@@ -22222,6 +22363,15 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "none | scroll",
+					values: [
+						{
+							name: "none",
+						},
+						{
+							name: "scroll",
+						},
+					],
 					description:
 						"The overflow-inline CSS media feature can be used to test how the output device handles content that overflows the initial containing block along the inline axis.",
 					browsers: ["E113", "FF66", "FFA66", "S17", "SM17", "C113", "CA113", "O99"],
@@ -22243,6 +22393,18 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "none | coarse | fine",
+					values: [
+						{
+							name: "none",
+						},
+						{
+							name: "coarse",
+						},
+						{
+							name: "fine",
+						},
+					],
 					description:
 						"The pointer CSS media feature tests whether the user has a pointing device (such as a mouse), and if so, how accurate the primary pointing device is.",
 					browsers: ["E12", "FF64", "FFA64", "S9", "SM9", "C41", "CA50", "O28"],
@@ -22265,6 +22427,15 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "light | dark",
+					values: [
+						{
+							name: "light",
+						},
+						{
+							name: "dark",
+						},
+					],
 					description:
 						"The prefers-color-scheme CSS media feature is used to detect if a user has requested light or dark color themes.",
 					browsers: ["E79", "FF67", "FFA67", "S12.1", "SM13", "C76", "CA76", "O62"],
@@ -22287,6 +22458,21 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "no-preference | less | more | custom",
+					values: [
+						{
+							name: "no-preference",
+						},
+						{
+							name: "less",
+						},
+						{
+							name: "more",
+						},
+						{
+							name: "custom",
+						},
+					],
 					description:
 						"The prefers-contrast CSS media feature is used to detect whether the user has requested the web content to be presented with a lower or higher contrast.",
 					browsers: ["E96", "FF101", "FFA101", "S14.1", "SM14.5", "C96", "CA96", "O82"],
@@ -22309,6 +22495,15 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "no-preference | reduce",
+					values: [
+						{
+							name: "no-preference",
+						},
+						{
+							name: "reduce",
+						},
+					],
 					description:
 						"The prefers-reduced-data CSS media feature is used to detect if the user has requested the web content that consumes less internet traffic.",
 					status: "experimental",
@@ -22330,6 +22525,15 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "no-preference | reduce",
+					values: [
+						{
+							name: "no-preference",
+						},
+						{
+							name: "reduce",
+						},
+					],
 					description:
 						"The prefers-reduced-motion CSS media feature is used to detect if a user has enabled a setting on their device to minimize the amount of non-essential motion. The setting is used to convey to the browser on the device that the user prefers an interface that removes, reduces, or replaces motion-based animations.",
 					browsers: ["E79", "FF63", "FFA64", "S10.1", "SM10.3", "C74", "CA74", "O62"],
@@ -22352,6 +22556,15 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "no-preference | reduce",
+					values: [
+						{
+							name: "no-preference",
+						},
+						{
+							name: "reduce",
+						},
+					],
 					description:
 						"The prefers-reduced-transparency CSS media feature is used to detect if a user has enabled a setting on their device to reduce the transparent or translucent layer effects used on the device. Switching on such a setting can help improve contrast and readability for some users.",
 					status: "experimental",
@@ -22373,6 +22586,7 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "range",
+					syntax: "<resolution> | infinite",
 					description: "The resolution CSS media feature can be used to test the pixel density of the output device.",
 					browsers: ["E12", "FF8", "FFA8", "S16", "SM16", "C29", "CA29", "IE9", "O16"],
 					baseline: {
@@ -22390,6 +22604,15 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "interlace | progressive",
+					values: [
+						{
+							name: "interlace",
+						},
+						{
+							name: "progressive",
+						},
+					],
 					description:
 						"The scan CSS media feature is used to apply CSS styles based on the scanning process of the output device.",
 				},
@@ -22406,6 +22629,18 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "none | initial-only | enabled",
+					values: [
+						{
+							name: "none",
+						},
+						{
+							name: "initial-only",
+						},
+						{
+							name: "enabled",
+						},
+					],
 					description:
 						"The scripting CSS media feature can be used to test whether scripting (such as JavaScript) is available.",
 					browsers: ["E120", "FF113", "FFA113", "S17", "SM17", "C120", "CA120", "O106"],
@@ -22423,6 +22658,15 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "rect | round",
+					values: [
+						{
+							name: "rect",
+						},
+						{
+							name: "round",
+						},
+					],
 					description:
 						"The shape CSS media feature can be used to test the shape of the device to distinguish rectangular and round displays.",
 				},
@@ -22439,6 +22683,18 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "none | slow | fast",
+					values: [
+						{
+							name: "none",
+						},
+						{
+							name: "slow",
+						},
+						{
+							name: "fast",
+						},
+					],
 					description:
 						"The update CSS media feature can be used to test how frequently (if at all) the output device is able to modify the appearance of content once rendered.",
 					browsers: ["E113", "FF102", "FFA102", "S17", "SM17", "C113", "CA113", "O99"],
@@ -22460,6 +22716,7 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "range",
+					syntax: "<integer>",
 					browsers: ["E138", "C138", "CA138", "O122"],
 					baseline: {
 						status: "false",
@@ -22474,6 +22731,18 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "srgb | p3 | rec2020",
+					values: [
+						{
+							name: "srgb",
+						},
+						{
+							name: "p3",
+						},
+						{
+							name: "rec2020",
+						},
+					],
 				},
 				{
 					name: "video-dynamic-range",
@@ -22488,6 +22757,15 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "discrete",
+					syntax: "standard | high",
+					values: [
+						{
+							name: "standard",
+						},
+						{
+							name: "high",
+						},
+					],
 					description:
 						"The video-dynamic-range CSS media feature can be used to test the combination of brightness, contrast ratio, and color depth that are supported by the video plane of the user agent and the output device.",
 					browsers: ["FF100", "FFA100", "O84"],
@@ -22508,6 +22786,7 @@ export const cssData: CSSDataV1 = {
 						},
 					],
 					type: "range",
+					syntax: "<length>",
 					description:
 						"The width CSS media feature can be used to test the width of the viewport (or the page box, for paged media).",
 					browsers: ["E12", "FF2", "FFA4", "S3", "SM1", "C1", "CA18", "IE9", "O10"],

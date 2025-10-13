@@ -1,6 +1,6 @@
 {
   "name": "@somesass/language-services",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "private": true,
   "description": "The features powering some-sass-language-server",
   "keywords": [
@@ -49,7 +49,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@somesass/vscode-css-languageservice": "2.2.2",
+    "@somesass/vscode-css-languageservice": "2.2.3",
     "colorjs.io": "0.5.2",
     "es-toolkit": "1.39.10",
     "sassdoc-parser": "3.4.1"

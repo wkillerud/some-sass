@@ -1,3 +1,9 @@
+## 2.2.3 (2025-10-13)
+
+### 🩹 Fixes
+
+- add support for scoped modules as alias values ([f6e69037](https://github.com/wkillerud/some-sass/commit/f6e69037))
+
 ## 2.2.2 (2025-10-04)
 
 ### 🩹 Fixes

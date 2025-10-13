@@ -42,6 +42,8 @@ function aliasSettings(): LanguageSettings {
 			"@NoUnderscoreDir/": "/noUnderscore/",
 			"@UnderscoreDir/": "/underscore/",
 			"@BothDir/": "/both/",
+			"@scoped/fake-module": "/src/assets/styles.scss",
+			"@scoped/fake-module/": "/src/assets/",
 		},
 	};
 }
@@ -867,6 +869,24 @@ foo
 			const settings = aliasSettings();
 			const ls = getSCSSLS();
 			ls.configure(settings);
+
+			await assertLinks(ls, '@use "@scoped/fake-module"', [
+				{
+					namespace: "fake-module",
+					range: newRange(5, 26),
+					target: "test://test/src/assets/styles.scss",
+					type: nodes.NodeType.Use,
+				},
+			]);
+
+			await assertLinks(ls, '@use "@scoped/fake-module/styles.scss"', [
+				{
+					namespace: "styles",
+					range: newRange(5, 38),
+					target: "test://test/src/assets/styles.scss",
+					type: nodes.NodeType.Use,
+				},
+			]);
 
 			await assertLinks(ls, '@import "@SassStylesheet"', [
 				{ range: newRange(8, 25), target: "test://test/src/assets/styles.scss", type: nodes.NodeType.Import },

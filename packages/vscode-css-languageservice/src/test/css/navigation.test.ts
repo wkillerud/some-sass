@@ -245,6 +245,8 @@ function aliasSettings(): LanguageSettings {
 		importAliases: {
 			"@SingleStylesheet": "/src/assets/styles.css",
 			"@AssetsDir/": "/src/assets/",
+			"@scoped/fake-module": "/src/assets/styles.css",
+			"@scoped/fake-module/": "/src/assets/",
 		},
 	};
 }
@@ -534,6 +536,14 @@ suite("CSS - Navigation", () => {
 
 			await assertLinks(ls, '@import "@AssetsDir/styles.css"', [
 				{ range: newRange(8, 31), target: "test://test/src/assets/styles.css", type: nodes.NodeType.Import },
+			]);
+
+			await assertLinks(ls, '@import "@scoped/fake-module"', [
+				{ range: newRange(8, 29), target: "test://test/src/assets/styles.css", type: nodes.NodeType.Import },
+			]);
+
+			await assertLinks(ls, '@import "@scoped/fake-module/styles.css"', [
+				{ range: newRange(8, 40), target: "test://test/src/assets/styles.css", type: nodes.NodeType.Import },
 			]);
 		});
 

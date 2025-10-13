@@ -642,8 +642,16 @@ export class CSSNavigation {
 					return this.mapReference(joinPath(rootFolderUri, settings[target]), isRawLink);
 				}
 				// Reference folder
-				const firstSlash = target.indexOf("/");
-				const prefix = `${target.substring(0, firstSlash)}/`;
+				let firstSlash = target.indexOf("/");
+				let prefix = `${target.substring(0, firstSlash)}/`;
+
+				// If a scoped module (starts with @) then get up until second instance of '/', or to the end of the string for root-level imports.
+				if (target[0] === "@" && target.indexOf("/") !== -1) {
+					const secondSlash = target.indexOf("/", firstSlash + 1);
+					if (secondSlash !== -1) {
+						prefix = `${target.substring(0, secondSlash)}/`;
+					}
+				}
 				if (prefix in settings) {
 					const aliasPath = settings[prefix].slice(0, -1);
 					let newPath = joinPath(rootFolderUri, aliasPath);

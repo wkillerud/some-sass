@@ -3,8 +3,8 @@ const { getDocUri, showFile, sleepCI } = require("./util");
 const assert = require("assert");
 
 const mainUri = getDocUri("apps/frontpage/styles.scss");
-const moduleUri = getDocUri("packages/fake-module/fake-module.scss");
-const colorsUri = getDocUri("packages/fake-module/_colors.scss");
+const moduleUri = getDocUri("packages/fake-module/src/styles/fake-module.scss");
+const colorsUri = getDocUri("packages/fake-module/src/styles/_colors.scss");
 
 before(async () => {
 	await showFile(mainUri);

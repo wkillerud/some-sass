@@ -1,0 +1,16 @@
+{
+  "name": "@org-scope/fake-module",
+  "type": "module",
+  "exports": {
+    ".": {
+      "sass": "./src/styles/fake-module.scss"
+    },
+    "./*.scss": {
+      "sass": "./src/styles/*.scss"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ]
+}

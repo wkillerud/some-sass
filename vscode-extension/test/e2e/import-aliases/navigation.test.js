@@ -23,7 +23,7 @@ test("supports import aliases (#347)", async () => {
 		(v) => v.target && v.target.path.endsWith("fake-module.scss"),
 	);
 	if (!module || !module.target) {
-		return assert.fail("Didn't find a working link to fake-module.scss");
+		return assert.fail("Didn't find a working link to fake-module.scss, got " + JSON.stringify(links));
 	}
 
 	await goToTarget(module.target);
@@ -43,7 +43,7 @@ test("supports import aliases to directories", async () => {
 		(v) => v.target && v.target.path.endsWith("colors.scss"),
 	);
 	if (!module || !module.target) {
-		return assert.fail("Didn't find a working link to _colors.scss");
+		return assert.fail("Didn't find a working link to _colors.scss, got " + JSON.stringify(links));
 	}
 
 	await goToTarget(module.target);

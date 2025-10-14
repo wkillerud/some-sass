@@ -1,6 +1,7 @@
 {
 	"somesass.workspace.importAliases": {
-		"@org-scope/fake-module": "${workspace}/packages/fake-module/fake-module.scss",
-		"@org-scope/fake-module/": "${workspace}/packages/fake-module/"
-	}
+		"@org-scope/fake-module": "/packages/fake-module/fake-module.scss",
+		"@org-scope/fake-module/": "/packages/fake-module/"
+	},
+	"somesass.workspace.logLevel": "trace"
 }

@@ -158,6 +158,29 @@ export class SomeSassServer {
 			);
 
 			settings.workspace.workspaceRoot = workspaceRoot;
+			if (
+				typeof settings.workspace.importAliases === "object" &&
+				Object.keys(settings.workspace.importAliases).length
+			) {
+				if (!settings.scss.links.enabled) {
+					this.log.info(
+						"somesass.workspace.importAliases requires somesass.scss.links.enabled to be true, ignoring the `false` value",
+					);
+					settings.scss.links.enabled = true;
+				}
+				if (!settings.sass.links.enabled) {
+					this.log.info(
+						"somesass.workspace.importAliases requires somesass.sass.links.enabled to be true, ignoring the `false` value",
+					);
+					settings.sass.links.enabled = true;
+				}
+				if (!settings.css.links.enabled) {
+					this.log.info(
+						"somesass.workspace.importAliases requires somesass.css.links.enabled to be true, ignoring the `false` value",
+					);
+					settings.css.links.enabled = true;
+				}
+			}
 
 			this.configuration = settings;
 			if (ls) {

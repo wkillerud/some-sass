@@ -158,6 +158,7 @@ export class SomeSassServer {
 			);
 
 			settings.workspace.workspaceRoot = workspaceRoot;
+
 			if (
 				typeof settings.workspace.importAliases === "object" &&
 				Object.keys(settings.workspace.importAliases).length
@@ -179,6 +180,25 @@ export class SomeSassServer {
 						"somesass.workspace.importAliases requires somesass.css.links.enabled to be true, ignoring the `false` value",
 					);
 					settings.css.links.enabled = true;
+				}
+
+				for (const [alias, path] of Object.entries(
+					settings.workspace.importAliases,
+				)) {
+					// Remove the commonly used ${workspace} variable https://code.visualstudio.com/docs/reference/variables-reference
+					// We require paths from the workspace root anyway.
+					if (path.includes("${workspace}")) {
+						settings.workspace.importAliases[alias] = path.replace(
+							"${workspace}",
+							"",
+						);
+					}
+					// WorkspaceFolder is not supported, one instance of the language server is started per workspace in a multi-root project.
+					if (path.includes("${workspaceFolder:")) {
+						this.log.warn(
+							"Using the workspaceFolder variable in importAliases is not supported. Some Sass starts one instance of the language server per root in a multi-root project. Each folder is treated as an isolated project.",
+						);
+					}
 				}
 			}
 

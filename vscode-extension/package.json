@@ -88,6 +88,13 @@
             "description": "List of glob patterns for directories that are excluded when scanning.",
             "order": 1
           },
+          "somesass.workspace.importAliases": {
+            "type": "object",
+            "scope": "resource",
+            "default": {},
+            "markdownDescription": "A map of aliases for file paths in the workspace, useful for example when using custom workspace tools to treat folders sort of as packages without publishing them.",
+            "order": 2
+          },
           "somesass.workspace.logLevel": {
             "type": "string",
             "scope": "resource",
@@ -102,7 +109,7 @@
               "trace"
             ],
             "description": "Control how much gets logged to the Output window.",
-            "order": 2
+            "order": 3
           },
           "some-sass.trace.server": {
             "type": "string",

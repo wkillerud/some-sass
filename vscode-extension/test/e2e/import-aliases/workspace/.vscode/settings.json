@@ -1,0 +1,8 @@
+{
+	"somesass.workspace.importAliases": {
+		"@org-scope/fake-module": "/packages/fake-module/src/styles/fake-module.scss",
+		// workspaceFolder is not supported, one instance of the language server is started per workspace in a multi-root project
+		"@org-scope/fake-module/": "${workspace}/packages/fake-module/src/styles/"
+	},
+	"somesass.workspace.logLevel": "trace"
+}

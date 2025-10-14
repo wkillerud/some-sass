@@ -337,7 +337,7 @@ export interface LanguageConfiguration {
 export interface WorkspaceConfiguration {
 	exclude: string[];
 	importAliases: {
-		[key: string]: any;
+		[key: string]: string;
 	};
 	/**
 	 * Pass in [load paths](https://sass-lang.com/documentation/cli/dart-sass/#load-path) that will be used in addition to `node_modules`.

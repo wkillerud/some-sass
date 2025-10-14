@@ -1,3 +1,14 @@
+## 2.3.4 (2025-10-14)
+
+### 🩹 Fixes
+
+- set up missing pieces for the importAliases setting in Code ([#348](https://github.com/wkillerud/some-sass/pull/348))
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 2.2.4
+- Updated @somesass/language-services to 2.3.4
+
 ## 2.3.3 (2025-10-13)
 
 ### 🧱 Updated Dependencies

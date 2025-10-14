@@ -1,0 +1,6 @@
+{
+	"somesass.workspace.importAliases": {
+		"@org-scope/fake-module": "${workspace}/packages/fake-module/fake-module.scss",
+		"@org-scope/fake-module/": "${workspace}/packages/fake-module/"
+	}
+}

@@ -1,0 +1,8 @@
+@use "@org-scope/fake-module";
+@use "@org-scope/fake-module/colors";
+
+$card-bg: colors.$primary;
+
+.square {
+  @include fake-module.square(12px);
+}

@@ -64,5 +64,11 @@
     "typescript": "5.9.2",
     "typescript-eslint": "8.39.0",
     "vitest": "3.2.4"
+  },
+  "overrides": {
+    "tinyglobby": {
+      ".": "0.2.14",
+      "fdir": "6.4.4"
+    }
   }
 }

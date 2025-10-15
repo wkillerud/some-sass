@@ -1,3 +1,14 @@
+## 2.3.5 (2025-10-15)
+
+### 🩹 Fixes
+
+- extension activation on Windows ([#351](https://github.com/wkillerud/some-sass/pull/351))
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 2.2.5
+- Updated @somesass/language-services to 2.3.5
+
 ## 2.3.4 (2025-10-14)
 
 ### 🩹 Fixes

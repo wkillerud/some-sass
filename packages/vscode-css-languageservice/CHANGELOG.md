@@ -1,3 +1,7 @@
+## 2.2.5 (2025-10-15)
+
+This was a version bump only for @somesass/vscode-css-languageservice to align it with other projects, there were no code changes.
+
 ## 2.2.4 (2025-10-14)
 
 This was a version bump only for @somesass/vscode-css-languageservice to align it with other projects, there were no code changes.

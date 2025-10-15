@@ -1,6 +1,6 @@
 {
   "name": "some-sass-language-server",
-  "version": "2.3.4",
+  "version": "2.3.5",
   "description": "LSP server for SCSS and Sass indented. Full support for @use and @forward, including aliases, prefixes and hiding. Rich documentation through SassDoc. Workspace-wide code navigation and refactoring.",
   "keywords": [
     "sass",
@@ -56,7 +56,7 @@
     "coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@somesass/language-services": "2.3.4",
+    "@somesass/language-services": "2.3.5",
     "@types/node": "22.17.0",
     "@vitest/coverage-v8": "3.2.4",
     "es-toolkit": "1.39.8",

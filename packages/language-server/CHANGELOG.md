@@ -1,3 +1,14 @@
+## 2.3.6 (2025-11-11)
+
+### 🩹 Fixes
+
+- filter out broken links to sass built-ins ([#363](https://github.com/wkillerud/some-sass/pull/363), [#256](https://github.com/wkillerud/some-sass/issues/256))
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 2.2.6
+- Updated @somesass/language-services to 2.3.6
+
 ## 2.3.5 (2025-10-15)
 
 ### 🩹 Fixes

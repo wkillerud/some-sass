@@ -572,7 +572,12 @@ export class SomeSassServer {
 						await initialScan;
 					}
 					const result = await ls.findDocumentLinks(document);
-					return result;
+					return result.filter((link) => {
+						// Filter out links that don't lead anywhere (#256).
+						// Done here since we rely on findDocumentLinks returning
+						// these links for other features internally (completions).
+						return !link.target?.startsWith("sass:");
+					});
 				} else {
 					return null;
 				}

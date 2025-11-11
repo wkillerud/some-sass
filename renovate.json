@@ -3,7 +3,7 @@
 	"extends": ["config:recommended"],
 	"schedule": ["on the first day of the month"],
 	"dependencyDashboard": false,
-	"ignoreDeps": ["@types/vscode"],
+	"ignoreDeps": ["@types/vscode", "@types/node"],
 	"packageRules": [
 		{
 			"groupName": "devDependencies (non-major)",

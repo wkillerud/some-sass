@@ -57,7 +57,6 @@
   },
   "devDependencies": {
     "@somesass/language-services": "2.3.5",
-    "@types/node": "24.10.0",
     "@vitest/coverage-v8": "4.0.6",
     "es-toolkit": "1.41.0",
     "merge-options": "3.0.4",

@@ -24,7 +24,7 @@ async function run() {
 	await call(`git pull`);
 	await call(`npm run clean`);
 	await call(`npm clean-install`);
-	await call(`npm run build`);
+	await call(`npm run build:production`);
 	await call(`npm run release`);
 	await call(`git push`);
 	await call(`git push --tags`);

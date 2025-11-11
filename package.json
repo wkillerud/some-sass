@@ -10,7 +10,7 @@
   "scripts": {
     "prepare": "husky",
     "build": "nx run-many -t build",
-    "build:production": "nx run-many -t build:production",
+    "build:production": "nx run-many -t build:production --skip-nx-cache",
     "preclean": "nx reset",
     "clean": "nx run-many -t clean",
     "postclean": "shx rm -rf node_modules",

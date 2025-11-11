@@ -50,6 +50,18 @@ test("navigating to a circular dependency does not cause a loop (#206)", async (
 	);
 });
 
+test("does not include sass built-ins as navigable links (#256)", async () => {
+	await showFile(mainUri);
+	let links = await findDocumentLinks(mainUri);
+
+	const builtin = links.find(
+		(v) => v.target && v.target.toString().includes("sass:"),
+	);
+	if (builtin) {
+		return assert.fail("Got an invalid link to a Sass built-in: " + builtin.target.toString());
+	}
+});
+
 /**
  * @param {import('vscode').Uri} documentUri
  * @returns {Promise<import('vscode').DocumentLink[]>}

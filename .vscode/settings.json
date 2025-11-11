@@ -1,5 +1,21 @@
 {
-	"somesass.scannerDepth": 30,
+  "chat.disableAIFeatures": true,
+  "chat.mcp.access": "none",
+  "chat.mcp.autostart": "never",
+  "chat.mcp.gallery.enabled": false,
+  "chat.mcp.assisted.nuget.enabled": false,
+  "chat.mcp.discovery.enabled": {
+    "claude-desktop": false,
+    "windsurf": false,
+    "cursor-global": false,
+    "cursor-workspace": false
+  },
+  "chat.agent.enabled": false,
+  "chat.agent.thinkingStyle": "none",
+  "chat.agent.maxRequests": 0,
+  "chat.agentSessionsViewLocation": "disabled",
+  "chat.allowAnonymousAccess": false,
+  "somesass.scannerDepth": 30,
 	"somesass.scannerExclude": [
 		"**/.git/**",
 		"**/node_modules/**",

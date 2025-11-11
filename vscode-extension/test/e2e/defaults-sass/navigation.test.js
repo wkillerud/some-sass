@@ -54,7 +54,6 @@ test("does not include sass built-ins as navigable links (#256)", async () => {
 	await showFile(mainUri);
 	let links = await findDocumentLinks(mainUri);
 
-	console.log(links);
 	const builtin = links.find(
 		(v) => v.target && v.target.toString().includes("sass:"),
 	);

@@ -68,7 +68,7 @@
   "overrides": {
     "tinyglobby": {
       ".": "0.2.14",
-      "fdir": "6.4.4"
+      "fdir": "6.5.0"
     }
   }
 }

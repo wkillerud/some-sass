@@ -17,7 +17,7 @@
 	},
 	"devDependencies": {
 		"@vscode/web-custom-data": "0.6.1",
-		"rimraf": "6.1.0",
+		"rimraf": "6.1.2",
 		"source-map-support": "0.5.21",
 		"typescript": "5.9.3"
 	},

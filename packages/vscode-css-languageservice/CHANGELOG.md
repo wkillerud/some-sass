@@ -1,3 +1,9 @@
+## 2.2.7 (2025-12-12)
+
+### 🩹 Fixes
+
+- update web-custom-data ([#375](https://github.com/wkillerud/some-sass/pull/375))
+
 ## 2.2.6 (2025-11-11)
 
 This was a version bump only for @somesass/vscode-css-languageservice to align it with other projects, there were no code changes.

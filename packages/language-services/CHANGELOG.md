@@ -1,3 +1,13 @@
+## 2.3.7 (2025-12-12)
+
+### 🩹 Fixes
+
+- **deps:** update dependency es-toolkit to v1.42.0 ([#373](https://github.com/wkillerud/some-sass/pull/373))
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 2.2.7
+
 ## 2.3.6 (2025-11-11)
 
 ### 🩹 Fixes

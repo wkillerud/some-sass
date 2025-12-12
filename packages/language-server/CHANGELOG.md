@@ -1,3 +1,10 @@
+## 2.3.7 (2025-12-12)
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 2.2.7
+- Updated @somesass/language-services to 2.3.7
+
 ## 2.3.6 (2025-11-11)
 
 ### 🩹 Fixes

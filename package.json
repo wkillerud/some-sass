@@ -43,7 +43,7 @@
     "@rspack/core": "1.7.0",
     "@swc-node/register": "1.11.1",
     "@swc/core": "1.15.8",
-    "@swc/helpers": "0.5.17",
+    "@swc/helpers": "0.5.18",
     "@types/node": "22.18.13",
     "@types/picomatch": "4.0.2",
     "@types/vscode": "1.86.0",

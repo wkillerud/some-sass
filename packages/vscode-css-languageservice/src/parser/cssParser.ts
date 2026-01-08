@@ -844,9 +844,7 @@ export class Parser {
 			return this.finish(node, ParseError.IdentifierExpected);
 		}
 
-		if (this.syntax === "indented" && this.accept(TokenType.SemiColon)) {
-			return this.finish(node, ParseError.UnexpectedSemicolon);
-		} else if (this.syntax !== "indented" && !this.accept(TokenType.SemiColon)) {
+		if (this.syntax !== "indented" && !this.accept(TokenType.SemiColon)) {
 			return this.finish(node, ParseError.SemiColonExpected);
 		}
 
@@ -924,9 +922,7 @@ export class Parser {
 			}
 		}
 
-		if (this.syntax === "indented" && this.accept(TokenType.SemiColon)) {
-			return this.finish(node, ParseError.UnexpectedSemicolon);
-		} else if (this.syntax !== "indented" && !this.accept(TokenType.SemiColon)) {
+		if (this.syntax !== "indented" && !this.accept(TokenType.SemiColon)) {
 			return this.finish(node, ParseError.SemiColonExpected);
 		}
 
@@ -1113,9 +1109,7 @@ export class Parser {
 		if ((!names || names.getChildren().length === 1) && (this.peek(TokenType.CurlyL) || this.peek(TokenType.Indent))) {
 			return this._parseBody(node, this._parseLayerDeclaration.bind(this, isNested));
 		}
-		if (this.syntax === "indented" && this.accept(TokenType.SemiColon)) {
-			return this.finish(node, ParseError.UnexpectedSemicolon);
-		} else if (this.syntax !== "indented" && !this.accept(TokenType.SemiColon)) {
+		if (this.syntax !== "indented" && !this.accept(TokenType.SemiColon)) {
 			return this.finish(node, ParseError.SemiColonExpected);
 		}
 		return this.finish(node);

@@ -45,39 +45,15 @@ Again, GitHub Actions is does the actual publishing when there are new tags.
 
 ### Manual release process
 
-In case `npm run release` fails, or GitHub Actions can't publish, here's how you can release manually (provided you have access).
+In case `npm run release` fails:
 
-To prepare the repository:
-
-```sh
-git checkout main
-git pull
-npm clean-install
-npm run build
-npm run test:all
-```
-
-Then, in `packages/language-server`:
-
-```sh
-# run npm version first if nx failed
-npm publish
-```
-
-In `vscode-extension/`:
-
-```sh
-vsce package
-```
-
-Then log in to and publish manually via Visual Studio [Marketplace], [Open VSX] and GitHub Releases (attach the `.vsix` file to the release).
-
-References:
-
-- [npm version](https://docs.npmjs.com/cli/v10/commands/npm-version)
-- [npm publish](https://docs.npmjs.com/cli/v10/commands/npm-publish)
-- [vsce](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)
-- [osvx](https://github.com/eclipse/openvsx/wiki/Publishing-Extensions)
+- Update the version numbers in `package.json` across the different packages.
+- Make sure you use the new version numbers in `"dependencies"`.
+- Run `npm install` to update the lockfile.
+- Create a manual changelog entry.
+- Commit the changes.
+- `git tag` the versions following the existing pattern (`<packagename>@<version>`).
+- Push to let GitHub Actions publish with Trusted Publishing.
 
 [nx]: https://nx.dev/recipes/nx-release/automatically-version-with-conventional-commits#usage-with-independent-releases
 [conventional]: https://www.conventionalcommits.org/en/v1.0.0/

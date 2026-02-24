@@ -1,3 +1,9 @@
+## 2.2.8 (2026-02-24)
+
+### 🩹 Fixes
+
+- port changes in vscode-languageservice 6.3.10 ([3e3ce57d](https://github.com/wkillerud/some-sass/commit/3e3ce57d))
+
 ## 2.2.7 (2025-12-12)
 
 ### 🩹 Fixes

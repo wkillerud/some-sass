@@ -25,12 +25,19 @@ async function run() {
 	await call(`npm run clean`);
 	await call(`npm clean-install`);
 	await call(`npm run build:production`);
+
+	let serverPkgJsonPreRelease = await fs.readFile(
+		path.join(process.cwd(), "packages", "language-server", "package.json"),
+		"utf-8",
+	);
+	serverPkgJsonPreRelease = JSON.parse(serverPkgJsonPreRelease);
+
 	await call(`npm run release`);
 	await call(`git push`);
 	await call(`git push --tags`);
 	console.log(`[release] pushed server release, updating client`);
 
-	let serverPkgJson = await fs.readFile(
+	let serverPkgJsonPostRelease = await fs.readFile(
 		path.join(process.cwd(), "packages", "language-server", "package.json"),
 		"utf-8",
 	);
@@ -38,12 +45,11 @@ async function run() {
 		path.join(process.cwd(), "vscode-extension", "package.json"),
 		"utf-8",
 	);
-	serverPkgJson = JSON.parse(serverPkgJson);
+	serverPkgJsonPostRelease = JSON.parse(serverPkgJsonPostRelease);
 	clientPkgJson = JSON.parse(clientPkgJson);
 
-	const oldServerVersion =
-		clientPkgJson.dependencies["some-sass-language-server"];
-	const newServerVersion = serverPkgJson.version;
+	const oldServerVersion = serverPkgJsonPreRelease.version;
+	const newServerVersion = serverPkgJsonPostRelease.version;
 
 	const diff = semver.diff(
 		semver.parse(oldServerVersion),
@@ -56,7 +62,6 @@ async function run() {
 		return;
 	}
 	clientPkgJson.version = semver.inc(clientPkgJson.version, diff);
-	clientPkgJson.dependencies["some-sass-language-server"] = newServerVersion;
 
 	await fs.writeFile(
 		path.join(process.cwd(), "vscode-extension", "package.json"),

@@ -810,6 +810,72 @@ export class SassParser extends cssParser.Parser {
 		return this._tryParseKeyframeSelector() || this._parseRuleSetDeclaration();
 	}
 
+	public _parseIfTest(): nodes.Node | null {
+		const node = this.create(nodes.Node);
+
+		if (this.acceptIdent("sass")) {
+			if (this.hasWhitespace() || !this.accept(TokenType.ParenthesisL)) {
+				return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL]);
+			}
+			node.addChild(this._parseExpr());
+			if (!this.accept(TokenType.ParenthesisR)) {
+				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL]);
+			}
+			return this.finish(node);
+		}
+
+		return super._parseIfTest();
+	}
+
+	public _parseFunction(): nodes.Function | null {
+		const pos = this.mark();
+		const node = this.create(nodes.Function);
+
+		let isIf = this.peekIdent("if");
+
+		if (!node.setIdentifier(this._parseFunctionIdentifier())) {
+			return null;
+		}
+
+		if (this.hasWhitespace() || !this.accept(TokenType.ParenthesisL)) {
+			this.restoreAtMark(pos);
+			return null;
+		}
+
+		let firstArgument: nodes.Node | null;
+		let parseArgument = this._parseFunctionArgument.bind(this);
+		let separator = TokenType.Comma;
+		if (!isIf) {
+			firstArgument = this._parseFunctionArgument();
+		} else {
+			const pos = this.mark();
+			firstArgument = this._parseIfBranch();
+			if (firstArgument && !firstArgument.isErroneous()) {
+				parseArgument = this._parseIfBranch.bind(this);
+				separator = TokenType.SemiColon;
+			} else {
+				this.restoreAtMark(pos);
+				firstArgument = this._parseFunctionArgument();
+			}
+		}
+
+		if (node.getArguments().addChild(firstArgument)) {
+			while (this.accept(separator)) {
+				if (this.peek(TokenType.ParenthesisR)) {
+					break;
+				}
+				if (!node.getArguments().addChild(parseArgument())) {
+					this.markError(node, ParseError.ExpressionExpected);
+				}
+			}
+		}
+
+		if (!this.accept(TokenType.ParenthesisR)) {
+			return <nodes.Function>this.finish(node, ParseError.RightParenthesisExpected);
+		}
+		return <nodes.Function>this.finish(node);
+	}
+
 	public _parseFunctionArgument(): nodes.Node | null {
 		// [variableName ':'] expression | variableName '...'
 		const node = <nodes.FunctionArgument>this.create(nodes.FunctionArgument);

@@ -1154,4 +1154,15 @@ suite("SCSS - Parser", () => {
 			ParseError.SemiColonExpected,
 		);
 	});
+
+	test("if function", function () {
+		const parser = new SassParser();
+		assertNode("if(true, black, white)", parser, parser._parseFunction.bind(parser));
+		assertNode("if(sass(true): black; else: white;)", parser, parser._parseFunction.bind(parser));
+		assertNode(
+			"if(sass($value == 'default'): flex-gutter(); else: $value;)",
+			parser,
+			parser._parseFunction.bind(parser),
+		);
+	});
 });

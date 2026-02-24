@@ -617,8 +617,8 @@ export class Parser {
 		return hasContent ? this.finish(node) : null;
 	}
 
-	public _parseDeclaration(stopTokens?: TokenType[]): nodes.Declaration | null {
-		const customProperty = this._tryParseCustomPropertyDeclaration(stopTokens);
+	public _parseDeclaration(stopTokens?: TokenType[], standaloneCustomPropertyValid = false): nodes.Declaration | null {
+		const customProperty = this._tryParseCustomPropertyDeclaration(stopTokens, standaloneCustomPropertyValid);
 		if (customProperty) {
 			return customProperty;
 		}
@@ -648,7 +648,10 @@ export class Parser {
 		return this.finish(node);
 	}
 
-	public _tryParseCustomPropertyDeclaration(stopTokens?: TokenType[]): nodes.CustomPropertyDeclaration | null {
+	public _tryParseCustomPropertyDeclaration(
+		stopTokens?: TokenType[],
+		standaloneCustomPropertyValid = false,
+	): nodes.CustomPropertyDeclaration | null {
 		if (!this.peekRegExp(TokenType.Ident, /^--/)) {
 			return null;
 		}
@@ -658,6 +661,9 @@ export class Parser {
 		}
 
 		if (!this.accept(TokenType.Colon)) {
+			if (standaloneCustomPropertyValid) {
+				return this.finish(node);
+			}
 			return this.finish(node, ParseError.ColonExpected, [TokenType.Colon]);
 		}
 		if (this.prevToken) {
@@ -1314,6 +1320,59 @@ export class Parser {
 		return this.finish(node);
 	}
 
+	public _parseBooleanExpression(parseTest: () => nodes.Node | null): nodes.Node | null {
+		// <boolean-expr[ <test> ]> = not <boolean-expr-group> | <boolean-expr-group>
+		//                                     [ [ and <boolean-expr-group> ]*
+		//                                     | [ or <boolean-expr-group> ]* ]
+
+		const node = this.create(nodes.Node);
+
+		if (this.acceptIdent("not")) {
+			if (!node.addChild(this._parseBooleanExpressionGroup(parseTest))) {
+				return null;
+			}
+		} else {
+			if (!node.addChild(this._parseBooleanExpressionGroup(parseTest))) {
+				return null;
+			}
+			if (this.peekIdent("and")) {
+				while (this.acceptIdent("and")) {
+					if (!node.addChild(this._parseBooleanExpressionGroup(parseTest))) {
+						return null;
+					}
+				}
+			} else if (this.peekIdent("or")) {
+				while (this.acceptIdent("or")) {
+					if (!node.addChild(this._parseBooleanExpressionGroup(parseTest))) {
+						return null;
+					}
+				}
+			}
+		}
+		return this.finish(node);
+	}
+
+	public _parseBooleanExpressionGroup(parseTest: () => nodes.Node | null) {
+		const node = this.create(nodes.Node);
+		const pos = this.mark();
+
+		if (this.accept(TokenType.ParenthesisL)) {
+			if (node.addChild(this._parseBooleanExpression(parseTest))) {
+				if (!this.accept(TokenType.ParenthesisR)) {
+					return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL]);
+				}
+				return this.finish(node);
+			}
+			this.restoreAtMark(pos);
+		}
+
+		if (!node.addChild(parseTest())) {
+			return null;
+		}
+
+		return this.finish(node);
+	}
+
 	public _parseMediaCondition(): nodes.Node | null {
 		// <media-condition> = <media-not> | <media-and> | <media-or> | <media-in-parens>
 		// <media-not> = not <media-in-parens>
@@ -1441,7 +1500,7 @@ export class Parser {
 		if (this.accept(TokenType.ParenthesisL)) {
 			// scope-start selector can start with a combinator as it defaults to :scope
 			// Treat as nested
-			if (!node.setScopeStart(this._parseSelector(true))) {
+			if (!node.setScopeStart(this._parseScopeSelectorList())) {
 				return this.finish(node, ParseError.SelectorExpected, [], [TokenType.ParenthesisR]);
 			}
 
@@ -1457,7 +1516,7 @@ export class Parser {
 			}
 			// 'to' selector can start with a combinator as it defaults to :scope
 			// Treat as nested
-			if (!node.setScopeEnd(this._parseSelector(true))) {
+			if (!node.setScopeEnd(this._parseScopeSelectorList())) {
 				return this.finish(node, ParseError.SelectorExpected, [], [TokenType.ParenthesisR]);
 			}
 
@@ -1467,6 +1526,17 @@ export class Parser {
 		}
 
 		return this.finish(node);
+	}
+
+	private _parseScopeSelectorList(): nodes.Node | null {
+		const selectors = this.createNode(nodes.NodeType.SelectorList);
+		if (!selectors.addChild(this._parseSelector(true))) {
+			return null;
+		}
+		while (this.accept(TokenType.Comma) && selectors.addChild(this._parseSelector(true))) {
+			// loop
+		}
+		return this.finish(selectors);
 	}
 
 	public _parseMedium(): nodes.Node | null {
@@ -1581,7 +1651,16 @@ export class Parser {
 		this.consumeToken(); // @container
 
 		node.addChild(this._parseIdent()); // optional container name
-		node.addChild(this._parseContainerQuery());
+		if (node.addChild(this._parseContainerQuery())) {
+			while (this.accept(TokenType.Comma)) {
+				if (this.peek(TokenType.CurlyL)) {
+					break;
+				}
+
+				node.addChild(this._parseIdent()); // optional container name
+				node.addChild(this._parseContainerQuery());
+			}
+		}
 
 		return this._parseBody(node, this._parseContainerDeclaration.bind(this, isNested));
 	}
@@ -1593,7 +1672,7 @@ export class Parser {
 		if (this.acceptIdent("not")) {
 			node.addChild(this._parseContainerQueryInParens());
 		} else {
-			node.addChild(this._parseContainerQueryInParens());
+			node.addChild(this._parseContainerQueryInParens(true));
 			if (this.peekIdent("and")) {
 				while (this.acceptIdent("and")) {
 					node.addChild(this._parseContainerQueryInParens());
@@ -1607,7 +1686,7 @@ export class Parser {
 		return this.finish(node);
 	}
 
-	public _parseContainerQueryInParens(): nodes.Node {
+	public _parseContainerQueryInParens(optional = false): nodes.Node | null {
 		// <query-in-parens>     = ( <container-query> )
 		// 					  | ( <size-feature> )
 		// 					  | style( <style-query> )
@@ -1631,6 +1710,9 @@ export class Parser {
 				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 			}
 		} else {
+			if (optional) {
+				return null;
+			}
 			return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.CurlyL, TokenType.Indent]);
 		}
 		return this.finish(node);
@@ -1659,7 +1741,7 @@ export class Parser {
 				}
 			}
 		} else {
-			node.addChild(this._parseDeclaration([TokenType.ParenthesisR]));
+			node.addChild(this._parseDeclaration([TokenType.ParenthesisR], true));
 		}
 		return this.finish(node);
 	}
@@ -2238,6 +2320,13 @@ export class Parser {
 		const pos = this.mark();
 		const node = this.create(nodes.Function);
 
+		let parseArgument = this._parseFunctionArgument.bind(this);
+		let separator = TokenType.Comma;
+		if (this.peekIdent("if")) {
+			parseArgument = this._parseIfBranch.bind(this);
+			separator = TokenType.SemiColon;
+		}
+
 		if (!node.setIdentifier(this._parseFunctionIdentifier())) {
 			return null;
 		}
@@ -2247,12 +2336,12 @@ export class Parser {
 			return null;
 		}
 
-		if (node.getArguments().addChild(this._parseFunctionArgument())) {
-			while (this.accept(TokenType.Comma)) {
+		if (node.getArguments().addChild(parseArgument())) {
+			while (this.accept(separator)) {
 				if (this.peek(TokenType.ParenthesisR)) {
 					break;
 				}
-				if (!node.getArguments().addChild(this._parseFunctionArgument())) {
+				if (!node.getArguments().addChild(parseArgument())) {
 					this.markError(node, ParseError.ExpressionExpected);
 				}
 			}
@@ -2290,6 +2379,84 @@ export class Parser {
 		if (node.setValue(this._parseExpr(true))) {
 			return this.finish(node);
 		}
+		return null;
+	}
+
+	public _parseIfBranch() {
+		// <if-branch> = <if-condition> : <declaration-value>?
+
+		const node = this.create(nodes.Node);
+		if (!node.addChild(this._parseIfCondition())) {
+			return this.finish(node, ParseError.IfConditionExpected, [], [TokenType.SemiColon]);
+		}
+		if (!this.accept(TokenType.Colon)) {
+			return this.finish(node, ParseError.ColonExpected, [], [TokenType.SemiColon]);
+		}
+		node.addChild(this._parseExpr());
+		return this.finish(node);
+	}
+
+	public _parseIfCondition(): nodes.Node | null {
+		// <if-condition> = <boolean-expr[ <if-test> ]> | else
+
+		const node = this.create(nodes.Node);
+
+		if (this.peekIdent("else")) {
+			node.addChild(this._parseIdent());
+			return this.finish(node);
+		}
+
+		return this._parseBooleanExpression(this._parseIfTest.bind(this));
+	}
+
+	public _parseIfTest(): nodes.Node | null {
+		// <if-test> =
+		// 	supports( [ <ident> : <declaration-value> ] | <supports-condition> ) |
+		// 	media( <media-feature> | <media-condition> ) |
+		// 	style( <style-query> )
+
+		const node = this.create(nodes.Node);
+
+		if (this.acceptIdent("supports")) {
+			if (this.hasWhitespace() || !this.accept(TokenType.ParenthesisL)) {
+				return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.Colon]);
+			}
+			node.addChild(this._tryToParseDeclaration() || this._parseSupportsCondition());
+			if (!this.accept(TokenType.ParenthesisR)) {
+				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.Colon]);
+			}
+			return this.finish(node);
+		}
+
+		if (this.acceptIdent("media")) {
+			if (this.hasWhitespace() || !this.accept(TokenType.ParenthesisL)) {
+				return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.Colon]);
+			}
+			const pos = this.mark();
+			const condition = this._parseMediaCondition();
+			if (condition && !condition.isErroneous()) {
+				node.addChild(condition);
+			} else {
+				this.restoreAtMark(pos);
+				node.addChild(this._parseMediaFeature());
+			}
+			if (!this.accept(TokenType.ParenthesisR)) {
+				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.Colon]);
+			}
+			return this.finish(node);
+		}
+
+		if (this.acceptIdent("style")) {
+			if (this.hasWhitespace() || !this.accept(TokenType.ParenthesisL)) {
+				return this.finish(node, ParseError.LeftParenthesisExpected, [], [TokenType.Colon]);
+			}
+			node.addChild(this._parseStyleQuery());
+			if (!this.accept(TokenType.ParenthesisR)) {
+				return this.finish(node, ParseError.RightParenthesisExpected, [], [TokenType.Colon]);
+			}
+			return this.finish(node);
+		}
+
 		return null;
 	}
 

@@ -59,4 +59,5 @@ export const ParseError = {
 	WildcardExpected: new CSSIssueType("css-wildcardexpected", l10n.t("wildcard expected")),
 	IdentifierOrVariableExpected: new CSSIssueType("css-idorvarexpected", l10n.t("identifier or variable expected")),
 	UnexpectedSemicolon: new CSSIssueType("css-nosemi", l10n.t("';' is not allowed in indented syntax")),
+	IfConditionExpected: new CSSIssueType("css-ifconditionexpected", l10n.t("if condition expected")),
 };

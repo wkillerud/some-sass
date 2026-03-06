@@ -58,7 +58,7 @@
   "devDependencies": {
     "@somesass/language-services": "2.3.8",
     "@vitest/coverage-v8": "4.0.18",
-    "es-toolkit": "1.44.0",
+    "es-toolkit": "1.45.1",
     "merge-options": "3.0.4",
     "path-browserify": "1.0.1",
     "process": "0.11.10",

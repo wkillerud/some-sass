@@ -17,7 +17,6 @@ import {
 	Function,
 	SassDocumentSymbol,
 } from "../language-services-types";
-import { asDollarlessVariable } from "../utils/sass";
 import { applySassDoc } from "../utils/sassdoc";
 
 export class DoHover extends LanguageFeature {
@@ -40,6 +39,7 @@ export class DoHover extends LanguageFeature {
 			nodeType = NodeType.Stylesheet;
 		}
 
+		let namespace: string | null = null;
 		let kind: SymbolKind | undefined;
 		let name: string | undefined;
 		let range: Range | undefined = undefined;
@@ -51,6 +51,7 @@ export class DoHover extends LanguageFeature {
 					parent.type !== NodeType.VariableDeclaration &&
 					parent.type !== NodeType.FunctionParameter
 				) {
+					namespace = this.getNodeNamespace(hoverNode as Variable);
 					name = (hoverNode as Variable).getName();
 					kind = SymbolKind.Variable;
 				}
@@ -80,6 +81,7 @@ export class DoHover extends LanguageFeature {
 					return null;
 				}
 				if (node) {
+					namespace = this.getNodeNamespace(node);
 					name = (node as Function | MixinReference).getName();
 					kind = type;
 				}
@@ -167,80 +169,70 @@ export class DoHover extends LanguageFeature {
 			);
 
 			// Traverse the workspace looking for a symbol of kinds.includes(symbol.kind) && name === symbol.name
-			const result = await this.findInWorkspace<
-				[TextDocument, SassDocumentSymbol]
-			>(
-				(document, prefix) => {
-					const symbols = this.ls.findDocumentSymbols(document);
-					for (const symbol of symbols) {
-						if (symbol.kind === kind) {
-							const prefixedSymbol = `${prefix}${asDollarlessVariable(symbol.name)}`;
-							const prefixedName = asDollarlessVariable(name!);
-							if (prefixedSymbol === prefixedName) {
-								return [[document, symbol]];
+
+			let lookupDocument = namespace
+				? await this.getNamespaceDocument(document, namespace)
+				: document;
+
+			if (lookupDocument) {
+				let { symbolDocument, symbol } = await this.findSymbolInWorkspace(
+					lookupDocument,
+					name,
+					[kind],
+				);
+
+				if (!symbol) {
+					// Fall back to looking through all the things, assuming folks use @import
+					const documents = this.cache.documents();
+					for (const document of documents) {
+						const symbols = this.ls.findDocumentSymbols(document);
+						for (const sym of symbols) {
+							if (sym.kind === kind && sym.name === name) {
+								symbolDocument = document;
+								symbol = sym;
+								break;
 							}
 						}
 					}
-				},
-				document,
-				{ lazy: true },
-			);
-
-			let symbolDocument: TextDocument | null = null;
-			let symbol: SassDocumentSymbol | null = null;
-			if (result.length !== 0) {
-				[symbolDocument, symbol] = result[0];
-			} else {
-				// Fall back to looking through all the things, assuming folks use @import
-				const documents = this.cache.documents();
-				for (const document of documents) {
-					const symbols = this.ls.findDocumentSymbols(document);
-					for (const sym of symbols) {
-						if (sym.kind === kind && sym.name === name) {
-							symbolDocument = document;
-							symbol = sym;
-							break;
-						}
-					}
 				}
-			}
 
-			if (symbol && symbolDocument) {
-				switch (symbol.kind) {
-					case SymbolKind.Variable: {
-						const hover = await this.getVariableHoverContent(
-							symbolDocument,
-							symbol,
-							name,
-						);
-						hover.range = range;
-						return hover;
-					}
-					case SymbolKind.Method: {
-						const hover = this.getMixinHoverContent(
-							symbolDocument,
-							symbol,
-							name,
-						);
-						hover.range = range;
-						return hover;
-					}
-					case SymbolKind.Function: {
-						const hover = this.getFunctionHoverContent(
-							symbolDocument,
-							symbol,
-							name,
-						);
-						hover.range = range;
-						return hover;
-					}
-					case SymbolKind.Class: {
-						const hover = this.getPlaceholderHoverContent(
-							symbolDocument,
-							symbol,
-						);
-						hover.range = range;
-						return hover;
+				if (symbol && symbolDocument) {
+					switch (symbol.kind) {
+						case SymbolKind.Variable: {
+							const hover = await this.getVariableHoverContent(
+								symbolDocument,
+								symbol,
+								name,
+							);
+							hover.range = range;
+							return hover;
+						}
+						case SymbolKind.Method: {
+							const hover = this.getMixinHoverContent(
+								symbolDocument,
+								symbol,
+								name,
+							);
+							hover.range = range;
+							return hover;
+						}
+						case SymbolKind.Function: {
+							const hover = this.getFunctionHoverContent(
+								symbolDocument,
+								symbol,
+								name,
+							);
+							hover.range = range;
+							return hover;
+						}
+						case SymbolKind.Class: {
+							const hover = this.getPlaceholderHoverContent(
+								symbolDocument,
+								symbol,
+							);
+							hover.range = range;
+							return hover;
+						}
 					}
 				}
 			}

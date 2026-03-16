@@ -2,7 +2,7 @@
   "name": "some-sass",
   "displayName": "Some Sass",
   "description": "Improved support for SCSS, Sass indented and SassDoc. Workspace awareness and full support for Sass modules.",
-  "version": "4.3.8",
+  "version": "4.3.9",
   "private": true,
   "publisher": "SomewhatStationery",
   "license": "MIT",

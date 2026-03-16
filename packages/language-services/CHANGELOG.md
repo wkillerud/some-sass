@@ -1,3 +1,13 @@
+## 2.3.9 (2026-03-16)
+
+### 🩹 Fixes
+
+- make do-hover, find-definition and find-colors namespace aware ([538e39a3](https://github.com/wkillerud/some-sass/commit/538e39a3))
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 2.2.9
+
 ## 2.3.8 (2026-02-24)
 
 ### 🩹 Fixes

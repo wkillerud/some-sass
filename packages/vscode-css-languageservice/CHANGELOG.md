@@ -1,3 +1,7 @@
+## 2.2.9 (2026-03-16)
+
+This was a version bump only for @somesass/vscode-css-languageservice to align it with other projects, there were no code changes.
+
 ## 2.2.8 (2026-02-24)
 
 ### 🩹 Fixes

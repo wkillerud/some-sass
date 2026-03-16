@@ -91,3 +91,63 @@ test("should find color information from variable referenced by another variable
 		},
 	});
 });
+
+test("should find correct color information from the variable declaration when variables collide across @use modules", async () => {
+	const one = fileSystemProvider.createDocument("$a: #f00;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument("$a: #0f0;", {
+		uri: "two.scss",
+	});
+	const main = fileSystemProvider.createDocument([
+		'@use "./one";',
+		'@use "./two";',
+		".one { color: one.$a; }",
+		".two { color: two.$a; }",
+	]);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(main);
+
+	const [colorInformation1, colorInformation2] = await ls.findColors(main);
+
+	assert.deepStrictEqual(colorInformation1, {
+		color: {
+			alpha: 1,
+			blue: 0,
+			green: 0,
+			red: 1,
+		},
+		range: {
+			end: {
+				character: 20,
+				line: 2,
+			},
+			start: {
+				character: 18,
+				line: 2,
+			},
+		},
+	});
+
+	assert.deepStrictEqual(colorInformation2, {
+		color: {
+			alpha: 1,
+			blue: 0,
+			green: 1,
+			red: 0,
+		},
+		range: {
+			end: {
+				character: 20,
+				line: 3,
+			},
+			start: {
+				character: 18,
+				line: 3,
+			},
+		},
+	});
+});

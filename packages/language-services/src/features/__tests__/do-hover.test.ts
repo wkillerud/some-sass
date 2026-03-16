@@ -115,6 +115,205 @@ test("should show hover information for symbol in a different document via @use 
 	assert.match(JSON.stringify(result), /\$primary/);
 });
 
+test("should show correct hover information when aliased modules symbols collide", async () => {
+	const one = fileSystemProvider.createDocument("$primary: red;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument("$primary: green;", {
+		uri: "two.scss",
+	});
+	const main = fileSystemProvider.createDocument([
+		'@use "./one" as o;',
+		'@use "./two" as t;',
+		".one { color: o.$primary; }",
+		".two { color: t.$primary; }",
+	]);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(main);
+
+	const resultOne = await ls.doHover(main, Position.create(2, 21));
+	assert.isNotNull(resultOne, "Expected to find a hover result for $primary");
+	const stringifiedOne = JSON.stringify(resultOne);
+	assert.match(stringifiedOne, /\$primary/);
+	assert.match(stringifiedOne, /one.scss/);
+
+	const resultTwo = await ls.doHover(main, Position.create(3, 21));
+	assert.isNotNull(resultTwo, "Expected to find a hover result for $primary");
+	const stringifiedTwo = JSON.stringify(resultTwo);
+	assert.match(stringifiedTwo, /\$primary/);
+	assert.match(stringifiedTwo, /two.scss/);
+});
+
+test("should show correct hover information when modules variables collide", async () => {
+	const one = fileSystemProvider.createDocument("$primary: red;", {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument("$primary: green;", {
+		uri: "two.scss",
+	});
+	const main = fileSystemProvider.createDocument([
+		'@use "./one";',
+		'@use "./two";',
+		".one { color: one.$primary; }",
+		".two { color: two.$primary; }",
+	]);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(main);
+
+	const resultOne = await ls.doHover(main, Position.create(2, 21));
+	assert.isNotNull(resultOne, "Expected to find a hover result for $primary");
+	const stringifiedOne = JSON.stringify(resultOne);
+	assert.match(stringifiedOne, /\$primary/);
+	assert.match(stringifiedOne, /one.scss/);
+
+	const resultTwo = await ls.doHover(main, Position.create(3, 21));
+	assert.isNotNull(resultTwo, "Expected to find a hover result for $primary");
+	const stringifiedTwo = JSON.stringify(resultTwo);
+	assert.match(stringifiedTwo, /\$primary/);
+	assert.match(stringifiedTwo, /two.scss/);
+});
+
+test("should show correct hover information when modules functions collide", async () => {
+	const one = fileSystemProvider.createDocument(
+		"@function primary() { @return red; }",
+		{ uri: "one.scss" },
+	);
+	const two = fileSystemProvider.createDocument(
+		"@function primary() { @return green; }",
+		{ uri: "two.scss" },
+	);
+	const main = fileSystemProvider.createDocument([
+		'@use "./one";',
+		'@use "./two";',
+		".one { color: one.primary(); }",
+		".two { color: two.primary(); }",
+	]);
+
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(main);
+
+	const resultOne = await ls.doHover(main, Position.create(2, 21));
+	assert.isNotNull(resultOne, "Expected to find a hover result for primary");
+	const stringifiedOne = JSON.stringify(resultOne);
+	assert.match(stringifiedOne, /primary/);
+	assert.match(stringifiedOne, /one.scss/);
+
+	const resultTwo = await ls.doHover(main, Position.create(3, 21));
+	assert.isNotNull(resultTwo, "Expected to find a hover result for primary");
+	const stringifiedTwo = JSON.stringify(resultTwo);
+	assert.match(stringifiedTwo, /primary/);
+	assert.match(stringifiedTwo, /two.scss/);
+});
+
+test("should show correct hover information when modules mixins collide", async () => {
+	const one = fileSystemProvider.createDocument(
+		"@mixin primary() { color: red; }",
+		{ uri: "one.scss" },
+	);
+	const two = fileSystemProvider.createDocument(
+		"@mixin primary() { color: green; }",
+		{ uri: "two.scss" },
+	);
+	const main = fileSystemProvider.createDocument([
+		'@use "./one";',
+		'@use "./two";',
+		".one { @include one.primary(); }",
+		".two { @include two.primary(); }",
+	]);
+
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(main);
+
+	const resultOne = await ls.doHover(main, Position.create(2, 22));
+	assert.isNotNull(resultOne, "Expected to find a hover result for primary");
+	const stringifiedOne = JSON.stringify(resultOne);
+	assert.match(stringifiedOne, /primary/);
+	assert.match(stringifiedOne, /one.scss/);
+
+	const resultTwo = await ls.doHover(main, Position.create(3, 22));
+	assert.isNotNull(resultTwo, "Expected to find a hover result for primary");
+	const stringifiedTwo = JSON.stringify(resultTwo);
+	assert.match(stringifiedTwo, /primary/);
+	assert.match(stringifiedTwo, /two.scss/);
+});
+
+test("should show correct hover information when user defined symbol collide with sass builtin", async () => {
+	const one = fileSystemProvider.createDocument(
+		"$e: 1; @function random() { @return 1; };",
+		{ uri: "one.scss" },
+	);
+	const two = fileSystemProvider.createDocument(
+		"$e: 2; @function random() { @return 2; };",
+		{ uri: "two.scss" },
+	);
+	const main = fileSystemProvider.createDocument([
+		'@use "./one";',
+		'@use "sass:math";',
+		'@use "./two";',
+		".one { opacity: one.$e; scale: one.random(); }",
+		".builtin { opacity: math.$e; scale: math.random(); }",
+		".two { opacity: two.$e; scale: two.random(); }",
+	]);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(main);
+
+	const resultOne = await ls.doHover(main, Position.create(3, 21));
+	assert.isNotNull(resultOne, "Expected to find a hover result for $e");
+	const stringifiedOne = JSON.stringify(resultOne);
+	assert.match(stringifiedOne, /\$e/);
+	assert.match(stringifiedOne, /one.scss/);
+
+	const resultRandomOne = await ls.doHover(main, Position.create(3, 37));
+	assert.isNotNull(
+		resultRandomOne,
+		"Expected to find a hover result for random",
+	);
+	const stringifiedRandomOne = JSON.stringify(resultRandomOne);
+	assert.match(stringifiedRandomOne, /random/);
+	assert.match(stringifiedRandomOne, /one.scss/);
+
+	const resultBuiltin = await ls.doHover(main, Position.create(4, 26));
+	assert.isNotNull(resultBuiltin, "Expected to find a hover result for $e");
+	const stringifiedBuiltin = JSON.stringify(resultBuiltin);
+	assert.match(stringifiedBuiltin, /\$e/);
+	assert.match(stringifiedBuiltin, /\[Sass reference\]/);
+
+	const resultRandomBuiltin = await ls.doHover(main, Position.create(4, 43));
+	assert.isNotNull(
+		resultRandomBuiltin,
+		"Expected to find a hover result for random",
+	);
+	const stringifiedRandomBuiltin = JSON.stringify(resultRandomBuiltin);
+	assert.match(stringifiedRandomBuiltin, /random/);
+	assert.match(stringifiedRandomBuiltin, /\[Sass reference\]/);
+
+	const resultTwo = await ls.doHover(main, Position.create(5, 21));
+	assert.isNotNull(resultTwo, "Expected to find a hover result for $e");
+	const stringifiedTwo = JSON.stringify(resultTwo);
+	assert.match(stringifiedTwo, /\$e/);
+	assert.match(stringifiedTwo, /two.scss/);
+
+	const resultRandomTwo = await ls.doHover(main, Position.create(5, 38));
+	assert.isNotNull(
+		resultRandomTwo,
+		"Expected to find a hover result for random",
+	);
+	const stringifiedRandomTwo = JSON.stringify(resultRandomTwo);
+	assert.match(stringifiedRandomTwo, /random/);
+	assert.match(stringifiedRandomTwo, /two.scss/);
+});
+
 test("should show hover information for symbol prefixed via @forward", async () => {
 	const one = fileSystemProvider.createDocument(
 		["$a: 1;", "@mixin mixin() { @content; }", "@function make() { @return; }"],

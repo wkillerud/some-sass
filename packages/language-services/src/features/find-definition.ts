@@ -1,4 +1,4 @@
-import { getNodeAtOffset } from "@somesass/vscode-css-languageservice";
+import { Forward, getNodeAtOffset } from "@somesass/vscode-css-languageservice";
 import { LanguageFeature } from "../language-feature";
 import {
 	TextDocument,
@@ -35,6 +35,8 @@ export class FindDefinition extends LanguageFeature {
 		// so we'll need to look for more than one SymbolKind.
 		let kinds: SymbolKind[] | undefined;
 		let name: string | undefined;
+		let namespace: string | null = null;
+
 		switch (node.type) {
 			case NodeType.VariableName: {
 				const parent = node.getParent();
@@ -43,6 +45,7 @@ export class FindDefinition extends LanguageFeature {
 						!(parent instanceof FunctionParameter) &&
 						!(parent instanceof VariableDeclaration)
 					) {
+						namespace = this.getNodeNamespace(node);
 						name = (node as Variable).getName();
 						kinds = [SymbolKind.Variable];
 					}
@@ -72,6 +75,7 @@ export class FindDefinition extends LanguageFeature {
 			}
 			case NodeType.Identifier: {
 				const parent = node.getParent();
+				let targetNode: Node = node;
 				if (parent && parent.type === NodeType.ForwardVisibility) {
 					name = node.getText();
 					// At this point the identifier can be both a function and a mixin.
@@ -97,7 +101,11 @@ export class FindDefinition extends LanguageFeature {
 						name = (n as Function | MixinReference).getName();
 						kinds = [kind];
 					}
+
+					if (n) targetNode = n;
 				}
+
+				namespace = this.getNodeNamespace(targetNode);
 				break;
 			}
 		}
@@ -111,30 +119,20 @@ export class FindDefinition extends LanguageFeature {
 		}
 
 		// Traverse the workspace looking for a symbol of kinds.includes(symbol.kind) && name === symbol.name
-		const result = await this.findInWorkspace<Location>(
-			(document, prefix) => {
-				const symbols = this.ls.findDocumentSymbols(document);
-				for (const symbol of symbols) {
-					if (symbol.kind === SymbolKind.Class) {
-						// Placeholders are not prefixed the same way other symbols are
-						if (kinds!.includes(symbol.kind) && symbol.name === name) {
-							return Location.create(document.uri, symbol.selectionRange);
-						}
-					}
 
-					const prefixedSymbol = `${prefix}${asDollarlessVariable(symbol.name)}`;
-					const prefixedName = asDollarlessVariable(name!);
-					if (kinds!.includes(symbol.kind) && prefixedSymbol === prefixedName) {
-						return Location.create(document.uri, symbol.selectionRange);
-					}
-				}
-			},
-			document,
-			{ lazy: true },
-		);
+		const lookupDocument = namespace
+			? await this.getNamespaceDocument(document, namespace)
+			: document;
 
-		if (result.length !== 0) {
-			return result[0];
+		if (lookupDocument) {
+			let { symbolDocument, symbol } = await this.findSymbolInWorkspace(
+				lookupDocument,
+				name,
+				kinds,
+			);
+
+			if (symbolDocument && symbol)
+				return Location.create(symbolDocument.uri, symbol.selectionRange);
 		}
 
 		// If not found, go through the old fashioned way and assume everything is in scope via @import

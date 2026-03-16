@@ -4,6 +4,9 @@ import {
 	LanguageService as VSCodeLanguageService,
 	Scanner,
 	SassScanner,
+	Node,
+	Module,
+	SymbolKind,
 } from "@somesass/vscode-css-languageservice";
 import { LanguageModelCache } from "./language-model-cache";
 import {
@@ -357,6 +360,27 @@ export abstract class LanguageFeature {
 			return null;
 		}
 
+		const namespace = this.getNodeNamespace(variable);
+
+		if (namespace) {
+			const namespaceDocument = await this.getNamespaceDocument(
+				document,
+				namespace,
+			);
+
+			if (namespaceDocument) {
+				const { symbolDocument, symbol } = await this.findSymbolInWorkspace(
+					namespaceDocument,
+					variable.getName(),
+					[SymbolKind.Variable],
+				);
+
+				if (symbol) {
+					return this.internalFindValue(symbolDocument, symbol.range.start);
+				}
+			}
+		}
+
 		const parent = variable.getParent();
 		if (parent instanceof VariableDeclaration) {
 			const value = parent.getValue();
@@ -405,5 +429,79 @@ export abstract class LanguageFeature {
 		} else {
 			return valueString;
 		}
+	}
+
+	protected getNodeNamespace(node: Node): string | null {
+		if (node.type === NodeType.MixinReference) {
+			const text = node.getText();
+			const dotIndex = text.indexOf(".");
+
+			if (dotIndex === -1) return null;
+
+			// remove « @include » and mixin name
+			return text.startsWith("@include ")
+				? text.substring(9, dotIndex > 0 ? dotIndex : undefined)
+				: null;
+		}
+
+		const parent = node.getParent();
+		if (!parent || parent.type !== NodeType.Module) return null;
+
+		const identifier = (parent as Module).getIdentifier();
+		if (!identifier) return null;
+
+		return identifier.getText() ?? null;
+	}
+
+	protected async getNamespaceDocument(
+		document: TextDocument,
+		namespace: string,
+	): Promise<TextDocument | null> {
+		const links = await this.ls.findDocumentLinks(document);
+
+		for (const link of links) {
+			if (
+				link.target &&
+				link.type === NodeType.Use &&
+				link.namespace === namespace
+			) {
+				if (link.target.includes("sass:")) return null;
+				return this.cache.getDocument(link.target) ?? null;
+			}
+		}
+
+		return null;
+	}
+
+	protected async findSymbolInWorkspace(
+		document: TextDocument,
+		name: string,
+		kinds: SymbolKind[],
+	): Promise<
+		| { symbolDocument: TextDocument; symbol: SassDocumentSymbol }
+		| { symbolDocument: null; symbol: null }
+	> {
+		const result = await this.findInWorkspace<{
+			symbolDocument: TextDocument;
+			symbol: SassDocumentSymbol;
+		}>(
+			(symbolDocument, prefix) => {
+				const symbols = this.ls.findDocumentSymbols(symbolDocument);
+				for (const symbol of symbols) {
+					if (!kinds.includes(symbol.kind)) continue;
+
+					const prefixedSymbol = `${prefix}${asDollarlessVariable(symbol.name)}`;
+					const prefixedName = asDollarlessVariable(name);
+
+					if (prefixedSymbol !== prefixedName) continue;
+
+					return { symbolDocument, symbol };
+				}
+			},
+			document,
+			{ lazy: true },
+		);
+
+		return result[0] ?? { symbolDocument: null, symbol: null };
 	}
 }

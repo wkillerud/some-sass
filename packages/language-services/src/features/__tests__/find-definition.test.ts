@@ -125,6 +125,39 @@ test("should find variable definition via the module link", async () => {
 	});
 });
 
+test("should resolve variable definitions correctly when modules have colliding symbols", async () => {
+	const one = fileSystemProvider.createDocument(["$a: 1;"], {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(["$a: 2;"], {
+		uri: "two.scss",
+	});
+	const main = fileSystemProvider.createDocument([
+		'@use "./one";',
+		'@use "./two";',
+		".a { content: one.$a; }",
+		".b { content: two.$a; }",
+	]);
+
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(main);
+
+	// one.$a
+	const posOne = Position.create(2, 19);
+	const locOne = await ls.findDefinition(main, posOne);
+
+	assert.isNotNull(locOne);
+	assert.match(locOne!.uri, /one\.scss$/);
+
+	// two.$a
+	const posTwo = Position.create(3, 19);
+	const locTwo = await ls.findDefinition(main, posTwo);
+
+	assert.isNotNull(locTwo);
+	assert.match(locTwo!.uri, /two\.scss$/);
+});
+
 test("should find mixin definition via the module link", async () => {
 	const one = fileSystemProvider.createDocument(
 		["$a: 1;", "@mixin mixin() { @content; }", "@function make() { @return; }"],
@@ -156,6 +189,40 @@ test("should find mixin definition via the module link", async () => {
 	});
 });
 
+test("should resolve mixin definitions correctly when modules have colliding symbols", async () => {
+	const one = fileSystemProvider.createDocument(["@mixin mixin() {}"], {
+		uri: "one.scss",
+	});
+	const two = fileSystemProvider.createDocument(["@mixin mixin() {}"], {
+		uri: "two.scss",
+	});
+
+	const main = fileSystemProvider.createDocument([
+		'@use "./one";',
+		'@use "./two";',
+		".a { @include one.mixin(); }",
+		".b { @include two.mixin(); }",
+	]);
+
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(main);
+
+	// one.mixin
+	const posOne = Position.create(2, 20);
+	const locOne = await ls.findDefinition(main, posOne);
+
+	assert.isNotNull(locOne);
+	assert.match(locOne!.uri, /one\.scss$/);
+
+	// two.mixin
+	const posTwo = Position.create(3, 20);
+	const locTwo = await ls.findDefinition(main, posTwo);
+
+	assert.isNotNull(locTwo);
+	assert.match(locTwo!.uri, /two\.scss$/);
+});
+
 test("should find function definition via the module link", async () => {
 	const one = fileSystemProvider.createDocument(
 		["$a: 1;", "@mixin mixin() { @content; }", "@function make() { @return; }"],
@@ -185,6 +252,43 @@ test("should find function definition via the module link", async () => {
 			line: 2,
 		},
 	});
+});
+
+test("should resolve function definitions correctly when modules have colliding symbols", async () => {
+	const one = fileSystemProvider.createDocument(
+		["@function make() { @return 1; }"],
+		{ uri: "one.scss" },
+	);
+
+	const two = fileSystemProvider.createDocument(
+		["@function make() { @return 2; }"],
+		{ uri: "two.scss" },
+	);
+
+	const main = fileSystemProvider.createDocument([
+		'@use "./one";',
+		'@use "./two";',
+		".a { content: one.make(1); }",
+		".b { content: two.make(1); }",
+	]);
+
+	ls.parseStylesheet(one);
+	ls.parseStylesheet(two);
+	ls.parseStylesheet(main);
+
+	// one.make
+	const posOne = Position.create(2, 20);
+	const locOne = await ls.findDefinition(main, posOne);
+
+	assert.isNotNull(locOne);
+	assert.match(locOne!.uri, /one\.scss$/);
+
+	// two.make
+	const posTwo = Position.create(3, 20);
+	const locTwo = await ls.findDefinition(main, posTwo);
+
+	assert.isNotNull(locTwo);
+	assert.match(locTwo!.uri, /two\.scss$/);
 });
 
 test("should find placeholder definition", async () => {

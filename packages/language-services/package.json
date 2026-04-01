@@ -51,7 +51,7 @@
   "dependencies": {
     "@somesass/vscode-css-languageservice": "2.2.9",
     "colorjs.io": "0.5.2",
-    "es-toolkit": "1.44.0",
+    "es-toolkit": "1.45.1",
     "sassdoc-parser": "3.4.1"
   },
   "devDependencies": {

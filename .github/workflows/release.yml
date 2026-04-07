@@ -50,7 +50,7 @@ jobs:
         run: xvfb-run -a npm run test:e2e
 
       - name: Run web e2e tests
-        uses: nick-fields/retry@9417ab499314dfe692edb043ded2ff9b3f5f0a68
+        uses: nick-fields/retry@dd56f1ca8ca991e2385c18ab6dd36ea7f9fdb55f
         with:
           timeout_minutes: 5
           max_attempts: 3

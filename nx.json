@@ -1,67 +1,68 @@
 {
-	"$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "tui": {
     "enabled": false
   },
-	"targetDefaults": {
-		"build": {
-			"dependsOn": ["^build"],
-			"outputs": ["{projectRoot}/dist"],
-			"cache": true
-		},
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/dist"],
+      "cache": true
+    },
     "build:production": {
-			"dependsOn": ["^build:production"],
-			"outputs": ["{projectRoot}/dist"],
-			"cache": true
-		},
-		"test": {
-			"dependsOn": ["^test"],
-			"cache": true
-		},
-		"coverage": {
-			"dependsOn": ["^coverage"],
-			"outputs": ["{projectRoot}/coverage"],
-			"cache": true
-		},
-		"compile": {
-			"outputs": ["{projectRoot}/lib"],
-			"cache": true
-		},
-		"compile-esm": {
-			"outputs": ["{projectRoot}/lib"],
-			"cache": true
-		},
-		"mocha": {
-			"cache": true
-		},
-		"lint": {
-			"cache": true
-		},
-		"test:e2e": {
-			"cache": true
-		},
-		"pretest:web": {
-			"cache": true
-		},
-		"test:web": {
-			"cache": true
-		}
-	},
-	"defaultBase": "main",
-	"plugins": [],
-	"release": {
-		"version": {
-			"conventionalCommits": true
-		},
-		"projectsRelationship": "independent",
-		"projects": ["packages/*", "vscode-extension/*"],
-		"releaseTagPattern": "{projectName}@{version}",
-		"changelog": {
-			"projectChangelogs": {
-				"renderOptions": {
-					"authors": false
-				}
-			}
-		}
-	}
+      "dependsOn": ["^build:production"],
+      "outputs": ["{projectRoot}/dist"],
+      "cache": true
+    },
+    "test": {
+      "dependsOn": ["^test"],
+      "cache": true
+    },
+    "coverage": {
+      "dependsOn": ["^coverage"],
+      "outputs": ["{projectRoot}/coverage"],
+      "cache": true
+    },
+    "compile": {
+      "outputs": ["{projectRoot}/lib"],
+      "cache": true
+    },
+    "compile-esm": {
+      "outputs": ["{projectRoot}/lib"],
+      "cache": true
+    },
+    "mocha": {
+      "cache": true
+    },
+    "lint": {
+      "cache": true
+    },
+    "test:e2e": {
+      "cache": true
+    },
+    "pretest:web": {
+      "cache": true
+    },
+    "test:web": {
+      "cache": true
+    }
+  },
+  "defaultBase": "main",
+  "plugins": [],
+  "release": {
+    "version": {
+      "conventionalCommits": true
+    },
+    "projectsRelationship": "independent",
+    "projects": ["packages/*", "vscode-extension/*"],
+    "releaseTagPattern": "{projectName}@{version}",
+    "changelog": {
+      "projectChangelogs": {
+        "renderOptions": {
+          "authors": false
+        }
+      }
+    }
+  },
+  "analytics": false
 }

@@ -1,4 +1,4 @@
-import { Forward, getNodeAtOffset } from "@somesass/vscode-css-languageservice";
+import { getNodeAtOffset } from "@somesass/vscode-css-languageservice";
 import { LanguageFeature } from "../language-feature";
 import {
 	TextDocument,
@@ -13,7 +13,6 @@ import {
 	VariableDeclaration,
 	Variable,
 } from "../language-services-types";
-import { asDollarlessVariable } from "../utils/sass";
 
 export class FindDefinition extends LanguageFeature {
 	async findDefinition(

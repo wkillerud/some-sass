@@ -3,8 +3,7 @@
 	"version": "2.2.9",
 	"private": true,
 	"description": "Language service for CSS, LESS and SCSS",
-	"main": "./lib/umd/cssLanguageService.js",
-	"typings": "./lib/umd/cssLanguageService",
+	"types": "./lib/esm/cssLanguageService.d.ts",
 	"module": "./lib/esm/cssLanguageService.js",
 	"author": "Microsoft Corporation",
 	"repository": {
@@ -28,10 +27,8 @@
 		"vscode-uri": "3.1.0"
 	},
 	"scripts": {
-		"build": "run-s compile compile-esm",
+		"build": "tsc -p ./src/tsconfig.json",
 		"build:production": "npm run build",
-		"compile": "tsc -p ./src/tsconfig.json",
-		"compile-esm": "tsc -p ./src/tsconfig.esm.json",
 		"clean": "rimraf lib node_modules",
 		"watch": "tsc -w -p ./src",
 		"test": "vitest",

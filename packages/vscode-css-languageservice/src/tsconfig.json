@@ -1,14 +1,15 @@
 {
 	"compilerOptions": {
 		"target": "es2020",
-		"module": "umd",
-		"moduleResolution": "node",
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
+    "types": ["node"],
 		"sourceMap": true,
 		"inlineSourceMap": false,
 		"declaration": true,
 		"strict": true,
 		"stripInternal": true,
-		"outDir": "../lib/umd",
+		"outDir": "../lib/esm",
 		"lib": ["es2020"]
 	},
 	"exclude": ["./test/"]

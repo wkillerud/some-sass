@@ -4,7 +4,7 @@
 	"private": true,
 	"description": "Language service for CSS, LESS and SCSS",
 	"types": "./lib/esm/cssLanguageService.d.ts",
-	"module": "./lib/esm/cssLanguageService.js",
+	"main": "./lib/esm/cssLanguageService.js",
 	"author": "Microsoft Corporation",
 	"repository": {
 		"type": "git",

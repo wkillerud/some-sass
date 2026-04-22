@@ -15,6 +15,7 @@ export default tseslint.config(
 		},
 		rules: {
 			"depend/ban-dependencies": "error",
+			"no-useless-assignment": "off", // broken in eslint 10.2.1
 		},
 	},
 	{

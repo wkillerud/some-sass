@@ -30,9 +30,6 @@ jobs:
           node-version: "lts/*"
           registry-url: "https://registry.npmjs.org"
 
-      - name: Update npm for attestation feature
-        run: npm install -g npm@latest
-
       - name: Install dependencies
         run: npm clean-install
 

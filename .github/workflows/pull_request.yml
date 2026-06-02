@@ -23,7 +23,7 @@ jobs:
           node-version: "lts/*"
 
       - name: Install dependencies
-        run: npm clean-install
+        run: npm clean-install --verbose
 
       - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
         run: npm audit signatures

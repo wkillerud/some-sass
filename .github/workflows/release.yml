@@ -13,6 +13,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: write # to be able to publish a GitHub release
       issues: write # to be able to comment on released issues

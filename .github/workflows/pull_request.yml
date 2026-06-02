@@ -21,7 +21,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: "lts/*"
+          node-version: 24.15.0
 
       - name: Install dependencies
         run: npm clean-install --verbose

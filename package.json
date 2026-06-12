@@ -34,8 +34,8 @@
     ]
   },
   "devDependencies": {
-    "@commitlint/cli": "20.5.3",
-    "@commitlint/config-conventional": "20.5.3",
+    "@commitlint/cli": "21.0.2",
+    "@commitlint/config-conventional": "21.0.2",
     "@eslint/js": "10.0.1",
     "@nx/js": "22.7.1",
     "@nx/web": "22.7.1",
@@ -54,8 +54,8 @@
     "eslint-plugin-depend": "1.5.0",
     "eslint-plugin-prettier": "5.5.5",
     "husky": "9.1.7",
-    "lint-staged": "16.4.0",
-    "npm-run-all2": "8.0.4",
+    "lint-staged": "17.0.7",
+    "npm-run-all2": "9.0.2",
     "nx": "22.7.1",
     "ovsx": "1.0.0",
     "prettier": "3.8.3",

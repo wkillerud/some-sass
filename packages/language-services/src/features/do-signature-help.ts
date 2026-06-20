@@ -80,7 +80,7 @@ export class DoSignatureHelp extends LanguageFeature {
 			// activeParameter is 0 index
 			if (
 				allParameters.length === 0 ||
-				allParameters.length > result.activeParameter
+				allParameters.length > (result.activeParameter || 0)
 			) {
 				const signatureInfo = SignatureInformation.create(
 					`${identifier}${symbol.detail || "()"}`,

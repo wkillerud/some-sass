@@ -8,6 +8,7 @@
     "@types/node",
     "@rspack/core",
     "@rspack/cli",
+    "vscode-languageserver",
     "tinyglobby"
   ],
 	"packageRules": [

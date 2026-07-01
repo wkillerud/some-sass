@@ -1398,7 +1398,7 @@
     "some-sass-language-server": "file:../packages/language-server",
     "tinyglobby": "0.2.14",
     "vscode-css-languageservice": "6.3.10",
-    "vscode-languageclient": "9.0.1",
+    "vscode-languageclient": "10.0.1",
     "vscode-uri": "3.1.0"
   },
   "devDependencies": {

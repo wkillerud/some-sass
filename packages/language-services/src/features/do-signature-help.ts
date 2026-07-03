@@ -21,9 +21,7 @@ export class DoSignatureHelp extends LanguageFeature {
 	): Promise<SignatureHelp | null> {
 		const stylesheet = this.ls.parseStylesheet(document);
 		let node = getNodeAtOffset(stylesheet, document.offsetAt(position)) as
-			| Function
-			| MixinReference
-			| null;
+			Function | MixinReference | null;
 
 		if (!node) {
 			return null;

@@ -202,8 +202,7 @@ export type SetDataProvidersOptions = {
 };
 
 export type Rename =
-	| { range: Range; placeholder: string }
-	| { defaultBehavior: boolean };
+	{ range: Range; placeholder: string } | { defaultBehavior: boolean };
 
 export type LintLevel = "ignore" | "warning" | "error";
 

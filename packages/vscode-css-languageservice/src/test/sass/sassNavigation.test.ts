@@ -1544,6 +1544,64 @@ foo
 			);
 		});
 
+		test("SCSS node package resolving through exports without pkg: prefix", async () => {
+			const ls = getSCSSLS();
+			const testUri = getTestResource("about.scss");
+			const workspaceFolder = getTestResource("");
+
+			async function assertUseLink(url: string, namespace: string, target: string) {
+				const quoted = `"${url}"`;
+				await assertLinks(
+					ls,
+					`@use ${quoted}`,
+					[
+						{
+							namespace,
+							range: newRange(5, 5 + quoted.length),
+							target: getTestResource(target),
+							type: nodes.NodeType.Use,
+						},
+					],
+					"scss",
+					testUri,
+					workspaceFolder,
+				);
+			}
+
+			// String subpath pattern pointing into a build folder: "./static/*": "./build/static/*"
+			await assertUseLink(
+				"@foo/build-exports/static/styles/theme",
+				"theme",
+				"node_modules/@foo/build-exports/build/static/styles/theme.scss",
+			);
+			await assertUseLink(
+				"@foo/build-exports/static/styles/theme.scss",
+				"theme",
+				"node_modules/@foo/build-exports/build/static/styles/theme.scss",
+			);
+			await assertUseLink(
+				"@foo/build-exports/static/styles/mixins",
+				"mixins",
+				"node_modules/@foo/build-exports/build/static/styles/_mixins.scss",
+			);
+			await assertUseLink(
+				"@foo/build-exports/static/styles/constants/colors",
+				"colors",
+				"node_modules/@foo/build-exports/build/static/styles/constants/colors.scss",
+			);
+
+			// Conditional exports work without the prefix as well
+			await assertUseLink("bar/button", "button", "node_modules/bar/styles/button.scss");
+			await assertUseLink("bar-pattern/theme/colors", "colors", "node_modules/bar-pattern/styles/theme/colors.scss");
+
+			// The pkg: prefix supports string subpath patterns too
+			await assertUseLink(
+				"pkg:@foo/build-exports/static/styles/theme",
+				"theme",
+				"node_modules/@foo/build-exports/build/static/styles/theme.scss",
+			);
+		});
+
 		test("Sass node package resolving", async () => {
 			let ls = getSCSSLS();
 			let testUri = getTestResource("about.sass");

@@ -12,6 +12,7 @@ These changes should be kept whenever we merge in changes from upstream. Cross o
   - [ ] Push `sass:` links as resolved in `findDocumentLinks` and `findDocumentLinks2` in `cssNavigation.ts` (we use them for completions).
   - [ ] Additions for `as`, `hide`, `show` and `type` in `findUnresolvedLinks` in `cssNavigation.ts`.
   - [x] `pkg:` imports.
+  - [ ] `exports` lookup for module imports without the `pkg:` prefix in `resolveReference` in `sassNavigation.ts`.
 - [ ] Placeholder selectors and usages in symbols (for completions, navigation).
   - [ ] `_parseExtends` in `scssParser.ts`.
   - [ ] `collectDocumentSymbols` in `cssNavigation.ts` surrounding `NodeType.SelectorPlaceholder`.

@@ -376,7 +376,11 @@ export abstract class LanguageFeature {
 				);
 
 				if (symbol) {
-					return this.internalFindValue(symbolDocument, symbol.range.start);
+					return this.internalFindValue(
+						symbolDocument,
+						symbol.range.start,
+						depth + 1,
+					);
 				}
 			}
 		}
@@ -388,9 +392,12 @@ export abstract class LanguageFeature {
 				return null;
 			}
 			if (value.getText().includes("$")) {
+				// The value can start with a namespace, as in `module.$variable`.
+				// Look up the variable node itself, not the start of the value.
+				const reference = findFirstVariable(value) ?? value;
 				return await this.internalFindValue(
 					document,
-					document.positionAt(value.offset),
+					document.positionAt(reference.offset),
 					depth + 1,
 				);
 			}
@@ -504,4 +511,17 @@ export abstract class LanguageFeature {
 
 		return result[0] ?? { symbolDocument: null, symbol: null };
 	}
+}
+
+function findFirstVariable(node: Node): Variable | null {
+	let variable: Variable | null = null;
+	node.accept((child) => {
+		if (variable) return false;
+		if (child instanceof Variable) {
+			variable = child;
+			return false;
+		}
+		return true;
+	});
+	return variable;
 }

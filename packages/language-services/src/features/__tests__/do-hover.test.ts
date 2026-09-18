@@ -441,3 +441,29 @@ test("should show expected hover information for Sassdoc in the case of more tha
 	assert.isNotNull(result, "Expected to find a hover result for @author");
 	assert.match(JSON.stringify(result), /@author/);
 });
+
+test("should show the value of a variable that references a namespaced variable", async () => {
+	const scaling = fileSystemProvider.createDocument("$spacing-1: 4px;", {
+		uri: "scaling.scss",
+	});
+	const theme = fileSystemProvider.createDocument(
+		['@use "./scaling" as Scaling;', "$spacing-1: Scaling.$spacing-1;"],
+		{ uri: "theme.scss" },
+	);
+	const component = fileSystemProvider.createDocument(
+		['@use "./theme";', ".a { gap: theme.$spacing-1; }"],
+		{ uri: "component.scss" },
+	);
+
+	// emulate scanner of language service which adds workspace documents to the cache
+	ls.parseStylesheet(scaling);
+	ls.parseStylesheet(theme);
+	ls.parseStylesheet(component);
+
+	const result = await ls.doHover(component, Position.create(1, 18));
+	assert.isNotNull(result, "Expected to find a hover result for $spacing-1");
+	assert.include(
+		JSON.stringify(result),
+		"$spacing-1: 4px; // via Scaling.$spacing-1",
+	);
+});

@@ -68,8 +68,8 @@
     "util": "0.12.5",
     "vitest": "4.1.11",
     "vscode-languageserver": "9.0.1",
-    "vscode-languageserver-textdocument": "1.0.14",
-    "vscode-languageserver-types": "3.18.3",
+    "vscode-languageserver-textdocument": "1.0.15",
+    "vscode-languageserver-types": "3.18.4",
     "vscode-uri": "3.2.0"
   }
 }

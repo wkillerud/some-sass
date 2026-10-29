@@ -2,11 +2,14 @@
 	"name": "@somesass/vscode-css-languageservice",
 	"version": "2.2.9",
 	"description": "Fork of vscode-css-languageservice for some-sass-language-server",
-  "publishConfig": {
-    "access": "public"
-  },
+	"publishConfig": {
+		"access": "public"
+	},
 	"types": "./lib/esm/cssLanguageService.d.ts",
 	"main": "./lib/esm/cssLanguageService.js",
+	"files": [
+		"lib"
+	],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/wkillerud/some-sass"

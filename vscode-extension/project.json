@@ -1,19 +1,19 @@
 {
-	"$schema": "../node_modules/nx/schemas/project-schema.json",
-	"name": "some-sass",
-	"sourceRoot": "vscode-extension/src",
-	"projectType": "application",
-	"targets": {
-		"package": {
-			"executor": "nx:run-commands",
-			"dependsOn": ["build", "^build"],
-			"options": {
-				"commands": [
-					"cd vscode-extension && npx vsce package --out some-sass.vsix"
-				],
-				"parallel": false
-			},
-			"outputs": ["{workspaceRoot}/dist/apps"]
-		}
-	}
+  "name": "some-sass",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "vscode-extension/src",
+  "projectType": "application",
+  "targets": {
+    "package": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build", "^build"],
+      "outputs": ["{workspaceRoot}/dist/apps"],
+      "options": {
+        "commands": [
+          "cd vscode-extension && npx vsce package --out some-sass.vsix"
+        ],
+        "parallel": false
+      }
+    }
+  }
 }

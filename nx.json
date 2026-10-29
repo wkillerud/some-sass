@@ -55,13 +55,15 @@
     },
     "projectsRelationship": "independent",
     "projects": ["packages/*", "vscode-extension/*"],
-    "releaseTagPattern": "{projectName}@{version}",
     "changelog": {
       "projectChangelogs": {
         "renderOptions": {
           "authors": false
         }
       }
+    },
+    "releaseTag": {
+      "pattern": "{projectName}@{version}"
     }
   },
   "analytics": false

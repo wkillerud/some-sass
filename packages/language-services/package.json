@@ -1,7 +1,9 @@
 {
   "name": "@somesass/language-services",
   "version": "2.3.9",
-  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "The features powering some-sass-language-server",
   "keywords": [
     "scss",

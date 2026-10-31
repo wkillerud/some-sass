@@ -37,8 +37,8 @@
     "@commitlint/cli": "21.2.3",
     "@commitlint/config-conventional": "21.2.3",
     "@eslint/js": "10.0.1",
-    "@nx/js": "23.2.1",
-    "@nx/web": "23.2.1",
+    "@nx/js": "24.0.3",
+    "@nx/web": "24.0.3",
     "@rspack/cli": "1.7.11",
     "@rspack/core": "1.7.11",
     "@swc-node/register": "1.12.1",
@@ -47,7 +47,7 @@
     "@types/node": "22.18.13",
     "@types/picomatch": "4.0.3",
     "@types/vscode": "1.86.0",
-    "@vscode/vsce": "3.9.2",
+    "@vscode/vsce": "4.1.0",
     "cross-env": "10.1.0",
     "eslint": "10.12.0",
     "eslint-config-prettier": "10.1.8",
@@ -56,14 +56,14 @@
     "husky": "9.1.7",
     "lint-staged": "17.6.0",
     "npm-run-all2": "9.0.3",
-    "nx": "23.2.1",
+    "nx": "24.0.3",
     "ovsx": "1.2.0",
     "prettier": "3.9.9",
     "shx": "0.4.0",
     "ts-loader": "9.6.2",
-    "typescript": "6.0.3",
+    "typescript": "7.0.2",
     "typescript-eslint": "8.71.0",
-    "vitest": "4.1.11"
+    "vitest": "5.0.5"
   },
   "overrides": {
     "tinyglobby": {

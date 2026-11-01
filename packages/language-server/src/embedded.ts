@@ -20,20 +20,19 @@ export function isFileWhereScssCanBeEmbedded(path: string) {
 export function getSassRegions(content: string) {
 	const regions: Region[] = [];
 	const startRe =
-		/<style[\w\t\n "'=]+(lang|type)=["'](text\/)?(?<type>s(a|c)ss)["'][\w\t\n "'=]*>/g;
+		/<style\s(?:[^>]*?\s)?(?:lang|type)=(?<quote>["'])(?:text\/)?(?<type>s[ac]ss)\k<quote>[^>]*>/g;
 	const endRe = /<\/style>/g;
 	let start: RegExpExecArray | null;
-	let end: RegExpExecArray | null;
-	while (
-		(start = startRe.exec(content)) !== null &&
-		(end = endRe.exec(content)) !== null
-	) {
-		if (start[0] !== undefined) {
-			regions.push({
-				type: (start.groups?.type || "scss") as "sass" | "scss",
-				range: [start.index + start[0].length, end.index],
-			});
-		}
+	while ((start = startRe.exec(content)) !== null) {
+		// Find the end tag that comes after this start tag
+		endRe.lastIndex = startRe.lastIndex;
+		const end = endRe.exec(content);
+		if (!end) break;
+		regions.push({
+			type: (start.groups?.type || "scss") as "sass" | "scss",
+			range: [startRe.lastIndex, end.index],
+		});
+		startRe.lastIndex = endRe.lastIndex;
 	}
 
 	return regions;
@@ -82,22 +81,29 @@ export function getSassRegionsDocument(
 
 	const text = document.getText();
 	const regions = getSassRegions(text);
-
-	if (
-		typeof position === "undefined" ||
-		(regions.some(({ range }) => range[0] <= offset && range[1] >= offset) &&
-			regions.every(({ type }) => type === regions[0].type))
-	) {
-		const uri = document.uri;
-		const version = document.version;
-
-		return TextDocument.create(
-			uri,
-			regions[0].type,
-			version,
-			getSassContent(text, regions),
-		);
+	if (regions.length === 0) {
+		return null;
 	}
 
-	return null;
+	let type = regions[0].type;
+	if (typeof position !== "undefined") {
+		const current = regions.find(
+			({ range }) => range[0] <= offset && range[1] >= offset,
+		);
+		if (!current) {
+			return null;
+		}
+		type = current.type;
+	}
+
+	// The document can only have one language, so mask regions of the other type.
+	return TextDocument.create(
+		document.uri,
+		type,
+		document.version,
+		getSassContent(
+			text,
+			regions.filter((region) => region.type === type),
+		),
+	);
 }

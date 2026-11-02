@@ -32,6 +32,9 @@ jobs:
       - name: Run linter
         run: npm run lint
 
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Build extension
         run: npm run build:production
 

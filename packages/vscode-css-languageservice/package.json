@@ -1,6 +1,6 @@
 {
 	"name": "@somesass/vscode-css-languageservice",
-	"version": "2.2.9",
+	"version": "2.2.10",
 	"description": "Fork of vscode-css-languageservice for some-sass-language-server",
 	"publishConfig": {
 		"access": "public"

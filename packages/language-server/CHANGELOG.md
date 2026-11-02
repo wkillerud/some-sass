@@ -1,3 +1,14 @@
+## 2.3.9 (2026-11-02)
+
+### 🩹 Fixes
+
+- pair style end tags and accept all attributes in embedded Sass regions ([26c51c61](https://github.com/wkillerud/some-sass/commit/26c51c61))
+
+### 🧱 Updated Dependencies
+
+- Updated @somesass/vscode-css-languageservice to 2.2.10
+- Updated @somesass/language-services to 2.3.10
+
 ## 2.3.8 (2026-03-16)
 
 ### 🧱 Updated Dependencies

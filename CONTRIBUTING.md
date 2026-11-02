@@ -4,6 +4,14 @@ Thank you for showing an interest in contributing, be it to the language server,
 
 The best place to get started is [the guide for new contributors](https://wkillerud.github.io/some-sass/contributing/new-contributors.html).
 
+## LLM policy
+
+The project is by default **negative to LLM-based contributions**. Exceptions can be made provided that:
+
+- Proposed changes are small and reviewable in minutes.
+- Trust has been established between you and the maintainer.
+- **You** think the result is the correct way to solve the problem.
+
 ## Conventional commits
 
 This repository uses [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) to automate versioning and changelog generation.

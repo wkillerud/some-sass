@@ -57,9 +57,9 @@
     "sassdoc-parser": "3.4.1"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "4.1.12",
+    "@vitest/coverage-v8": "5.1.0",
     "shx": "0.4.0",
-    "typescript": "6.0.3",
+    "typescript": "7.0.2",
     "vscode-languageserver-textdocument": "1.0.12",
     "vscode-languageserver-types": "3.17.5",
     "vscode-uri": "3.1.0"

@@ -57,7 +57,7 @@
   },
   "devDependencies": {
     "@somesass/language-services": "2.3.10",
-    "@vitest/coverage-v8": "4.1.12",
+    "@vitest/coverage-v8": "5.1.0",
     "es-toolkit": "1.53.1",
     "merge-options": "3.0.4",
     "path-browserify": "1.0.1",
@@ -66,7 +66,7 @@
     "tinyglobby": "0.2.14",
     "url": "0.11.4",
     "util": "0.12.5",
-    "vitest": "4.1.12",
+    "vitest": "5.1.0",
     "vscode-languageserver": "9.0.1",
     "vscode-languageserver-textdocument": "1.0.12",
     "vscode-languageserver-types": "3.17.5",

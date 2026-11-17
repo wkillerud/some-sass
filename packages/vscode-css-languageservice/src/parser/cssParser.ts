@@ -392,6 +392,7 @@ export class Parser {
 			this._parseNamespace() ||
 			this._parseDocument() ||
 			this._parseContainer(isNested) ||
+			this._parseStartingStyleAtRule(isNested) ||
 			this._parseUnknownAtRule()
 		);
 	}

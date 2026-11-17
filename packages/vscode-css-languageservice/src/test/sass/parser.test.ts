@@ -10,7 +10,9 @@ import { SassParser } from "../../parser/sassParser";
 import { ParseError } from "../../parser/cssErrors";
 import { SassParseError } from "../../parser/sassErrors";
 
-import { assertNode, assertError } from "../css/parser.test";
+import * as nodes from "../../parser/cssNodes";
+
+import { assertNode, assertError, assertType } from "../css/parser.test";
 
 suite("SCSS - Parser", () => {
 	test("Comments", function () {
@@ -1164,5 +1166,25 @@ suite("SCSS - Parser", () => {
 			parser,
 			parser._parseFunction.bind(parser),
 		);
+	});
+	test("nested identifier", function () {
+		const parser = new SassParser();
+		assertType("calc(100% - var(--x))", parser, nodes.NodeType.Identifier, parser._parseExpr.bind(parser));
+		assertType("calc(100% - 2 * var(--x))", parser, nodes.NodeType.Identifier, parser._parseExpr.bind(parser));
+		assertType("calc(1 + 2 + var(--x))", parser, nodes.NodeType.Identifier, parser._parseExpr.bind(parser));
+		assertType("calc((100% - var(--x)) * 2)", parser, nodes.NodeType.Identifier, parser._parseExpr.bind(parser));
+		// sass ones here
+		assertType("$a: 2 * var(--x);", parser, nodes.NodeType.Identifier, parser._parseVariableDeclaration.bind(parser));
+		assertType(
+			"$a: 2 * var(--x) + 1;",
+			parser,
+			nodes.NodeType.Identifier,
+			parser._parseVariableDeclaration.bind(parser),
+		);
+		// no longer fail
+		assertType("calc(2 * var(--x) + 1)", parser, nodes.NodeType.Identifier, parser._parseExpr.bind(parser));
+		assertType("calc(var(--x) * 2 / 3)", parser, nodes.NodeType.Identifier, parser._parseExpr.bind(parser));
+		assertType("calc(-1 * var(--x) + 1 * 2)", parser, nodes.NodeType.Identifier, parser._parseExpr.bind(parser));
+		assertType("calc((100% - var(--x)) * 2 / 3)", parser, nodes.NodeType.Identifier, parser._parseExpr.bind(parser));
 	});
 });
